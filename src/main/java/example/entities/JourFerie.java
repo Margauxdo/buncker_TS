@@ -16,6 +16,30 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class JourFerie {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Regle getRegle() {
+        return regle;
+    }
+
+    public void setRegle(Regle regle) {
+        this.regle = regle;
+    }
+
+    public List<Date> getJoursFerieList() {
+        return joursFerieList;
+    }
+
+    public void setJoursFerieList(List<Date> joursFerieList) {
+        this.joursFerieList = joursFerieList;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_jourFerie")

@@ -20,6 +20,30 @@ public class TypeRegle {
     @Column(name = "id_typeRegle")
     private int id;
 
+    public List<Regle> getListTypesRegles() {
+        return listTypesRegles;
+    }
+
+    public void setListTypesRegles(List<Regle> listTypesRegles) {
+        this.listTypesRegles = listTypesRegles;
+    }
+
+    public String getTypeRegle() {
+        return typeRegle;
+    }
+
+    public void setTypeRegle(String typeRegle) {
+        this.typeRegle = typeRegle;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private String typeRegle;
 
     //relation onetomany avec regle

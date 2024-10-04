@@ -20,6 +20,30 @@ public class TypeValise {
     @Column(name = "typeValise_id")
     private int id;
 
+    public List<Valise> getValises() {
+        return valises;
+    }
+
+    public void setValises(List<Valise> valises) {
+        this.valises = valises;
+    }
+
+    public String getProprietaire() {
+        return proprietaire;
+    }
+
+    public void setProprietaire(String proprietaire) {
+        this.proprietaire = proprietaire;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private String proprietaire;
 
     //Relation onetomany avec valise

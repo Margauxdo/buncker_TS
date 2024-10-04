@@ -22,6 +22,30 @@ public class SortieSemaine {
 
     private Date sortieSemaine;
 
+    public Regle getRegle() {
+        return regle;
+    }
+
+    public void setRegle(Regle regle) {
+        this.regle = regle;
+    }
+
+    public Date getSortieSemaine() {
+        return sortieSemaine;
+    }
+
+    public void setSortieSemaine(Date sortieSemaine) {
+        this.sortieSemaine = sortieSemaine;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     //relation manytoone avec regle
     @ManyToOne
     @JoinColumn(name = "regle_id")
