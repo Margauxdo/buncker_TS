@@ -14,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RetourSécurité {
+public class RetourSecurite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

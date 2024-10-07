@@ -208,12 +208,12 @@ public class Client {
         this.problemes = problemes;
     }
 
-    public List<RetourSécurité> getRetourSécuritéList() {
-        return retourSécuritéList;
+    public List<RetourSecurite> getRetourSecuriteList() {
+        return retourSecuriteList;
     }
 
-    public void setRetourSécuritéList(List<RetourSécurité> retourSécuritéList) {
-        this.retourSécuritéList = retourSécuritéList;
+    public void setRetourSecuriteList(List<RetourSecurite> retourSecuriteList) {
+        this.retourSecuriteList = retourSecuriteList;
     }
 
     private String codeClient;//TODO:? verifier//
@@ -225,7 +225,7 @@ public class Client {
     private List<Probleme> problemes;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<RetourSécurité> retourSécuritéList;
+    private List<RetourSecurite> retourSecuriteList;
 
 
 
