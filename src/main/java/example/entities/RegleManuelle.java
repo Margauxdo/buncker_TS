@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "regleManuelle")
+//@Table(name = "regleManuelle")
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder

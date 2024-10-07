@@ -58,4 +58,9 @@ public class Probleme {
     @JoinColumn(name = "valise_id")
     private Valise valise;
 
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
+
+
 }

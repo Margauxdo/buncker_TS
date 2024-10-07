@@ -49,4 +49,5 @@ public class TypeValise {
     //Relation onetomany avec valise
     @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL)
     private List<Valise> valises;
+
 }
