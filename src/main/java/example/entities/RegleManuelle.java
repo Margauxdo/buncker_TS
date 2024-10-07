@@ -1,39 +1,29 @@
 package example.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-
+@Getter
+@Setter
 @Entity
 @Table(name = "regleManuelle")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class RegleManuelle extends Regle{
+@SuperBuilder
+public class RegleManuelle extends Regle {
     private String descriptionRegle;
-
-    public String getCreateurRegle() {
-        return createurRegle;
-    }
+    private String createurRegle;
 
     public void setCreateurRegle(String createurRegle) {
         this.createurRegle = createurRegle;
     }
 
-    public String getDescriptionRegle() {
-        return descriptionRegle;
-    }
-
     public void setDescriptionRegle(String descriptionRegle) {
         this.descriptionRegle = descriptionRegle;
     }
-
-    private String createurRegle;
-
-
 }
