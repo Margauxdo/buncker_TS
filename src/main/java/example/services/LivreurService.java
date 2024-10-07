@@ -14,6 +14,10 @@ public class LivreurService implements ILivreurService {
     @Autowired
     private LivreurRepository livreurRepository;
 
+    public LivreurService(LivreurRepository livreurRepository) {
+        this.livreurRepository = livreurRepository;
+    }
+
     @Override
     public Livreur createLivreur(Livreur livreur) {
 

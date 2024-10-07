@@ -14,6 +14,10 @@ public class ClientService implements IClientService {
 @Autowired
 private ClientRepository clientRepository;
 
+public ClientService(ClientRepository clientRepository) {
+    this.clientRepository = clientRepository;
+}
+
     @Override
     public Client createClient(Client client) {
         return clientRepository.save(client);

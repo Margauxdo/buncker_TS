@@ -14,6 +14,10 @@ public class ValiseService implements IValiseService {
     @Autowired
     private ValiseRepository valiseRepository;
 
+    public ValiseService(ValiseRepository valiseRepository) {
+        this.valiseRepository = valiseRepository;
+    }
+
 
     @Override
     public Valise createValise(Valise valise) {

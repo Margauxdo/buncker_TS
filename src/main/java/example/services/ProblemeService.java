@@ -14,6 +14,10 @@ public class ProblemeService implements IProblemeService {
     @Autowired
     private ProblemeRepository problemeRepository;
 
+    public ProblemeService(ProblemeRepository problemeRepository) {
+        this.problemeRepository = problemeRepository;
+    }
+
     @Override
     public Probleme createProbleme(Probleme probleme) {
         return problemeRepository.save(probleme);

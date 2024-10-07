@@ -14,6 +14,10 @@ public class RetourSecuriteService implements IRetourSecuriteService {
     @Autowired
     private RetourSecuriteRepository retourSecuriteRepository;
 
+    public RetourSecuriteService(RetourSecuriteRepository retourSecuriteRepository) {
+        this.retourSecuriteRepository = retourSecuriteRepository;
+    }
+
     @Override
     public RetourSecurite createRetourSecurite(RetourSecurite retourSecurite) {
         return retourSecuriteRepository.save(retourSecurite);

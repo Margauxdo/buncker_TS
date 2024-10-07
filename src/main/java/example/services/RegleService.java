@@ -13,6 +13,9 @@ public class RegleService implements IRegleService {
 
     @Autowired
     private RegleRepository regleRepository;
+    public RegleService(RegleRepository regleRepository) {
+        this.regleRepository = regleRepository;
+    }
 
     @Override
     public Regle createRegle(Regle regle) {

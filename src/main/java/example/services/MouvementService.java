@@ -14,6 +14,10 @@ public class MouvementService implements IMouvementService {
     @Autowired
     private MouvementRepository mouvementRepository;
 
+    public MouvementService(MouvementRepository mouvementRepository) {
+        this.mouvementRepository = mouvementRepository;
+    } ;
+
 
     @Override
     public Mouvement createMouvement(Mouvement mouvement) {
