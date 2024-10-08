@@ -23,6 +23,7 @@ public class Regle {
     @Column(name = "id_regle")
     private int id;
 
+
     private String reglePourSortie;
     private String coderegle;
     private Date dateRegle;

@@ -20,6 +20,8 @@ public class JourFerie {
         return id;
     }
 
+
+
     public void setId(int id) {
         this.id = id;
     }
@@ -44,6 +46,8 @@ public class JourFerie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_jourFerie")
     private int id;
+
+
 
     //relation manytoone avec Regle
     @ManyToOne
