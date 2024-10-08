@@ -18,6 +18,9 @@ public class Valise {
     @Column(name = "id_valise")
     private int id;
 
+    @Setter
+    private String description;
+
     private Long numeroValise;
     private String refClient;
     private Date sortie;

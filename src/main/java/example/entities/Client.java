@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -218,8 +219,8 @@ public class Client {
 
     private String codeClient;//TODO:? verifier//
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<Valise> valises;
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Valise> valises = new ArrayList<>();
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Probleme> problemes;
