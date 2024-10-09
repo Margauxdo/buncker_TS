@@ -20,10 +20,12 @@ public class RegleManuelle extends Regle {
     private String createurRegle;
 
     public void setCreateurRegle(String createurRegle) {
+
         this.createurRegle = createurRegle;
     }
 
     public void setDescriptionRegle(String descriptionRegle) {
+
         this.descriptionRegle = descriptionRegle;
     }
 }

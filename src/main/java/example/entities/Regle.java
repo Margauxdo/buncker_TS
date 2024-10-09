@@ -42,6 +42,8 @@ public class Regle {
     @OneToOne(mappedBy = "regleSortie")
     private Valise valise;
 
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL)
     private List<SortieSemaine> sortieSemaine;
 
