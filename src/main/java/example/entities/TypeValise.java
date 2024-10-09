@@ -44,6 +44,7 @@ public class TypeValise {
         this.id = id;
     }
 
+    @Column(nullable = false)
     private String proprietaire;
 
     //Relation onetomany avec valise

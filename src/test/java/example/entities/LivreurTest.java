@@ -80,5 +80,14 @@ public class LivreurTest {
         assertNotNull(retrievedLivreur.getMouvements());
         assertEquals(2, retrievedLivreur.getMouvements().size());
     }
+    @Test
+    public void testCascadeDeleteMouvements(){
+
+    }
+    @Test
+    public void testNonNullCodeLivreur(){
+
+    }
+
 
 }

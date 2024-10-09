@@ -159,7 +159,14 @@ public class RegleTest {
         Formule expectedFormule = formuleRepository.findAll().get(0);
         Assertions.assertEquals(expectedFormule.getId(), regle.getFormule().getId());
     }
+    @Test
+    public void testCascadeDeleteSortieSemaine(){
 
+    }
+    @Test
+    public void testNonNullCoderegle(){
+
+    }
 
 
 

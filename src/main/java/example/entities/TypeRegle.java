@@ -21,6 +21,7 @@ public class TypeRegle {
     private int id;
 
     public List<Regle> getListTypesRegles() {
+
         return listTypesRegles;
     }
 
@@ -29,11 +30,13 @@ public class TypeRegle {
     }
 
     public String getTypeRegle() {
-        return typeRegle;
+
+        return nomTypeRegle;
     }
 
     public void setTypeRegle(String typeRegle) {
-        this.typeRegle = typeRegle;
+
+        this.nomTypeRegle = nomTypeRegle;
     }
 
     public int getId() {
@@ -44,7 +47,7 @@ public class TypeRegle {
         this.id = id;
     }
 
-    private String typeRegle;
+    private String nomTypeRegle;
 
     //relation onetomany avec regle
     @OneToMany(mappedBy = "typeRegle", cascade = CascadeType.ALL)

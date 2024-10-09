@@ -20,7 +20,7 @@ public class SortieSemaine {
     @Column(name = "sortieSemaine_id")
     private int id;
 
-    private Date sortieSemaine;
+    private Date dateSortieSemaine;
 
     public Regle getRegle() {
         return regle;
@@ -30,12 +30,12 @@ public class SortieSemaine {
         this.regle = regle;
     }
 
-    public Date getSortieSemaine() {
-        return sortieSemaine;
+    public Date getDateSortieSemaine() {
+        return dateSortieSemaine;
     }
 
     public void setSortieSemaine(Date sortieSemaine) {
-        this.sortieSemaine = sortieSemaine;
+        this.dateSortieSemaine = sortieSemaine;
     }
 
     public int getId() {

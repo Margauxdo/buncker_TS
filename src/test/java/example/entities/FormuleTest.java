@@ -57,5 +57,17 @@ public class FormuleTest {
         assertEquals(1, formule.getRegle().getId(), "Regle ID should match the associated Regle");
         assertEquals("Test Rule", formule.getRegle().getReglePourSortie(), "Regle content should match the expected value");
     }
+    @Test
+    public void testCascadePersistValises(){
+
+    }
+    @Test
+    public void testCascadeDeleteValises(){
+
+    }
+    @Test
+    public void testNonNullName(){
+
+    }
 }
 

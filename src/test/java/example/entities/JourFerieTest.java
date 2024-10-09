@@ -81,5 +81,9 @@ public class JourFerieTest {
         assertNotNull(joursFerieList);
         assertEquals(2, joursFerieList.size());
     }
+    @Test
+    public void testCascadeDeleteJoursFerieList() {
+
+    }
 }
 

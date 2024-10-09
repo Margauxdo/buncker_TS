@@ -22,6 +22,7 @@ public class Client {
     @Column(name="id_client")
     private int id;
 
+    @Column(nullable = false)
     private String name;
     private String adresse;
     private String email;
@@ -221,6 +222,7 @@ public class Client {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Valise> valises = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Probleme> problemes;

@@ -88,5 +88,17 @@ public class MouvementTest {
         // Verify that statutSortie is stored and retrieved correctly
         Assertions.assertEquals("close", mouvement.getStatutSortie(), "statutSortie should match the expected value 'close'");
     }
+    @Test
+    public void testMouvementLivreurAssociation(){
+
+    }
+    @Test
+    public void testNonNullDateHeureMouvement(){
+
+    }
+    @Test
+    public void testUpdateMouvementStatutSortie(){
+
+    }
 }
 

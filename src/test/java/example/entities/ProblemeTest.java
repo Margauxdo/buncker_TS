@@ -74,4 +74,12 @@ public class ProblemeTest {
         Client expectedClient = clientRepository.findAll().get(0);
         Assertions.assertEquals(expectedClient.getId(), probleme.getClient().getId(), "Client ID should match");
     }
+    @Test
+    public void testNonNullDescriptionProbleme(){
+
+    }
+    @Test
+    public void testUpdateProblemeDetails(){
+
+    }
 }

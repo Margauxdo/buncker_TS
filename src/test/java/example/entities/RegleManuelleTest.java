@@ -107,6 +107,18 @@ public class RegleManuelleTest {
         Regle expectedRegle = regleRepository.findAll().get(0);
         Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId(), "L'ID de RegleManuelle devrait correspondre à l'ID dans le repository");
     }
+    @Test
+    public void testInheritedAttributesPersistence(){
+
+    }
+    @Test
+    public void testUpdateDescriptionRegle(){
+
+    }
+    @Test
+    public void testUpdateCreateurRegle(){
+
+    }
 
 
 }

@@ -75,6 +75,13 @@ public class RetourSecuriteTest {
         Client expectedClient = clientRepository.findAll().get(0);
         Assertions.assertEquals(expectedClient, retourSecurite.getClient());
     }
+    @Test
+    public void testNonNullNumero(){
 
+    }
+    @Test
+    public void testUpdateDateSecurite(){
+
+    }
 
 }
