@@ -15,14 +15,26 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class RetourSecurite {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int id; // Identifiant unique pour chaque retour sécurité
 
-    private Long numero;
-    private Date datesecurite;
-    private Boolean cloture;
+    @Column(nullable = false)
+    private Long numero; // Numéro unique pour identifier le retour sécurité
 
+    private Date datesecurite; // Date de sécurité (ex : date de retour prévue)
+
+    private Boolean cloture; // Statut de clôture du retour (ouvert ou fermé)
+
+    private Date dateCloture; // Date de clôture réelle du retour
+
+    // Relation avec l'entité Client (ManyToOne car plusieurs retours peuvent être associés à un même client)
+    @ManyToOne
+    @JoinColumn(name = "client_id") // Clé étrangère vers Client
+    private Client client;
+
+    // Getters et Setters personnalisés (si nécessaire pour des manipulations spécifiques)
     public Client getClient() {
         return client;
     }
@@ -70,11 +82,5 @@ public class RetourSecurite {
     public void setId(int id) {
         this.id = id;
     }
-
-    private Date dateCloture;
-
-    //relation manytoone avec Client
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
 }
+

@@ -224,6 +224,7 @@ public class Client {
     private List<Valise> valises = new ArrayList<>();
 
 
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Probleme> problemes;
 

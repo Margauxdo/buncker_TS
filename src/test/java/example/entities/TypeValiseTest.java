@@ -28,14 +28,16 @@ public class TypeValiseTest {
     @BeforeEach
     void setUp() {
         Valise valise1 = new Valise();
+        em.persist(valise1);
 
         List<Valise> valiseList = new ArrayList<>();
         valiseList.add(valise1);
-        em.persist(valise1);
 
-        typeValise = new TypeValise();  // Utilisation de la variable d'instance ici
+        typeValise = new TypeValise();
+        typeValise.setProprietaire("Nom du propriétaire");
+        typeValise.setDescription("Description du type");
         typeValise.setValises(valiseList);
-        typeValise.setProprietaire("nom du propriétaire de la règle");
+
         em.persist(typeValise);
         em.flush();
     }
@@ -45,15 +47,17 @@ public class TypeValiseTest {
         Assertions.assertNotNull(typeValise, "L'objet typeValise ne devrait pas être null.");
         Assertions.assertNotNull(typeValise.getId(), "L'ID de typeValise ne devrait pas être null après persistance.");
     }
+
     @Test
     public void testTypeValiseProprietaire() {
-        Assertions.assertEquals(typeValise.getProprietaire(),"nom du propriétaire de la règle");
+        Assertions.assertEquals("Nom du propriétaire", typeValise.getProprietaire(), "Le propriétaire devrait correspondre à la valeur initialisée.");
     }
+
     @Test
     public void testTypeValiseAssociationValise() {
-        Assertions.assertEquals(typeValise.getValises().size(),1);
-
+        Assertions.assertEquals(1, typeValise.getValises().size(), "Le typeValise devrait être associé à une valise.");
     }
+
     @Test
     public void testCascadePersistValises() {
         TypeValise foundTypeValise = em.find(TypeValise.class, typeValise.getId());
@@ -61,6 +65,7 @@ public class TypeValiseTest {
         Assertions.assertEquals(1, foundTypeValise.getValises().size(), "Une valise devrait être persistée en cascade.");
         Assertions.assertNotNull(foundTypeValise.getValises().get(0).getId(), "La valise persistée devrait avoir un ID.");
     }
+
     @Test
     public void testCascadeDeleteValises() {
         em.remove(typeValise);
@@ -72,10 +77,12 @@ public class TypeValiseTest {
         List<Valise> remainingValises = em.createQuery("SELECT v FROM Valise v", Valise.class).getResultList();
         Assertions.assertTrue(remainingValises.isEmpty(), "Les valises associées devraient également être supprimées.");
     }
+
     @Test
     public void testEmptyValiseList() {
         TypeValise emptyTypeValise = new TypeValise();
-        emptyTypeValise.setProprietaire("propriétaire sans valise");
+        emptyTypeValise.setProprietaire("Propriétaire sans valise");
+        emptyTypeValise.setDescription("Type de valise sans valises");
         emptyTypeValise.setValises(new ArrayList<>());
 
         em.persist(emptyTypeValise);
@@ -85,22 +92,16 @@ public class TypeValiseTest {
         Assertions.assertNotNull(foundTypeValise, "TypeValise devrait être persisté.");
         Assertions.assertTrue(foundTypeValise.getValises().isEmpty(), "La liste des valises devrait être vide.");
     }
+
     @Test
     public void testNonNullProprietaire() {
         TypeValise typeValiseWithoutProprietaire = new TypeValise();
-        typeValiseWithoutProprietaire.setValises(new ArrayList<>());
+        typeValiseWithoutProprietaire.setDescription("Description sans propriétaire");
 
         Assertions.assertThrows(PersistenceException.class, () -> {
             em.persist(typeValiseWithoutProprietaire);
             em.flush();
-        }, "Le propriétaire ne devrait pas être nul.");
+        }, "Le propriétaire ne devrait pas être nul et devrait lancer une exception.");
     }
-
-
-
-
-
-
-
 }
 

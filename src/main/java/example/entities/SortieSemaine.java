@@ -15,6 +15,10 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class SortieSemaine {
+    public void setDateSortieSemaine(Date dateSortieSemaine) {
+        this.dateSortieSemaine = dateSortieSemaine;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sortieSemaine_id")

@@ -15,40 +15,18 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TypeValise {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "typeValise_id")
     private int id;
 
-    public List<Valise> getValises() {
-        return valises;
-    }
-
-    public void setValises(List<Valise> valises) {
-        this.valises = valises;
-    }
-
-    public String getProprietaire() {
-        return proprietaire;
-    }
-
-    public void setProprietaire(String proprietaire) {
-        this.proprietaire = proprietaire;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @Column(nullable = false)
+    @Column(nullable = false)  // Contrainte non-null
     private String proprietaire;
 
-    //Relation onetomany avec valise
-    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL)
-    private List<Valise> valises;
+    @Column(nullable = false)  // Contrainte non-null
+    private String description;
 
+    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Valise> valises;
 }

@@ -20,6 +20,14 @@ public class TypeRegle {
     @Column(name = "id_typeRegle")
     private int id;
 
+    public String getNomTypeRegle() {
+        return nomTypeRegle;
+    }
+
+    public void setNomTypeRegle(String nomTypeRegle) {
+        this.nomTypeRegle = nomTypeRegle;
+    }
+
     public List<Regle> getListTypesRegles() {
 
         return listTypesRegles;

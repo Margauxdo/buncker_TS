@@ -50,6 +50,7 @@ public class Probleme {
     @Column(name = "id_probleme")
     private int id;
 
+    @Column(nullable = false)
     private String descriptionProbleme;
     private String detailsProbleme;
 
@@ -57,6 +58,14 @@ public class Probleme {
     @ManyToOne
     @JoinColumn(name = "valise_id")
     private Valise valise;
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
 
     @ManyToOne
     @JoinColumn(name = "client_id")

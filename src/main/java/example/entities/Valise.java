@@ -18,9 +18,7 @@ public class Valise {
     @Column(name = "id_valise")
     private int id;
 
-    @Setter
     private String description;
-
     private Long numeroValise;
     private String refClient;
     private Date sortie;
@@ -28,36 +26,24 @@ public class Valise {
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
     private Date dateCreation;
-
-    public TypeValise getTypeValise() {
-        return typevalise;
-    }
-
-    public void setTypeValise(TypeValise typeValise) {
-        this.typevalise = typeValise;
-    }
-
-
-
     private String numeroDujeu;
 
+    // Relation Many-to-One avec Client, suppression en cascade non activée pour éviter des suppressions involontaires
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "regle_id")
     private Regle regleSortie;
 
-    @Getter
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL)
+
+    // Relation One-to-Many avec Mouvement, suppression en cascade et orphanRemoval pour supprimer les mouvements liés
+    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mouvement> mouvementList;
 
     @ManyToOne
     @JoinColumn(name = "typevalise_id")
     private TypeValise typevalise;
-
-
-
-
 }
+
