@@ -47,25 +47,37 @@ public class RegleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+        // Créer et persister l'entité Client avec le nom initialisé
+        Client client = new Client();
+        client.setName("NomDuClient");  // Initialisez la propriété `name`
+        em.persist(client);
+
+        // Créer et persister les autres entités
         Formule formule = new Formule();
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        TypeRegle typeRegle = new TypeRegle();
-        Valise valise = new Valise();
-
         em.persist(formule);
-        em.persist(sortieSemaine);
-        em.persist(typeRegle);
-        em.persist(valise);
-        em.flush();
 
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        em.persist(sortieSemaine);
+
+        TypeRegle typeRegle = new TypeRegle();
+        em.persist(typeRegle);
+
+        // Associez `client` avec `valise` et persistez `valise`
+        Valise valise = new Valise();
+        valise.setClient(client);  // Associe Client à Valise
+        em.persist(valise);
+
+        em.flush();  // Synchronise toutes les entités persistées
+
+        // Créez et configurez l'entité `Regle`
         regle = new Regle();
-        regle.setFermeJS1(Boolean.FALSE);
-        regle.setFermeJS2(Boolean.FALSE);
-        regle.setFermeJS3(Boolean.FALSE);
-        regle.setFermeJS4(Boolean.FALSE);
-        regle.setFermeJS5(Boolean.FALSE);
-        regle.setFermeJS6(Boolean.FALSE);
-        regle.setFermeJS7(Boolean.FALSE);
+        regle.setFermeJS1(false);
+        regle.setFermeJS2(false);
+        regle.setFermeJS3(false);
+        regle.setFermeJS4(false);
+        regle.setFermeJS5(false);
+        regle.setFermeJS6(false);
+        regle.setFermeJS7(false);
         regle.setDateRegle(sdf.parse("2016-05-20"));
         regle.setReglePourSortie("PourSortie");
         regle.setCoderegle("Coderegle");
@@ -74,18 +86,19 @@ public class RegleTest {
         regle.setNBJSMEntree(25L);
         regle.setNombreJours(250);
 
-        // Initialize as a List and add sortieSemaine to it
         List<SortieSemaine> sorties = new ArrayList<>();
         sorties.add(sortieSemaine);
         regle.setSortieSemaine(sorties);
 
         regle.setTypeEntree("typeEntree");
         regle.setTypeRegle(typeRegle);
-        regle.setValise(valise);
+        regle.setValise(valise);  // Associe Valise à Regle
 
         em.persist(regle);
-        em.flush();
+        em.flush();  // Forcer la persistance de regle
     }
+
+
     @Test
     public void testReglePersitence(){
         Assertions.assertNotNull(regle.getId(),"Le id est null");

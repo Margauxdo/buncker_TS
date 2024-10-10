@@ -3,6 +3,7 @@ package example.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,8 +40,9 @@ public class Valise {
 
 
     // Relation One-to-Many avec Mouvement, suppression en cascade et orphanRemoval pour supprimer les mouvements liés
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Mouvement> mouvementList;
+    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Mouvement> mouvementList = new ArrayList<>();
+
 
     @ManyToOne
     @JoinColumn(name = "typevalise_id")

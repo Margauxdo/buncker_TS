@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,8 +45,11 @@ public class Regle {
 
     @Getter
     @Setter
-    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SortieSemaine> sortieSemaine;
+
+
+
 
     @ManyToOne
     @JoinColumn(name = "type_regle_id")
@@ -54,4 +58,5 @@ public class Regle {
     @ManyToOne
     @JoinColumn(name = "formule_id")
     private Formule formule;
+
 }

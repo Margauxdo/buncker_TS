@@ -31,14 +31,16 @@ public class ProblemeTest {
 
     @BeforeEach
     public void setUp() {
-        // Crée et sauvegarde une Valise et un Client pour lier à Probleme
-        Valise valise = new Valise();
-        valise.setDescription("Valise de test");
-        valise = valiseRepository.save(valise);
-
+        // Crée et persiste un Client pour lier à Valise
         Client client = new Client();
         client.setName("Nom du client"); // Initialisation du champ obligatoire
         client = clientRepository.save(client);
+
+        // Crée et persiste une Valise liée au Client
+        Valise valise = new Valise();
+        valise.setDescription("Valise de test");
+        valise.setClient(client); // Associe le client à la valise
+        valise = valiseRepository.save(valise);
 
         // Initialisation de Probleme avec les champs requis et associations
         probleme = new Probleme();

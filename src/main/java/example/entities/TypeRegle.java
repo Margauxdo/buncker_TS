@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -57,7 +58,7 @@ public class TypeRegle {
 
     private String nomTypeRegle;
 
-    //relation onetomany avec regle
-    @OneToMany(mappedBy = "typeRegle", cascade = CascadeType.ALL)
-    private List<Regle> listTypesRegles;
+    @OneToMany(mappedBy = "typeRegle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Regle> listTypesRegles = new ArrayList<>();
+
 }

@@ -220,7 +220,7 @@ public class Client {
 
     private String codeClient;//TODO:? verifier//
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Valise> valises = new ArrayList<>();
 
 
@@ -228,8 +228,8 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Probleme> problemes;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<RetourSecurite> retourSecuriteList;
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RetourSecurite> retourSecuriteList = new ArrayList<>();
 
 
 

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,9 @@ public class TypeValise {
     @Column(nullable = false)  // Contrainte non-null
     private String description;
 
-    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Valise> valises;
+    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Valise> valises = new ArrayList<>();
+
+
+
 }
