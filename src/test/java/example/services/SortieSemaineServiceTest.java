@@ -24,23 +24,24 @@ class SortieSemaineServiceTest {
     private SortieSemaineService sortieSemaineService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testCreateSortieSemaine_Success() {
+    public void testCreateSortieSemaine_Success() {
         SortieSemaine semaine = new SortieSemaine();
         when(sortieSemaineRepository.save(semaine)).thenReturn(semaine);
 
         SortieSemaine result = sortieSemaineService.createSortieSemaine(semaine);
 
-        assertNotNull(result);
+        assertNotNull(result, "Le résultat ne doit pas être nul après la création.");
         verify(sortieSemaineRepository, times(1)).save(semaine);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
     @Test
-    void testUpdateSortieSemaine_Success() {
+    public void testUpdateSortieSemaine_Success() {
         int id = 1;
         SortieSemaine semaine = new SortieSemaine();
         when(sortieSemaineRepository.existsById(id)).thenReturn(true);
@@ -48,77 +49,94 @@ class SortieSemaineServiceTest {
 
         SortieSemaine result = sortieSemaineService.updateSortieSemaine(id, semaine);
 
-        assertNotNull(result);
+        assertNotNull(result, "La mise à jour doit retourner un objet non nul.");
+        verify(sortieSemaineRepository, times(1)).existsById(id);
         verify(sortieSemaineRepository, times(1)).save(semaine);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
     @Test
-    void testUpdateSortieSemaine_Failure() {
+    public void testUpdateSortieSemaine_Failure() {
         int id = 1;
         SortieSemaine semaine = new SortieSemaine();
         when(sortieSemaineRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            sortieSemaineService.updateSortieSemaine(id, semaine);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                        sortieSemaineService.updateSortieSemaine(id, semaine),
+                "Une exception est attendue lorsque l'ID n'existe pas."
+        );
 
-        assertEquals("week outing is not possible", exception.getMessage());
+        assertEquals("week outing is not possible", exception.getMessage(),
+                "Le message d'erreur doit être 'week outing is not possible'.");
+        verify(sortieSemaineRepository, times(1)).existsById(id);
         verify(sortieSemaineRepository, never()).save(semaine);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
     @Test
-    void testDeleteSortieSemaine_Success() {
+    public void testDeleteSortieSemaine_Success() {
         int id = 1;
         sortieSemaineService.deleteSortieSemaine(id);
 
         verify(sortieSemaineRepository, times(1)).deleteById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
     @Test
-    void testGetSortieSemaine_Success() {
+    public void testGetSortieSemaine_Success() {
         int id = 1;
         SortieSemaine semaine = new SortieSemaine();
         when(sortieSemaineRepository.findById(id)).thenReturn(Optional.of(semaine));
 
         SortieSemaine result = sortieSemaineService.getSortieSemaine(id);
 
-        assertNotNull(result);
+        assertNotNull(result, "La récupération doit retourner un objet non nul.");
         verify(sortieSemaineRepository, times(1)).findById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
     @Test
-    void testGetSortieSemaine_NotFound() {
+    public void testGetSortieSemaine_NotFound() {
         int id = 1;
         when(sortieSemaineRepository.findById(id)).thenReturn(Optional.empty());
 
         SortieSemaine result = sortieSemaineService.getSortieSemaine(id);
 
-        assertNull(result);
+        assertNull(result, "La récupération d'un ID inexistant doit retourner null.");
         verify(sortieSemaineRepository, times(1)).findById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
     @Test
-    void testGetAllSortieSemaine_Success() {
+    public void testGetAllSortieSemaine_Success() {
         List<SortieSemaine> semaines = new ArrayList<>();
         semaines.add(new SortieSemaine());
         when(sortieSemaineRepository.findAll()).thenReturn(semaines);
 
         List<SortieSemaine> result = sortieSemaineService.getAllSortieSemaine();
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
+        assertNotNull(result, "La liste des semaines ne doit pas être nulle.");
+        assertEquals(1, result.size(), "La taille de la liste doit être égale à 1.");
         verify(sortieSemaineRepository, times(1)).findAll();
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
     @Test
-    void testDeleteSortieSemaine_NotExistingId() {
+    public void testDeleteSortieSemaine_NotExistingId() {
         int id = 999;
         doThrow(new RuntimeException("Item not found")).when(sortieSemaineRepository).deleteById(id);
 
-        assertThrows(RuntimeException.class, () -> sortieSemaineService.deleteSortieSemaine(id));
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> sortieSemaineService.deleteSortieSemaine(id),
+                "Une exception est attendue pour un ID inexistant.");
+
+        assertEquals("Item not found", exception.getMessage(), "Le message d'erreur doit être 'Item not found'.");
         verify(sortieSemaineRepository, times(1)).deleteById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
     @Test
-    void testGetAllSortieSemaine_LargeDataSet() {
+    public void testGetAllSortieSemaine_LargeDataSet() {
         List<SortieSemaine> semaines = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             semaines.add(new SortieSemaine());
@@ -127,16 +145,26 @@ class SortieSemaineServiceTest {
 
         List<SortieSemaine> result = sortieSemaineService.getAllSortieSemaine();
 
-        assertEquals(1000, result.size());
+        assertEquals(1000, result.size(), "La taille de la liste doit être de 1000.");
         verify(sortieSemaineRepository, times(1)).findAll();
+        verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
     @Test
-    void testNoInteractionsWithRepository() {
+    public void testNoInteractionsWithSortieSemaineRepository_Success() {
         verifyNoInteractions(sortieSemaineRepository);
     }
+    @Test
+    public void testNoInteractionsWithSortieSemaineRepository_Failure_Exception() {
+        int id =1;
+        SortieSemaine sortieSemaine =  new SortieSemaine();
+        sortieSemaine.setId(id);
+        try{
+            sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
+        }catch(RuntimeException e){
 
-
-
-
+        }
+        verify(sortieSemaineRepository , times(1)).existsById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
+    }
 }
-
