@@ -3,7 +3,6 @@ package example.services;
 import example.entities.RegleManuelle;
 import example.interfaces.IRegleManuelleService;
 import example.repositories.RegleManuelleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,30 +10,41 @@ import java.util.List;
 @Service
 public class RegleManuelleService implements IRegleManuelleService {
 
-    @Autowired
-    private RegleManuelleRepository regleManuelleRepository;
+    private final RegleManuelleRepository regleManuelleRepository;
 
-    public RegleManuelleService(RegleManuelleRepository regleManuelleRepository){
+    public RegleManuelleService(RegleManuelleRepository regleManuelleRepository) {
         this.regleManuelleRepository = regleManuelleRepository;
     }
 
     @Override
     public RegleManuelle createRegleManuelle(RegleManuelle regleManuelle) {
+        if (regleManuelle == null) {
+            throw new IllegalArgumentException("La règle manuelle ne peut pas être null");
+        }
         return regleManuelleRepository.save(regleManuelle);
     }
 
     @Override
     public RegleManuelle updateRegleManuelle(int id, RegleManuelle regleManuelle) {
-        if (regleManuelleRepository.findById(id).isPresent()) {
-            regleManuelle.setId(id);
-            return regleManuelleRepository.save(regleManuelle);
-        }else{
-            throw  new RuntimeException("Manual rule is not exists");
+        // Vérifie d'abord l'existence de l'ID
+        if (!regleManuelleRepository.existsById(id)) {
+            throw new RuntimeException("La règle manuelle n'existe pas");
         }
+
+        // Vérifie ensuite la correspondance des IDs
+        if (regleManuelle == null || regleManuelle.getId() != id) {
+            throw new IllegalArgumentException("L'ID de la règle manuelle ne correspond pas");
+        }
+
+        return regleManuelleRepository.save(regleManuelle);
     }
+
 
     @Override
     public void deleteRegleManuelle(int id) {
+        if (!regleManuelleRepository.existsById(id)) {
+            throw new RuntimeException("La règle manuelle n'existe pas");
+        }
         regleManuelleRepository.deleteById(id);
     }
 
@@ -48,3 +58,4 @@ public class RegleManuelleService implements IRegleManuelleService {
         return regleManuelleRepository.findAll();
     }
 }
+

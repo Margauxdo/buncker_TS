@@ -84,7 +84,7 @@ public class FormuleServiceTest {
     public void testUpdateFormule_Failure_Exception() {
         int id = 1;
         Formule formule = new Formule();
-        formule.setId(id); // Le même ID pour déclencher l'exception
+        formule.setId(1); // Le même ID pour déclencher l'exception
 
         when(formuleRepository.existsById(id)).thenReturn(true);
 

@@ -9,5 +9,8 @@ public interface IProblemeService {
     Probleme updateProbleme(int id, Probleme probleme);
     void deleteProbleme(int id);
     Probleme getProbleme(int id);
+
+    Probleme getProblemeById(int id);
+
     List<Probleme> getAllProblemes();
 }

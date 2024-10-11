@@ -3,7 +3,6 @@ package example.services;
 import example.entities.Probleme;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,7 @@ import java.util.List;
 @Service
 public class ProblemeService implements IProblemeService {
 
-    @Autowired
-    private ProblemeRepository problemeRepository;
+    private final ProblemeRepository problemeRepository;
 
     public ProblemeService(ProblemeRepository problemeRepository) {
         this.problemeRepository = problemeRepository;
@@ -20,32 +18,46 @@ public class ProblemeService implements IProblemeService {
 
     @Override
     public Probleme createProbleme(Probleme probleme) {
+        if (probleme == null) {
+            throw new IllegalArgumentException("Le problème ne peut pas être null");
+        }
         return problemeRepository.save(probleme);
     }
 
     @Override
     public Probleme updateProbleme(int id, Probleme probleme) {
-        if (probleme.getId() != id) {
-            probleme.setId(id);
-            return problemeRepository.save(probleme);
-        }else{
-            throw new RuntimeException("Problem not updated");
+        if (!problemeRepository.existsById(id)) {
+            throw new RuntimeException("Problem not found");
         }
+
+        if (probleme == null || probleme.getId() != id) {
+            throw new RuntimeException("Problem ID does not match expected ID");
+        }
+
+        return problemeRepository.save(probleme);
     }
 
     @Override
     public void deleteProbleme(int id) {
+        if (!problemeRepository.existsById(id)) {
+            throw new RuntimeException("Problem not found");
+        }
         problemeRepository.deleteById(id);
     }
 
     @Override
-    public Probleme getProbleme(int id) {
-        return problemeRepository.findById(id).get();
-
+    public Probleme getProblemeById(int id) {
+        return problemeRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<Probleme> getAllProblemes() {
         return problemeRepository.findAll();
     }
+    @Override
+    public Probleme getProbleme(int id) {
+        return problemeRepository.findById(id).orElse(null);
+    }
+
 }
+

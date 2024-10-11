@@ -25,13 +25,19 @@ public ClientService(ClientRepository clientRepository) {
 
     @Override
     public Client updateClient(int id, Client client) {
-        if (clientRepository.existsById(id)) {
-            client.setId(id);
-            return clientRepository.save(client);
-        }else{
+        if (!clientRepository.existsById(id)) {
             throw new RuntimeException("Customer not found");
         }
+
+        // Vérification de l'ID du client pour lever l'exception
+        if (client.getId() == id) {
+            throw new RuntimeException("Expression not valid");
+        }
+
+        client.setId(id); // Met à jour l'ID
+        return clientRepository.save(client);
     }
+
 
     @Override
     public void deleteClient(int id) {

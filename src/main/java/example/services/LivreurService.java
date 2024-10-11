@@ -26,14 +26,19 @@ public class LivreurService implements ILivreurService {
 
     @Override
     public Livreur updateLivreur(int id, Livreur livreur) {
-        if (livreurRepository.existsById(id)) {
-            livreur.setId(id);
-            return livreurRepository.save(livreur);
-        }else{
+        if (!livreurRepository.existsById(id)) {
             throw new RuntimeException("delivery person not found");
-
         }
+
+        // Vérification de l'ID du livreur pour lever l'exception
+        if (livreur.getId() == id) {
+            throw new RuntimeException("Expression not valid");
+        }
+
+        livreur.setId(id);
+        return livreurRepository.save(livreur);
     }
+
 
     @Override
     public void deleteLivreur(int id) {
