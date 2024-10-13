@@ -25,13 +25,13 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
     @Override
     public RetourSecurite updateRetourSecurite(int id, RetourSecurite retourSecurite) {
-        if (retourSecurite.getId() == id) {
-            retourSecurite.setId(id);
-            return retourSecuriteRepository.save(retourSecurite);
-        }else{
+        if (!retourSecuriteRepository.existsById(id)) {
             throw new RuntimeException("Safety return does not exist");
         }
+        retourSecurite.setId(id);
+        return retourSecuriteRepository.save(retourSecurite);
     }
+
 
     @Override
     public void deleteRetourSecurite(int id) {

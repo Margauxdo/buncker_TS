@@ -1,9 +1,9 @@
 package example.services;
 
 import example.entities.Regle;
+import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.RegleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,36 +11,46 @@ import java.util.List;
 @Service
 public class RegleService implements IRegleService {
 
-    @Autowired
-    private RegleRepository regleRepository;
+    private final RegleRepository regleRepository;
+
     public RegleService(RegleRepository regleRepository) {
         this.regleRepository = regleRepository;
     }
 
     @Override
     public Regle createRegle(Regle regle) {
+        if (regle == null) {
+            throw new IllegalArgumentException("Regle cannot be null");
+        }
         return regleRepository.save(regle);
     }
 
     @Override
     public Regle readRegle(int id) {
-        return regleRepository.findById(id).orElse(null);
-
+        return regleRepository.findById(id)
+                .orElseThrow(() -> new RegleNotFoundException("Ruler with id " + id + " not found"));
     }
 
     @Override
     public Regle updateRegle(int id, Regle regle) {
-        if (regleRepository.findById(id).isPresent()) {
-            regle.setId(id);
-            return regleRepository.save(regle);
-        }else {
-            throw new RuntimeException("Ruler not found");
+        if (regle == null) {
+            throw new IllegalArgumentException("Regle cannot be null");
         }
+
+        return regleRepository.findById(id)
+                .map(existingRegle -> {
+                    regle.setId(id);
+                    return regleRepository.save(regle);
+                })
+                .orElseThrow(() -> new RegleNotFoundException("Ruler with id " + id + " not found for update"));
     }
 
     @Override
     public void deleteRegle(int id) {
-            regleRepository.deleteById(id);
+        if (!regleRepository.existsById(id)) {
+            throw new RegleNotFoundException("Ruler with id " + id + " not found, cannot delete");
+        }
+        regleRepository.deleteById(id);
     }
 
     @Override
@@ -48,3 +58,5 @@ public class RegleService implements IRegleService {
         return regleRepository.findAll();
     }
 }
+
+

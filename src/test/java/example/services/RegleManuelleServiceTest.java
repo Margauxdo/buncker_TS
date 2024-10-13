@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entities.RegleManuelle;
+import example.entities.SortieSemaine;
 import example.repositories.RegleManuelleRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,4 +180,18 @@ public class RegleManuelleServiceTest {
     public void testNoInteractionWithRegleManuelleRepository_Success() {
         verifyNoInteractions(regleManuelleRepository);
     }
+    @Test
+    public void testNoInteractionWithRegleManuelleRepository_Failure_Exception() {
+        int id =1;
+        RegleManuelle regleManuelle = new RegleManuelle();
+        regleManuelle.setId(id);
+        try{
+            regleManuelleService.updateRegleManuelle(id, regleManuelle);
+        }catch(RuntimeException e){
+
+        }
+        verify(regleManuelleRepository , times(1)).existsById(id);
+        verifyNoMoreInteractions(regleManuelleRepository);
+    }
+
 }

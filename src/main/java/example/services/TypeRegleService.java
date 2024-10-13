@@ -25,15 +25,22 @@ public class TypeRegleService implements ITypeRegleService {
 
     @Override
     public TypeRegle updateTypeRegle(int id, TypeRegle typeRegle) {
-        if(typeRegleRepository.findById(id).isPresent()){
-            return typeRegleRepository.save(typeRegle);
-        }else{
-            throw new RuntimeException("Ryle type does not exist");
+        if (typeRegle.getId() != id) {
+            throw new IllegalArgumentException("L'ID du type de régle ne correspond pas");
         }
+
+        if (!typeRegleRepository.existsById(id)) {
+            throw new RuntimeException("Le type de régle n'existe pas");
+        }
+
+        return typeRegleRepository.save(typeRegle);
     }
 
     @Override
     public void deleteTypeRegle(int id) {
+        if (!typeRegleRepository.existsById(id)) {
+            throw new RuntimeException("Le type de régle n'existe pas");
+        }
         typeRegleRepository.deleteById(id);
     }
 
@@ -47,3 +54,4 @@ public class TypeRegleService implements ITypeRegleService {
         return typeRegleRepository.findAll();
     }
 }
+

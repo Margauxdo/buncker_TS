@@ -23,20 +23,26 @@ public class TypeValiseService implements ITypeValiseService {
 
     @Override
     public TypeValise updateTypeValise(int id, TypeValise typeValise) {
+        if (id != typeValise.getId()) {
+            throw new IllegalArgumentException("L'ID du type de valise ne correspond pas");
+        }
         if (typeValiseRepository.existsById(id)) {
-            typeValise.setId(id);
             return typeValiseRepository.save(typeValise);
-
-        }else{
-            throw  new RuntimeException("Suitcase type not found");
+        } else {
+            throw new RuntimeException("Suitcase type not found");
         }
     }
 
+
     @Override
     public void deleteTypeValise(int id) {
+        if (!typeValiseRepository.existsById(id)) {
+            throw new RuntimeException("Le type de valise n'existe pas");
+        }
         typeValiseRepository.deleteById(id);
-
     }
+
+
 
     @Override
     public TypeValise getTypeValise(int id) {

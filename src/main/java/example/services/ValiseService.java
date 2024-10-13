@@ -26,18 +26,26 @@ public class ValiseService implements IValiseService {
 
     @Override
     public Valise updateValise(int id, Valise valise) {
+        if (valise.getId() != id) {
+            throw new IllegalArgumentException("L'ID de la valise ne correspond pas");
+        }
         if (valiseRepository.existsById(id)) {
             valise.setId(id);
             return valiseRepository.save(valise);
-        }else{
+        } else {
             throw new RuntimeException("suitcase not found");
         }
     }
 
+
     @Override
     public void deleteValise(int id) {
+        if (!valiseRepository.existsById(id)) {
+            throw new RuntimeException("La valise n'existe pas");
+        }
         valiseRepository.deleteById(id);
     }
+
 
     @Override
     public Valise getValiseById(int id) {
