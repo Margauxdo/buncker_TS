@@ -19,6 +19,9 @@ public class Formule {
     private int id;
 
     private String libelle;
+
+
+
     private String formule;
 
     public Regle getRegle() {
@@ -57,4 +60,6 @@ public class Formule {
     @ManyToOne
     @JoinColumn(name = "regle_id")
     private Regle regle;
+
+
 }

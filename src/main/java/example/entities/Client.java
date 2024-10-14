@@ -42,6 +42,9 @@ public class Client {
     private String MemoRetourSecurité2;
     private String typeSuivie; //TODO:? verifier//
 
+    public Client(int i, String s, String s1, String mail, String number, String s2, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8, Object o9, Object o10, Object o11) {
+    }
+
     public int getId() {
         return id;
     }

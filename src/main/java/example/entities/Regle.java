@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
