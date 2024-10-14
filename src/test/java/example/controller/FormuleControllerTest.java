@@ -126,5 +126,47 @@ public class FormuleControllerTest {
 
         assertThrows(RuntimeException.class, () -> formuleController.deleteFormule(1));
     }
+
+    @Test
+    public void testCreateFormule_InvalidInput() {
+        Formule invalidFormule = new Formule(); // Considérons qu'elle est invalide, ex. données nulles ou incorrectes
+        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
+
+        ResponseEntity<Formule> response = formuleController.createFormule(invalidFormule);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void testUpdateFormule_InvalidInput() {
+        Formule invalidFormule = new Formule(); // Considérons qu'elle est invalide
+        when(formuleService.updateFormule(eq(1), any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
+
+        ResponseEntity<Formule> response = formuleController.updateFormule(1, invalidFormule);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+    @Test
+    public void testDeleteFormule_NotFound() {
+        doThrow(new IllegalArgumentException("Formule not found")).when(formuleService).deleteFormule(1);
+
+        ResponseEntity<Formule> response = formuleController.deleteFormule(1);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void testCreateFormule_Conflict() {
+        Formule formule = new Formule(); // Par exemple, une Formule avec un nom en conflit
+        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalStateException("Conflict detected"));
+
+        ResponseEntity<Formule> response = formuleController.createFormule(formule);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+    }
+
+
+
+
 }
 

@@ -37,28 +37,41 @@ public class FormuleController {
     //cree une nouvelle formule
     @PostMapping
     public ResponseEntity<Formule> createFormule(@RequestBody Formule formule) {
-        try{
+        try {
             Formule createdFormule = formuleService.createFormule(formule);
             return new ResponseEntity<>(createdFormule, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (RuntimeException e){
+        } catch (IllegalStateException e) { // Gérer le conflit
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+
     //Mettre a jour une formule existente
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<Formule> updateFormule(@PathVariable int id, @RequestBody Formule formule) {
-        Formule updatedFormule = formuleService.updateFormule(id, formule);
-        return  updatedFormule != null ? new ResponseEntity<>(updatedFormule, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Formule updatedFormule = formuleService.updateFormule(id, formule);
+            return updatedFormule != null ? new ResponseEntity<>(updatedFormule, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
+
 
     //Supprimer une formule
     @DeleteMapping("/{id}")
     public ResponseEntity<Formule> deleteFormule(@PathVariable int id) {
-        formuleService.deleteFormule(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            formuleService.deleteFormule(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
 }

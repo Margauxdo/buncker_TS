@@ -37,22 +37,36 @@ public class ValiseController {
             return new ResponseEntity<>(newValise, HttpStatus.CREATED);
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (IllegalStateException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping
+    @PutMapping("{id}")
     public ResponseEntity<Valise> updateValise(@RequestBody Valise valise, @PathVariable int id) {
-        Valise updatedValise = valiseService.updateValise(id, valise);
-        return updatedValise != null ? new ResponseEntity<>(updatedValise, HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try{
+            Valise updatedValise = valiseService.updateValise(id, valise);
+            return updatedValise != null ? new ResponseEntity<>(updatedValise, HttpStatus.OK):
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Valise> deleteValise(@PathVariable int id) {
-        valiseService.deleteValise(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try{
+            valiseService.deleteValise(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

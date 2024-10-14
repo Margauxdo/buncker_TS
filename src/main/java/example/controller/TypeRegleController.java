@@ -36,20 +36,32 @@ public class TypeRegleController {
            return new ResponseEntity<>(createdTypeRegle, HttpStatus.CREATED);
        }catch (IllegalArgumentException e) {
            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+       }catch (IllegalStateException e){
+           return new ResponseEntity<>(HttpStatus.CONFLICT);
        }catch (RuntimeException e) {
            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
        }
     }
     @PutMapping
     public ResponseEntity<TypeRegle> updateTypeRegle(@RequestBody TypeRegle typeRegle, @PathVariable int id) {
-        TypeRegle updatedTypeReggle = typeRegleService.updateTypeRegle(id, typeRegle);
-        return updatedTypeReggle != null ? new ResponseEntity<>(updatedTypeReggle, HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            TypeRegle updatedTypeReggle = typeRegleService.updateTypeRegle(id, typeRegle);
+            return updatedTypeReggle != null ? new ResponseEntity<>(updatedTypeReggle, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<TypeRegle> deleteTypeRegle(@PathVariable int id) {
-        typeRegleService.deleteTypeRegle(id);
+        try{
+            typeRegleService.deleteTypeRegle(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

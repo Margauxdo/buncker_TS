@@ -43,15 +43,26 @@ public class MouvementController {
 
     @PutMapping
     public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
-        Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
-        return updatedMouvement != null ? new ResponseEntity<>(updatedMouvement, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       try {
+           Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
+           return updatedMouvement != null ? new ResponseEntity<>(updatedMouvement, HttpStatus.OK) :
+                   new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }catch (IllegalArgumentException e){
+           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+       }
+
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Mouvement> deleteMouvement(@PathVariable int id) {
-        mouvementService.deleteMouvement(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            mouvementService.deleteMouvement(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

@@ -44,14 +44,24 @@ public class LivreurController {
 
     @PutMapping
     public ResponseEntity<Livreur> updateLivreur(@PathVariable int id, @RequestBody Livreur livreur) {
-        Livreur updatedLivreur = livreurService.updateLivreur(id, livreur);
-        return updatedLivreur != null ? new ResponseEntity<>(updatedLivreur, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Livreur updatedLivreur = livreurService.updateLivreur(id, livreur);
+            return updatedLivreur != null ? new ResponseEntity<>(updatedLivreur, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Livreur> deleteLivreur(@PathVariable int id) {
-        livreurService.deleteLivreur(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+       try {
+           livreurService.deleteLivreur(id);
+           return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+       }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+           return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+       }
     }
 }

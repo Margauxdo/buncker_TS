@@ -36,6 +36,8 @@ public class SortieSemaineController {
             return new ResponseEntity<>(createdSortie, HttpStatus.CREATED);
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (IllegalStateException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -43,15 +45,25 @@ public class SortieSemaineController {
 
     @PutMapping("{id}")
     public ResponseEntity<SortieSemaine> updateSortieSemaine(@PathVariable int id, @RequestBody SortieSemaine sortieSemaine) {
-        SortieSemaine updatedSortie = sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
-        return updatedSortie != null ? new ResponseEntity<>(updatedSortie, HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            SortieSemaine updatedSortie = sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
+            return updatedSortie != null ? new ResponseEntity<>(updatedSortie, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping
     public ResponseEntity<SortieSemaine> deleteSortieSemaine(@PathVariable int id) {
-        sortieSemaineService.deleteSortieSemaine(id);
+        try{
+            sortieSemaineService.deleteSortieSemaine(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

@@ -35,6 +35,8 @@ public class RegleController  {
             return new ResponseEntity<>(regleCreated, HttpStatus.CREATED);
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (IllegalStateException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -42,14 +44,25 @@ public class RegleController  {
 
     @PutMapping
     public ResponseEntity<Regle> updateRegle(@PathVariable int id, @RequestBody Regle regle) {
-        Regle updatedRegle = regleService.updateRegle(id,regle);
-        return updatedRegle != null ? new ResponseEntity<>(updatedRegle, HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Regle updatedRegle = regleService.updateRegle(id, regle);
+            return updatedRegle != null ? new ResponseEntity<>(updatedRegle, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Regle> deleteRegle(@PathVariable int id) {
-        regleService.deleteRegle(id);
+       try{
+           regleService.deleteRegle(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+       }catch (IllegalArgumentException e){
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }
+       catch (RuntimeException e) {
+           return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+       }
     }
 }

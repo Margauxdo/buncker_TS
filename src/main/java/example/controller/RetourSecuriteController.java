@@ -36,6 +36,8 @@ public class RetourSecuriteController {
             return new ResponseEntity<>(createdRS, HttpStatus.CREATED);
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (IllegalStateException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -43,14 +45,24 @@ public class RetourSecuriteController {
 
     @PutMapping
     public ResponseEntity<RetourSecurite> updateRetourSecurite(@PathVariable int id, @RequestBody RetourSecurite retourSecurite) {
-        RetourSecurite updatedRS = retourSecuriteService.updateRetourSecurite(id, retourSecurite);
-        return updatedRS != null ? new ResponseEntity<>(updatedRS, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            RetourSecurite updatedRS = retourSecuriteService.updateRetourSecurite(id, retourSecurite);
+            return updatedRS != null ? new ResponseEntity<>(updatedRS, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping
     public ResponseEntity<RetourSecurite> deleteRetourSecurite(@PathVariable int id) {
-        retourSecuriteService.deleteRetourSecurite(id);
+        try{
+            retourSecuriteService.deleteRetourSecurite(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

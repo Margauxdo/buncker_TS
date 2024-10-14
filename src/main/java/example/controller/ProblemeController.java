@@ -36,19 +36,31 @@ public class ProblemeController {
             return new ResponseEntity<>(newProbleme, HttpStatus.CREATED);
         }catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (IllegalStateException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch (RuntimeException e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping
     public ResponseEntity<Probleme> updateProbleme(@PathVariable int id, @RequestBody Probleme probleme) {
-        Probleme updatedProbleme = problemeService.updateProbleme(id, probleme);
-        return updatedProbleme != null ? new ResponseEntity<>(updatedProbleme, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Probleme updatedProbleme = problemeService.updateProbleme(id, probleme);
+            return updatedProbleme != null ? new ResponseEntity<>(updatedProbleme, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
     @DeleteMapping
     public ResponseEntity<Probleme> deleteProbleme(@PathVariable int id) {
-        problemeService.deleteProbleme(id);
+        try{
+            problemeService.deleteProbleme(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -36,20 +36,32 @@ public class TypeValiseController {
             return new ResponseEntity<>(createdTypeValise, HttpStatus.CREATED);
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (IllegalStateException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping
     public ResponseEntity<TypeValise> updateTypeValise(@RequestBody TypeValise typeValise, @PathVariable int id) {
-        TypeValise updatedTypeValise = typeValiseService.updateTypeValise(id, typeValise);
-        return updatedTypeValise != null ? new ResponseEntity<>(updatedTypeValise, HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            TypeValise updatedTypeValise = typeValiseService.updateTypeValise(id, typeValise);
+            return updatedTypeValise != null ? new ResponseEntity<>(updatedTypeValise, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<TypeValise> deleteTypeValise(@PathVariable int id) {
-        typeValiseService.deleteTypeValise(id);
+        try{
+            typeValiseService.deleteTypeValise(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
