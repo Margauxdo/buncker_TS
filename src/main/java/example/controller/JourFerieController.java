@@ -20,17 +20,27 @@ public class JourFerieController {
     private IJourFerieService jourFerieService;
 
     @GetMapping
-    public List<JourFerie> getJourFeries() {
+    public ResponseEntity<List<JourFerie>> getJourFeries() {
         List<JourFerie> jourFeries = jourFerieService.getJourFeries();
-        return new ResponseEntity<>(jourFeries, HttpStatus.OK).getBody();
+        return new ResponseEntity<>(jourFeries, HttpStatus.OK);
     }
+
+
     @GetMapping("{id}")
     public ResponseEntity<JourFerie> getJourFerie(@PathVariable int id) {
-        JourFerie jourFerie = jourFerieService.getJourFerie(id);
-        return jourFerie != null ? new ResponseEntity<>(jourFerie, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
+        if (id < 0) {
+            throw new IllegalArgumentException("Invalid ID: " + id);
+        }
+        try {
+            JourFerie jourFerie = jourFerieService.getJourFerie(id);
+            return jourFerie != null ? new ResponseEntity<>(jourFerie, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
 
 
 

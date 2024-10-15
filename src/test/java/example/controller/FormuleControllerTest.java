@@ -29,6 +29,7 @@ public class FormuleControllerTest {
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.openMocks(this);
     }
 
@@ -169,9 +170,11 @@ public class FormuleControllerTest {
 
 
 
-
-
-
+    @Test
+    public void testFormuleController(){
+        assertNotNull(formuleController);
+        assertNotNull(formuleController);
+    }
 
 }
 

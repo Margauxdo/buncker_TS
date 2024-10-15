@@ -1,6 +1,7 @@
 package example.controller;
 
 import example.entities.Livreur;
+import example.exceptions.ConflictException;
 import example.interfaces.ILivreurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,36 +33,42 @@ public class LivreurController {
 
     @PostMapping
     public ResponseEntity<Livreur> createLivreur(@RequestBody Livreur livreur) {
-        try{
+        try {
             Livreur createdLivreur = livreurService.createLivreur(livreur);
             return new ResponseEntity<>(createdLivreur, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (RuntimeException e){
+        } catch (ConflictException e) { // Custom exception for conflict scenarios
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping
+
+    @PutMapping("{id}")
     public ResponseEntity<Livreur> updateLivreur(@PathVariable int id, @RequestBody Livreur livreur) {
         try {
             Livreur updatedLivreur = livreurService.updateLivreur(id, livreur);
             return updatedLivreur != null ? new ResponseEntity<>(updatedLivreur, HttpStatus.OK) :
                     new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Livreur> deleteLivreur(@PathVariable int id) {
-       try {
-           livreurService.deleteLivreur(id);
-           return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-       }catch (IllegalArgumentException e){
+        try {
+            livreurService.deleteLivreur(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (RuntimeException e) {
-           return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-       }
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
+
 }

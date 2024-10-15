@@ -31,27 +31,34 @@ public class MouvementController {
 
     @PostMapping
     public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
-        try{
+        try {
             Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
             return new ResponseEntity<>(createdMouvement, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
+            // Check the message or add a specific condition to return CONFLICT
+            if ("Conflict detected".equals(e.getMessage())) {
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping
-    public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
-       try {
-           Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
-           return updatedMouvement != null ? new ResponseEntity<>(updatedMouvement, HttpStatus.OK) :
-                   new ResponseEntity<>(HttpStatus.NOT_FOUND);
-       }catch (IllegalArgumentException e){
-           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-       }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
+        try {
+            Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
+            return updatedMouvement != null ? new ResponseEntity<>(updatedMouvement, HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @DeleteMapping("{id}")
     public ResponseEntity<Mouvement> deleteMouvement(@PathVariable int id) {

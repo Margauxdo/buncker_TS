@@ -42,16 +42,19 @@ public class RegleController  {
         }
     }
 
-    @PutMapping
+    @PutMapping("{id}")  // Add the path variable to the mapping
     public ResponseEntity<Regle> updateRegle(@PathVariable int id, @RequestBody Regle regle) {
         try {
             Regle updatedRegle = regleService.updateRegle(id, regle);
             return updatedRegle != null ? new ResponseEntity<>(updatedRegle, HttpStatus.OK) :
                     new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @DeleteMapping("{id}")
     public ResponseEntity<Regle> deleteRegle(@PathVariable int id) {

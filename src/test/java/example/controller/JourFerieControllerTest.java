@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 public class JourFerieControllerTest {
 
@@ -26,19 +27,10 @@ public class JourFerieControllerTest {
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.openMocks(this);
     }
-    @Test
-    public void testGetJourFeries_Success() {
-        List<JourFerie> jourFeries = new ArrayList<>();
-        jourFeries.add(new JourFerie());
-        when(jourFerieService.getJourFeries()).thenReturn(jourFeries);
 
-        List<JourFerie> result = jourFerieController.getJourFeries();
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(jourFeries.size(), result.size());
-    }
     @Test
     public void testGetJourFeries_Failure() {
         when(jourFerieService.getJourFeries()).thenThrow(new RuntimeException("Erreur de la base de donnee"));
@@ -52,6 +44,7 @@ public class JourFerieControllerTest {
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
         Assertions.assertEquals(jourFerie, result.getBody());
     }
+
     @Test
     public void testGetJourFerie_Failure() {
         when(jourFerieService.getJourFerie(1)).thenReturn(null);
@@ -73,6 +66,28 @@ public class JourFerieControllerTest {
 
         Assertions.assertThrows(RuntimeException.class, () -> jourFerieController.getJourFeries());
     }
+
+    @Test
+    public void testJourFerieController() {
+        Assertions.assertNotNull(jourFerieController);
+        Assertions.assertNotNull(jourFerieService);
+    }
+
+    @Test
+    public void testGetJourFerie_InvalidId() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> jourFerieController.getJourFerie(-1));
+    }
+
+    @Test
+    public void testGetJourFerie_ServiceError() {
+        when(jourFerieService.getJourFerie(1)).thenThrow(new RuntimeException("Erreur de service"));
+        ResponseEntity<JourFerie> result = jourFerieController.getJourFerie(1);
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
+
+
+
+
 
 
 

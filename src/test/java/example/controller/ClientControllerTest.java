@@ -25,12 +25,12 @@ class ClientControllerTest {
     private IClientService clientService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testGetAllClients_Success() {
+    public void testGetAllClients_Success() {
         List<Client> clients = new ArrayList<>();
         clients.add(new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null));
         when(clientService.getAllClients()).thenReturn(clients);
@@ -42,14 +42,14 @@ class ClientControllerTest {
     }
 
     @Test
-    void testGetAllClients_Failure() {
+    public void testGetAllClients_Failure() {
         when(clientService.getAllClients()).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(RuntimeException.class, () -> clientController.getAllClients());
     }
 
     @Test
-    void testGetClientById_Success() {
+    public void testGetClientById_Success() {
         Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
         when(clientService.getClientById(1)).thenReturn(client);
 
@@ -60,7 +60,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void testGetClientById_NotFound() {
+    public void testGetClientById_NotFound() {
         when(clientService.getClientById(1)).thenReturn(null);
 
         ResponseEntity<Client> response = clientController.getClientById(1);
@@ -69,7 +69,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void testCreateClient_Success() {
+    public void testCreateClient_Success() {
         Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
         when(clientService.createClient(client)).thenReturn(client);
 
@@ -80,9 +80,9 @@ class ClientControllerTest {
     }
 
     @Test
-    void testCreateClient_InvalidInput() {
-        Client invalidClient = new Client(); // Simulate invalid client data
-        when(clientService.createClient(invalidClient)).thenThrow(new IllegalArgumentException("Invalid client data"));
+    public void testCreateClient_InvalidInput() {
+        Client invalidClient = new Client(); // Simulez des données client invalides
+        when(clientService.createClient(invalidClient)).thenThrow(new IllegalArgumentException("Données client invalides"));
 
         ResponseEntity<Client> response = clientController.createClient(invalidClient);
 
@@ -90,8 +90,9 @@ class ClientControllerTest {
     }
 
 
+
     @Test
-    void testCreateClient_Conflict() {
+    public void testCreateClient_Conflict() {
         Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
         when(clientService.createClient(client)).thenThrow(new IllegalStateException("Client conflict"));
 
@@ -102,7 +103,7 @@ class ClientControllerTest {
 
 
     @Test
-    void testUpdateClient_Success() {
+    public void testUpdateClient_Success() {
         Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
         when(clientService.updateClient(1, client)).thenReturn(client);
 
@@ -113,7 +114,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void testUpdateClient_NotFound() {
+    public void testUpdateClient_NotFound() {
         Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
         when(clientService.updateClient(1, client)).thenReturn(null);
 
@@ -123,7 +124,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void testUpdateClient_InvalidInput() {
+    public void testUpdateClient_InvalidInput() {
         Client invalidClient = new Client(); // Simulate invalid client data
         when(clientService.updateClient(eq(1), any(Client.class)))
                 .thenThrow(new IllegalArgumentException("Invalid client data"));
@@ -133,11 +134,8 @@ class ClientControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
-
-
-
     @Test
-    void testDeleteClient_Success() {
+    public void testDeleteClient_Success() {
         doNothing().when(clientService).deleteClient(1);
 
         ResponseEntity<Void> response = clientController.deleteClient(1);
@@ -146,7 +144,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void testDeleteClient_NotFound() {
+    public void testDeleteClient_NotFound() {
         doThrow(new IllegalArgumentException("Client not found")).when(clientService).deleteClient(1);
 
         ResponseEntity<Void> response = clientController.deleteClient(1);
@@ -156,12 +154,19 @@ class ClientControllerTest {
 
 
     @Test
-    void testDeleteClient_Failure() {
+    public void testDeleteClient_Failure() {
         doThrow(new RuntimeException("Database error")).when(clientService).deleteClient(1);
 
         ResponseEntity<Void> response = clientController.deleteClient(1);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+    @Test
+    public void testClientController(){
+            assertNotNull(clientController);
+            assertNotNull(clientService);
+        }
 
 }
+
+
