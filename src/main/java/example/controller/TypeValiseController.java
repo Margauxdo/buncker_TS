@@ -23,7 +23,7 @@ public class TypeValiseController {
     }
 
     @GetMapping("{id}")
-    private ResponseEntity<TypeValise> getTypeValise(@PathVariable int id) {
+    ResponseEntity<TypeValise> getTypeValise(@PathVariable int id) {
         TypeValise typeValise = typeValiseService.getTypeValise(id);
         return typeValise != null ? new ResponseEntity<>(typeValise, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);

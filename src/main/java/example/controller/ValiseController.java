@@ -1,8 +1,8 @@
 package example.controller;
 
-
 import example.entities.Valise;
 import example.interfaces.IValiseService;
+import example.exceptions.ResourceNotFoundException; // Ajoutez cet import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,28 +32,33 @@ public class ValiseController {
 
     @PostMapping
     public ResponseEntity<Valise> createValise(@RequestBody Valise valise) {
-        try{
+        try {
             Valise newValise = valiseService.createValise(valise);
             return new ResponseEntity<>(newValise, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (IllegalStateException e){
+        } catch (ResourceNotFoundException e) { // Exception définie ici
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("{id}")
     public ResponseEntity<Valise> updateValise(@RequestBody Valise valise, @PathVariable int id) {
-        try{
+        try {
             Valise updatedValise = valiseService.updateValise(id, valise);
-            return updatedValise != null ? new ResponseEntity<>(updatedValise, HttpStatus.OK):
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (IllegalArgumentException e) {
+            return updatedValise != null ? new ResponseEntity<>(updatedValise, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @DeleteMapping("{id}")
@@ -66,7 +71,5 @@ public class ValiseController {
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
-
 }
