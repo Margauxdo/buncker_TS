@@ -144,7 +144,6 @@ public class RegleControllerTest {
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // Expect 409 Conflict
     }
 
-
     @Test
     public void testCreateRegle_InternalServerError(){
         Regle regle = new Regle();

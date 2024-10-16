@@ -17,10 +17,15 @@ public class SortieSemaineController {
     private ISortieSemaineService sortieSemaineService;
 
     @GetMapping
-    public List<SortieSemaine> getAllSortieSemaine() {
-        List<SortieSemaine> sortieSemaines = sortieSemaineService.getAllSortieSemaine();
-        return new ResponseEntity<List<SortieSemaine>>(sortieSemaines, HttpStatus.OK).getBody();
+    public ResponseEntity<List<SortieSemaine>> getAllSortieSemaine() {
+        try {
+            List<SortieSemaine> sortieSemaines = sortieSemaineService.getAllSortieSemaine();
+            return new ResponseEntity<>(sortieSemaines, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
 
     @GetMapping("{id}")
     public ResponseEntity<SortieSemaine> getSortieSemaine(@PathVariable int id) {

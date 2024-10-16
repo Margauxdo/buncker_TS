@@ -29,30 +29,41 @@ public class RetourSecuriteController {
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
+
+    @PostMapping("/retourSecurite")
     public ResponseEntity<RetourSecurite> createRetourSecurite(@RequestBody RetourSecurite retourSecurite) {
-        try{
-            RetourSecurite createdRS = retourSecuriteService.createRetourSecurite(retourSecurite);
-            return new ResponseEntity<>(createdRS, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (IllegalStateException e){
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        if (retourSecurite == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            RetourSecurite createdRetourSecurite = retourSecuriteService.createRetourSecurite(retourSecurite);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdRetourSecurite);
+        } catch (IllegalArgumentException e) { // Catch IllegalArgumentException
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PutMapping
+
+
+
+
+
+    @PutMapping("/{id}") // Assurez-vous que la méthode utilise le bon mappage
     public ResponseEntity<RetourSecurite> updateRetourSecurite(@PathVariable int id, @RequestBody RetourSecurite retourSecurite) {
         try {
             RetourSecurite updatedRS = retourSecuriteService.updateRetourSecurite(id, retourSecurite);
             return updatedRS != null ? new ResponseEntity<>(updatedRS, HttpStatus.OK) :
                     new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) { // Ajoutez ce bloc pour gérer les exceptions Runtime
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @DeleteMapping
     public ResponseEntity<RetourSecurite> deleteRetourSecurite(@PathVariable int id) {
