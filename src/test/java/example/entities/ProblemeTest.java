@@ -34,6 +34,7 @@ public class ProblemeTest {
         // Crée et persiste un Client pour lier à Valise
         Client client = new Client();
         client.setName("Nom du client"); // Initialisation du champ obligatoire
+        client.setEmail("test@example.com");
         client = clientRepository.save(client);
 
         // Crée et persiste une Valise liée au Client

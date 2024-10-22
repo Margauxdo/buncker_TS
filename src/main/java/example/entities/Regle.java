@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,7 +26,9 @@ public class Regle {
 
 
     private String reglePourSortie;
+    @Column(name = "coderegle", unique = true, nullable = false)
     private String coderegle;
+
     private Date dateRegle;
     private int nombreJours;
     private Long calculCalendaire;
@@ -45,7 +48,7 @@ public class Regle {
     @Getter
     @Setter
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SortieSemaine> sortieSemaine;
+    private List<SortieSemaine> sortieSemaine = new ArrayList<>();
 
 
 

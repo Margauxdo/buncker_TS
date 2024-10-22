@@ -42,6 +42,7 @@ public class MouvementTest {
         // Create and save a Client instance
         Client client = new Client();
         client.setName("Test Client");
+        client.setEmail("test@example.com");
         clientRepository.save(client);
 
         // Create and save a Valise instance with a Client

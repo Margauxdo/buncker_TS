@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ActiveProfiles("test")
-@Transactional
 public class JourFerieTest {
 
     @Autowired
@@ -31,7 +30,8 @@ public class JourFerieTest {
     @BeforeEach
     public void setUp() {
         Regle regle = new Regle();
-
+        regle.setCoderegle("Code123"); // Ajoutez une valeur pour le champ obligatoire `coderegle`
+        regle.setDateRegle(new Date());
 
         // Persist une instance de `Regle` avant de créer `JourFerie`
         entityManager.persist(regle);
@@ -81,9 +81,6 @@ public class JourFerieTest {
         assertNotNull(joursFerieList);
         assertEquals(2, joursFerieList.size());
     }
-    @Test
-    public void testCascadeDeleteJoursFerieList() {
 
-    }
 }
 

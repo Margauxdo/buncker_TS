@@ -29,7 +29,6 @@ public class Valise {
     private Date dateCreation;
     private String numeroDujeu;
 
-    // Relation Many-to-One avec Client, suppression en cascade non activée pour éviter des suppressions involontaires
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
@@ -38,14 +37,12 @@ public class Valise {
     @JoinColumn(name = "regle_id")
     private Regle regleSortie;
 
-
-    // Relation One-to-Many avec Mouvement, suppression en cascade et orphanRemoval pour supprimer les mouvements liés
     @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Mouvement> mouvementList = new ArrayList<>();
-
 
     @ManyToOne
     @JoinColumn(name = "typevalise_id")
     private TypeValise typevalise;
 }
+
 

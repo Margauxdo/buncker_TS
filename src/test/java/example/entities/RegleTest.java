@@ -47,9 +47,10 @@ public class RegleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Créer et persister l'entité Client avec le nom initialisé
+        // Créer et persister l'entité Client avec le nom et l'email initialisés
         Client client = new Client();
-        client.setName("NomDuClient");  // Initialisez la propriété `name`
+        client.setName("NomDuClient");  // Initialisation du champ obligatoire `name`
+        client.setEmail("email@exemple.com");  // Initialisation du champ obligatoire `email`
         em.persist(client);
 
         // Créer et persister les autres entités
@@ -59,7 +60,9 @@ public class RegleTest {
         SortieSemaine sortieSemaine = new SortieSemaine();
         em.persist(sortieSemaine);
 
+        // Créer et persister l'entité TypeRegle avec la propriété nomTypeRegle
         TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("TypeRegleTest");  // Initialisation de nomTypeRegle
         em.persist(typeRegle);
 
         // Associez `client` avec `valise` et persistez `valise`
@@ -91,7 +94,7 @@ public class RegleTest {
         regle.setSortieSemaine(sorties);
 
         regle.setTypeEntree("typeEntree");
-        regle.setTypeRegle(typeRegle);
+        regle.setTypeRegle(typeRegle);  // Associe TypeRegle à Regle
         regle.setValise(valise);  // Associe Valise à Regle
 
         em.persist(regle);

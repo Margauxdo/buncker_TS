@@ -56,7 +56,9 @@ public class TypeRegle {
         this.id = id;
     }
 
+    @Column(name = "nom_type_regle", unique = true, nullable = false)
     private String nomTypeRegle;
+
 
     @OneToMany(mappedBy = "typeRegle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Regle> listTypesRegles = new ArrayList<>();

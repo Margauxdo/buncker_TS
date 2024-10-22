@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Date;
 
@@ -50,8 +51,9 @@ public class SortieSemaine {
         this.id = id;
     }
 
-    //relation manytoone avec regle
     @ManyToOne
-    @JoinColumn(name = "regle_id")
+    @JoinColumn(name = "regle_id", nullable = false)
+    @NotNull
     private Regle regle;
+
 }

@@ -34,6 +34,7 @@ public class SortieSemaineTest {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
         em.persist(regle);
         em.flush();
 

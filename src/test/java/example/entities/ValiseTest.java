@@ -41,16 +41,18 @@ public class ValiseTest {
         // Créer et persister un client pour la valise
         Client client1 = new Client();
         client1.setName("Doe");
+        client1.setEmail("doe@example.com");
         em.persist(client1);
 
         // Initialiser TypeValise avec une chaîne pour le propriétaire
         TypeValise type1 = new TypeValise();
-        type1.setProprietaire("Créateur de la règle"); // Définit le propriétaire en tant que chaîne
+        type1.setProprietaire("Créateur de la règle");
         type1.setDescription("Description du type de valise");
         em.persist(type1);
 
-        // Créer et persister une règle pour la valise
+        // Créer et persister une règle pour la valise avec un coderegle non nul
         Regle regle1 = new Regle();
+        regle1.setCoderegle("CODE123");  // Initialisation de 'coderegle'
         em.persist(regle1);
 
         // Créer et persister une liste de mouvements pour la valise
@@ -67,7 +69,7 @@ public class ValiseTest {
         valise.setNumeroValise(1234L);
         valise.setDescription("description de la valise");
         valise.setClient(client1);
-        valise.setTypevalise(type1); // Associe le type avec un propriétaire non nul
+        valise.setTypevalise(type1);
         valise.setDateCreation(sdf.parse("2016-02-20"));
         valise.setDateDernierMouvement(sdf.parse("2024-02-20"));
         valise.setDateRetourPrevue(sdf.parse("2024-09-02"));
@@ -75,7 +77,7 @@ public class ValiseTest {
         valise.setMouvementList(mouvementList);
         valise.setNumeroDujeu("numero du jeu");
         valise.setRefClient("ref client");
-        valise.setRegleSortie(regle1);
+        valise.setRegleSortie(regle1);  // Associe la règle avec la valise
         valise.setSortie(sdf.parse("2016-02-20"));
 
         em.persist(valise);
@@ -162,9 +164,11 @@ public class ValiseTest {
 
     @Test
     public void testUpdateClientAssociation() {
-        // Créer et persister un nouveau client
+        // Créer et persister un nouveau client avec toutes les valeurs nécessaires
         Client newClient = new Client();
         newClient.setName("Smith");
+        newClient.setEmail("smith@example.com");  // Ensure the email field is set
+        newClient.setAdresse("rue de paris 75000 Paris");  // Add any other required fields
         em.persist(newClient);
         em.flush();
 
@@ -174,7 +178,7 @@ public class ValiseTest {
 
         // Associer la valise au nouveau client
         foundValise.setClient(newClient);
-        em.persist(foundValise);
+        em.merge(foundValise);
         em.flush();
 
         // Vérifier que la valise est désormais associée au nouveau client
@@ -182,9 +186,10 @@ public class ValiseTest {
         Assertions.assertEquals("Smith", updatedValise.getClient().getName(), "La valise devrait être associée au nouveau client 'Smith'");
 
         // Vérifier que l'ancien client n'a plus cette valise dans sa liste de valises
-        Client oldClient = em.find(Client.class, valise.getClient().getId());
+        Client oldClient = em.find(Client.class, clientRepository.findAll().get(0).getId());  // Fetch the old client from the repository
         Assertions.assertFalse(oldClient.getValises().contains(updatedValise), "L'ancien client ne devrait plus avoir cette valise associée");
     }
+
     @Test
     public void testValiseRegleAssociation() {
         Valise foundValise = em.find(Valise.class, valise.getId());
@@ -209,6 +214,7 @@ public class ValiseTest {
     @Test
     public void testUpdateRegleAssociation() {
         Regle newRegle = new Regle();
+        newRegle.setCoderegle("NEWCODE123");  // Ensure 'coderegle' is set
         em.persist(newRegle);
         em.flush();
 
@@ -219,6 +225,7 @@ public class ValiseTest {
         Valise foundValise = em.find(Valise.class, valise.getId());
         Assertions.assertEquals(newRegle.getId(), foundValise.getRegleSortie().getId(), "La règle associée devrait être mise à jour.");
     }
+
 
     @Test
     public void testValiseTypeValiseAssociation() {

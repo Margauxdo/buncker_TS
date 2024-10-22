@@ -25,6 +25,7 @@ public class Client {
     @Column(nullable = false)
     private String name;
     private String adresse;
+    @Column(nullable = false, unique = true)
     private String email;
     private String telephoneExploitation;
     private String ville;

@@ -37,6 +37,7 @@ public class RetourSecuriteTest {
         // Création et persistance d'un client avec un nom obligatoire
         Client client = new Client();
         client.setName("Client Test"); // Initialisation du champ obligatoire 'name'
+        client.setEmail("client.test@example.com");
         em.persist(client);
         em.flush();
 

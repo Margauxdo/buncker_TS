@@ -29,6 +29,7 @@ public class TypeValiseTest {
         // Création d'un client pour chaque valise
         Client client = new Client();
         client.setName("Client Test");
+        client.setEmail("testclient@example.com");
         em.persist(client);  // Persister le client
 
         // Création d'une instance de TypeValise

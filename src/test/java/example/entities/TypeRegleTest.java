@@ -28,9 +28,11 @@ public class TypeRegleTest {
     @BeforeEach
     public void setUp() throws Exception {
         Regle regles1 = new Regle();
+        regles1.setCoderegle("CODE123");
         em.persist(regles1);
 
         Regle regles2 = new Regle();
+        regles2.setCoderegle("CODE456");
         em.persist(regles2);
 
         List<Regle> listRegles = new ArrayList<>();

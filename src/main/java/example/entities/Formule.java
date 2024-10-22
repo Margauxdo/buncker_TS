@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.misc.NotNull;
 
 @Entity
 @Table(name = "formule")
@@ -18,6 +19,8 @@ public class Formule {
     @Column(name = "id_formule")
     private int id;
 
+    @NotNull
+    @Column(nullable = false)
     private String libelle;
 
 
@@ -56,9 +59,8 @@ public class Formule {
         this.id = id;
     }
 
-    //relation manytoone avec regle
     @ManyToOne
-    @JoinColumn(name = "regle_id")
+    @JoinColumn(name = "regle_id", nullable = false) // Rend cette relation obligatoire
     private Regle regle;
 
 

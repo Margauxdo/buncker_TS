@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "type_valise")
+@Table(name = "type_valise", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"proprietaire", "description"})
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +32,4 @@ public class TypeValise {
 
     @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Valise> valises = new ArrayList<>();
-
-
-
 }
