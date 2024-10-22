@@ -6,7 +6,6 @@ import example.repositories.TypeRegleRepository;
 import example.repositories.ValiseRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +31,6 @@ public class RegleTest {
 
     private Regle regle;
 
-
-
     @Autowired
     private SortieSemaineRepository sortieSemaineRepository;
     @Autowired
@@ -47,32 +44,29 @@ public class RegleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Créer et persister l'entité Client avec le nom et l'email initialisés
+        // Création et persistance du Client
         Client client = new Client();
-        client.setName("NomDuClient");  // Initialisation du champ obligatoire `name`
-        client.setEmail("email@exemple.com");  // Initialisation du champ obligatoire `email`
+        client.setName("NomDuClient");
+        client.setEmail("email@exemple.com");
         em.persist(client);
 
-        // Créer et persister les autres entités
+        // Création et persistance de la Formule
         Formule formule = new Formule();
+        formule.setLibelle("LibelleFormule");
+        formule.setFormule("ContenuFormule");
         em.persist(formule);
 
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        em.persist(sortieSemaine);
-
-        // Créer et persister l'entité TypeRegle avec la propriété nomTypeRegle
+        // Création et persistance de TypeRegle
         TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("TypeRegleTest");  // Initialisation de nomTypeRegle
+        typeRegle.setNomTypeRegle("TypeRegleTest");
         em.persist(typeRegle);
 
-        // Associez `client` avec `valise` et persistez `valise`
+        // Création et persistance de Valise
         Valise valise = new Valise();
-        valise.setClient(client);  // Associe Client à Valise
+        valise.setClient(client);
         em.persist(valise);
 
-        em.flush();  // Synchronise toutes les entités persistées
-
-        // Créez et configurez l'entité `Regle`
+        // Création et persistance de Regle
         regle = new Regle();
         regle.setFermeJS1(false);
         regle.setFermeJS2(false);
@@ -88,102 +82,111 @@ public class RegleTest {
         regle.setFormule(formule);
         regle.setNBJSMEntree(25L);
         regle.setNombreJours(250);
-
-        List<SortieSemaine> sorties = new ArrayList<>();
-        sorties.add(sortieSemaine);
-        regle.setSortieSemaine(sorties);
-
         regle.setTypeEntree("typeEntree");
-        regle.setTypeRegle(typeRegle);  // Associe TypeRegle à Regle
-        regle.setValise(valise);  // Associe Valise à Regle
+        regle.setTypeRegle(typeRegle);
+        regle.setValise(valise);
 
+        // Initialisation de la collection sortieSemaine
+        List<SortieSemaine> sorties = new ArrayList<>();
+        regle.setSortieSemaine(sorties);
         em.persist(regle);
-        em.flush();  // Forcer la persistance de regle
-    }
+        em.flush();
 
+        // Création et persistance de SortieSemaine
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        sortieSemaine.setRegle(regle);
+        sorties.add(sortieSemaine);
+        em.persist(sortieSemaine);
+        em.flush();
+    }
 
     @Test
-    public void testReglePersitence(){
-        Assertions.assertNotNull(regle.getId(),"Le id est null");
+    public void testReglePersitence() {
+        Assertions.assertNotNull(regle.getId(), "Le id est null");
     }
 
     @Test
-    public void testRegleReglePourSortie(){
-        Assertions.assertEquals(regle.getReglePourSortie(),"PourSortie");
+    public void testRegleReglePourSortie() {
+        Assertions.assertEquals("PourSortie", regle.getReglePourSortie());
+    }
 
-    }
     @Test
-    public void testRegleCodeRegle(){
-        Assertions.assertEquals(regle.getCoderegle(),"Coderegle");
+    public void testRegleCodeRegle() {
+        Assertions.assertEquals("Coderegle", regle.getCoderegle());
     }
+
     @Test
     public void testRegleDateRegle() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Assertions.assertEquals(regle.getDateRegle(),(sdf.parse("2016-05-20")));
+        Assertions.assertEquals(sdf.parse("2016-05-20"), regle.getDateRegle());
+    }
 
-    }
     @Test
-    public void testRegleNombreJours(){
-        Assertions.assertEquals(regle.getNombreJours(),250);
+    public void testRegleNombreJours() {
+        Assertions.assertEquals(250, regle.getNombreJours());
     }
-    @Test
-    public void testRegleCalculCalendaire(){
-        Assertions.assertEquals(regle.getCalculCalendaire(),1234L);
 
-    }@Test
-    public void testRegleFermeJS(){
-        Assertions.assertEquals(regle.getFermeJS1(),Boolean.FALSE);
-        Assertions.assertEquals(regle.getFermeJS2(),Boolean.FALSE);
-        Assertions.assertEquals(regle.getFermeJS3(),Boolean.FALSE);
-        Assertions.assertEquals(regle.getFermeJS4(),Boolean.FALSE);
-        Assertions.assertEquals(regle.getFermeJS5(),Boolean.FALSE);
-        Assertions.assertEquals(regle.getFermeJS6(),Boolean.FALSE);
-        Assertions.assertEquals(regle.getFermeJS7(),Boolean.FALSE);
+    @Test
+    public void testRegleCalculCalendaire() {
+        Assertions.assertEquals(1234L, regle.getCalculCalendaire());
+    }
 
+    @Test
+    public void testRegleFermeJS() {
+        Assertions.assertFalse(regle.getFermeJS1());
+        Assertions.assertFalse(regle.getFermeJS2());
+        Assertions.assertFalse(regle.getFermeJS3());
+        Assertions.assertFalse(regle.getFermeJS4());
+        Assertions.assertFalse(regle.getFermeJS5());
+        Assertions.assertFalse(regle.getFermeJS6());
+        Assertions.assertFalse(regle.getFermeJS7());
+    }
 
-    }
     @Test
-    public void testRegleTypeEntree(){
-        Assertions.assertEquals(regle.getTypeEntree(),"typeEntree");
+    public void testRegleTypeEntree() {
+        Assertions.assertEquals("typeEntree", regle.getTypeEntree());
     }
+
     @Test
-    public void testRegleNBJSMEntree(){
-        Assertions.assertEquals(regle.getNBJSMEntree(),25L);
+    public void testRegleNBJSMEntree() {
+        Assertions.assertEquals(25L, regle.getNBJSMEntree());
     }
+
     @Test
-    public void testRegleValiseAssociation(){
+    public void testRegleValiseAssociation() {
         Assertions.assertNotNull(regle.getValise());
         Valise expectedValise = valiseRepository.findAll().get(0);
-        Assertions.assertEquals(expectedValise.getId(),regle.getValise().getId());
+        Assertions.assertEquals(expectedValise.getId(), regle.getValise().getId());
     }
+
     @Test
-    public void testRegleSortieSemaineAssociation(){
+    public void testRegleSortieSemaineAssociation() {
         Assertions.assertNotNull(regle.getSortieSemaine());
         Assertions.assertFalse(regle.getSortieSemaine().isEmpty());
         SortieSemaine expectedSortieSemaine = sortieSemaineRepository.findAll().get(0);
         Assertions.assertEquals(expectedSortieSemaine.getId(), regle.getSortieSemaine().get(0).getId());
     }
+
     @Test
-    public void testRegleTypeRegleAssociation(){
+    public void testRegleTypeRegleAssociation() {
         Assertions.assertNotNull(regle.getTypeRegle());
         TypeRegle expectedTypeRegle = typeRegleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedTypeRegle.getId(),regle.getTypeRegle().getId());
+        Assertions.assertEquals(expectedTypeRegle.getId(), regle.getTypeRegle().getId());
     }
+
     @Test
-    public void testRegleFormuleAssociation(){
+    public void testRegleFormuleAssociation() {
         Assertions.assertNotNull(regle.getFormule());
         Formule expectedFormule = formuleRepository.findAll().get(0);
         Assertions.assertEquals(expectedFormule.getId(), regle.getFormule().getId());
     }
+
     @Test
-    public void testCascadeDeleteSortieSemaine(){
+    public void testCascadeDeleteSortieSemaine() {
+        em.remove(regle);
+        em.flush();
 
+        List<SortieSemaine> sorties = sortieSemaineRepository.findAll();
+        Assertions.assertTrue(sorties.isEmpty(), "Les sorties de la semaine n'ont pas été supprimées en cascade");
     }
-    @Test
-    public void testNonNullCoderegle(){
-
-    }
-
-
-
 }

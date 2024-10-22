@@ -2,8 +2,6 @@ package example.entities;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -24,8 +22,8 @@ public class Regle {
     @Column(name = "id_regle")
     private int id;
 
-
     private String reglePourSortie;
+
     @Column(name = "coderegle", unique = true, nullable = false)
     private String coderegle;
 
@@ -45,20 +43,14 @@ public class Regle {
     @OneToOne(mappedBy = "regleSortie")
     private Valise valise;
 
-    @Getter
-    @Setter
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regle")
     private List<SortieSemaine> sortieSemaine = new ArrayList<>();
-
-
-
 
     @ManyToOne
     @JoinColumn(name = "type_regle_id")
     private TypeRegle typeRegle;
 
     @ManyToOne
-    @JoinColumn(name = "formule_id")
+    @JoinColumn(name = "formule_id", nullable = true)
     private Formule formule;
-
 }

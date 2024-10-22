@@ -42,7 +42,6 @@ public class RegleIntegrationTest {
         regleRepository.deleteAll();
     }
 
-    // Test for saving a valid Regle entity
     @Test
     public void testSaveRegleSuccess() {
         Regle regle = new Regle();
@@ -96,7 +95,7 @@ public class RegleIntegrationTest {
         regleRepository.flush();
 
         Optional<SortieSemaine> deletedSortieSemaine = sortieSemaineRepository.findById(sortieSemaine.getId());
-        assertFalse(deletedSortieSemaine.isPresent());  // Assurez-vous que l'enfant a été supprimé en cascade
+        assertFalse(deletedSortieSemaine.isPresent());
     }
 
 
@@ -189,30 +188,24 @@ public class RegleIntegrationTest {
 
     @Test
     public void testOneToOneRelationship() {
-        // Création d'un client
         Client client = new Client();
         client.setName("ClientTest");
         client.setEmail("client@test.com");
         clientRepository.saveAndFlush(client);
 
-        // Création d'une règle
         Regle regle = new Regle();
         regle.setCoderegle("R010");
 
-        // Création d'une valise et association avec la règle et le client
         Valise valise = new Valise();
         valise.setDescription("ValiseTest");
         valise.setClient(client);
         valise.setRegleSortie(regle);
 
-        // Associer la valise à la règle pour la bidirectionnalité
         regle.setValise(valise);
 
-        // Sauvegarde de la valise et de la règle
         valiseRepository.saveAndFlush(valise);
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
-        // Vérifications
         assertNotNull(savedRegle.getValise());
         assertEquals("ValiseTest", savedRegle.getValise().getDescription());
         assertEquals("ClientTest", savedRegle.getValise().getClient().getName());

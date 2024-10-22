@@ -51,7 +51,7 @@ public class SortieSemaine {
         this.id = id;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "regle_id", nullable = false)
     @NotNull
     private Regle regle;

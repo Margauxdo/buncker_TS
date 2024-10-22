@@ -1,12 +1,9 @@
 package example.integration.entities;
 
-import example.entities.Client;
 import example.entities.TypeValise;
-import example.entities.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
-import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -181,7 +178,7 @@ public class TypeValiseIntegrationTest {
         typeValiseRepository.saveAndFlush(typeValise1);
 
         TypeValise typeValise2 = new TypeValise();
-        typeValise2.setDescription("Unique Description");  // Même description
+        typeValise2.setDescription("Unique Description");
         typeValise2.setProprietaire("Proprietaire B");
         typeValiseRepository.saveAndFlush(typeValise2);
 

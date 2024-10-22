@@ -1,11 +1,12 @@
 package example.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
+
 
 @Entity
 @Table(name = "formule")
@@ -60,7 +61,7 @@ public class Formule {
     }
 
     @ManyToOne
-    @JoinColumn(name = "regle_id", nullable = false) // Rend cette relation obligatoire
+    @JoinColumn(name = "regle_id", nullable = true)
     private Regle regle;
 
 

@@ -130,14 +130,14 @@ public class ValiseIntegrationTest {
         clientA.setName("Henri");
         clientA.setEmail("henri@gmail.com");
         clientA.setAdresse("bd de turin 59000 Lille");
-        clientRepository.save(clientA);  // Enregistrement du client
+        clientRepository.save(clientA);
 
         Valise valise = new Valise();
         valise.setNumeroValise(252525L);
         valise.setRefClient("1234L");
         valise.setNumeroDujeu("1234");
         valise.setClient(clientA);
-        Valise savedValise = valiseRepository.save(valise);  // Enregistrement de la valise
+        Valise savedValise = valiseRepository.save(valise);
 
         Mouvement mouvement = new Mouvement();
         mouvement.setValise(savedValise);
