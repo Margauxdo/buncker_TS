@@ -39,6 +39,7 @@ public class RegleIntegrationTest {
 
     @BeforeEach
     public void setUp() {
+
         regleRepository.deleteAll();
     }
 

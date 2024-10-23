@@ -50,14 +50,14 @@ public class Probleme {
     @Column(name = "id_probleme")
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String descriptionProbleme;
     private String detailsProbleme;
 
-    //relation manytoone avec valise
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "valise_id")
     private Valise valise;
+
 
     public Client getClient() {
         return client;
