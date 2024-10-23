@@ -4,6 +4,7 @@ import example.entities.Client;
 import example.entities.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -128,6 +131,28 @@ class ClientIntegrationTest {
 
         assertTrue(valiseRepository.findById(valise.getId()).isEmpty());
     }
+    @Test
+    public void testFindAllClient() {
+        Client clientA = new Client();
+        clientA.setName("Client A");
+        clientA.setEmail("clientA@test.com");
+        clientA.setAdresse("Adresse A");
+        clientRepository.save(clientA);
+
+        Client clientB = new Client();
+        clientB.setName("Client B");
+        clientB.setEmail("clientB@test.com");
+        clientB.setAdresse("Adresse B");
+        clientRepository.save(clientB);
+
+        List<Client> clients = clientRepository.findAll();
+
+        Assertions.assertEquals(2, clients.size(), "Il devrait y avoir deux clients enregistrés.");
+
+        Assertions.assertTrue(clients.stream().anyMatch(c -> c.getName().equals("Client A") && c.getEmail().equals("clientA@test.com")));
+        Assertions.assertTrue(clients.stream().anyMatch(c -> c.getName().equals("Client B") && c.getEmail().equals("clientB@test.com")));
+    }
+
 
 
 

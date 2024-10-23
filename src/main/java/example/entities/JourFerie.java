@@ -51,7 +51,7 @@ public class JourFerie {
 
     //relation manytoone avec Regle
     @ManyToOne
-    @JoinColumn(name = "regle_id")
+    @JoinColumn(name = "regle_id", nullable = false)
     private Regle regle;
 
     //liste des jours feries

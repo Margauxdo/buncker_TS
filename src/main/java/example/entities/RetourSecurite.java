@@ -18,23 +18,22 @@ public class RetourSecurite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id; // Identifiant unique pour chaque retour sécurité
+    private int id;
 
     @Column(nullable = false)
-    private Long numero; // Numéro unique pour identifier le retour sécurité
+    private Long numero;
 
-    private Date datesecurite; // Date de sécurité (ex : date de retour prévue)
+    private Date datesecurite;
 
-    private Boolean cloture; // Statut de clôture du retour (ouvert ou fermé)
+    private Boolean cloture;
 
-    private Date dateCloture; // Date de clôture réelle du retour
+    private Date dateCloture;
 
-    // Relation avec l'entité Client (ManyToOne car plusieurs retours peuvent être associés à un même client)
-    @ManyToOne
-    @JoinColumn(name = "client_id") // Clé étrangère vers Client
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    // Getters et Setters personnalisés (si nécessaire pour des manipulations spécifiques)
+
     public Client getClient() {
         return client;
     }

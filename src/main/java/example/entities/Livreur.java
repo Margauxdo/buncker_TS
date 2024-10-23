@@ -22,6 +22,7 @@ public class Livreur {
 
     private String codeLivreur;
     private String motDePasse;
+    @Column(nullable = false)
     private String nomLivreur;
     private String prenomLivreur;
     private String numeroCartePro;

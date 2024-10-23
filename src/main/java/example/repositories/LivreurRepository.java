@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LivreurRepository extends JpaRepository<Livreur, Integer> {
+Livreur findByCodeLivreur(String codeLivreur);
+
 }

@@ -37,7 +37,7 @@ public class RegleManuelleIntegrationTest {
         regleManuelle.setCoderegle("RM001");
 
         RegleManuelle savedRegle = regleManuelleRepository.save(regleManuelle);
-        Assertions.assertNotNull(savedRegle.getId(), "L'ID de la règle doit être généré");
+        Assertions.assertNotNull(savedRegle.getId(), "The rule ID must be generated");
         Assertions.assertEquals("adminA", savedRegle.getCreateurRegle());
         Assertions.assertEquals("This is a manual rule", savedRegle.getDescriptionRegle());
         Assertions.assertEquals("RM001", savedRegle.getCoderegle());
@@ -51,7 +51,7 @@ public class RegleManuelleIntegrationTest {
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             regleManuelleRepository.save(regleManuelle);
-        }, "La sauvegarde devrait échouer si le créateur de la règle est manquant");
+        }, "Save should fail if rule creator is missing");
     }
 
     @Test
@@ -66,7 +66,7 @@ public class RegleManuelleIntegrationTest {
         regleManuelleRepository.deleteById(savedRegle.getId());
 
         Optional<RegleManuelle> foundRegle = regleManuelleRepository.findById(savedRegle.getId());
-        Assertions.assertFalse(foundRegle.isPresent(), "La règle supprimée ne doit plus être présente dans la base");
+        Assertions.assertFalse(foundRegle.isPresent(), "The deleted rule must no longer be present in the database");
     }
 
     @Test
@@ -82,7 +82,7 @@ public class RegleManuelleIntegrationTest {
         RegleManuelle updatedRegle = regleManuelleRepository.save(savedRegle);
 
         Assertions.assertEquals("Updated rule description", updatedRegle.getDescriptionRegle(),
-                "La description de la règle doit être mise à jour");
+                "The rule description needs to be updated");
     }
 
     @Test
@@ -102,7 +102,7 @@ public class RegleManuelleIntegrationTest {
 
         List<RegleManuelle> regles = regleManuelleRepository.findAll();
 
-        Assertions.assertEquals(2, regles.size(), "Il doit y avoir deux règles dans la base de données.");
+        Assertions.assertEquals(2, regles.size(), "There must be two rules in the database.");
     }
 
     @Test
@@ -113,8 +113,8 @@ public class RegleManuelleIntegrationTest {
 
         RegleManuelle savedRegle = regleManuelleRepository.save(regleManuelle);
 
-        Assertions.assertNotNull(savedRegle.getId(), "La règle doit être sauvegardée même sans description.");
-        Assertions.assertNull(savedRegle.getDescriptionRegle(), "La description de la règle doit être nulle.");
+        Assertions.assertNotNull(savedRegle.getId(), "The rule must be saved even without a description.");
+        Assertions.assertNull(savedRegle.getDescriptionRegle(), "The rule description must be null.");
     }
 
     @Test
@@ -132,7 +132,7 @@ public class RegleManuelleIntegrationTest {
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             regleManuelleRepository.save(regle2);
-        }, "Une exception doit être levée si un coderegle en double est sauvegardé.");
+        }, "An exception should be thrown if a duplicate rulecode is saved.");
     }
 
 

@@ -162,7 +162,6 @@ public class TypeValiseIntegrationTest {
 
         typeValiseRepository.saveAndFlush(typeValise);
 
-        // Supprimer TypeValise
         typeValiseRepository.deleteById(typeValise.getId());
         typeValiseRepository.flush();
 
@@ -173,13 +172,14 @@ public class TypeValiseIntegrationTest {
     @Test
     public void testUniqueConstraintOnDescription() {
         TypeValise typeValise1 = new TypeValise();
-        typeValise1.setDescription("Unique Description");
-        typeValise1.setProprietaire("Proprietaire A");
+        typeValise1.setDescription("Single Description");
+        typeValise1.setProprietaire("Owner A");
         typeValiseRepository.saveAndFlush(typeValise1);
 
         TypeValise typeValise2 = new TypeValise();
-        typeValise2.setDescription("Unique Description");
-        typeValise2.setProprietaire("Proprietaire B");
+        typeValise2.setDescription("Single Description");
+        typeValise2.setProprietaire("Owner B");
         typeValiseRepository.saveAndFlush(typeValise2);
 
-    }}
+    }
+}

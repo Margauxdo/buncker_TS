@@ -98,11 +98,11 @@ public class TypeRegleIntegrationTest {
     @Test
     public void testUniqueConstraintOnTypeRegleName() {
         TypeRegle typeRegle1 = new TypeRegle();
-        typeRegle1.setNomTypeRegle("UniqueName");
+        typeRegle1.setNomTypeRegle("SingleName");
         typeRegleRepository.saveAndFlush(typeRegle1);
 
         TypeRegle typeRegle2 = new TypeRegle();
-        typeRegle2.setNomTypeRegle("UniqueName");
+        typeRegle2.setNomTypeRegle("SingleName");
 
         assertThrows(DataIntegrityViolationException.class, () -> {
             typeRegleRepository.saveAndFlush(typeRegle2);

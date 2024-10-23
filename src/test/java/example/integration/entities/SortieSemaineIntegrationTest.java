@@ -46,8 +46,8 @@ public class SortieSemaineIntegrationTest {
         sortieSemaine.setRegle(regle);
 
         SortieSemaine savedSortie = semaineRepository.save(sortieSemaine);
-        Assertions.assertNotNull(savedSortie.getId(), "L'ID de la sortie doit être généré");
-        Assertions.assertEquals(regle.getId(), savedSortie.getRegle().getId(), "La règle associée doit correspondre");
+        Assertions.assertNotNull(savedSortie.getId(), "The output ID must be generated");
+        Assertions.assertEquals(regle.getId(), savedSortie.getRegle().getId(), "The associated rule must match");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class SortieSemaineIntegrationTest {
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             semaineRepository.save(sortieSemaine);
-        }, "Une exception doit être levée si la règle est manquante");
+        }, "expected DataIntegrityViolationException");
     }
 
 
@@ -76,7 +76,7 @@ public class SortieSemaineIntegrationTest {
         savedSortie.setDateSortieSemaine(newDate);
         SortieSemaine updatedSortie = semaineRepository.save(savedSortie);
 
-        Assertions.assertEquals(newDate, updatedSortie.getDateSortieSemaine(), "La date de sortie doit être mise à jour");
+        Assertions.assertEquals(newDate, updatedSortie.getDateSortieSemaine(), "Release date needs to be updated");
     }
 
     @Test
@@ -118,13 +118,13 @@ public class SortieSemaineIntegrationTest {
         semaineRepository.save(sortie2);
 
         List<SortieSemaine> sorties = semaineRepository.findAll();
-        Assertions.assertEquals(2, sorties.size(), "Il doit y avoir deux sorties dans la base de données.");
+        Assertions.assertEquals(2, sorties.size(), "There must be two outputs in the database.");
     }
 
     @Test
     public void testFindSortieSemaineByIdNotFound() {
-        Optional<SortieSemaine> foundSortie = semaineRepository.findById(999);
-        Assertions.assertFalse(foundSortie.isPresent(), "Aucune sortie ne doit être trouvée pour un ID inexistant");
+        Optional<SortieSemaine> foundSortie = semaineRepository.findById(9999);
+        Assertions.assertFalse(foundSortie.isPresent(), "No output should be found");
     }
 
     @Test
@@ -142,8 +142,8 @@ public class SortieSemaineIntegrationTest {
 
         regleRepository.deleteById(regle.getId());
 
-        Assertions.assertFalse(regleRepository.findById(regle.getId()).isPresent(), "La règle doit être supprimée");
-        Assertions.assertFalse(semaineRepository.findById(sortieSemaine.getId()).isPresent(), "La sortie doit être supprimée");
+        Assertions.assertFalse(regleRepository.findById(regle.getId()).isPresent(), "The rule must be deleted");
+        Assertions.assertFalse(semaineRepository.findById(sortieSemaine.getId()).isPresent(), "the week outing should be deleted");
     }
 
 }
