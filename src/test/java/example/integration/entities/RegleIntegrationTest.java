@@ -2,6 +2,7 @@ package example.integration.entities;
 
 import example.entities.*;
 import example.repositories.*;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integrationtest")
@@ -36,6 +38,10 @@ public class RegleIntegrationTest {
 
     @Autowired
     private RegleRepository regleRepository;
+
+    @Autowired
+    private JourFerieRepository jourFerieRepository;
+
 
     @BeforeEach
     public void setUp() {
@@ -211,6 +217,28 @@ public class RegleIntegrationTest {
         assertEquals("ValiseTest", savedRegle.getValise().getDescription());
         assertEquals("ClientTest", savedRegle.getValise().getClient().getName());
     }
+    @Test
+    public void testDeleteRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Test Regle");
+        regleRepository.saveAndFlush(regle);
+
+        JourFerie jourFerie = new JourFerie();
+        jourFerie.setRegle(regle);
+        jourFerieRepository.saveAndFlush(jourFerie);
+
+        jourFerieRepository.deleteByRegleId(regle.getId());
+        jourFerieRepository.flush();
+
+        regleRepository.deleteById(regle.getId());
+        regleRepository.flush();
+
+        assertFalse(regleRepository.findById(regle.getId()).isPresent());
+
+        assertEquals(0, jourFerieRepository.findAll().size());
+    }
+
+
 
 
 

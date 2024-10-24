@@ -53,4 +53,9 @@ public class Regle {
     @ManyToOne
     @JoinColumn(name = "formule_id", nullable = true)
     private Formule formule;
+
+    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JourFerie> jourFeries = new ArrayList<>();
+
+
 }
