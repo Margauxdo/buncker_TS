@@ -121,5 +121,39 @@ public class FormuleRepositoryIntegrationTest {
         foundF.forEach(formule -> System.out.println(formule.getFormule()));
     }
 
+    @Test
+    public void testSaveFormuleInvalidInput() {
+        Formule formule = new Formule();
+        // Ne pas définir les champs obligatoires comme "libelle"
+        assertThrows(Exception.class, () -> {
+            formuleRepository.save(formule);
+        });
+    }
+    
+
+    @Test
+    public void testDeleteFormuleWithRegle() {
+        Regle regletest = new Regle();
+        Formule formule = new Formule();
+        formule.setLibelle("libelle 1234");
+        formule.setFormule("formule test");
+        regletest.setFormule(formule);
+        formule.setRegle(regletest);
+
+        Formule savedF = formuleRepository.save(formule);
+        formuleRepository.deleteById(savedF.getId());
+
+        // Vérifiez que la Formule est bien supprimée
+        Optional<Formule> foundF = formuleRepository.findById(savedF.getId());
+        assertFalse(foundF.isPresent());
+    }
+
+
+
+
+
+
+
+
 
 }
