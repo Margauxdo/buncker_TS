@@ -48,12 +48,13 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- PostgreSQL (runtime) -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>42.5.5</version>
             <scope>runtime</scope>
         </dependency>
+
 
         <!-- Lombok -->
         <dependency>
@@ -141,6 +142,13 @@
     </build>
 
     <profiles>
+        <!-- Test Profile for Unit Testing -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
         <!-- Profil de test pour l'intégration -->
         <profile>
             <id>integrationtest</id>
