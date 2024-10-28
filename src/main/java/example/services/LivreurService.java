@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class LivreurService implements ILivreurService {
+public class    LivreurService implements ILivreurService {
 
     @Autowired
     private LivreurRepository livreurRepository;
@@ -30,11 +30,7 @@ public class LivreurService implements ILivreurService {
             throw new RuntimeException("delivery person not found");
         }
 
-        // Vérification de l'ID du livreur pour lever l'exception
-        if (livreur.getId() == id) {
-            throw new RuntimeException("Expression not valid");
-        }
-
+        // Mettre à jour l'ID de l'objet `livreur` pour correspondre à l'ID fourni
         livreur.setId(id);
         return livreurRepository.save(livreur);
     }

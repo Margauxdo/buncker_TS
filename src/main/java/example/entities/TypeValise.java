@@ -24,10 +24,10 @@ public class TypeValise {
     @Column(name = "typeValise_id")
     private int id;
 
-    @Column(nullable = false)  // Contrainte non-null
+    @Column(nullable = false)
     private String proprietaire;
 
-    @Column(nullable = false)  // Contrainte non-null
+    @Column(nullable = false)
     private String description;
 
     @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

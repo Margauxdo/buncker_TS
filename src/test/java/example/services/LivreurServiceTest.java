@@ -69,25 +69,26 @@ public class LivreurServiceTest {
 
     }
     @Test
-    public void testUpdateLivreur_Failure_Exception(){
+    public void testUpdateLivreur_Failure_Exception() {
+
         int id = 1;
         Livreur livreur = new Livreur();
-        livreur.setId(1); // Le même ID pour déclencher l'exception
+        livreur.setId(id);
 
-        when(livreurRepository.existsById(id)).thenReturn(true);
+        when(livreurRepository.existsById(id)).thenReturn(false);
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             livreurService.updateLivreur(id, livreur);
         });
 
-        Assertions.assertEquals("Expression not valid", exception.getMessage(),
+        Assertions.assertEquals("delivery person not found", exception.getMessage(),
                 "Exception message should match expected error");
 
         verify(livreurRepository, times(1)).existsById(id);
         verify(livreurRepository, never()).save(any(Livreur.class));
         verifyNoMoreInteractions(livreurRepository);
-
     }
+
     @Test
     public void testDeleteLivreur_Success(){
         int id = 1;

@@ -25,19 +25,17 @@ public class FormuleService implements IFormuleService {
     }
 
     @Override
-    public Formule updateFormule(int id, Formule formule) {
-        // Vérifie d'abord si l'entité avec cet ID existe
-        if (!formuleRepository.existsById(id)) {
-            throw new RuntimeException("Formule not found for ID " + id);
-        }
+    public Formule updateFormule(int id, Formule formuleDetails) {
+        Formule existingFormule = formuleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Formule not found for ID " + id));
 
-        if (formule.getId() != id) {
-            formule.setId(id);
-            return formuleRepository.save(formule);
-        } else {
-            throw new RuntimeException("Expression not valid");
-        }
+        existingFormule.setLibelle(formuleDetails.getLibelle());
+        existingFormule.setFormule(formuleDetails.getFormule());
+        existingFormule.setRegle(formuleDetails.getRegle());
+
+        return formuleRepository.save(existingFormule);
     }
+
 
 
     @Override

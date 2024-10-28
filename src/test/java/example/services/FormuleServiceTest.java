@@ -56,17 +56,17 @@ public class FormuleServiceTest {
         verifyNoMoreInteractions(formuleRepository);
     }
 
-    // Tests pour updateFormule
     @Test
     public void testUpdateFormule_Success() {
         int id = 1;
         Formule formule = new Formule();
-        formule.setId(2); // ID différent pour forcer la mise à jour
+        formule.setId(2);
 
-        when(formuleRepository.existsById(id)).thenReturn(true);
+        when(formuleRepository.findById(id)).thenReturn(Optional.of(new Formule(id, "libellé existant", "formule existante", null)));
+
         when(formuleRepository.save(any(Formule.class))).thenAnswer(invocation -> {
             Formule savedFormule = invocation.getArgument(0);
-            savedFormule.setId(id); // Met à jour l'ID pour correspondre à `updateFormule`
+            savedFormule.setId(id);
             return savedFormule;
         });
 
@@ -75,32 +75,16 @@ public class FormuleServiceTest {
         Assertions.assertNotNull(result, "Formule should not be null");
         Assertions.assertEquals(id, result.getId(), "L'ID de la formule devrait être mis à jour");
 
-        verify(formuleRepository, times(1)).existsById(id);
-        verify(formuleRepository, times(1)).save(formule);
+        verify(formuleRepository, times(1)).findById(id);
+        verify(formuleRepository, times(1)).save(any(Formule.class));
         verifyNoMoreInteractions(formuleRepository);
     }
 
-    @Test
-    public void testUpdateFormule_Failure_Exception() {
-        int id = 1;
-        Formule formule = new Formule();
-        formule.setId(1); // Le même ID pour déclencher l'exception
 
-        when(formuleRepository.existsById(id)).thenReturn(true);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            formuleService.updateFormule(id, formule);
-        });
 
-        Assertions.assertEquals("Expression not valid", exception.getMessage(),
-                "Exception message should match expected error");
 
-        verify(formuleRepository, times(1)).existsById(id);
-        verify(formuleRepository, never()).save(any(Formule.class));
-        verifyNoMoreInteractions(formuleRepository);
-    }
 
-    // Tests pour getFormuleById
     @Test
     public void testGetFormuleById_Success() {
         int id = 1;
@@ -197,12 +181,11 @@ public class FormuleServiceTest {
         try {
             formuleService.updateFormule(id, formule);
         } catch (RuntimeException e) {
-            // Ignore l'exception pour ce test
         }
 
-        // Vérifie que seule l'interaction `existsById` s'est produite et aucune autre
-        verify(formuleRepository, times(1)).existsById(id);
+        verify(formuleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(formuleRepository);
     }
+
 }
 

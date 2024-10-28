@@ -29,12 +29,11 @@ public ClientService(ClientRepository clientRepository) {
             throw new RuntimeException("Customer not found");
         }
 
-        // Vérification de l'ID du client pour lever l'exception
-        if (client.getId() == id) {
+        if (client.getId() != id) {
             throw new RuntimeException("Expression not valid");
         }
 
-        client.setId(id); // Met à jour l'ID
+        client.setId(id);
         return clientRepository.save(client);
     }
 

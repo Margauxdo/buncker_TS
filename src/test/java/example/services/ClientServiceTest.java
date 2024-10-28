@@ -53,12 +53,12 @@ public class ClientServiceTest {
     public void testUpdateClient_Success() {
         int id = 1;
         Client client = new Client();
-        client.setId(2); // ID différent pour que `updateClient` le mette à jour
+        client.setId(id);
 
         when(clientRepository.existsById(id)).thenReturn(true);
         when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> {
             Client savedClient = invocation.getArgument(0);
-            savedClient.setId(id); // Mettre à jour l'ID pour correspondre à l'appel de `updateClient`
+            savedClient.setId(id);
             return savedClient;
         });
 
@@ -72,21 +72,26 @@ public class ClientServiceTest {
         verifyNoMoreInteractions(clientRepository);
     }
 
+
     @Test
-    public void testUpdateClient_Failure_Exception(){
+    public void testUpdateClient_Failure_Exception() {
         int id = 1;
         Client client = new Client();
-        client.setId(id);
+        client.setId(2);
+
         when(clientRepository.existsById(id)).thenReturn(true);
-        Exception exception = Assertions.assertThrows(RuntimeException.class,()-> {
-            clientService.updateClient(id,client);
+
+        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            clientService.updateClient(id, client);
         });
-        Assertions.assertEquals("Expression not valid", exception.getMessage()
-        , "Exception message should match expected error");
+
+        Assertions.assertEquals("Expression not valid", exception.getMessage(), "Exception message should match expected error");
+
         verify(clientRepository, times(1)).existsById(id);
         verify(clientRepository, never()).save(any(Client.class));
         verifyNoMoreInteractions(clientRepository);
     }
+
     @Test
     public void testDeleteClient_Success() {
         int id = 1;

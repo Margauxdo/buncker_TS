@@ -25,7 +25,10 @@ public class SortieSemaine {
     @Column(name = "sortieSemaine_id")
     private int id;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "sortie_semaine")  // Si le nom de la colonne dans la base de données est différent
     private Date dateSortieSemaine;
+
 
     public Regle getRegle() {
         return regle;
