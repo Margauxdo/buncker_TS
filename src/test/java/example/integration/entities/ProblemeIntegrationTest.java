@@ -107,24 +107,27 @@ public class ProblemeIntegrationTest {
         Client clientA = new Client();
         clientA.setName("Martin");
         clientA.setEmail("martin@example.com");
-        clientRepository.save(clientA);
+        clientA = clientRepository.saveAndFlush(clientA);
 
         Valise val1 = new Valise();
         val1.setClient(clientA);
-        valiseRepository.save(val1);
+        val1 = valiseRepository.saveAndFlush(val1);
 
         Probleme probleme = new Probleme();
         probleme.setClient(clientA);
         probleme.setValise(val1);
         probleme.setDetailsProbleme("Initial details");
         probleme.setDescriptionProbleme("Initial description");
+        Probleme savedPb = problemeRepository.saveAndFlush(probleme);
 
-        Probleme savedPb = problemeRepository.save(probleme);
         savedPb.setDetailsProbleme("Updated details");
-        Probleme updatedPb = problemeRepository.save(savedPb);
+        Probleme updatedPb = problemeRepository.saveAndFlush(savedPb);
 
         Assertions.assertEquals("Updated details", updatedPb.getDetailsProbleme());
     }
+
+
+
 
 
 
@@ -155,29 +158,38 @@ public class ProblemeIntegrationTest {
 
     @Test
     public void testCascadeDeleteProblemeWithValise() {
+        // Création et sauvegarde du client
         Client clientA = new Client();
         clientA.setName("Martin");
         clientA.setEmail("martin@example.com");
-        clientRepository.save(clientA);
+        clientA = clientRepository.saveAndFlush(clientA);  // Attache le client au contexte de persistance
 
+        // Création et sauvegarde de la valise
         Valise val1 = new Valise();
         val1.setClient(clientA);
-        valiseRepository.save(val1);
+        val1 = valiseRepository.saveAndFlush(val1);  // Attache la valise au contexte de persistance
 
+        // Création et sauvegarde du problème avec le client et la valise attachés
         Probleme probleme = new Probleme();
         probleme.setClient(clientA);
         probleme.setValise(val1);
-        probleme.setDetailsProbleme("Details of the problem");
-        probleme.setDescriptionProbleme("Description of the problem");
+        probleme.setDetailsProbleme("Détails du problème");
+        probleme.setDescriptionProbleme("Description du problème");
+        Probleme savedProbleme = problemeRepository.saveAndFlush(probleme);  // Attache le problème au contexte de persistance
 
-        problemeRepository.save(probleme);
+        // Suppression du problème
+        problemeRepository.delete(savedProbleme);
+        problemeRepository.flush(); // Force la suppression dans la base de données
 
-        problemeRepository.delete(probleme);
+        // Suppression de la valise
         valiseRepository.delete(val1);
+        valiseRepository.flush();  // Force la suppression dans la base de données
 
-        Optional<Probleme> foundPb = problemeRepository.findById(probleme.getId());
-        Assertions.assertFalse(foundPb.isPresent());
+        // Vérification que le problème n'existe plus
+        Optional<Probleme> foundProbleme = problemeRepository.findById(savedProbleme.getId());
+        Assertions.assertFalse(foundProbleme.isPresent(), "Le problème devrait être supprimé.");
     }
+
 
     @Test
     public void testFindAllProblemes() {
@@ -214,17 +226,16 @@ public class ProblemeIntegrationTest {
         Assertions.assertTrue(allProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Problem 2")));
     }
 
-
     @Test
     public void testPartialUpdateProbleme() {
         Client clientA = new Client();
         clientA.setName("Martin");
         clientA.setEmail("martin@example.com");
-        clientRepository.save(clientA);
+        clientRepository.saveAndFlush(clientA);
 
         Valise val1 = new Valise();
         val1.setClient(clientA);
-        valiseRepository.save(val1);
+        valiseRepository.saveAndFlush(val1);
 
         Probleme probleme = new Probleme();
         probleme.setClient(clientA);
@@ -232,17 +243,16 @@ public class ProblemeIntegrationTest {
         probleme.setDetailsProbleme("Initial details");
         probleme.setDescriptionProbleme("Initial description");
 
-        Probleme savedPb = problemeRepository.save(probleme);
+        Probleme savedPb = problemeRepository.saveAndFlush(probleme);
 
-        // Effectuer une mise à jour partielle
         savedPb.setDescriptionProbleme("Updated description");
-        problemeRepository.save(savedPb);
+        problemeRepository.saveAndFlush(savedPb);
 
-        // Vérifier que les détails restent inchangés
         Probleme updatedPb = problemeRepository.findById(savedPb.getId()).orElseThrow();
         Assertions.assertEquals("Initial details", updatedPb.getDetailsProbleme());
         Assertions.assertEquals("Updated description", updatedPb.getDescriptionProbleme());
     }
+
 
     @Test
     public void testSaveProblemeWithoutDescriptionThrowsException() {
@@ -269,11 +279,11 @@ public class ProblemeIntegrationTest {
         Client clientA = new Client();
         clientA.setName("Martin");
         clientA.setEmail("martin@example.com");
-        clientRepository.save(clientA);
+        clientA = clientRepository.save(clientA);
 
         Valise val1 = new Valise();
         val1.setClient(clientA);
-        valiseRepository.save(val1);
+        val1 = valiseRepository.save(val1);
 
         Probleme probleme1 = new Probleme();
         probleme1.setClient(clientA);
@@ -295,6 +305,7 @@ public class ProblemeIntegrationTest {
         Assertions.assertNotNull(problemesByValise);
         Assertions.assertEquals(2, problemesByValise.size());
     }
+
 
 
 

@@ -26,12 +26,10 @@ public class RegleManuelleService implements IRegleManuelleService {
 
     @Override
     public RegleManuelle updateRegleManuelle(int id, RegleManuelle regleManuelle) {
-        // Vérifie d'abord l'existence de l'ID
         if (!regleManuelleRepository.existsById(id)) {
             throw new RuntimeException("La règle manuelle n'existe pas");
         }
 
-        // Vérifie ensuite la correspondance des IDs
         if (regleManuelle == null || regleManuelle.getId() != id) {
             throw new IllegalArgumentException("L'ID de la règle manuelle ne correspond pas");
         }

@@ -44,9 +44,12 @@ public class ProblemeRepositoryIntegrationTest {
         Client client = new Client();
         client.setName("harry");
         client.setEmail("harry@gmail.com");
+        client = clientRepository.save(client);
 
         Valise valise = new Valise();
         valise.setNumeroValise(123L);
+        valise.setClient(client);
+        valise = valiseRepository.save(valise);
 
         Probleme probleme = new Probleme();
         probleme.setValise(valise);
@@ -60,65 +63,94 @@ public class ProblemeRepositoryIntegrationTest {
         assertEquals("description test", saved.getDescriptionProbleme());
     }
 
+
     @Test
-    public void testFindProblemeById(){
+    public void testFindProblemeById() {
+
         Client client = new Client();
         client.setName("harry");
         client.setEmail("harry@gmail.com");
+        client = clientRepository.save(client);
+
         Valise valise = new Valise();
         valise.setNumeroValise(123L);
+        valise.setClient(client);
+        valise = valiseRepository.save(valise);
+
         Probleme probleme = new Probleme();
         probleme.setValise(valise);
         probleme.setClient(client);
         probleme.setDetailsProbleme("details test");
         probleme.setDescriptionProbleme("description test");
-        Probleme saved = problemeRepository.save(probleme);
-        Optional<Probleme> found = problemeRepository.findById(saved.getId());
-        assertTrue(found.isPresent());
-        assertEquals("details test", found.get().getDetailsProbleme());
-        assertEquals("description test", found.get().getDescriptionProbleme());
 
+
+        Probleme savedProbleme = problemeRepository.save(probleme);
+        Optional<Probleme> foundProbleme = problemeRepository.findById(savedProbleme.getId());
+
+
+        assertTrue(foundProbleme.isPresent());
+        assertEquals("details test", foundProbleme.get().getDetailsProbleme());
+        assertEquals("description test", foundProbleme.get().getDescriptionProbleme());
+        assertEquals(client.getId(), foundProbleme.get().getClient().getId());
+        assertEquals(valise.getId(), foundProbleme.get().getValise().getId());
     }
 
+
     @Test
-    public void testDeleteProbleme(){
+    public void testDeleteProbleme() {
         Client client = new Client();
         client.setName("harry");
         client.setEmail("harry@gmail.com");
+        client = clientRepository.save(client);
+
         Valise valise = new Valise();
         valise.setNumeroValise(123L);
+        valise.setClient(client);
+        valise = valiseRepository.save(valise);
+
         Probleme probleme = new Probleme();
         probleme.setValise(valise);
         probleme.setClient(client);
         probleme.setDetailsProbleme("details test");
         probleme.setDescriptionProbleme("description test");
         Probleme saved = problemeRepository.save(probleme);
+
         problemeRepository.delete(saved);
         Optional<Probleme> found = problemeRepository.findById(saved.getId());
-        assertFalse(found.isPresent());
 
+        assertFalse(found.isPresent());
     }
+
     @Test
-    public void testUpdateProbleme(){
+    public void testUpdateProbleme() {
         Client client = new Client();
         client.setName("harry");
         client.setEmail("harry@gmail.com");
+        client = clientRepository.save(client);
+
         Valise valise = new Valise();
         valise.setNumeroValise(123L);
+        valise.setClient(client);
+        valise = valiseRepository.save(valise);
+
         Probleme probleme = new Probleme();
         probleme.setValise(valise);
         probleme.setClient(client);
         probleme.setDetailsProbleme("details test");
         probleme.setDescriptionProbleme("description test");
         Probleme saved = problemeRepository.save(probleme);
+
         saved.setDetailsProbleme("details updated");
         saved.setDescriptionProbleme("description updated");
         Probleme updated = problemeRepository.save(saved);
+
         Optional<Probleme> found = problemeRepository.findById(updated.getId());
+
         assertTrue(found.isPresent());
         assertEquals("details updated", found.get().getDetailsProbleme());
         assertEquals("description updated", found.get().getDescriptionProbleme());
     }
+
     @Test
     public void testFindAllProbleme() {
         Client client = new Client();
