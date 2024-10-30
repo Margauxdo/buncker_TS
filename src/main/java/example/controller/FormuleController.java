@@ -1,11 +1,13 @@
 package example.controller;
 
 import example.entities.Formule;
+import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,32 +19,38 @@ public class FormuleController {
     @Autowired
     private IFormuleService formuleService;
 
-    //recup les formules
+    // Gère l'exception FormuleNotFoundException et retourne un statut 404
+    @ExceptionHandler(FormuleNotFoundException.class)
+    public ResponseEntity<String> handleFormuleNotFoundException(FormuleNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+        return new ResponseEntity<>("Données invalides pour la création de Formule", HttpStatus.BAD_REQUEST);
+    }
+
+
     @GetMapping
     public List<Formule> getAllFormules() {
         List<Formule> formules = formuleService.getAllFormules();
         return new ResponseEntity<>(formules, HttpStatus.OK).getBody();
     }
 
-    //Recup client par son id
     @GetMapping("{id}")
     public ResponseEntity<Formule> getFormuleById(@PathVariable int id) {
         Formule formule = formuleService.getFormuleById(id);
-        return formule != null ? new ResponseEntity<>(formule, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-
+        return formule != null ? new ResponseEntity<>(formule, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    //cree une nouvelle formule
     @PostMapping
-    public ResponseEntity<Formule> createFormule(@RequestBody Formule formule) {
+    public ResponseEntity<Formule> createFormule(@Valid @RequestBody Formule formule) {
         try {
             Formule createdFormule = formuleService.createFormule(formule);
             return new ResponseEntity<>(createdFormule, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (IllegalStateException e) { // Gérer le conflit
+        } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -50,7 +58,6 @@ public class FormuleController {
     }
 
 
-    //Mettre a jour une formule existente
     @PutMapping("/{id}")
     public ResponseEntity<Formule> updateFormule(@PathVariable int id, @RequestBody Formule formule) {
         try {
@@ -62,8 +69,6 @@ public class FormuleController {
         }
     }
 
-
-    //Supprimer une formule
     @DeleteMapping("/{id}")
     public ResponseEntity<Formule> deleteFormule(@PathVariable int id) {
         try {
@@ -73,5 +78,4 @@ public class FormuleController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }

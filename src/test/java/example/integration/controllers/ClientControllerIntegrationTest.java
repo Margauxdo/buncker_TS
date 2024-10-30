@@ -1,4 +1,3 @@
-
 package example.integration.controllers;
 
 import example.entities.Client;
@@ -11,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -32,6 +31,7 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void getAllClients_shouldReturnClients_whenClientsExist() throws Exception {
+        // Arrange
         Client client = new Client();
         client.setName("Nom Test");
         client.setAdresse("Adresse Test");
@@ -46,6 +46,7 @@ public class ClientControllerIntegrationTest {
 
         clientRepository.save(client);
 
+        // Act & Assert
         mockMvc.perform(get("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -54,6 +55,7 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void getClientById_shouldReturnClient_whenClientExists() throws Exception {
+        // Arrange
         Client client = new Client();
         client.setName("Nom Test");
         client.setAdresse("Adresse Test");
@@ -68,6 +70,7 @@ public class ClientControllerIntegrationTest {
 
         client = clientRepository.save(client);
 
+        // Act & Assert
         mockMvc.perform(get("/api/clients/{id}", client.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -76,6 +79,7 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void getClientById_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {
+        // Act & Assert
         mockMvc.perform(get("/api/clients/{id}", 999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -83,8 +87,10 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void createClient_shouldCreateClient_whenValidRequest() throws Exception {
+        // Arrange
         String clientJson = "{\"name\":\"Nom Test\",\"adresse\":\"Adresse Test\",\"email\":\"email@example.com\"}";
 
+        // Act & Assert
         mockMvc.perform(post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(clientJson))
@@ -94,8 +100,10 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void createClient_shouldReturnBadRequest_whenInvalidRequest() throws Exception {
+        // Arrange
         String clientJson = "{\"name\":\"\",\"email\":\"invalid_email\"}";
 
+        // Act & Assert
         mockMvc.perform(post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(clientJson))
@@ -104,6 +112,7 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void updateClient_shouldUpdateClient_whenClientExists() throws Exception {
+        // Arrange
         Client client = new Client();
         client.setName("Nom Test");
         client.setAdresse("Adresse Test");
@@ -118,6 +127,7 @@ public class ClientControllerIntegrationTest {
                 client.getId()
         );
 
+        // Act & Assert
         mockMvc.perform(put("/api/clients/{id}", client.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedClientJson))
@@ -125,12 +135,12 @@ public class ClientControllerIntegrationTest {
                 .andExpect(jsonPath("$.name", is("Nom Mis à Jour")));
     }
 
-
-
     @Test
     public void updateClient_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {
+        // Arrange
         String updatedClientJson = "{\"name\":\"Nom Test\",\"adresse\":\"Adresse Test\",\"email\":\"email@example.com\"}";
 
+        // Act & Assert
         mockMvc.perform(put("/api/clients/{id}", 999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedClientJson))
@@ -139,6 +149,7 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void deleteClient_shouldReturnNoContent_whenClientExists() throws Exception {
+        // Arrange
         Client client = new Client();
         client.setName("Nom Test");
         client.setAdresse("Adresse Test");
@@ -148,6 +159,7 @@ public class ClientControllerIntegrationTest {
 
         client = clientRepository.save(client);
 
+        // Act & Assert
         mockMvc.perform(delete("/api/clients/{id}", client.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -155,6 +167,7 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void deleteClient_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {
+        // Act & Assert
         mockMvc.perform(delete("/api/clients/{id}", 999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());

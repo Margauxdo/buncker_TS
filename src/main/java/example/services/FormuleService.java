@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entities.Formule;
+import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,32 +25,43 @@ public class FormuleService implements IFormuleService {
         return formuleRepository.save(formule);
     }
 
+
     @Override
-    public Formule updateFormule(int id, Formule formuleDetails) {
-        Formule existingFormule = formuleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Formule not found for ID " + id));
-
-        existingFormule.setLibelle(formuleDetails.getLibelle());
-        existingFormule.setFormule(formuleDetails.getFormule());
-        existingFormule.setRegle(formuleDetails.getRegle());
-
-        return formuleRepository.save(existingFormule);
+    public Formule updateFormule(int id, Formule formule) {
+        return formuleRepository.findById(id)
+                .map(existingFormule -> {
+                    existingFormule.setLibelle(formule.getLibelle());
+                    existingFormule.setFormule(formule.getFormule());
+                    return formuleRepository.save(existingFormule);
+                })
+                .orElseThrow(() -> new FormuleNotFoundException("Formule not found for ID " + id));
     }
-
-
 
     @Override
     public Formule getFormuleById(int id) {
         return formuleRepository.findById(id).orElse(null);
     }
 
-    @Override
+
     public List<Formule> getAllFormules() {
         return formuleRepository.findAll();
     }
 
+
+
     @Override
     public void deleteFormule(int id) {
+        if (!formuleRepository.existsById(id)) {
+            throw new FormuleNotFoundException("Formule not found for ID " + id);
+        }
         formuleRepository.deleteById(id);
     }
+
+
 }
+
+
+
+
+
+

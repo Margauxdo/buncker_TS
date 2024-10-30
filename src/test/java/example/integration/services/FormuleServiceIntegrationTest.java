@@ -80,23 +80,32 @@ public class FormuleServiceIntegrationTest {
     }
     @Test
     public void testGetAllFormules() {
-        // Arrange
+        // Arrange : Crée deux instances de Formule et les enregistre dans le repository
         Formule form1 = Formule.builder()
-                .libelle("libelle 2B")
-                .formule("formule supplémentaire")
+                .libelle("libelle 1")
+                .formule("formule 1")
                 .build();
 
-        formuleService.createFormule(formule);
-        formuleService.createFormule(form1);
+        Formule form2 = Formule.builder()
+                .libelle("libelle 2")
+                .formule("formule 2")
+                .build();
 
-        // Act
+        // Sauvegarde les deux formules dans le repository et force le flush
+        formuleRepository.save(form1);
+        formuleRepository.save(form2);
+        formuleRepository.flush();
+
+        // Act : Récupère toutes les formules via le service
         List<Formule> formules = formuleService.getAllFormules();
 
-        // Assert
-        assertNotNull(formules);
-        assertEquals(2, formules.size(), "Expected only 2 form in the repository");
-
+        // Assert : Vérifie que la liste contient bien 2 formules
+        assertNotNull(formules, "La liste des formules ne doit pas être nulle");
+        assertEquals(2, formules.size(), "La liste des formules devrait contenir 2 éléments");
     }
+
+
+
     @Test
     public void testDeleteFormule() {
         //Arrange

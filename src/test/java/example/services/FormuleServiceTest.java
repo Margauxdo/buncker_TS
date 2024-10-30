@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entities.Formule;
+import example.exceptions.FormuleNotFoundException;
 import example.repositories.FormuleRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
 import java.util.List;
@@ -115,7 +117,7 @@ public class FormuleServiceTest {
         verifyNoMoreInteractions(formuleRepository);
     }
 
-    // Tests pour getAllFormules
+
     @Test
     public void testGetAllFormules_Success() {
         List<Formule> formules = new ArrayList<>();
@@ -137,35 +139,71 @@ public class FormuleServiceTest {
 
         List<Formule> result = formuleService.getAllFormules();
 
+        Assertions.assertNotNull(result, "Le résultat ne doit pas être null");
         Assertions.assertTrue(result.isEmpty(), "La liste des formules devrait être vide");
+
         verify(formuleRepository, times(1)).findAll();
-        verifyNoMoreInteractions(formuleRepository);
+        verifyNoMoreInteractions(formuleRepository); // Assure qu'il n'y a pas d'autres interactions
     }
 
-    // Tests pour deleteFormule
+
     @Test
     public void testDeleteFormule_Success() {
         int id = 1;
 
+        // Arrange
+        when(formuleRepository.existsById(id)).thenReturn(true);
+
+        // Act
         formuleService.deleteFormule(id);
 
+        // Assert
+        verify(formuleRepository, times(1)).existsById(id);
         verify(formuleRepository, times(1)).deleteById(id);
+    }
+
+
+
+    @Test
+    public void testDeleteFormule_Failure_NotFound() {
+        int id = 1;
+
+        when(formuleRepository.existsById(id)).thenReturn(false);
+
+        Exception exception = Assertions.assertThrows(FormuleNotFoundException.class, () -> {
+            formuleService.deleteFormule(id);
+        });
+
+        Assertions.assertEquals("Formule not found for ID " + id, exception.getMessage(), "Exception message should match expected error");
+
+        verify(formuleRepository, times(1)).existsById(id);
+
+        verify(formuleRepository, never()).deleteById(id);
         verifyNoMoreInteractions(formuleRepository);
     }
 
-    @Test
-    public void testDeleteFormule_Failure_Exception() {
-        int id = 1;
-        doThrow(new RuntimeException("Database error")).when(formuleRepository).deleteById(id);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+    @Test
+    public void testDeleteFormule_Failure_DatabaseException() {
+        int id = 1;
+
+        when(formuleRepository.existsById(id)).thenReturn(true);
+
+        doThrow(new DataIntegrityViolationException("Database error")).when(formuleRepository).deleteById(id);
+
+        Exception exception = Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             formuleService.deleteFormule(id);
         });
 
         Assertions.assertEquals("Database error", exception.getMessage(), "Exception message should match expected error");
+
+        verify(formuleRepository, times(1)).existsById(id);
         verify(formuleRepository, times(1)).deleteById(id);
         verifyNoMoreInteractions(formuleRepository);
     }
+
+
+
 
     @Test
     public void testNoInteractionWithFormuleRepository_Success() {
