@@ -116,12 +116,14 @@ class ClientControllerTest {
     @Test
     public void testUpdateClient_NotFound() {
         Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
+
         when(clientService.updateClient(1, client)).thenReturn(null);
 
         ResponseEntity<Client> response = clientController.updateClient(1, client);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+
 
     @Test
     public void testUpdateClient_InvalidInput() {
@@ -136,12 +138,15 @@ class ClientControllerTest {
 
     @Test
     public void testDeleteClient_Success() {
+        when(clientService.existsById(1)).thenReturn(true);
+
         doNothing().when(clientService).deleteClient(1);
 
         ResponseEntity<Void> response = clientController.deleteClient(1);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
+
 
     @Test
     public void testDeleteClient_NotFound() {
@@ -155,12 +160,15 @@ class ClientControllerTest {
 
     @Test
     public void testDeleteClient_Failure() {
+        when(clientService.existsById(1)).thenReturn(true);
+
         doThrow(new RuntimeException("Database error")).when(clientService).deleteClient(1);
 
         ResponseEntity<Void> response = clientController.deleteClient(1);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+
     @Test
     public void testClientController(){
             assertNotNull(clientController);

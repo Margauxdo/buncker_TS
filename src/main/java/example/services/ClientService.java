@@ -26,7 +26,7 @@ public ClientService(ClientRepository clientRepository) {
     @Override
     public Client updateClient(int id, Client client) {
         if (!clientRepository.existsById(id)) {
-            throw new RuntimeException("Customer not found");
+            throw new RuntimeException("Client not found");
         }
 
         if (client.getId() != id) {
@@ -36,6 +36,10 @@ public ClientService(ClientRepository clientRepository) {
         client.setId(id);
         return clientRepository.save(client);
     }
+
+
+
+
 
 
     @Override
@@ -51,5 +55,9 @@ public ClientService(ClientRepository clientRepository) {
     @Override
     public List<Client> getAllClients() {
         return clientRepository.findAll();
+    }
+    @Override
+    public boolean existsById(int id) {
+        return clientRepository.existsById(id);
     }
 }

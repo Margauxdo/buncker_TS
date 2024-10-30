@@ -159,7 +159,7 @@ public class RetourSecuriteServiceIntegrationTest {
                     .datesecurite(dateSecu)
                     .numero(55865L)
                     .build();
-            retourSecuriteService.createRetourSecurite(rs2); // Enregistrement de rs2
+            retourSecuriteService.createRetourSecurite(rs2);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

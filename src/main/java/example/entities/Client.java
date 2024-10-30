@@ -1,6 +1,8 @@
 package example.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,8 +25,11 @@ public class Client {
     private int id;
 
     @Column(nullable = false)
+    @NotBlank(message = "Name is required")
     private String name;
     private String adresse;
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required")
     @Column(nullable = false, unique = true)
     private String email;
     private String telephoneExploitation;

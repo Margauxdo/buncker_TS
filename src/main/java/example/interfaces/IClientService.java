@@ -11,4 +11,6 @@ public interface IClientService {
     void deleteClient(int id);
     Client getClientById(int id);
     List<Client> getAllClients();
+    boolean existsById(int id);
 }
+

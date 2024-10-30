@@ -41,7 +41,7 @@ public class Valise {
     private List<Mouvement> mouvementList = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "typevalise_id")
+    @JoinColumn(name = "typevalise_id" )
     private TypeValise typevalise;
 }
 

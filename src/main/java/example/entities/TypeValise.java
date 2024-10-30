@@ -1,6 +1,7 @@
 package example.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class TypeValise {
 
     @Column(nullable = false)
     private String proprietaire;
+
 
     @Column(nullable = false)
     private String description;

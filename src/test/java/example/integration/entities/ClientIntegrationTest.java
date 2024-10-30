@@ -4,6 +4,7 @@ import example.entities.Client;
 import example.entities.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,10 +109,11 @@ class ClientIntegrationTest {
         Client client = new Client();
         client.setEmail("nullname@example.com");
 
-        assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             clientRepository.save(client);
         });
     }
+
     @Test
     public void testCascadeDeleteClientDeletesValises() {
         Client client = new Client();

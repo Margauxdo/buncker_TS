@@ -1,13 +1,13 @@
 package example.entities;
 
 import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -31,7 +31,6 @@ public class ClientTest {
 
     @BeforeEach
     public void setUp() {
-        // Initialise le client
         client = new Client();
         client.setName("John Doe");
         client.setEmail("john.doe@example.com");
@@ -40,14 +39,12 @@ public class ClientTest {
         client.setVille("Sampleville");
         client.setPersonnelEtFonction("Manager");
 
-        // Crée et associe une valise au client
         Valise valise = new Valise();
         valise.setDescription("Valise Test");
         valise.setClient(client); // Lien bidirectionnel
         client.setValises(new ArrayList<>());
         client.getValises().add(valise);
 
-        // Persiste le client (valise est persistée en cascade)
         em.persist(client);
         em.flush();
     }
@@ -99,12 +96,14 @@ public class ClientTest {
     public void testNonNullName() {
         Client clientWithoutName = new Client();
         clientWithoutName.setAdresse("Adresse sans nom");
+        clientWithoutName.setEmail("nullname@example.com");
 
-        Assertions.assertThrows(PersistenceException.class, () -> {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
             em.persist(clientWithoutName);
             em.flush();
         }, "Le nom du client ne devrait pas être nul.");
     }
+
 
 }
 

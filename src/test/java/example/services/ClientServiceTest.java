@@ -91,6 +91,22 @@ public class ClientServiceTest {
         verify(clientRepository, never()).save(any(Client.class));
         verifyNoMoreInteractions(clientRepository);
     }
+    @Test
+    public void testUpdateClient_Success_WhenIdMatches() {
+        int id = 1;
+        Client client = new Client();
+        client.setId(id);  // Id correspondant à celui de la requête
+
+        when(clientRepository.existsById(id)).thenReturn(true);
+        when(clientRepository.save(client)).thenReturn(client);
+
+        Client updatedClient = clientService.updateClient(id, client);
+
+        Assertions.assertNotNull(updatedClient, "Client should be updated successfully");
+        verify(clientRepository, times(1)).existsById(id);
+        verify(clientRepository, times(1)).save(client);
+    }
+
 
     @Test
     public void testDeleteClient_Success() {
