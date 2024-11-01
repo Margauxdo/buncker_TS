@@ -3,6 +3,7 @@ package example.integration.entities;
 import example.entities.*;
 import example.repositories.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -138,10 +139,9 @@ public class RegleIntegrationTest {
 
     @Test
     public void testSaveEntityFailureDueToNullField() {
-        Regle regle = new Regle();
+        Regle regle = new Regle();  // champs obligatoires non initialisés
 
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             regleRepository.saveAndFlush(regle);
         });
     }

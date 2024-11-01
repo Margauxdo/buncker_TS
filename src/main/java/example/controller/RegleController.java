@@ -1,71 +1,86 @@
 package example.controller;
 
 import example.entities.Regle;
+import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/regle")
-public class RegleController  {
+@Validated
+public class RegleController {
 
     @Autowired
     private IRegleService regleService;
 
     @GetMapping
-    public List<Regle> readRegles() {
+    public ResponseEntity<List<Regle>> readRegles() {
         List<Regle> regleList = regleService.readAllRegles();
-        return new ResponseEntity<>(regleList, HttpStatus.OK).getBody();
+        return ResponseEntity.ok(regleList);
     }
+
     @GetMapping("{id}")
     public ResponseEntity<Regle> readRegleById(@PathVariable int id) {
         Regle regle = regleService.readRegle(id);
-        return regle != null ? new ResponseEntity<>(regle, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (regle == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(regle);
     }
 
     @PostMapping
-    public ResponseEntity<Regle> createRegle(@RequestBody Regle regle) {
-        try{
-            Regle regleCreated = regleService.createRegle(regle);
-            return new ResponseEntity<>(regleCreated, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (IllegalStateException e){
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Regle> createRegle(@RequestBody @Valid Regle regle) {
+        try {
+            if (regleService.regleExists(regle.getCoderegle())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            Regle newRegle = regleService.createRegle(regle);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newRegle);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Retourne 400 BAD_REQUEST en cas d'argument invalide
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // Retourne 409 CONFLICT en cas de conflit
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Retourne 500 en cas d'erreur interne
         }
     }
 
-    @PutMapping("{id}")  // Add the path variable to the mapping
-    public ResponseEntity<Regle> updateRegle(@PathVariable int id, @RequestBody Regle regle) {
+
+
+    @PutMapping("{id}")
+    public ResponseEntity<Regle> updateRegle(@PathVariable int id, @RequestBody @Valid Regle regle) {
         try {
             Regle updatedRegle = regleService.updateRegle(id, regle);
-            return updatedRegle != null ? new ResponseEntity<>(updatedRegle, HttpStatus.OK) :
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (updatedRegle == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Retourne 404 si updatedRegle est null
+            }
+            return ResponseEntity.ok(updatedRegle);
+        } catch (RegleNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Retourne 404 en cas d'exception
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Retourne 400 en cas de données invalides
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Retourne 500 en cas d'erreur interne
         }
     }
 
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Regle> deleteRegle(@PathVariable int id) {
-       try{
-           regleService.deleteRegle(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-       }catch (IllegalArgumentException e){
-           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-       }
-       catch (RuntimeException e) {
-           return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-       }
+    public ResponseEntity<Void> deleteRegle(@PathVariable int id) {
+        try {
+            regleService.deleteRegle(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

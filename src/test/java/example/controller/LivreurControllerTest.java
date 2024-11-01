@@ -34,11 +34,18 @@ public class LivreurControllerTest {
     public void testGetAllLivreurs_Success() {
         List<Livreur> livreurs = new ArrayList<>();
         livreurs.add(new Livreur());
+
         when(livreurService.getAllLivreurs()).thenReturn(livreurs);
-        List<Livreur> result = livreurController.getAllLivreurs();
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(livreurs.size(), result.size());
+
+        ResponseEntity<List<Livreur>> response = livreurController.getAllLivreurs();
+        List<Livreur> result = response.getBody();
+
+        // Vérifier les assertions
+        Assertions.assertNotNull(result, "La liste des livreurs ne devrait pas être nulle");
+        Assertions.assertEquals(livreurs.size(), result.size(), "La taille de la liste devrait correspondre");
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "Le statut HTTP devrait être OK");
     }
+
     @Test
     public void testGetAllLivreurs_Failure() {
         when(livreurService.getAllLivreurs()).thenThrow(new RuntimeException("Erreur de la base de donnee"));
@@ -61,11 +68,15 @@ public class LivreurControllerTest {
     @Test
     public void testCreateLivreur_Success() {
         Livreur livreur = new Livreur();
+        livreur.setNomLivreur("John Doe");
         when(livreurService.createLivreur(any(Livreur.class))).thenReturn(livreur);
+
         ResponseEntity<Livreur> result = livreurController.createLivreur(livreur);
+
         Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
         Assertions.assertEquals(livreur, result.getBody());
     }
+
     @Test
     public void testCreateLivreur_Failure() {
         Livreur livreur = new Livreur();
@@ -76,22 +87,31 @@ public class LivreurControllerTest {
     @Test
     public void testUpdateLivreur_Success() {
         Livreur updatedLivreur = new Livreur();
-        when(livreurService.updateLivreur(1,updatedLivreur)).thenReturn(updatedLivreur);
-        ResponseEntity<Livreur> result = livreurController.updateLivreur(1,updatedLivreur);
+        updatedLivreur.setNomLivreur("NomValide");
+        when(livreurService.updateLivreur(1, updatedLivreur)).thenReturn(updatedLivreur);
+
+        ResponseEntity<Livreur> result = livreurController.updateLivreur(1, updatedLivreur);
+
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
         Assertions.assertEquals(updatedLivreur, result.getBody());
     }
+
     @Test
     public void testUpdateLivreur_Failure() {
         Livreur updatedLivreur = new Livreur();
-        when(livreurService.updateLivreur(1,updatedLivreur)).thenReturn(null);
-        ResponseEntity<Livreur> result = livreurController.updateLivreur(1,updatedLivreur);
+        updatedLivreur.setNomLivreur("NomValide");
+
+        when(livreurService.updateLivreur(1, updatedLivreur)).thenReturn(null);
+
+        ResponseEntity<Livreur> result = livreurController.updateLivreur(1, updatedLivreur);
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
+
     @Test
     public void testDeleteLivreur_Success() {
         doNothing().when(livreurService).deleteLivreur(1);
-        ResponseEntity<Livreur> result = livreurController.deleteLivreur(1);
+        ResponseEntity<Void> result = livreurController.deleteLivreur(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
     }
 
@@ -106,24 +126,29 @@ public class LivreurControllerTest {
     @Test
     public void testDeleteLivreur_NotFound(){
         doThrow(new IllegalArgumentException("Not found")).when(livreurService).deleteLivreur(1);
-        ResponseEntity<Livreur> result = livreurController.deleteLivreur(1);
+        ResponseEntity<Void> result = livreurController.deleteLivreur(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
 
     @Test
-    public void testCreateLivreur_NotFound() {
+    public void testCreateLivreur_Conflict() {
         Livreur livreur = new Livreur();
+        livreur.setNomLivreur("NomValide");
+
         when(livreurService.createLivreur(any(Livreur.class))).thenThrow(new ConflictException("conflict detected"));
+
         ResponseEntity<Livreur> result = livreurController.createLivreur(livreur);
+
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
     }
+
 
 
     @Test
     public void testDeleteLivreur_Failure() {
         doThrow(new IllegalArgumentException("Livreur non trouvé")).when(livreurService).deleteLivreur(1);
-        ResponseEntity<Livreur> result = livreurController.deleteLivreur(1);
+        ResponseEntity<Void> result = livreurController.deleteLivreur(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 

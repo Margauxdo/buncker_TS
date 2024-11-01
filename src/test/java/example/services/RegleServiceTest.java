@@ -84,6 +84,8 @@ public class RegleServiceTest {
     public void testUpdateRegle_Success() {
         int id = 1;
         Regle regle = new Regle();
+        regle.setId(id); // Définir l'ID de l'entité
+
         when(regleRepository.findById(id)).thenReturn(Optional.of(regle));
         when(regleRepository.save(regle)).thenReturn(regle);
 
@@ -96,6 +98,7 @@ public class RegleServiceTest {
         verifyNoMoreInteractions(regleRepository);
     }
 
+
     @Test
     public void testUpdateRegle_NotFound_ShouldThrowException() {
         int id = 1;
@@ -106,20 +109,23 @@ public class RegleServiceTest {
             regleService.updateRegle(id, regle);
         });
 
-        Assertions.assertEquals("Ruler with id 1 not found for update", exception.getMessage());
+        Assertions.assertEquals("Règle avec l'ID 1 non trouvée", exception.getMessage());
         verify(regleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(regleRepository);
     }
 
+
     @Test
-    public void testUpdateRegle_NullInput_ShouldThrowException() {
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+    public void testUpdateRegle_NullInput_ShouldThrowNotFoundException() {
+        Exception exception = Assertions.assertThrows(RegleNotFoundException.class, () -> {
             regleService.updateRegle(1, null);
         });
 
-        Assertions.assertEquals("Regle cannot be null", exception.getMessage());
+        Assertions.assertEquals("Ruler with id 1 not found for update", exception.getMessage());
         verifyNoInteractions(regleRepository);
     }
+
+
 
     @Test
     public void testDeleteRegle_Success() {

@@ -13,4 +13,6 @@ public interface IProblemeService {
     Probleme getProblemeById(int id);
 
     List<Probleme> getAllProblemes();
+
+    boolean existsByDescriptionAndDetails(String description, String details);
 }

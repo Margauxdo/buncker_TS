@@ -27,4 +27,11 @@ public class JourFerieService implements IJourFerieService {
     public List<JourFerie> getJourFeries() {
         return jourFerieRepository.findAll();
     }
-}
+
+    @Override
+    public JourFerie saveJourFerie(JourFerie jourFerie) {
+        return jourFerieRepository.save(jourFerie);
+
+    }
+
+    }

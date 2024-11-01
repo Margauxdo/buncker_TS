@@ -16,11 +16,17 @@ public class ProblemeService implements IProblemeService {
         this.problemeRepository = problemeRepository;
     }
 
+
     @Override
     public Probleme createProbleme(Probleme probleme) {
-        if (probleme == null) {
-            throw new IllegalArgumentException("Le problème ne peut pas être null");
+        // Check if a problem with the same details already exists
+        boolean exists = problemeRepository.existsByDescriptionProblemeAndDetailsProbleme(
+                probleme.getDescriptionProbleme(), probleme.getDetailsProbleme());
+
+        if (exists) {
+            throw new IllegalStateException("Duplicate problem detected");
         }
+
         return problemeRepository.save(probleme);
     }
 
@@ -58,6 +64,11 @@ public class ProblemeService implements IProblemeService {
     public Probleme getProbleme(int id) {
         return problemeRepository.findById(id).orElse(null);
     }
+    @Override
+    public boolean existsByDescriptionAndDetails(String description, String details) {
+        return problemeRepository.existsByDescriptionProblemeAndDetailsProbleme(description, details);
+    }
+
 
 }
 

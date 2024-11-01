@@ -3,6 +3,7 @@ package example.services;
 import example.entities.RegleManuelle;
 import example.interfaces.IRegleManuelleService;
 import example.repositories.RegleManuelleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,24 +28,21 @@ public class RegleManuelleService implements IRegleManuelleService {
     @Override
     public RegleManuelle updateRegleManuelle(int id, RegleManuelle regleManuelle) {
         if (!regleManuelleRepository.existsById(id)) {
-            throw new RuntimeException("La règle manuelle n'existe pas");
+            throw new EntityNotFoundException("RegleManuelle not found with ID " + id);
         }
-
-        if (regleManuelle == null || regleManuelle.getId() != id) {
-            throw new IllegalArgumentException("L'ID de la règle manuelle ne correspond pas");
-        }
-
+        regleManuelle.setId(id);
         return regleManuelleRepository.save(regleManuelle);
     }
 
 
-    @Override
+
     public void deleteRegleManuelle(int id) {
         if (!regleManuelleRepository.existsById(id)) {
-            throw new RuntimeException("La règle manuelle n'existe pas");
+            throw new EntityNotFoundException("RegleManuelle with ID " + id + " not found");
         }
         regleManuelleRepository.deleteById(id);
     }
+
 
     @Override
     public RegleManuelle getRegleManuelle(int id) {

@@ -1,5 +1,6 @@
 package example.entities;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import jakarta.persistence.*;
@@ -24,8 +25,10 @@ public class Regle {
 
     private String reglePourSortie;
 
+    @NotBlank(message = "Le code de la règle est obligatoire")
     @Column(name = "coderegle", unique = true, nullable = false)
     private String coderegle;
+
 
     private Date dateRegle;
     private int nombreJours;

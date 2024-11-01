@@ -2,6 +2,7 @@ package example.controller;
 
 import example.entities.Mouvement;
 import example.interfaces.IMouvementService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,44 +33,63 @@ public class MouvementController {
     @PostMapping
     public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
         try {
+            // Manual validation
+            if (mouvement.getDateHeureMouvement() == null || mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
             Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
             return new ResponseEntity<>(createdMouvement, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            // Check the message or add a specific condition to return CONFLICT
-            if ("Conflict detected".equals(e.getMessage())) {
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
 
     @PutMapping("/{id}")
     public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
         try {
+            // Vérifier si le Mouvement existe
+            if (!mouvementService.existsById(id)) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Renvoie 404 si l'entité n'est pas trouvée
+            }
+
+            // Autres validations et mises à jour
+            if (mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3
+                    || mouvement.getDateHeureMouvement() == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Renvoie 400 si la validation échoue
+            }
+
             Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
-            return updatedMouvement != null ? new ResponseEntity<>(updatedMouvement, HttpStatus.OK) :
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(updatedMouvement, HttpStatus.OK); // Renvoie 200 si tout est correct
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // En cas d'erreur serveur
         }
     }
+
+
+
+
+
+
 
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Mouvement> deleteMouvement(@PathVariable int id) {
+    public ResponseEntity<Void> deleteMouvement(@PathVariable int id) {
         try {
+            if (!mouvementService.existsById(id)) { // Check if the Mouvement exists
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
             mouvementService.deleteMouvement(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }

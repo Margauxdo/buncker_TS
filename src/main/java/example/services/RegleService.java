@@ -34,16 +34,23 @@ public class RegleService implements IRegleService {
     @Override
     public Regle updateRegle(int id, Regle regle) {
         if (regle == null) {
-            throw new IllegalArgumentException("Regle cannot be null");
+            throw new RegleNotFoundException("Ruler with id " + id + " not found for update");
+
         }
 
         return regleRepository.findById(id)
                 .map(existingRegle -> {
-                    regle.setId(id);
-                    return regleRepository.save(regle);
+                    existingRegle.setCoderegle(regle.getCoderegle());
+                    existingRegle.setDateRegle(regle.getDateRegle());
+                    existingRegle.setNombreJours(regle.getNombreJours());
+                    // Mettre à jour d'autres champs si nécessaire
+                    return regleRepository.save(existingRegle);
                 })
-                .orElseThrow(() -> new RegleNotFoundException("Ruler with id " + id + " not found for update"));
+                .orElseThrow(() -> new RegleNotFoundException("Règle avec l'ID " + id + " non trouvée"));
     }
+
+
+
 
     @Override
     public void deleteRegle(int id) {
@@ -57,6 +64,12 @@ public class RegleService implements IRegleService {
     public List<Regle> readAllRegles() {
         return regleRepository.findAll();
     }
+    @Override
+    public boolean regleExists(String coderegle) {
+        return regleRepository.existsByCoderegle(coderegle);
+    }
+
+
 }
 
 

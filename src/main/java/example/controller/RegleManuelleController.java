@@ -3,6 +3,7 @@ package example.controller;
 import example.entities.RegleManuelle;
 import example.exceptions.ConflictException;
 import example.interfaces.IRegleManuelleService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,23 +60,27 @@ public class RegleManuelleController {
         try {
             RegleManuelle updatedRegleManuelle = regleManuelleService.updateRegleManuelle(id, regleManuelle);
             if (updatedRegleManuelle == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                throw new EntityNotFoundException("RegleManuelle not found with ID " + id);
             }
             return new ResponseEntity<>(updatedRegleManuelle, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<RegleManuelle> deleteRegleManuelle(@PathVariable int id) {
-        try {
-            regleManuelleService.deleteRegleManuelle(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IllegalArgumentException e) {
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRegleManuelle(@PathVariable int id) {
+        try {
+            regleManuelleService.deleteRegleManuelle(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

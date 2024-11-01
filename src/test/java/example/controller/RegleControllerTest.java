@@ -30,14 +30,20 @@ public class RegleControllerTest {
         MockitoAnnotations.openMocks(this);
     }
     @Test
-    public void testReadRegles_Success(){
+    public void testReadRegles_Success() {
         List<Regle> regles = new ArrayList<>();
         regles.add(new Regle());
+
         when(regleService.readAllRegles()).thenReturn(regles);
-        List<Regle> result = regleController.readRegles();
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(regles.size(), result.size());
+
+        ResponseEntity<List<Regle>> response = regleController.readRegles();
+
+        List<Regle> result = response.getBody();
+
+        Assertions.assertNotNull(result, "The result should not be null");
+        Assertions.assertEquals(regles.size(), result.size(), "The size of the result list should match the mock data");
     }
+
     @Test
     public void testReadRegles_Failure(){
         when(regleService.readAllRegles()).thenThrow(new RuntimeException("Erreur de la base de donnee"));
@@ -65,12 +71,17 @@ public class RegleControllerTest {
         Assertions.assertEquals(regle, result.getBody());
     }
     @Test
-    public void testCreateRegle_Failure(){
+    public void testCreateRegle_Failure() {
         Regle regle = new Regle();
+
         when(regleService.createRegle(regle)).thenThrow(new IllegalArgumentException("Rule invalid"));
+
         ResponseEntity<Regle> result = regleController.createRegle(regle);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode(), "Expected BAD_REQUEST status");
     }
+
+
     @Test
     public void testUpdateRegle_Success(){
         Regle updatedRegle = new Regle();
@@ -80,55 +91,62 @@ public class RegleControllerTest {
         Assertions.assertEquals(updatedRegle, result.getBody());
     }
     @Test
-    public void testUpdateRegle_Failure(){
+    public void testUpdateRegle_Failure() {
         Regle updatedRegle = new Regle();
-        when(regleService.updateRegle(1,updatedRegle)).thenReturn(null);
-        ResponseEntity<Regle> result = regleController.updateRegle(1,updatedRegle);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+        when(regleService.updateRegle(1, updatedRegle)).thenReturn(null); // Simule l'absence de résultat
+
+        ResponseEntity<Regle> result = regleController.updateRegle(1, updatedRegle);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "Expected NOT_FOUND status");
     }
+
     @Test
     public void testDeleteRegle_Success(){
         doNothing().when(regleService).deleteRegle(1);
-        ResponseEntity<Regle> result = regleController.deleteRegle(1);
+        ResponseEntity<Void> result = regleController.deleteRegle(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
     }
     @Test
     public void testDeleteRegle_Failure(){
         doThrow(new RuntimeException("Internal server error")).when(regleService).deleteRegle(1);
-        ResponseEntity<Regle> result = regleController.deleteRegle(1);
+        ResponseEntity<Void> result = regleController.deleteRegle(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
         verify(regleService, times(1)).deleteRegle(1);
     }
+
+
+
+
+
     @Test
-    public void testCreateRegle_InvalidInput(){
+    public void testUpdateRegle_InvalidInput() {
         Regle invalidRegle = new Regle();
-        when(regleService.createRegle(invalidRegle)).thenThrow(new IllegalArgumentException("Invalid data"));
-        ResponseEntity<Regle> result = regleController.createRegle(invalidRegle);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-    }
-    @Test
-    public void testUpdateRegle_InvalidInput(){
-        Regle invalidRegle = new Regle();
+
         when(regleService.updateRegle(anyInt(), any(Regle.class)))
-        .thenThrow(new IllegalArgumentException("Invalid data"));
-        ResponseEntity<Regle> result = regleController.updateRegle(1,invalidRegle);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+                .thenThrow(new IllegalArgumentException("Invalid data"));
+
+        ResponseEntity<Regle> result = regleController.updateRegle(1, invalidRegle);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode(), "Expected BAD_REQUEST status");
     }
+
     @Test
     public void testDeleteRegle_NotFound(){
         doThrow(new IllegalArgumentException("Rule not found")).when(regleService).deleteRegle(1);
-        ResponseEntity<Regle> result = regleController.deleteRegle(1);
+        ResponseEntity<Void> result = regleController.deleteRegle(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
     @Test
-    public void testCreateRegle_NotFound(){
+    public void testCreateRegle_NotFound() {
         Regle regle = new Regle();
         when(regleService.createRegle(any(Regle.class)))
                 .thenThrow(new IllegalStateException("Conflict Detected")); // Conflict exception
 
         ResponseEntity<Regle> result = regleController.createRegle(regle);
+
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // Expect 409 Conflict
     }
+
 
     @Test
     public void testRegleController(){
@@ -136,22 +154,30 @@ public class RegleControllerTest {
         Assertions.assertNotNull(regleService);
     }
     @Test
-    public void testCreateRegle_Conflict(){
+    public void testCreateRegle_Conflict() {
         Regle regle = new Regle();
+
+        // Simule une exception de conflit lorsque createRegle est appelé
         when(regleService.createRegle(any(Regle.class)))
-                .thenThrow(new IllegalStateException("Conflict Detected")); // Simulate conflict
+                .thenThrow(new IllegalStateException("Conflict Detected"));
+
+        // Appelle la méthode createRegle dans le contrôleur
         ResponseEntity<Regle> result = regleController.createRegle(regle);
-        Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // Expect 409 Conflict
+
+        // Vérifie que le statut de réponse est CONFLICT
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "Expected CONFLICT status");
     }
+
 
     @Test
     public void testCreateRegle_InternalServerError(){
         Regle regle = new Regle();
         when(regleService.createRegle(any(Regle.class)))
-        .thenThrow(new RuntimeException("Internal server error"));
+                .thenThrow(new RuntimeException("Internal server error"));
         ResponseEntity<Regle> result = regleController.createRegle(regle);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
+
     @Test
     public void testUpdateRegle_InternalServerError() {
         Regle regle = new Regle();
@@ -165,11 +191,17 @@ public class RegleControllerTest {
     }
 
 
+
     @Test
-    public void testDeleteRegle_InternalServerError(){
+    public void testDeleteRegle_InternalServerError() {
+        // Simule une exception RuntimeException lorsque deleteRegle est appelé
         doThrow(new RuntimeException("Internal server error")).when(regleService).deleteRegle(1);
-        ResponseEntity<Regle> result = regleController.deleteRegle(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+
+        // Appelle la méthode deleteRegle dans le contrôleur
+        ResponseEntity<Void> result = regleController.deleteRegle(1);
+
+        // Vérifie que le statut de réponse est INTERNAL_SERVER_ERROR
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode(), "Expected INTERNAL_SERVER_ERROR status");
     }
 
 

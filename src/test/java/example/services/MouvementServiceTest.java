@@ -80,7 +80,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de mise à jour avec exception
     @Test
     public void testUpdateMouvement_Failure_Exception() {
         int id = 1;
@@ -89,15 +88,17 @@ public class MouvementServiceTest {
 
         when(mouvementRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        // S'assurer que l'exception est bien levée avec le bon message
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
             mouvementService.updateMouvement(id, mouvement);
         });
+        Assertions.assertEquals("Mouvement not found", exception.getMessage());
 
-        Assertions.assertEquals("movement not found", exception.getMessage());
         verify(mouvementRepository, times(1)).existsById(id);
         verify(mouvementRepository, never()).save(any(Mouvement.class));
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
     // Test de suppression avec succès
     @Test

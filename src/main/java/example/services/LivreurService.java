@@ -1,8 +1,11 @@
 package example.services;
 
 import example.entities.Livreur;
+import example.exceptions.ConflictException;
+import example.exceptions.RegleNotFoundException;
 import example.interfaces.ILivreurService;
 import example.repositories.LivreurRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,26 +23,35 @@ public class    LivreurService implements ILivreurService {
 
     @Override
     public Livreur createLivreur(Livreur livreur) {
-
+        if (livreurRepository.existsByCodeLivreur(livreur.getCodeLivreur())) {
+            throw new ConflictException("Livreur with this code already exists.");
+        }
         return livreurRepository.save(livreur);
     }
 
+
     @Override
+    // In LivreurService.java
+
     public Livreur updateLivreur(int id, Livreur livreur) {
         if (!livreurRepository.existsById(id)) {
-            throw new RuntimeException("delivery person not found");
+            throw new RegleNotFoundException("Delivery person not found with ID " + id);
         }
-
-        // Mettre à jour l'ID de l'objet `livreur` pour correspondre à l'ID fourni
         livreur.setId(id);
         return livreurRepository.save(livreur);
     }
 
 
+
+
     @Override
     public void deleteLivreur(int id) {
+        if (!livreurRepository.existsById(id)) {
+            throw new EntityNotFoundException("Livreur not found with ID: " + id);
+        }
         livreurRepository.deleteById(id);
     }
+
 
     @Override
     public Livreur getLivreurById(int id) {

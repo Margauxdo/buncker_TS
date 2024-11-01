@@ -10,4 +10,6 @@ public interface IMouvementService {
     void deleteMouvement(int id);
     List<Mouvement> getAllMouvements();
     Mouvement getMouvementById(int id);
+    boolean existsById(int id);
+
 }

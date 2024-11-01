@@ -3,6 +3,7 @@ package example.services;
 import example.entities.Mouvement;
 import example.interfaces.IMouvementService;
 import example.repositories.MouvementRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +25,14 @@ public class MouvementService implements IMouvementService {
         return mouvementRepository.save(mouvement);
     }
 
-    @Override
     public Mouvement updateMouvement(int id, Mouvement mouvement) {
-        if (mouvementRepository.existsById(id)) {
-            mouvement.setId(id);
-            return mouvementRepository.save(mouvement);
-        }else{
-            throw  new RuntimeException("movement not found");
+        if (!mouvementRepository.existsById(id)) {
+            throw new EntityNotFoundException("Mouvement not found"); // Custom exception ou message d'erreur 404
         }
+        return mouvementRepository.save(mouvement);
     }
+
+
 
     @Override
     public void deleteMouvement(int id) {
@@ -49,4 +49,9 @@ public class MouvementService implements IMouvementService {
         return mouvementRepository.findById(id).orElse(null);
 
     }
+    @Override
+    public boolean existsById(int id) {
+        return mouvementRepository.existsById(id);
+    }
+
 }

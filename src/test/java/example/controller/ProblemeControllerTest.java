@@ -89,20 +89,20 @@ public class ProblemeControllerTest {
     @Test
     public void testDeleteProbleme_Success(){
         doNothing().when(problemeService).deleteProbleme(1);
-        ResponseEntity<Probleme> result = problemeController.deleteProbleme(1);
+        ResponseEntity<Void> result = problemeController.deleteProbleme(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
     }
     @Test
     public void testDeleteProbleme_Failure(){
         doThrow(new RuntimeException("Internal server Error")).when(problemeService).deleteProbleme(1);
-        ResponseEntity<Probleme> result = problemeController.deleteProbleme(1);
+        ResponseEntity<Void> result = problemeController.deleteProbleme(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
         verify(problemeService).deleteProbleme(1);
     }
     @Test
     public void testDeleteProbleme_NotFound(){
         doThrow(new IllegalArgumentException("Problem not found")).when(problemeService).deleteProbleme(1);
-        ResponseEntity<Probleme> result = problemeController.deleteProbleme(1);
+        ResponseEntity<Void> result = problemeController.deleteProbleme(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
     @Test
@@ -111,12 +111,18 @@ public class ProblemeControllerTest {
         Assertions.assertNotNull(problemeService);
     }
     @Test
-    public void testCreateProbleme_Conflict(){
+    public void testCreateProbleme_Conflict() {
+        // Arrange: Prepare a problem object and mock the service to throw an exception
         Probleme probleme = new Probleme();
         when(problemeService.createProbleme(any(Probleme.class))).thenThrow(new IllegalStateException("Conflit"));
+
+        // Act: Call the controller method
         ResponseEntity<Probleme> result = problemeController.createProbleme(probleme);
+
+        // Assert: Verify that the response status is 409 CONFLICT
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
     }
+
 
     @Test
     public void testUpdateProbleme_InvalidInput(){

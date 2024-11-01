@@ -3,6 +3,7 @@ package example.services;
 import example.entities.RegleManuelle;
 import example.entities.SortieSemaine;
 import example.repositories.RegleManuelleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,23 +75,26 @@ public class RegleManuelleServiceTest {
     }
 
     @Test
-    public void testUpdateRegleManuelle_Failure_Exception() {
+    public void testUpdateRegleManuelle_IdIsSetProperly() {
         int id = 1;
         RegleManuelle regleManuelle = new RegleManuelle();
-        regleManuelle.setId(2); // ID différent pour déclencher l'exception
+        regleManuelle.setId(2); // Intentionally set a different ID
 
-        // Mock la réponse de `existsById`
+        // Mock existsById to simulate the entity exists
         when(regleManuelleRepository.existsById(id)).thenReturn(true);
 
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            regleManuelleService.updateRegleManuelle(id, regleManuelle);
-        });
+        // Run updateRegleManuelle
+        regleManuelleService.updateRegleManuelle(id, regleManuelle);
 
-        Assertions.assertEquals("L'ID de la règle manuelle ne correspond pas", exception.getMessage());
+        // Verify that the ID is set correctly and save is called
+        Assertions.assertEquals(id, regleManuelle.getId(), "The ID should be updated to match the provided ID.");
         verify(regleManuelleRepository, times(1)).existsById(id);
-        verify(regleManuelleRepository, never()).save(any(RegleManuelle.class));
+        verify(regleManuelleRepository, times(1)).save(regleManuelle);
         verifyNoMoreInteractions(regleManuelleRepository);
     }
+
+
+
 
 
 
@@ -116,10 +120,11 @@ public class RegleManuelleServiceTest {
             regleManuelleService.deleteRegleManuelle(id);
         });
 
-        Assertions.assertEquals("La règle manuelle n'existe pas", exception.getMessage());
+        Assertions.assertEquals("RegleManuelle with ID 1 not found", exception.getMessage()); // Mettez à jour le message ici
         verify(regleManuelleRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(regleManuelleRepository);
     }
+
 
     @Test
     public void testGetRegleManuelle_Success() {

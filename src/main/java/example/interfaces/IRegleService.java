@@ -11,4 +11,5 @@ public interface IRegleService {
     void deleteRegle(int id);
     List<Regle> readAllRegles();
 
+    boolean regleExists(String coderegle);
 }

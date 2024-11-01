@@ -3,6 +3,7 @@ package example.controller;
 import example.entities.RegleManuelle;
 import example.exceptions.ConflictException;
 import example.interfaces.IRegleManuelleService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,13 +91,13 @@ public class RegleManuelleControllerTest {
     @Test
     public void testDeleteRegleManuelle_Success(){
         doNothing().when(regleManuelleService).deleteRegleManuelle(1);
-        ResponseEntity<RegleManuelle> result = regleManuelleController.deleteRegleManuelle(1);
+        ResponseEntity<Void> result = regleManuelleController.deleteRegleManuelle(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
     }
     @Test
     public void testDeleteRegleManuelle_Failure(){
         doThrow(new RuntimeException("Internal server error")).when(regleManuelleService).deleteRegleManuelle(1);
-        ResponseEntity<RegleManuelle> result = regleManuelleController.deleteRegleManuelle(1);
+        ResponseEntity<Void> result = regleManuelleController.deleteRegleManuelle(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
         verify(regleManuelleService, times(1)).deleteRegleManuelle(1);
     }
@@ -111,10 +112,11 @@ public class RegleManuelleControllerTest {
 
     @Test
     public void testDeleteRegleManuelle_NotFound(){
-        doThrow(new IllegalArgumentException("Manual rule not found")).when(regleManuelleService).deleteRegleManuelle(1);
-        ResponseEntity<RegleManuelle> result = regleManuelleController.deleteRegleManuelle(1);
+        doThrow(new EntityNotFoundException("Manual rule not found")).when(regleManuelleService).deleteRegleManuelle(1);
+        ResponseEntity<Void> result = regleManuelleController.deleteRegleManuelle(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
+
 
 
 
@@ -147,7 +149,7 @@ public class RegleManuelleControllerTest {
     @Test
     public void testDeleteRegleManuelle_InternalServerError(){
         doThrow(new RuntimeException("Internal server error")).when(regleManuelleService).deleteRegleManuelle(1);
-        ResponseEntity<RegleManuelle> response = regleManuelleController.deleteRegleManuelle(1);
+        ResponseEntity<Void> response = regleManuelleController.deleteRegleManuelle(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 

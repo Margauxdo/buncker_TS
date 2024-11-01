@@ -31,36 +31,41 @@ public class ProblemeController {
 
     @PostMapping
     public ResponseEntity<Probleme> createProbleme(@RequestBody Probleme probleme) {
-        try{
+        try {
             Probleme newProbleme = problemeService.createProbleme(probleme);
             return new ResponseEntity<>(newProbleme, HttpStatus.CREATED);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) { // Ensures conflicts return 409
             return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping
+
+
+
+    @PutMapping("{id}")
     public ResponseEntity<Probleme> updateProbleme(@PathVariable int id, @RequestBody Probleme probleme) {
         try {
             Probleme updatedProbleme = problemeService.updateProbleme(id, probleme);
             return updatedProbleme != null ? new ResponseEntity<>(updatedProbleme, HttpStatus.OK)
                     : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    @DeleteMapping
-    public ResponseEntity<Probleme> deleteProbleme(@PathVariable int id) {
-        try{
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteProbleme(@PathVariable int id) {
+        try {
             problemeService.deleteProbleme(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

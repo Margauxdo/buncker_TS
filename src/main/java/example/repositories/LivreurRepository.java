@@ -9,9 +9,10 @@ import java.util.List;
 @Repository
 public interface LivreurRepository extends JpaRepository<Livreur, Integer> {
 
-    Livreur findByCodeLivreur(String codeLivreur);  // Garder cette méthode
+    Livreur findByCodeLivreur(String codeLivreur);
 
-    List<Livreur> findByNomLivreur(String name);  // Trouver par nom
+    List<Livreur> findByNomLivreur(String name);
 
-    List<Livreur> findByNumeroCartePro(String numeroCartePro);  // Trouver par carte pro
+    List<Livreur> findByNumeroCartePro(String numeroCartePro);
+    boolean existsByCodeLivreur(String codeLivreur);
 }

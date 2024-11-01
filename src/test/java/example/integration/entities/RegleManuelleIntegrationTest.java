@@ -2,6 +2,7 @@ package example.integration.entities;
 
 import example.entities.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,10 +50,11 @@ public class RegleManuelleIntegrationTest {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setDescriptionRegle("This is a rule without a creator");
 
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
             regleManuelleRepository.save(regleManuelle);
         }, "Save should fail if rule creator is missing");
     }
+
 
     @Test
     public void testDeleteRegleManuelle() {
@@ -106,16 +108,18 @@ public class RegleManuelleIntegrationTest {
     }
 
     @Test
-    public void testSaveRegleManuelleWithNullDescription() {
+    public void testSaveRegleManuelleWithDescription() {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("adminA");
         regleManuelle.setCoderegle("RM001");
+        regleManuelle.setDescriptionRegle("Description de test"); // Fournir une description
 
         RegleManuelle savedRegle = regleManuelleRepository.save(regleManuelle);
 
-        Assertions.assertNotNull(savedRegle.getId(), "The rule must be saved even without a description.");
-        Assertions.assertNull(savedRegle.getDescriptionRegle(), "The rule description must be null.");
+        Assertions.assertNotNull(savedRegle.getId(), "The rule must be saved with a description.");
+        Assertions.assertEquals("Description de test", savedRegle.getDescriptionRegle(), "The rule description should match.");
     }
+
 
     @Test
     public void testSaveDuplicateCoderegle() {

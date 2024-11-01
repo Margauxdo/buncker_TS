@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ProblemeRepository extends JpaRepository<Probleme, Integer> {
     List<Probleme> findByValise(Valise valise);
+    boolean existsByDescriptionProblemeAndDetailsProbleme(String descriptionProbleme, String detailsProbleme);
 }

@@ -205,6 +205,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("Jean Paul Martin");
         regleManuelle.setCoderegle("12345");
+        regleManuelle.setDescriptionRegle("Description de test"); // Fournir une description valide
         regleManuelle.setTypeRegle(tp);
 
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);
@@ -213,6 +214,8 @@ public class RegleManuelleRepositoryIntegrationTest {
         assertTrue(foundRM.isPresent());
         assertEquals("Type Regle Test", foundRM.get().getTypeRegle().getNomTypeRegle());
     }
+
+
 
 
 
