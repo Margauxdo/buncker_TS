@@ -3,9 +3,12 @@ package example.integration.entities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.controller.ValiseController;
 import example.entities.Client;
+import example.entities.Probleme;
+import example.entities.Regle;
 import example.entities.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ProblemeRepository;
+import example.repositories.RegleRepository;
 import example.repositories.ValiseRepository;
 import example.services.ValiseService;
 import org.junit.jupiter.api.Assertions;
@@ -21,10 +24,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -49,6 +53,9 @@ public class ValiseIntegrationTest {
 
     @Autowired
     private ProblemeRepository problemeRepository;
+
+    @Autowired
+    private RegleRepository regleRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -86,31 +93,23 @@ public class ValiseIntegrationTest {
 
     @Test
     public void testCreateValise_Success() {
-        // Initialisation de l'objet Valise
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        client = clientRepository.save(client);
+
         Valise valise = new Valise();
         valise.setDescription("Nouvelle Valise");
         valise.setNumeroValise(67890L);
-
-        // Initialisation de l'objet Client
-        Client client = new Client();
-        client.setId(1);
-        client.setName("Client Test");
-        client.setEmail("client@test.com");
-
-        // Association du client à la valise
         valise.setClient(client);
 
-        // Mock du clientRepository et valiseService
-        when(clientRepository.findById(anyInt())).thenReturn(Optional.of(client));
-        when(valiseService.createValise(any(Valise.class))).thenReturn(valise);
+        Valise createdValise = valiseService.createValise(valise);
 
-        // Appel du contrôleur
-        ResponseEntity<Valise> response = valiseController.createValise(valise);
-
-        // Vérification des résultats
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assertions.assertEquals(valise, response.getBody());
+        assertEquals("Nouvelle Valise", createdValise.getDescription());
+        assertEquals(67890L, createdValise.getNumeroValise());
+        assertEquals(client.getId(), createdValise.getClient().getId());
     }
+
 
 
 
@@ -151,4 +150,96 @@ public class ValiseIntegrationTest {
         Valise updatedValise = valiseRepository.findById(valise.getId()).orElseThrow();
         assertEquals("Valise mise à jour", updatedValise.getDescription());
     }
+
+    @Test
+    void testValiseRelationWithRegle() {
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        clientRepository.save(client);
+
+        Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
+        regleRepository.save(regle);
+
+        Valise valise = new Valise();
+        valise.setClient(client);
+        valise.setRegleSortie(regle);
+        valiseRepository.save(valise);
+
+        Optional<Valise> found = valiseRepository.findById(valise.getId());
+        assertTrue(found.isPresent());
+        assertNotNull(found.get().getRegleSortie());
+        assertEquals("CODE123", found.get().getRegleSortie().getCoderegle());
+    }
+
+
+
+    @Test
+    void testValiseRelationWithClient() {
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        clientRepository.save(client);
+
+        Valise valise = new Valise();
+        valise.setClient(client);
+        valiseRepository.save(valise);
+
+        Optional<Valise> found = valiseRepository.findById(valise.getId());
+        assertTrue(found.isPresent());
+        assertEquals("Client Test", found.get().getClient().getName());
+        assertEquals("client@test.com", found.get().getClient().getEmail());
+    }
+
+
+    @Test
+    void testCreateValise() {
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        clientRepository.save(client);
+
+        Valise valise = new Valise();
+        valise.setNumeroValise(123L);
+        valise.setClient(client);
+        valiseRepository.save(valise);
+
+        Optional<Valise> found = valiseRepository.findById(valise.getId());
+        assertTrue(found.isPresent());
+        assertEquals(123L, found.get().getNumeroValise());
+        assertNotNull(found.get().getClient());
+        assertEquals("Client Test", found.get().getClient().getName());
+    }
+
+
+
+
+
+
+
+
+    @Test
+    void testValiseRelationWithProblemes() {
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        clientRepository.save(client);
+
+        Valise valise = new Valise();
+        valise.setClient(client);
+        valiseRepository.save(valise);
+
+        Probleme probleme = new Probleme();
+        probleme.setValise(valise);
+        probleme.setDescriptionProbleme("Problème Test");
+        problemeRepository.save(probleme);
+
+        List<Probleme> problemes = problemeRepository.findByValiseId(valise.getId());
+        assertFalse(problemes.isEmpty());
+        assertEquals(valise.getId(), problemes.get(0).getValise().getId());
+    }
+
+
+
 }

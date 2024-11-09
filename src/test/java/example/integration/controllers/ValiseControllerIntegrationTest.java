@@ -6,6 +6,7 @@ import example.entities.Client;
 import example.entities.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("integrationtest")
+@Transactional
 public class ValiseControllerIntegrationTest {
 
     @Autowired
@@ -49,7 +52,7 @@ public class ValiseControllerIntegrationTest {
         valiseRepository.deleteAll();
         clientRepository.deleteAll();
 
-        Client client = new Client();
+        client = new Client();
         client.setName("Client Test");
         client.setEmail("getvalisetest@example.com");
         clientRepository.save(client);
@@ -59,11 +62,19 @@ public class ValiseControllerIntegrationTest {
         valise.setNumeroValise(123456L);
         valise.setClient(client);
         valise = valiseRepository.save(valise);
+
+        System.out.println("Client ID : " + client.getId());
+        System.out.println("Valise ID : " + valise.getId());
+
+            objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
+
     }
 
     @Test
     public void testGetValiseById_Success() throws Exception {
-        // Effectuer la requête GET
+        assertTrue(valiseRepository.findById(valise.getId()).isPresent(), "La valise n'existe pas dans la base de données.");
+
         mockMvc.perform(get("/api/valise/" + valise.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -71,6 +82,7 @@ public class ValiseControllerIntegrationTest {
                 .andExpect(jsonPath("$.description").value("Valise de test"))
                 .andExpect(jsonPath("$.numeroValise").value(123456));
     }
+
 
 
 

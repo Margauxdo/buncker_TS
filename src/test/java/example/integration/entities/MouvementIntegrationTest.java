@@ -20,6 +20,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Date;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integrationtest")
@@ -84,7 +87,7 @@ public class MouvementIntegrationTest {
         Mouvement savedMouvement = mouvementRepository.save(mouvement);
         Optional<Mouvement> foundMouvement = mouvementRepository.findById(savedMouvement.getId());
 
-        Assertions.assertTrue(foundMouvement.isPresent());
+        assertTrue(foundMouvement.isPresent());
     }
 
     @Test
@@ -140,6 +143,35 @@ public class MouvementIntegrationTest {
         Optional<Mouvement> foundMouvement = mouvementRepository.findById(mouvement.getId());
         Assertions.assertFalse(foundMouvement.isPresent());
     }
+    @Test
+    void testMouvementRelationWithLivreur() {
+        Livreur livreur = new Livreur();
+        livreur.setNomLivreur("Jules verne");
+        livreurRepository.save(livreur);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setLivreur(livreur);
+        mouvementRepository.save(mouvement);
+
+        Optional<Mouvement> found = mouvementRepository.findById(mouvement.getId());
+        assertTrue(found.isPresent());
+        Assertions.assertEquals("Jules verne", found.get().getLivreur().getNomLivreur());
+    }
+
+    @Test
+    void testCreateMouvement() {
+        Mouvement mouvement = new Mouvement();
+        mouvementRepository.save(mouvement);
+
+        Optional<Mouvement> found = mouvementRepository.findById(mouvement.getId());
+        assertTrue(found.isPresent());
+    }
+
+
+
+
+
+
 
 }
 

@@ -16,6 +16,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -49,11 +53,11 @@ public class LivreurIntegrationTest {
         Livreur savedLivreur = livreurRepository.save(livreur1);
 
         Assertions.assertNotNull(savedLivreur.getId());
-        Assertions.assertEquals("Dupond", savedLivreur.getNomLivreur());
-        Assertions.assertEquals("1234", savedLivreur.getCodeLivreur());
-        Assertions.assertEquals("123456", savedLivreur.getNumeroCartePro());
-        Assertions.assertEquals("jean", savedLivreur.getPrenomLivreur());
-        Assertions.assertEquals("1234", savedLivreur.getMotDePasse());
+        assertEquals("Dupond", savedLivreur.getNomLivreur());
+        assertEquals("1234", savedLivreur.getCodeLivreur());
+        assertEquals("123456", savedLivreur.getNumeroCartePro());
+        assertEquals("jean", savedLivreur.getPrenomLivreur());
+        assertEquals("1234", savedLivreur.getMotDePasse());
     }
     @Test
     public void testFindLivreurById(){
@@ -67,10 +71,10 @@ public class LivreurIntegrationTest {
         Livreur foundLivreur = livreurRepository.findById(savedLivreur.getId()).orElse(null);
 
         Assertions.assertNotNull(foundLivreur);
-        Assertions.assertEquals("Dupond", foundLivreur.getNomLivreur());
-        Assertions.assertEquals("1234", foundLivreur.getCodeLivreur());
-        Assertions.assertEquals("123456", foundLivreur.getNumeroCartePro());
-        Assertions.assertEquals("jean", foundLivreur.getPrenomLivreur());
+        assertEquals("Dupond", foundLivreur.getNomLivreur());
+        assertEquals("1234", foundLivreur.getCodeLivreur());
+        assertEquals("123456", foundLivreur.getNumeroCartePro());
+        assertEquals("jean", foundLivreur.getPrenomLivreur());
 
     }
     @Test
@@ -85,10 +89,10 @@ public class LivreurIntegrationTest {
         Livreur foundLivreurByCode = livreurRepository.findByCodeLivreur(savedLivreur.getCodeLivreur());
 
         Assertions.assertNotNull(foundLivreurByCode);
-        Assertions.assertEquals("Dupond", foundLivreurByCode.getNomLivreur());
-        Assertions.assertEquals("1234", foundLivreurByCode.getCodeLivreur());
-        Assertions.assertEquals("123456", foundLivreurByCode.getNumeroCartePro());
-        Assertions.assertEquals("jean", foundLivreurByCode.getPrenomLivreur());
+        assertEquals("Dupond", foundLivreurByCode.getNomLivreur());
+        assertEquals("1234", foundLivreurByCode.getCodeLivreur());
+        assertEquals("123456", foundLivreurByCode.getNumeroCartePro());
+        assertEquals("jean", foundLivreurByCode.getPrenomLivreur());
 
     }
     @Test
@@ -107,9 +111,9 @@ public class LivreurIntegrationTest {
         livreurRepository.save(livB);
 
         List<Livreur> livreurs = livreurRepository.findAll();
-        Assertions.assertEquals(2, livreurs.size());
-        Assertions.assertTrue(livreurs.stream().anyMatch(livreur -> livreur.getNomLivreur().equals("Dupond")) );
-        Assertions.assertTrue(livreurs.stream().anyMatch(livreur -> livreur.getNomLivreur().equals("Leon")) );
+        assertEquals(2, livreurs.size());
+        assertTrue(livreurs.stream().anyMatch(livreur -> livreur.getNomLivreur().equals("Dupond")) );
+        assertTrue(livreurs.stream().anyMatch(livreur -> livreur.getNomLivreur().equals("Leon")) );
     }
 
     @Test
@@ -137,7 +141,7 @@ public class LivreurIntegrationTest {
         savedLivreur.setNomLivreur("henry");
         Livreur updatedLivreur = livreurRepository.save(savedLivreur);
 
-        Assertions.assertEquals("henry", updatedLivreur.getNomLivreur(), "The delivery person's name should be updated to 'henry'");
+        assertEquals("henry", updatedLivreur.getNomLivreur(), "The delivery person's name should be updated to 'henry'");
     }
 
     @Test
@@ -175,5 +179,32 @@ public class LivreurIntegrationTest {
         livreurRepository.deleteById(savedLivreur.getId());
         Assertions.assertFalse(livreurRepository.findById(savedLivreur.getId()).isPresent());
     }
+
+    @Test
+    void testCreateLivreur() {
+        Livreur livreur = new Livreur();
+        livreur.setNomLivreur("Livreur Test");
+        livreurRepository.save(livreur);
+
+        Optional<Livreur> found = livreurRepository.findById(livreur.getId());
+        assertTrue(found.isPresent());
+        assertEquals("Livreur Test", found.get().getNomLivreur());
+    }
+
+    @Test
+    void testLivreurRelationWithMouvement() {
+        Livreur livreur = new Livreur();
+        livreur.setNomLivreur("Livreur Test");
+        livreurRepository.save(livreur);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setLivreur(livreur);
+        mouvementRepository.save(mouvement);
+
+        Optional<Mouvement> found = mouvementRepository.findById(mouvement.getId());
+        assertTrue(found.isPresent());
+        assertEquals(livreur.getId(), found.get().getLivreur().getId());
+    }
+
 
 }

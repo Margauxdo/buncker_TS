@@ -4,6 +4,7 @@ import example.entities.JourFerie;
 import example.entities.Regle;
 import example.repositories.JourFerieRepository;
 import example.repositories.RegleRepository;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -44,8 +47,8 @@ public class JourFerieIntegrationTest {
         jourFerie.setRegle(regleA);
 
         JourFerie savedJF = jourFerieRepository.save(jourFerie);
-        Assertions.assertNotNull(savedJF.getId(), "generated ID should not be null");
-        Assertions.assertEquals(regleA.getId(), savedJF.getRegle().getId());
+        assertNotNull(savedJF.getId(), "generated ID should not be null");
+        assertEquals(regleA.getId(), savedJF.getRegle().getId());
 
     }
     @Test
@@ -75,7 +78,7 @@ public class JourFerieIntegrationTest {
         savedJF.setJoursFerieList(new ArrayList<>());
         JourFerie updatedJF = jourFerieRepository.save(savedJF);
 
-        Assertions.assertEquals(regleA.getCoderegle(), updatedJF.getRegle().getCoderegle(), "La règle doit rester inchangée");
+        assertEquals(regleA.getCoderegle(), updatedJF.getRegle().getCoderegle(), "La règle doit rester inchangée");
     }
 
     @Test
@@ -111,7 +114,7 @@ public class JourFerieIntegrationTest {
         jourFerieRepository.save(jourFerie1);
         jourFerieRepository.save(jourFerie2);
         List<JourFerie> listJF = jourFerieRepository.findAll();
-        Assertions.assertEquals(2, listJF.size());
+        assertEquals(2, listJF.size());
 
     }
 
@@ -135,7 +138,7 @@ public class JourFerieIntegrationTest {
 
         jourFerieRepository.deleteById(jourFerie.getId());
 
-        Assertions.assertTrue(regleRepository.findById(regleA.getId()).isPresent(), "The rule must still exist after the holiday is removed");
+        assertTrue(regleRepository.findById(regleA.getId()).isPresent(), "The rule must still exist after the holiday is removed");
     }
     @Test
     public void testUpdateJourFerieWithDifferentRegle() {
@@ -155,8 +158,13 @@ public class JourFerieIntegrationTest {
         jourFerie.setRegle(regleB);
         JourFerie updatedJF = jourFerieRepository.save(jourFerie);
 
-        Assertions.assertEquals(regleB.getId(), updatedJF.getRegle().getId(), "The rule should be updated correctly.");
+        assertEquals(regleB.getId(), updatedJF.getRegle().getId(), "The rule should be updated correctly.");
     }
+
+
+
+
+
 
 
 }

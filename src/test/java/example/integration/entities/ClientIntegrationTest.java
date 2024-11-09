@@ -1,8 +1,10 @@
     package example.integration.entities;
 
 import example.entities.Client;
+import example.entities.Probleme;
 import example.entities.Valise;
 import example.repositories.ClientRepository;
+import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
@@ -19,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,6 +34,8 @@ class ClientIntegrationTest {
     private ClientRepository clientRepository;
     @Autowired
     private ValiseRepository valiseRepository;
+    @Autowired
+    private ProblemeRepository problemeRepository;
 
     @BeforeEach
     void setup() {
@@ -154,6 +159,39 @@ class ClientIntegrationTest {
         Assertions.assertTrue(clients.stream().anyMatch(c -> c.getName().equals("Client A") && c.getEmail().equals("clientA@test.com")));
         Assertions.assertTrue(clients.stream().anyMatch(c -> c.getName().equals("Client B") && c.getEmail().equals("clientB@test.com")));
     }
+
+    @Test
+    void testCreateClient() {
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        clientRepository.save(client);
+
+        Optional<Client> found = clientRepository.findById(client.getId());
+        assertTrue(found.isPresent());
+        assertEquals("Client Test", found.get().getName());
+        assertEquals("client@test.com", found.get().getEmail());
+    }
+
+
+    @Test
+    void testClientRelationshipWithProbleme() {
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        clientRepository.save(client);
+
+        Probleme probleme = new Probleme();
+        probleme.setClient(client);
+        probleme.setDescriptionProbleme("Problème de test");
+        problemeRepository.save(probleme);
+
+        List<Probleme> problemes = problemeRepository.findByClientId(client.getId());
+        assertFalse(problemes.isEmpty());
+        assertEquals(client.getId(), problemes.get(0).getClient().getId());
+    }
+
+
 
 
 

@@ -18,6 +18,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integrationtest")
@@ -56,8 +59,8 @@ public class ProblemeIntegrationTest {
 
         Probleme savedPb = problemeRepository.save(probleme);
         Assertions.assertNotNull(savedPb.getId());
-        Assertions.assertEquals(clientA, savedPb.getClient());
-        Assertions.assertEquals("Description of the problem", savedPb.getDescriptionProbleme());
+        assertEquals(clientA, savedPb.getClient());
+        assertEquals("Description of the problem", savedPb.getDescriptionProbleme());
     }
 
     @Test
@@ -67,7 +70,7 @@ public class ProblemeIntegrationTest {
         pb.setDescriptionProbleme("Description of the problem");
         Probleme savedPb = problemeRepository.saveAndFlush(pb);
         Optional<Probleme> foundPb = problemeRepository.findById(savedPb.getId());
-        Assertions.assertTrue(foundPb.isPresent());
+        assertTrue(foundPb.isPresent());
     }
 
 
@@ -123,7 +126,7 @@ public class ProblemeIntegrationTest {
         savedPb.setDetailsProbleme("Updated details");
         Probleme updatedPb = problemeRepository.saveAndFlush(savedPb);
 
-        Assertions.assertEquals("Updated details", updatedPb.getDetailsProbleme());
+        assertEquals("Updated details", updatedPb.getDetailsProbleme());
     }
 
 
@@ -213,10 +216,10 @@ public class ProblemeIntegrationTest {
         List<Probleme> allProblemes = problemeRepository.findAll();
 
         Assertions.assertNotNull(allProblemes);
-        Assertions.assertEquals(2, allProblemes.size());
+        assertEquals(2, allProblemes.size());
 
-        Assertions.assertTrue(allProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Problem 1")));
-        Assertions.assertTrue(allProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Problem 2")));
+        assertTrue(allProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Problem 1")));
+        assertTrue(allProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Problem 2")));
     }
 
     @Test
@@ -242,8 +245,8 @@ public class ProblemeIntegrationTest {
         problemeRepository.saveAndFlush(savedPb);
 
         Probleme updatedPb = problemeRepository.findById(savedPb.getId()).orElseThrow();
-        Assertions.assertEquals("Initial details", updatedPb.getDetailsProbleme());
-        Assertions.assertEquals("Updated description", updatedPb.getDescriptionProbleme());
+        assertEquals("Initial details", updatedPb.getDetailsProbleme());
+        assertEquals("Updated description", updatedPb.getDescriptionProbleme());
     }
 
 
@@ -296,8 +299,27 @@ public class ProblemeIntegrationTest {
         List<Probleme> problemesByValise = problemeRepository.findByValise(val1);
 
         Assertions.assertNotNull(problemesByValise);
-        Assertions.assertEquals(2, problemesByValise.size());
+        assertEquals(2, problemesByValise.size());
     }
+
+    @Test
+    void testProblemeRelationWithClient() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("test@example.com");
+        clientRepository.save(client);
+
+        Probleme probleme = new Probleme();
+        probleme.setClient(client);
+        probleme.setDescriptionProbleme("Problème de test");
+        problemeRepository.save(probleme);
+
+        Optional<Probleme> found = problemeRepository.findById(probleme.getId());
+        assertTrue(found.isPresent());
+        assertEquals("Test Client", found.get().getClient().getName());
+        assertEquals("Problème de test", found.get().getDescriptionProbleme());
+    }
+
 
 
 
