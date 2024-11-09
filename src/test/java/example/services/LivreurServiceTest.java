@@ -5,6 +5,7 @@ import example.entities.Formule;
 import example.entities.Livreur;
 import example.exceptions.RegleNotFoundException;
 import example.repositories.LivreurRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,7 +115,7 @@ public class LivreurServiceTest {
 
         when(livreurRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
             livreurService.deleteLivreur(id);
         });
 
@@ -124,6 +125,8 @@ public class LivreurServiceTest {
         verify(livreurRepository, times(1)).existsById(id);
         verify(livreurRepository, never()).deleteById(id);
     }
+
+
 
 
 
@@ -173,18 +176,22 @@ public class LivreurServiceTest {
         verifyNoInteractions(livreurRepository);
     }
     @Test
-    public void testNoInteractionWithLivreurRepository_Failure_Exception(){
-        int id=1;
-        Livreur livreur=new Livreur();
+    public void testNoInteractionWithLivreurRepository_Failure_Exception() {
+        int id = 1;
+        Livreur livreur = new Livreur();
         livreur.setId(id);
-        try{
+
+        when(livreurRepository.existsById(id)).thenReturn(false);
+
+        Exception exception = assertThrows(RegleNotFoundException.class, () -> {
             livreurService.updateLivreur(id, livreur);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        });
+
+        Assertions.assertEquals("Delivery person not found with ID " + id, exception.getMessage());
         verify(livreurRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(livreurRepository);
+        verify(livreurRepository, never()).save(any(Livreur.class));
     }
+
     @Test
     public void testUpdateLivreur_LivreurNotFound() {
         when(livreurRepository.findById(anyInt())).thenReturn(Optional.empty());

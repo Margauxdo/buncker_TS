@@ -155,17 +155,42 @@ public class FormuleIntegrationTest {
     void testFormuleRelationWithRegle() {
         Formule formule = new Formule();
         formule.setLibelle("Formule Test");
-        formuleRepository.save(formule);
+        Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
         Regle regle = new Regle();
         regle.setCoderegle("CODE123");
-        regle.setFormule(formule);
-        regleRepository.save(regle);
+        regle.setFormule(savedFormule);
+        regleRepository.saveAndFlush(regle);
 
         Optional<Regle> foundRegle = regleRepository.findById(regle.getId());
         assertTrue(foundRegle.isPresent());
-        assertEquals(formule.getId(), foundRegle.get().getFormule().getId());
+        assertEquals(savedFormule.getId(), foundRegle.get().getFormule().getId());
     }
+
+
+
+    @Test
+    public void testDeleteFormuleWithRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("R127");
+        regle.setDateRegle(new Date());
+        regle = regleRepository.saveAndFlush(regle);
+
+        Formule formule = new Formule();
+        formule.setFormule("formule6");
+        formule.setLibelle("libelle 6");
+        formule.setRegle(regle);
+        Formule savedFormule = formuleRepository.saveAndFlush(formule);
+
+        regle.setFormule(null);
+        regleRepository.saveAndFlush(regle);
+
+        formuleRepository.delete(savedFormule);
+
+        Optional<Formule> deletedFormule = formuleRepository.findById(savedFormule.getId());
+        assertTrue(deletedFormule.isEmpty());
+    }
+
 
 
 }

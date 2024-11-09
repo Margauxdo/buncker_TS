@@ -181,14 +181,21 @@ public class ClientServiceTest {
         int id = 1;
         Client client = new Client();
         client.setId(id);
-        try{
+
+        when(clientRepository.existsById(id)).thenReturn(false);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
             clientService.updateClient(id, client);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        });
+
+        Assertions.assertEquals("Client not found", exception.getMessage(),
+                "The exception should correspond to 'Client not found'");
+
         verify(clientRepository, times(1)).existsById(id);
+        verify(clientRepository, never()).save(any(Client.class));
         verifyNoMoreInteractions(clientRepository);
     }
+
 
     @Test
     public void testUpdateClient_ClientNotFound() {
