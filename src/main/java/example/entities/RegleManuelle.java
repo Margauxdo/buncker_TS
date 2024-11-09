@@ -20,8 +20,8 @@ public class RegleManuelle extends Regle {
 
     private String descriptionRegle;
 
-    @NotNull(message = "Le créateur de la règle est obligatoire")
-    @NotEmpty(message = "Le créateur ne peut pas être vide")
+    @NotNull(message = "Rule creator is required")
+    @NotEmpty(message = "Creator cannot be empty")
     private String createurRegle;
 
     public void setCreateurRegle(String createurRegle) {

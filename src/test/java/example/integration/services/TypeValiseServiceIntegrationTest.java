@@ -64,7 +64,7 @@ public class TypeValiseServiceIntegrationTest {
 
         // Assert
         boolean isDeleted = !typeValiseRepository.existsById(savedTV.getId());
-        assertTrue(isDeleted, "TypeValise devrait être supprimé de la base de données");
+        assertTrue(isDeleted, "Type Suitcase should be deleted from the database");
     }
 
     @Test

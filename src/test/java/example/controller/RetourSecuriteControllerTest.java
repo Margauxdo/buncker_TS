@@ -2,12 +2,14 @@ package example.controller;
 
 import example.entities.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -76,21 +78,25 @@ public class RetourSecuriteControllerTest {
     }
     @Test
     public void testUpdateRetourSecurite_Failure() {
+        int id = 1;
         RetourSecurite updateRetourSecurite = new RetourSecurite();
-        when(retourSecuriteService.updateRetourSecurite(1,updateRetourSecurite)).thenReturn(null);
-        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecurite(1,updateRetourSecurite);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        when(retourSecuriteService.updateRetourSecurite(id, updateRetourSecurite))
+                .thenThrow(new EntityNotFoundException("Safety return does not exist"));
+
+        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecurite(id, updateRetourSecurite);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status code should be 404 NOT_FOUND");
     }
+
     @Test
     public void testDeleteRetourSecurite_Succes() {
         doNothing().when(retourSecuriteService).deleteRetourSecurite(1);
-        ResponseEntity<RetourSecurite> result = RScontroller.deleteRetourSecurite(1);
+        ResponseEntity<Void> result = RScontroller.deleteRetourSecurite(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
     }
     @Test
     public void testDeleteRetourSecurite_Failure() {
         doThrow(new RuntimeException("Internal server error")).when(retourSecuriteService).deleteRetourSecurite(1);
-        ResponseEntity<RetourSecurite> result = RScontroller.deleteRetourSecurite(1);
+        ResponseEntity<Void> result = RScontroller.deleteRetourSecurite(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
         verify(retourSecuriteService).deleteRetourSecurite(1);
     }
@@ -102,12 +108,15 @@ public class RetourSecuriteControllerTest {
     @Test
     public void testCreateRetourSecurite_Failure() {
         RetourSecurite retourSecurite = new RetourSecurite();
-        // Make sure this throws an IllegalArgumentException
-        when(retourSecuriteService.createRetourSecurite(any(RetourSecurite.class))).thenThrow(new IllegalArgumentException("security invalid"));
+
+        when(retourSecuriteService.createRetourSecurite(any(RetourSecurite.class)))
+                .thenThrow(new DataIntegrityViolationException("security invalid"));
 
         ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(retourSecurite);
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
+
 
 
     @Test
@@ -122,14 +131,18 @@ public class RetourSecuriteControllerTest {
     @Test
     public void testDeleteRetourSecurite_InternalServerError() {
         doThrow(new RuntimeException("Internal server error")).when(retourSecuriteService).deleteRetourSecurite(1);
-        ResponseEntity<RetourSecurite> result = RScontroller.deleteRetourSecurite(1);
+        ResponseEntity<Void> result = RScontroller.deleteRetourSecurite(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
     @Test
     public void testCreateRetourSecurite_NullInput() {
+        when(retourSecuriteService.createRetourSecurite(null)).thenThrow(new DataIntegrityViolationException("Null input not allowed"));
+
         ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(null);
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
+
 
 }

@@ -34,14 +34,12 @@ public class RetourSecuriteTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Création et persistance d'un client avec un nom obligatoire
         Client client = new Client();
-        client.setName("Client Test"); // Initialisation du champ obligatoire 'name'
+        client.setName("Client Test");
         client.setEmail("client.test@example.com");
         em.persist(client);
         em.flush();
 
-        // Initialisation de RetourSecurite avec les valeurs nécessaires
         retourSecurite = new RetourSecurite();
         retourSecurite.setClient(client);
         retourSecurite.setCloture(Boolean.FALSE);
@@ -55,36 +53,43 @@ public class RetourSecuriteTest {
 
     @Test
     public void testRetourSecuritePersistence() {
-        Assertions.assertNotNull(retourSecurite.getId(), "L'ID de retourSecurite ne doit pas être nul après la persistance");
+        Assertions.assertNotNull(retourSecurite.getId(),
+                "Security return ID must not be null after persistence");
     }
 
     @Test
     public void testRetourSecuriteNumero() {
-        Assertions.assertEquals(25689568965L, retourSecurite.getNumero(), "Le numéro doit correspondre à la valeur initialisée");
+        Assertions.assertEquals(25689568965L, retourSecurite.getNumero(),
+                "The number must match the initialized value");
     }
 
     @Test
     public void testRetourSecuriteDateSecurite() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Assertions.assertEquals(sdf.parse("2020-02-25"), retourSecurite.getDatesecurite(), "La date de sécurité doit correspondre à la date initialisée");
+        Assertions.assertEquals(sdf.parse("2020-02-25"), retourSecurite.getDatesecurite(),
+                "The security date must match the initialized date");
     }
 
     @Test
     public void testRetourSecuriteDateCloture() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Assertions.assertEquals(sdf.parse("2020-02-25"), retourSecurite.getDateCloture(), "La date de clôture doit correspondre à la date initialisée");
+        Assertions.assertEquals(sdf.parse("2020-02-25"), retourSecurite.getDateCloture(),
+                "The closing date must match the initialized date");
     }
 
     @Test
     public void testRetourSecuriteCloture() {
-        Assertions.assertEquals(Boolean.FALSE, retourSecurite.getCloture(), "Le champ cloture doit être égal à FALSE");
+        Assertions.assertEquals(Boolean.FALSE, retourSecurite.getCloture(),
+                "The fence field must be equal to FALSE");
     }
 
     @Test
     public void testRetourSecuriteClientAssociation() {
-        Assertions.assertNotNull(retourSecurite.getClient(), "Le client associé à retourSecurite ne doit pas être nul");
+        Assertions.assertNotNull(retourSecurite.getClient(),
+                "The client associated with the Security return must not be null");
         Client expectedClient = clientRepository.findAll().get(0);
-        Assertions.assertEquals(expectedClient, retourSecurite.getClient(), "Le client associé doit correspondre au client persistant");
+        Assertions.assertEquals(expectedClient, retourSecurite.getClient(),
+                "The associated client must match the persistent client");
     }
 
     @Test
@@ -96,7 +101,7 @@ public class RetourSecuriteTest {
         Assertions.assertThrows(PersistenceException.class, () -> {
             em.persist(retourSecuriteWithoutNumero);
             em.flush();
-        }, "La persistance doit échouer si le numéro est nul");
+        }, "Persistence should fail if number is null");
     }
 
     @Test
@@ -107,7 +112,8 @@ public class RetourSecuriteTest {
         em.flush();
 
         RetourSecurite updatedRetourSecurite = em.find(RetourSecurite.class, retourSecurite.getId());
-        Assertions.assertEquals(sdf.parse("2021-05-15"), updatedRetourSecurite.getDatesecurite(), "La date de sécurité doit être mise à jour avec succès");
+        Assertions.assertEquals(sdf.parse("2021-05-15"), updatedRetourSecurite.getDatesecurite(),
+                "The security date must be updated successfully.");
     }
 }
 

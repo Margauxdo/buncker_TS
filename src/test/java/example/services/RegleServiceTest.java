@@ -36,7 +36,7 @@ public class RegleServiceTest {
 
         Regle result = regleService.createRegle(regle);
 
-        Assertions.assertNotNull(result, "Regle should not be null");
+        Assertions.assertNotNull(result, "Rule should not be null");
         verify(regleRepository, times(1)).save(regle);
         verifyNoMoreInteractions(regleRepository);
     }
@@ -47,9 +47,10 @@ public class RegleServiceTest {
             regleService.createRegle(null);
         });
 
-        Assertions.assertEquals("Regle cannot be null", exception.getMessage());
+        Assertions.assertEquals("Ruler cannot be null", exception.getMessage());
         verifyNoInteractions(regleRepository);
     }
+
 
     @Test
     public void testReadRegle_Success() {
@@ -60,8 +61,8 @@ public class RegleServiceTest {
 
         Regle result = regleService.readRegle(id);
 
-        Assertions.assertNotNull(result, "Regle should not be null");
-        Assertions.assertEquals(id, result.getId(), "Regle ID should be correct");
+        Assertions.assertNotNull(result, "Rule should not be null");
+        Assertions.assertEquals(id, result.getId(), "Ruler ID should be correct");
         verify(regleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(regleRepository);
     }
@@ -84,15 +85,15 @@ public class RegleServiceTest {
     public void testUpdateRegle_Success() {
         int id = 1;
         Regle regle = new Regle();
-        regle.setId(id); // Définir l'ID de l'entité
+        regle.setId(id);
 
         when(regleRepository.findById(id)).thenReturn(Optional.of(regle));
         when(regleRepository.save(regle)).thenReturn(regle);
 
         Regle updatedRegle = regleService.updateRegle(id, regle);
 
-        Assertions.assertNotNull(updatedRegle, "Updated regle should not be null");
-        Assertions.assertEquals(id, updatedRegle.getId(), "Regle ID should be updated");
+        Assertions.assertNotNull(updatedRegle, "Updated rule should not be null");
+        Assertions.assertEquals(id, updatedRegle.getId(), "Rule ID should be updated");
         verify(regleRepository, times(1)).findById(id);
         verify(regleRepository, times(1)).save(regle);
         verifyNoMoreInteractions(regleRepository);
@@ -109,10 +110,11 @@ public class RegleServiceTest {
             regleService.updateRegle(id, regle);
         });
 
-        Assertions.assertEquals("Règle avec l'ID 1 non trouvée", exception.getMessage());
+        Assertions.assertEquals("Ruler withID 1 not found", exception.getMessage());
         verify(regleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(regleRepository);
     }
+
 
 
     @Test
@@ -163,7 +165,7 @@ public class RegleServiceTest {
 
         List<Regle> result = regleService.readAllRegles();
 
-        Assertions.assertEquals(2, result.size(), "There should be 2 regles");
+        Assertions.assertEquals(2, result.size(), "There should be 2 rules");
         verify(regleRepository, times(1)).findAll();
         verifyNoMoreInteractions(regleRepository);
     }
@@ -174,7 +176,7 @@ public class RegleServiceTest {
 
         List<Regle> result = regleService.readAllRegles();
 
-        Assertions.assertTrue(result.isEmpty(), "Regle list should be empty");
+        Assertions.assertTrue(result.isEmpty(), "Rule list should be empty");
         verify(regleRepository, times(1)).findAll();
         verifyNoMoreInteractions(regleRepository);
     }

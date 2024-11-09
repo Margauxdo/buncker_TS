@@ -39,30 +39,26 @@ public class MouvementTest {
     public void setUp() throws ParseException {
         sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Create and save a Client instance
         Client client = new Client();
         client.setName("Test Client");
         client.setEmail("test@example.com");
         clientRepository.save(client);
 
-        // Create and save a Valise instance with a Client
         Valise valise = new Valise();
         valise.setClient(client);
         valiseRepository.save(valise);
 
-        // Create and save a Livreur instance
         Livreur livreur = new Livreur();
         livreur.setNomLivreur("Test Livreur");
         livreurRepository.save(livreur);
 
-        // Initialize Mouvement entity with associations
         mouvement = Mouvement.builder()
                 .dateHeureMouvement(sdf.parse("2024-10-25"))
                 .dateRetourPrevue(sdf.parse("2025-01-05"))
                 .dateSortiePrevue(sdf.parse("2025-01-01"))
                 .statutSortie("close")
                 .valise(valise)
-                .livreur(livreur) // Associate Livreur with Mouvement
+                .livreur(livreur)
                 .build();
 
         em.persist(mouvement);
@@ -71,23 +67,23 @@ public class MouvementTest {
 
     @Test
     public void testMouvementPersistence() {
-        Assertions.assertNotNull(mouvement.getId(), "Mouvement should have a non-null ID after persistence");
+        Assertions.assertNotNull(mouvement.getId(), "Movement should have a non-null ID after persistence");
     }
 
     @Test
     public void testMouvementValiseAssociation() {
-        Assertions.assertNotNull(mouvement.getValise(), "Mouvement should be associated with a Valise");
+        Assertions.assertNotNull(mouvement.getValise(), "Movement should be associated with a Valise");
         Assertions.assertEquals(mouvement.getValise().getId(), valiseRepository.findAll().get(0).getId(), "Valise ID should match");
     }
 
     @Test
     public void testMouvementLivreurAssociation() {
-        Assertions.assertNotNull(mouvement.getLivreur(), "Mouvement should be associated with a Livreur");
+        Assertions.assertNotNull(mouvement.getLivreur(), "Movement should be associated with a Livreur");
     }
 
     @Test
     public void testNonNullDateHeureMouvement() {
-        Assertions.assertNotNull(mouvement.getDateHeureMouvement(), "dateHeureMouvement should not be null");
+        Assertions.assertNotNull(mouvement.getDateHeureMouvement(), "date time movement should not be null");
     }
 
     @Test
@@ -95,6 +91,6 @@ public class MouvementTest {
         mouvement.setStatutSortie("open");
         em.persist(mouvement);
         em.flush();
-        Assertions.assertEquals("open", mouvement.getStatutSortie(), "statutSortie should be updated to 'open'");
+        Assertions.assertEquals("open", mouvement.getStatutSortie(), "Status Exit should be updated to 'open'");
     }
 }

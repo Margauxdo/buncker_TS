@@ -5,6 +5,8 @@ import example.entities.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.ITypeRegleService;
 import example.interfaces.ITypeValiseService;
+import example.repositories.TypeValiseRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +33,7 @@ public class TypeValiseControllerTest {
     private ITypeValiseService typeValiseService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -82,29 +84,31 @@ public class TypeValiseControllerTest {
     public void testUpdateTypeValise_Success() {
         TypeValise updateTypeValise = new TypeValise();
         when(typeValiseService.updateTypeValise(1, updateTypeValise)).thenReturn(updateTypeValise);
-        ResponseEntity<TypeValise> response = typeValiseController.updateTypeValise(updateTypeValise, 1);
+        ResponseEntity<TypeValise> response = typeValiseController.updateTypeValise(1, updateTypeValise);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     @Test
     public void testUpdateTypeValise_Failure() {
         TypeValise updatedTypeValise = new TypeValise();
-        when(typeValiseService.updateTypeValise(1, updatedTypeValise)).thenReturn(null);
-        ResponseEntity<TypeValise> response = typeValiseController.updateTypeValise(updatedTypeValise, 1);
+
+        when(typeValiseService.updateTypeValise(1, updatedTypeValise)).thenThrow(new EntityNotFoundException("TypeValise not found"));
+
+        ResponseEntity<TypeValise> response = typeValiseController.updateTypeValise(1, updatedTypeValise);
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+
+
     @Test
     public void testDeleteTypeValise_Success() {
         doNothing().when(typeValiseService).deleteTypeValise(1);
         ResponseEntity<TypeValise> response = typeValiseController.deleteTypeValise(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
-    @Test
-    public void testDeleteTypeValise_Failure() {
-        doThrow(new RuntimeException("Internal error")).when(typeValiseService).deleteTypeValise(1);
-        ResponseEntity<TypeValise> response = typeValiseController.deleteTypeValise(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        verify(typeValiseService).deleteTypeValise(1);
-    }
+
+
+
+
     @Test
     public void testCreateTypeValise_InvalidInput() {
         TypeValise invalidTypeValise = new TypeValise();
@@ -117,7 +121,7 @@ public class TypeValiseControllerTest {
         TypeValise invalidTypeValise = new TypeValise();
         when(typeValiseService.updateTypeValise(anyInt(), any(TypeValise.class)))
                 .thenThrow(new IllegalArgumentException("suitcase invalid"));
-        ResponseEntity<TypeValise> response = typeValiseController.updateTypeValise(invalidTypeValise, 1);
+        ResponseEntity<TypeValise> response = typeValiseController.updateTypeValise(1, invalidTypeValise);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
     @Test

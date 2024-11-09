@@ -22,7 +22,7 @@ public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_client")
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     @NotBlank(message = "Name is required")
@@ -44,8 +44,8 @@ public class Client {
     private String ramassage6;
     private String ramassage7;
     private String EnvoiparDefaut;
-    private String MemoRetourSecurité1;
-    private String MemoRetourSecurité2;
+    private String MemoRetourSecurite1;
+    private String MemoRetourSecurite2;
     private String typeSuivie; //TODO:? verifier//
 
     public Client(int i, String s, String s1, String mail, String number, String s2, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8, Object o9, Object o10, Object o11) {
@@ -172,19 +172,19 @@ public class Client {
     }
 
     public String getMemoRetourSecurité1() {
-        return MemoRetourSecurité1;
+        return MemoRetourSecurite1;
     }
 
     public void setMemoRetourSecurité1(String memoRetourSecurité1) {
-        MemoRetourSecurité1 = memoRetourSecurité1;
+        MemoRetourSecurite1 = memoRetourSecurité1;
     }
 
     public String getMemoRetourSecurité2() {
-        return MemoRetourSecurité2;
+        return MemoRetourSecurite2;
     }
 
     public void setMemoRetourSecurité2(String memoRetourSecurité2) {
-        MemoRetourSecurité2 = memoRetourSecurité2;
+        MemoRetourSecurite2 = memoRetourSecurité2;
     }
 
     public String getTypeSuivie() {

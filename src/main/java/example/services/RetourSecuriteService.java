@@ -3,6 +3,7 @@ package example.services;
 import example.entities.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
 import example.repositories.RetourSecuriteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,20 +24,29 @@ public class RetourSecuriteService implements IRetourSecuriteService {
         return retourSecuriteRepository.save(retourSecurite);
     }
 
+
     @Override
     public RetourSecurite updateRetourSecurite(int id, RetourSecurite retourSecurite) {
-        if (!retourSecuriteRepository.existsById(id)) {
-            throw new RuntimeException("Safety return does not exist");
+        if (retourSecurite.getNumero() == null) {
+            throw new IllegalArgumentException("Invalid data: 'numero' cannot be null.");
         }
-        retourSecurite.setId(id);
-        return retourSecuriteRepository.save(retourSecurite);
+
+        RetourSecurite existingRetourSecurite = retourSecuriteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Back Security not found with id: " + id));
+
+        existingRetourSecurite.setNumero(retourSecurite.getNumero());
+        return retourSecuriteRepository.save(existingRetourSecurite);
     }
 
 
     @Override
     public void deleteRetourSecurite(int id) {
-        retourSecuriteRepository.deleteById(id);
+        RetourSecurite retourSecurite = retourSecuriteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Back Security not found with id: " + id));
+        retourSecuriteRepository.delete(retourSecurite);
     }
+
+
 
     @Override
     public RetourSecurite getRetourSecurite(int id) {

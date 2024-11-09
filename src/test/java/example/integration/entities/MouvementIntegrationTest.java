@@ -49,7 +49,7 @@ public class MouvementIntegrationTest {
     public void testSaveMouvement() {
         Client client = new Client();
         client.setName("Martin");
-        client.setEmail("martin@example.com"); // Ajout de l'email pour respecter la contrainte
+        client.setEmail("martin@example.com");
         clientRepository.save(client);
 
         Valise valise = new Valise();

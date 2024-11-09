@@ -32,7 +32,7 @@ public class ProblemeServiceTest {
         when(problemeRepository.save(probleme)).thenReturn(probleme);
         Probleme problemeCreated = problemeService.createProbleme(probleme);
 
-        Assertions.assertNotNull(problemeCreated, "Le problème ne doit pas être null");
+        Assertions.assertNotNull(problemeCreated, "The problem must not be null");
         verify(problemeRepository).save(probleme);
     }
 
@@ -55,8 +55,8 @@ public class ProblemeServiceTest {
             return savedProbleme;
         });
         Probleme result = problemeService.updateProbleme(id, probleme);
-        Assertions.assertNotNull(result, "Probleme not updated");
-        Assertions.assertEquals(id, result.getId(), "Probleme not updated");
+        Assertions.assertNotNull(result, "Problem not updated");
+        Assertions.assertEquals(id, result.getId(), "Problem not updated");
         verify(problemeRepository, times(1)).existsById(id);
         verify(problemeRepository, times(1)).save(probleme);
         verifyNoMoreInteractions(problemeRepository);
@@ -65,7 +65,7 @@ public class ProblemeServiceTest {
     public void testUpdateProbleme_Failure_Exception() {
         int id = 1;
         Probleme probleme = new Probleme();
-        probleme.setId(2); // ID différent pour déclencher l'exception
+        probleme.setId(2);
 
         when(problemeRepository.existsById(id)).thenReturn(true);
 
@@ -74,7 +74,7 @@ public class ProblemeServiceTest {
         });
 
         Assertions.assertEquals("Problem ID does not match expected ID", exception.getMessage(),
-                "L'exception doit correspondre au message attendu");
+                "The exception must match the expected message");
         verify(problemeRepository, times(1)).existsById(id);
         verify(problemeRepository, never()).save(any(Probleme.class));
         verifyNoMoreInteractions(problemeRepository);
@@ -103,7 +103,7 @@ public class ProblemeServiceTest {
         });
 
         Assertions.assertEquals("Problem not found", exception.getMessage(),
-                "Le message de l'exception devrait correspondre à 'Problem not found'");
+                "The exception message should match 'Problem not found'");
         verify(problemeRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(problemeRepository);
     }
@@ -115,8 +115,8 @@ public class ProblemeServiceTest {
         probleme.setId(id);
         when(problemeRepository.findById(id)).thenReturn(Optional.of(probleme));
         Probleme result = problemeService.getProblemeById(id);
-        Assertions.assertNotNull(result, "Probleme not found");
-        Assertions.assertEquals(id, result.getId(), "Probleme not found");
+        Assertions.assertNotNull(result, "Problem not found");
+        Assertions.assertEquals(id, result.getId(), "Problem not found");
         verify(problemeRepository, times(1)).findById(id);
         verifyNoMoreInteractions(problemeRepository);
     }
@@ -127,7 +127,7 @@ public class ProblemeServiceTest {
 
         Probleme result = problemeService.getProblemeById(id);
 
-        Assertions.assertNull(result, "Le problème devrait être null si non trouvé");
+        Assertions.assertNull(result, "Problem should be null if not found");
         verify(problemeRepository, times(1)).findById(id);
         verifyNoMoreInteractions(problemeRepository);
     }
@@ -140,7 +140,7 @@ public class ProblemeServiceTest {
 
         when(problemeRepository.findAll()).thenReturn(problemeList);
         List<Probleme> result = problemeService.getAllProblemes();
-        Assertions.assertEquals(2, result.size(), "Liste des problemes");
+        Assertions.assertEquals(2, result.size(), "List of problems");
         verify(problemeRepository, times(1)).findAll();
         verifyNoMoreInteractions(problemeRepository);
     }
@@ -168,7 +168,6 @@ public class ProblemeServiceTest {
         try {
             problemeService.updateProbleme(id, probleme);
         } catch (Exception e) {
-            // Ignorez l'exception pour ce test spécifique
         }
 
         verify(problemeRepository, times(1)).existsById(id);

@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -64,12 +65,15 @@ public class SortieSemaineTest {
         Assertions.assertEquals(expectedRegle.toString(), sortieSemaine.getRegle().toString());
     }
     @Test
-    public void testUpdateDateSortieSemaine(){
+    public void testUpdateDateSortieSemaine() throws ParseException {
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date nouvelleDate = sdf.parse("2025-01-15");
+        sortieSemaine.setDateSortieSemaine(nouvelleDate);
+        Assertions.assertEquals(nouvelleDate, sortieSemaine.getDateSortieSemaine(),
+                "The release date of the week should be updated correctly.");
     }
-    @Test
-    public void testNonNullDateSortieSemaine(){
 
-    }
+
 
 }

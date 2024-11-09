@@ -25,13 +25,11 @@ public class Mouvement {
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
 
-    // Relation with Valise
     @ManyToOne
     @JoinColumn(name = "valise_id")
     private Valise valise;
 
-    // Relation with Livreur
     @ManyToOne
-    @JoinColumn(name = "livreur_id") // Corrected from "livreur-id" to "livreur_id"
+    @JoinColumn(name = "livreur_id")
     private Livreur livreur;
 }

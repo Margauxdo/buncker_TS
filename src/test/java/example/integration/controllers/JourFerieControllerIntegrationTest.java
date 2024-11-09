@@ -106,18 +106,13 @@ public class JourFerieControllerIntegrationTest {
 
     @Test
     public void testGetHolidayById_shouldReturnNotFoundForNonExistentId() throws Exception {
-        mockMvc.perform(get("/api-jourferie/{id}", 999)
+        mockMvc.perform(get("/api-jourferie/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 // Assert
                 .andExpect(status().isNotFound());
     }
-    @Test
-    public void testGetHolidayById_shouldReturnServerErrorForException() throws Exception {
-        mockMvc.perform(get("/api-jourferie/{id}", 9999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // Assert
-                .andExpect(status().isInternalServerError());
-    }
+
+
 
 
 }

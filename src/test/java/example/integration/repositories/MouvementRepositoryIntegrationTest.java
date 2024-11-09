@@ -118,48 +118,40 @@ public class MouvementRepositoryIntegrationTest {
         Client client1 = new Client();
         client1.setName("Client 1");
         client1.setEmail("client1@example.com");
-        client1 = clientRepository.save(client1);  // Enregistrer le client
+        client1 = clientRepository.save(client1);
 
-        // Créer une valise et l'associer au client
         Valise valise1 = new Valise();
         valise1.setNumeroValise(456L);
-        valise1.setClient(client1);  // Associer la valise au client
-        valise1 = valiseRepository.save(valise1);  // Enregistrer la valise
+        valise1.setClient(client1);
+        valise1 = valiseRepository.save(valise1);
 
-        // Créer un mouvement et l'associer au livreur et à la valise
         Mouvement mouvement1 = new Mouvement();
         mouvement1.setLivreur(livreur1);
         mouvement1.setValise(valise1);
-        mouvement1 = mouvementRepository.save(mouvement1);  // Enregistrer le mouvement
-
-        // Créer un deuxième livreur
+        mouvement1 = mouvementRepository.save(mouvement1);
         Livreur livreur2 = new Livreur();
         livreur2.setNomLivreur("Louis");
         livreur2.setCodeLivreur("code456");
-        livreur2 = livreurRepository.save(livreur2);  // Enregistrer le deuxième livreur
+        livreur2 = livreurRepository.save(livreur2);
 
-        // Créer un autre client et l'associer à la deuxième valise
         Client client2 = new Client();
         client2.setName("Client 2");
-        client2.setEmail("client2@example.com");  // Fournir un email pour satisfaire la contrainte NOT NULL
-        client2 = clientRepository.save(client2);  // Enregistrer le deuxième client
+        client2.setEmail("client2@example.com");
+        client2 = clientRepository.save(client2);
 
-        // Créer une deuxième valise et l'associer au deuxième client
         Valise valise2 = new Valise();
         valise2.setNumeroValise(789L);
-        valise2.setClient(client2);  // Associer la deuxième valise au deuxième client
-        valise2 = valiseRepository.save(valise2);  // Enregistrer la deuxième valise
+        valise2.setClient(client2);
+        valise2 = valiseRepository.save(valise2);
 
-        // Créer un deuxième mouvement et l'associer au deuxième livreur et à la deuxième valise
         Mouvement mouvement2 = new Mouvement();
         mouvement2.setLivreur(livreur2);
         mouvement2.setValise(valise2);
-        mouvement2 = mouvementRepository.save(mouvement2);  // Enregistrer le deuxième mouvement
+        mouvement2 = mouvementRepository.save(mouvement2);
 
-        // Vérifier que tous les mouvements sont présents
         List<Mouvement> mouvements = mouvementRepository.findAll();
         assertNotNull(mouvements);
-        assertTrue(mouvements.size() >= 2);  // Vérifier que les deux mouvements sont bien enregistrés
+        assertTrue(mouvements.size() >= 2);
 
         mouvements.forEach(mouvement -> System.out.println(mouvement.getId()));
     }

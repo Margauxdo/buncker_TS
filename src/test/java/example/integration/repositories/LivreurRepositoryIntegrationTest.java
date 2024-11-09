@@ -78,7 +78,7 @@ public class LivreurRepositoryIntegrationTest {
 
         assertEquals(1, livreurs.size());
 
-         assertEquals("Harry", livreurs.get(0).getNomLivreur());  // Corrigé ici
+         assertEquals("Harry", livreurs.get(0).getNomLivreur());
     }
 
     @Test

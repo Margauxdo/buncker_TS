@@ -59,14 +59,14 @@ public class TypeRegleTest {
     }
     @Test
     public void testTypeRegleListTypesREgle() {
-        Assertions.assertNotNull(typeRegle.getListTypesRegles(), "la liste des regles ne devrait pas être null");
+        Assertions.assertNotNull(typeRegle.getListTypesRegles(), "the list of rules should not be null");
         Assertions.assertEquals(2, typeRegle.getListTypesRegles().size());
     }
     @Test
     public void testTypeRegleAssociationRegle() {
         List<Regle> associatedRegles = typeRegle.getListTypesRegles();
-        Assertions.assertNotNull(associatedRegles, "La liste des règles associées ne devrait pas être nulle.");
-        Assertions.assertEquals(2, associatedRegles.size(), "Le type de règle devrait être associé à deux règles.");
+        Assertions.assertNotNull(associatedRegles, "The list of associated rules should not be null.");
+        Assertions.assertEquals(2, associatedRegles.size(), "The rule type should be associated with two rules.");
     }
     @Test
     public void testCascadeDeletion() {
@@ -74,9 +74,9 @@ public class TypeRegleTest {
         em.flush();
 
         TypeRegle deletedTypeRegle = em.find(TypeRegle.class, typeRegle.getId());
-        Assertions.assertNull(deletedTypeRegle, "TypeRegle devrait être supprimé.");
+        Assertions.assertNull(deletedTypeRegle, "Type Rule should be deleted.");
 
         List<Regle> remainingRegles = em.createQuery("SELECT r FROM Regle r", Regle.class).getResultList();
-        Assertions.assertTrue(remainingRegles.isEmpty(), "Les règles associées devraient être supprimées en cascade.");
+        Assertions.assertTrue(remainingRegles.isEmpty(), "Associated rules should be deleted in cascade.");
     }
 }

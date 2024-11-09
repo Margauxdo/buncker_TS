@@ -2,7 +2,10 @@ package example.controller;
 
 import example.entities.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,17 +34,13 @@ public class RetourSecuriteController {
 
 
     @PostMapping("/retourSecurite")
-    public ResponseEntity<RetourSecurite> createRetourSecurite(@RequestBody RetourSecurite retourSecurite) {
-        if (retourSecurite == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
+    public ResponseEntity<RetourSecurite> createRetourSecurite(@Valid @RequestBody RetourSecurite retourSecurite) {
         try {
             RetourSecurite createdRetourSecurite = retourSecuriteService.createRetourSecurite(retourSecurite);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdRetourSecurite);
-        } catch (IllegalArgumentException e) { // Catch IllegalArgumentException
+        } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -51,29 +50,32 @@ public class RetourSecuriteController {
 
 
 
-    @PutMapping("/{id}") // Assurez-vous que la méthode utilise le bon mappage
-    public ResponseEntity<RetourSecurite> updateRetourSecurite(@PathVariable int id, @RequestBody RetourSecurite retourSecurite) {
+
+    @PutMapping("/{id}")
+    public ResponseEntity<RetourSecurite> updateRetourSecurite(@PathVariable int id, @Valid @RequestBody RetourSecurite retourSecurite) {
         try {
-            RetourSecurite updatedRS = retourSecuriteService.updateRetourSecurite(id, retourSecurite);
-            return updatedRS != null ? new ResponseEntity<>(updatedRS, HttpStatus.OK) :
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            RetourSecurite updatedRetourSecurite = retourSecuriteService.updateRetourSecurite(id, retourSecurite);
+            return new ResponseEntity<>(updatedRetourSecurite, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) { // Ajoutez ce bloc pour gérer les exceptions Runtime
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    @DeleteMapping
-    public ResponseEntity<RetourSecurite> deleteRetourSecurite(@PathVariable int id) {
-        try{
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRetourSecurite(@PathVariable int id) {
+        try {
             retourSecuriteService.deleteRetourSecurite(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 }

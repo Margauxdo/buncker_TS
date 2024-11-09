@@ -13,13 +13,13 @@ public class ProblemeService implements IProblemeService {
     private final ProblemeRepository problemeRepository;
 
     public ProblemeService(ProblemeRepository problemeRepository) {
+
         this.problemeRepository = problemeRepository;
     }
 
 
     @Override
     public Probleme createProbleme(Probleme probleme) {
-        // Check if a problem with the same details already exists
         boolean exists = problemeRepository.existsByDescriptionProblemeAndDetailsProbleme(
                 probleme.getDescriptionProbleme(), probleme.getDetailsProbleme());
 
@@ -53,15 +53,18 @@ public class ProblemeService implements IProblemeService {
 
     @Override
     public Probleme getProblemeById(int id) {
+
         return problemeRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<Probleme> getAllProblemes() {
+
         return problemeRepository.findAll();
     }
     @Override
     public Probleme getProbleme(int id) {
+
         return problemeRepository.findById(id).orElse(null);
     }
     @Override

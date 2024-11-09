@@ -12,8 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -47,7 +46,7 @@ public class LivreurTest {
     public void testLivreurPersistence(){
         em.persist(livreur);
         em.flush();
-        assertNotNull(livreur.getId(), "L'id n'existe pas");
+        assertNotNull(livreur.getId(), "The id does not exist");
 
 
     }
@@ -56,7 +55,7 @@ public class LivreurTest {
         em.persist(livreur);
         em.flush();
         Livreur retrievedLivreur = em.find(Livreur.class, livreur.getId());
-        assertNotNull(retrievedLivreur, "L'id doit être récupéré depuis la base de donnée");
+        assertNotNull(retrievedLivreur, "The id must be retrieved from the database");
         assertEquals("Henry", retrievedLivreur.getNomLivreur());
         assertEquals("Martin", retrievedLivreur.getPrenomLivreur());
         assertEquals("1234Henry", retrievedLivreur.getCodeLivreur());
@@ -69,25 +68,35 @@ public class LivreurTest {
 
     @Test
     public void testLivreurMouvementsRelation() {
-        // Persist le livreur et ses mouvements
         em.persist(livreur);
         em.flush();
-
-        // Récupère le livreur depuis la base de données
         Livreur retrievedLivreur = em.find(Livreur.class, livreur.getId());
-
-        // Vérifie que la liste des mouvements est bien enregistrée
         assertNotNull(retrievedLivreur.getMouvements());
         assertEquals(2, retrievedLivreur.getMouvements().size());
     }
     @Test
-    public void testCascadeDeleteMouvements(){
+    public void testCascadeDeleteMouvements() {
+        em.persist(livreur);
+        em.flush();
 
-    }
-    @Test
-    public void testNonNullCodeLivreur(){
+        int livreurId = livreur.getId();
+        int mouvement1Id = livreur.getMouvements().get(0).getId();
+        int mouvement2Id = livreur.getMouvements().get(1).getId();
 
+        em.remove(livreur);
+        em.flush();
+
+        Livreur deletedLivreur = em.find(Livreur.class, livreurId);
+        Mouvement deletedMouvement1 = em.find(Mouvement.class, mouvement1Id);
+        Mouvement deletedMouvement2 = em.find(Mouvement.class, mouvement2Id);
+
+        assertNull(deletedLivreur, "The delivery man must be removed.");
+        assertNull(deletedMouvement1, "Movement 1 must be deleted in cascade.");
+        assertNull(deletedMouvement2, "Movement 2 must be deleted in cascade..");
     }
+
+
+
 
 
 }

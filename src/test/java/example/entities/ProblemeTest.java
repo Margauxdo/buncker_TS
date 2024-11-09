@@ -31,26 +31,22 @@ public class ProblemeTest {
 
     @BeforeEach
     public void setUp() {
-        // Crée et persiste un Client pour lier à Valise
         Client client = new Client();
-        client.setName("Nom du client"); // Initialisation du champ obligatoire
-        client.setEmail("test@example.com");
+        client.setName("nomA");
+        client.setEmail("nomA@gmail.com");
         client = clientRepository.save(client);
 
-        // Crée et persiste une Valise liée au Client
         Valise valise = new Valise();
         valise.setDescription("Valise de test");
-        valise.setClient(client); // Associe le client à la valise
+        valise.setClient(client);
         valise = valiseRepository.save(valise);
 
-        // Initialisation de Probleme avec les champs requis et associations
         probleme = new Probleme();
         probleme.setDescriptionProbleme("description des problemes");
         probleme.setDetailsProbleme("detail des problemes");
         probleme.setClient(client);
         probleme.setValise(valise);
 
-        // Persistance de Probleme pour consistance
         em.persist(probleme);
         em.flush();
     }
@@ -98,12 +94,12 @@ public class ProblemeTest {
 
     @Test
     public void testUpdateProblemeDetails() {
-        probleme.setDetailsProbleme("Nouveaux détails des problèmes");
+        probleme.setDetailsProbleme("updated problem details");
         em.merge(probleme);
         em.flush();
 
         Probleme updatedProbleme = em.find(Probleme.class, probleme.getId());
-        Assertions.assertEquals("Nouveaux détails des problèmes", updatedProbleme.getDetailsProbleme(), "Details should be updated");
+        Assertions.assertEquals("updated problem details", updatedProbleme.getDetailsProbleme(), "Details should be updated");
     }
 }
 

@@ -128,7 +128,7 @@ public class SortieSemaineRepositoryIntegrationTest {
 
         List<SortieSemaine> sorties = sortieSemaineRepository.findByDateSortieSemaine(dateSortie);
         assertNotNull(sorties);
-        assertEquals(1, sorties.size(), "Il devrait y avoir une seule sortie pour cette date");
+        assertEquals(1, sorties.size(), "There should be only one release for this date");
         assertEquals(regle.getCoderegle(), sorties.get(0).getRegle().getCoderegle());
     }
     @Test
@@ -138,7 +138,7 @@ public class SortieSemaineRepositoryIntegrationTest {
 
         assertThrows(Exception.class, () -> {
             sortieSemaineRepository.save(sortieSem);
-        }, "Une exception devrait être lancée si la Regle est manquante");
+        }, "An exception should be thrown if the Rule is missing");
     }
     @Test
     public void testUpdateSortieSemaineDate() {
@@ -157,7 +157,7 @@ public class SortieSemaineRepositoryIntegrationTest {
 
         Optional<SortieSemaine> foundSS = sortieSemaineRepository.findById(savedSS.getId());
         assertTrue(foundSS.isPresent());
-        assertEquals(newDate, foundSS.get().getDateSortieSemaine(), "La date de sortie devrait être mise à jour");
+        assertEquals(newDate, foundSS.get().getDateSortieSemaine(), "The output date should be updated");
     }
 
 

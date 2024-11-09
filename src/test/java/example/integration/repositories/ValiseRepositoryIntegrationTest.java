@@ -192,7 +192,7 @@ public class ValiseRepositoryIntegrationTest {
         Client client = new Client();
         client.setName("John Doe");
         client.setEmail("john.doe@example.com");
-        clientRepository.save(client);  // Save the client to the database
+        clientRepository.save(client);
 
         Valise val = new Valise();
         val.setNumeroValise(2548L);

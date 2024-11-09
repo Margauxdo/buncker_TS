@@ -169,7 +169,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         regleManuelleRepository.delete(savedRM);
 
         Optional<RegleManuelle> foundRM = regleManuelleRepository.findById(savedRM.getId());
-        assertFalse(foundRM.isPresent(), "La suppression en cascade n'a pas fonctionné pour RegleManuelle");
+        assertFalse(foundRM.isPresent(), "Cascade delete did not work for ManualRule");
 
     }
     @Test
@@ -178,7 +178,7 @@ public class RegleManuelleRepositoryIntegrationTest {
 
         assertThrows(Exception.class, () -> {
             regleManuelleRepository.save(regleManuelle);
-        }, "La sauvegarde de RegleManuelle aurait dû échouer à cause de champs obligatoires manquants");
+        }, "Manual Rule save should have failed due to missing required fields");
     }
     @Test
     public void testFindAllPerformance() {
@@ -194,8 +194,8 @@ public class RegleManuelleRepositoryIntegrationTest {
         long endTime = System.currentTimeMillis();
 
         assertNotNull(foundRM);
-        assertTrue(foundRM.size() >= 1000, "Le nombre d'entités récupérées est incorrect");
-        System.out.println("Temps de récupération pour 1000 entités : " + (endTime - startTime) + "ms");
+        assertTrue(foundRM.size() >= 1000, "Incorrect number of entities retrieved");
+        System.out.println("Retrieval time for 1000 entities : " + (endTime - startTime) + "ms");
     }
     @Test
     public void testRegleManuelleWithTypeRegle() {
@@ -205,7 +205,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("Jean Paul Martin");
         regleManuelle.setCoderegle("12345");
-        regleManuelle.setDescriptionRegle("Description de test"); // Fournir une description valide
+        regleManuelle.setDescriptionRegle("Description de test");
         regleManuelle.setTypeRegle(tp);
 
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);

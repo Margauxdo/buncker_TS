@@ -19,14 +19,13 @@ public class FormuleController {
     @Autowired
     private IFormuleService formuleService;
 
-    // Gère l'exception FormuleNotFoundException et retourne un statut 404
     @ExceptionHandler(FormuleNotFoundException.class)
     public ResponseEntity<String> handleFormuleNotFoundException(FormuleNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
-        return new ResponseEntity<>("Données invalides pour la création de Formule", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Invalid data for Formula creation", HttpStatus.BAD_REQUEST);
     }
 
 

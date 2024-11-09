@@ -118,7 +118,6 @@ public class LivreurIntegrationTest {
         livreur.setCodeLivreur("1234");
         livreur.setNumeroCartePro("123456");
         livreur.setPrenomLivreur("jean");
-        // Le nom n'est pas défini, ce qui provoque l'exception
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             livreurRepository.save(livreur);

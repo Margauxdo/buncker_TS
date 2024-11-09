@@ -112,7 +112,7 @@ public class RegleManuelleIntegrationTest {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("adminA");
         regleManuelle.setCoderegle("RM001");
-        regleManuelle.setDescriptionRegle("Description de test"); // Fournir une description
+        regleManuelle.setDescriptionRegle("Description de test");
 
         RegleManuelle savedRegle = regleManuelleRepository.save(regleManuelle);
 

@@ -36,7 +36,7 @@ public class ProblemeController {
             return new ResponseEntity<>(newProbleme, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (IllegalStateException e) { // Ensures conflicts return 409
+        } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

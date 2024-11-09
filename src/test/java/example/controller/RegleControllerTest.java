@@ -46,7 +46,7 @@ public class RegleControllerTest {
 
     @Test
     public void testReadRegles_Failure(){
-        when(regleService.readAllRegles()).thenThrow(new RuntimeException("Erreur de la base de donnee"));
+        when(regleService.readAllRegles()).thenThrow(new RuntimeException("error database"));
         assertThrows(RuntimeException.class, () -> regleController.readRegles());
     }
     @Test
@@ -93,7 +93,7 @@ public class RegleControllerTest {
     @Test
     public void testUpdateRegle_Failure() {
         Regle updatedRegle = new Regle();
-        when(regleService.updateRegle(1, updatedRegle)).thenReturn(null); // Simule l'absence de résultat
+        when(regleService.updateRegle(1, updatedRegle)).thenReturn(null);
 
         ResponseEntity<Regle> result = regleController.updateRegle(1, updatedRegle);
 
@@ -140,11 +140,11 @@ public class RegleControllerTest {
     public void testCreateRegle_NotFound() {
         Regle regle = new Regle();
         when(regleService.createRegle(any(Regle.class)))
-                .thenThrow(new IllegalStateException("Conflict Detected")); // Conflict exception
+                .thenThrow(new IllegalStateException("Conflict Detected"));
 
         ResponseEntity<Regle> result = regleController.createRegle(regle);
 
-        Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // Expect 409 Conflict
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // 409
     }
 
 
@@ -157,14 +157,11 @@ public class RegleControllerTest {
     public void testCreateRegle_Conflict() {
         Regle regle = new Regle();
 
-        // Simule une exception de conflit lorsque createRegle est appelé
         when(regleService.createRegle(any(Regle.class)))
                 .thenThrow(new IllegalStateException("Conflict Detected"));
 
-        // Appelle la méthode createRegle dans le contrôleur
         ResponseEntity<Regle> result = regleController.createRegle(regle);
 
-        // Vérifie que le statut de réponse est CONFLICT
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "Expected CONFLICT status");
     }
 
@@ -186,7 +183,6 @@ public class RegleControllerTest {
 
         ResponseEntity<Regle> result = regleController.updateRegle(1, regle);
 
-        // Verify the response status is INTERNAL_SERVER_ERROR
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
@@ -194,13 +190,10 @@ public class RegleControllerTest {
 
     @Test
     public void testDeleteRegle_InternalServerError() {
-        // Simule une exception RuntimeException lorsque deleteRegle est appelé
         doThrow(new RuntimeException("Internal server error")).when(regleService).deleteRegle(1);
 
-        // Appelle la méthode deleteRegle dans le contrôleur
         ResponseEntity<Void> result = regleController.deleteRegle(1);
 
-        // Vérifie que le statut de réponse est INTERNAL_SERVER_ERROR
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode(), "Expected INTERNAL_SERVER_ERROR status");
     }
 

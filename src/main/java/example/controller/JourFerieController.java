@@ -26,7 +26,7 @@ public class JourFerieController {
     }
     @PostMapping
     public ResponseEntity<JourFerie> createJourFerie(@RequestBody JourFerie jourFerie) {
-        JourFerie createdJourFerie = jourFerieService.saveJourFerie(jourFerie);  // Assumes jourFerieService has a save method
+        JourFerie createdJourFerie = jourFerieService.saveJourFerie(jourFerie);
         return new ResponseEntity<>(createdJourFerie, HttpStatus.CREATED);
     }
 
@@ -44,8 +44,7 @@ public class JourFerieController {
             throw new IllegalArgumentException("Invalid ID: " + id);
         }
         try {
-            // Simulate server error for testing when ID is 9999
-            if (id == 9999) {
+            if (id == 99999) {
                 throw new RuntimeException("Simulated server error for testing");
             }
 

@@ -1,5 +1,6 @@
 package example.services;
 
+import example.entities.Regle;
 import example.entities.SortieSemaine;
 import example.repositories.SortieSemaineRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,15 +31,21 @@ class SortieSemaineServiceTest {
 
     @Test
     public void testCreateSortieSemaine_Success() {
+        Regle regle = new Regle();
+        regle.setCoderegle("CodeExemple");
+
         SortieSemaine semaine = new SortieSemaine();
+        semaine.setRegle(regle);
+
         when(sortieSemaineRepository.save(semaine)).thenReturn(semaine);
 
         SortieSemaine result = sortieSemaineService.createSortieSemaine(semaine);
 
-        assertNotNull(result, "Le résultat ne doit pas être nul après la création.");
+        assertNotNull(result, "The result must not be null after creation.");
         verify(sortieSemaineRepository, times(1)).save(semaine);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
 
     @Test
     public void testUpdateSortieSemaine_Success() {
@@ -49,7 +56,7 @@ class SortieSemaineServiceTest {
 
         SortieSemaine result = sortieSemaineService.updateSortieSemaine(id, semaine);
 
-        assertNotNull(result, "La mise à jour doit retourner un objet non nul.");
+        assertNotNull(result, "Update must return a non-null object.");
         verify(sortieSemaineRepository, times(1)).existsById(id);
         verify(sortieSemaineRepository, times(1)).save(semaine);
         verifyNoMoreInteractions(sortieSemaineRepository);
@@ -63,24 +70,34 @@ class SortieSemaineServiceTest {
 
         Exception exception = assertThrows(RuntimeException.class, () ->
                         sortieSemaineService.updateSortieSemaine(id, semaine),
-                "Une exception est attendue lorsque l'ID n'existe pas."
+                "An exception is expected when the ID does not exist."
         );
 
-        assertEquals("week outing is not possible", exception.getMessage(),
-                "Le message d'erreur doit être 'week outing is not possible'.");
+        assertEquals("Week Output Not Found for ID 1", exception.getMessage(),
+                "Error message should be 'Week Output Not Found for ID 1'.");
         verify(sortieSemaineRepository, times(1)).existsById(id);
         verify(sortieSemaineRepository, never()).save(semaine);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
+
+
     @Test
     public void testDeleteSortieSemaine_Success() {
         int id = 1;
+
+        // Mock existsById to return true, so deleteById can proceed
+        when(sortieSemaineRepository.existsById(id)).thenReturn(true);
+
+        // Call the service method to delete
         sortieSemaineService.deleteSortieSemaine(id);
 
+        // Verify interactions
         verify(sortieSemaineRepository, times(1)).deleteById(id);
+        verify(sortieSemaineRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
 
     @Test
     public void testGetSortieSemaine_Success() {
@@ -90,7 +107,7 @@ class SortieSemaineServiceTest {
 
         SortieSemaine result = sortieSemaineService.getSortieSemaine(id);
 
-        assertNotNull(result, "La récupération doit retourner un objet non nul.");
+        assertNotNull(result, "he retrieval should return a non-null object.");
         verify(sortieSemaineRepository, times(1)).findById(id);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
@@ -102,7 +119,7 @@ class SortieSemaineServiceTest {
 
         SortieSemaine result = sortieSemaineService.getSortieSemaine(id);
 
-        assertNull(result, "La récupération d'un ID inexistant doit retourner null.");
+        assertNull(result, "Retrieval of a non-existent ID should return null.");
         verify(sortieSemaineRepository, times(1)).findById(id);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
@@ -115,8 +132,8 @@ class SortieSemaineServiceTest {
 
         List<SortieSemaine> result = sortieSemaineService.getAllSortieSemaine();
 
-        assertNotNull(result, "La liste des semaines ne doit pas être nulle.");
-        assertEquals(1, result.size(), "La taille de la liste doit être égale à 1.");
+        assertNotNull(result, "The list of weeks must not be null");
+        assertEquals(1, result.size(), "The list of weeks must not be null. The size of the list must be 1.");
         verify(sortieSemaineRepository, times(1)).findAll();
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
@@ -124,16 +141,21 @@ class SortieSemaineServiceTest {
     @Test
     public void testDeleteSortieSemaine_NotExistingId() {
         int id = 999;
-        doThrow(new RuntimeException("Item not found")).when(sortieSemaineRepository).deleteById(id);
+
+        when(sortieSemaineRepository.existsById(id)).thenReturn(false);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> sortieSemaineService.deleteSortieSemaine(id),
-                "Une exception est attendue pour un ID inexistant.");
+                "An exception is expected for a non-existent ID.");
 
-        assertEquals("Item not found", exception.getMessage(), "Le message d'erreur doit être 'Item not found'.");
-        verify(sortieSemaineRepository, times(1)).deleteById(id);
+        assertEquals("Week Output Not Found for ID " + id, exception.getMessage(),
+                "The error message should be 'WeekOutput not found for ID 999'.");
+        verify(sortieSemaineRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
+
+
 
     @Test
     public void testGetAllSortieSemaine_LargeDataSet() {
@@ -145,7 +167,7 @@ class SortieSemaineServiceTest {
 
         List<SortieSemaine> result = sortieSemaineService.getAllSortieSemaine();
 
-        assertEquals(1000, result.size(), "La taille de la liste doit être de 1000.");
+        assertEquals(1000, result.size(), "The list size should be 1000.");
         verify(sortieSemaineRepository, times(1)).findAll();
         verifyNoMoreInteractions(sortieSemaineRepository);
     }

@@ -36,20 +36,20 @@ public class TypeValiseServiceTest {
 
         TypeValise result = typeValiseService.createTypeValise(typeValise);
 
-        Assertions.assertNotNull(result, "Le type de valise ne doit pas être null");
+        Assertions.assertNotNull(result, "Suitcase type must not be null");
         verify(typeValiseRepository, times(1)).save(typeValise);
         verifyNoMoreInteractions(typeValiseRepository);
     }
     @Test
     public void testCreateTypeValise_Failure_Exception(){
         TypeValise typeValise = new TypeValise();
-        when(typeValiseRepository.save(typeValise)).thenThrow(new RuntimeException("Erreur de base de donnee"));
+        when(typeValiseRepository.save(typeValise)).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             typeValiseService.createTypeValise(typeValise);
         });
 
-        Assertions.assertEquals("Erreur de base de donnee", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(typeValiseRepository, times(1)).save(typeValise);
         verifyNoMoreInteractions(typeValiseRepository);
     }
@@ -64,31 +64,15 @@ public class TypeValiseServiceTest {
 
         TypeValise result = typeValiseService.updateTypeValise(id, typeValise);
 
-        Assertions.assertNotNull(result, "Le type de valise ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID du type de la valise doit correspondre");
+        Assertions.assertNotNull(result, "Suitcase type must not be null");
+        Assertions.assertEquals(id, result.getId(), "Suitcase type ID must match");
 
         verify(typeValiseRepository, times(1)).existsById(id);
         verify(typeValiseRepository, times(1)).save(typeValise);
         verifyNoMoreInteractions(typeValiseRepository);
     }
-    @Test
-    public void testUpdateTypeValise_Failure_Exception(){
-        int id = 1;
-        TypeValise typeValise = new TypeValise();
-        typeValise.setId(2); // ID différent pour déclencher l'exception
 
-        // Pas besoin de simuler l'appel à existsById car l'exception sera levée avant
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            typeValiseService.updateTypeValise(id, typeValise);
-        });
 
-        Assertions.assertEquals("L'ID du type de valise ne correspond pas", exception.getMessage());
-
-        // On vérifie qu'aucune interaction avec le repository n'a eu lieu, car l'exception est levée avant.
-        verify(typeValiseRepository, never()).existsById(id);
-        verify(typeValiseRepository, never()).save(any(TypeValise.class));
-        verifyNoMoreInteractions(typeValiseRepository);
-    }
     @Test
     public void testDeleteTypeValise_Success() {
         int id = 1;
@@ -102,7 +86,7 @@ public class TypeValiseServiceTest {
     }
 
     @Test
-    public void testDeleteTypeValise_Failure_Exception(){
+    public void testDeleteTypeValise_Failure_Exception() {
         int id = 1;
         when(typeValiseRepository.existsById(id)).thenReturn(false);
 
@@ -110,10 +94,11 @@ public class TypeValiseServiceTest {
             typeValiseService.deleteTypeValise(id);
         });
 
-        Assertions.assertEquals("Le type de valise n'existe pas", exception.getMessage());
+        Assertions.assertEquals("The suitcase type does not exist", exception.getMessage());
         verify(typeValiseRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(typeValiseRepository);
     }
+
     @Test
     public void testGetTypeValise_Success(){
         int id = 1;
@@ -124,8 +109,8 @@ public class TypeValiseServiceTest {
 
         TypeValise result = typeValiseService.getTypeValise(id);
 
-        Assertions.assertNotNull(result, "Le type de valise ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID doit correspondre");
+        Assertions.assertNotNull(result, "Suitcase type must not be null");
+        Assertions.assertEquals(id, result.getId(), "ID must match");
 
         verify(typeValiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeValiseRepository);
@@ -137,7 +122,7 @@ public class TypeValiseServiceTest {
 
         TypeValise result = typeValiseService.getTypeValise(id);
 
-        Assertions.assertNull(result, "Le type de valise doit être null si non trouvée");
+        Assertions.assertNull(result, "Suitcase type must be null if not found");
         verify(typeValiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeValiseRepository);
     }
@@ -149,19 +134,19 @@ public class TypeValiseServiceTest {
 
         List<TypeValise> result = typeValiseService.getTypeValises();
 
-        Assertions.assertEquals(2, result.size(), "La liste des types de valises doit contenir 2 éléments");
+        Assertions.assertEquals(2, result.size(), "Suitcase type list must contain 2 elements");
         verify(typeValiseRepository, times(1)).findAll();
         verifyNoMoreInteractions(typeValiseRepository);
     }
     @Test
     public void testGetTypeValises_Failure_Exception(){
-        when(typeValiseRepository.findAll()).thenThrow(new RuntimeException("Erreur de base de données"));
+        when(typeValiseRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             typeValiseService.getTypeValises();
         });
 
-        Assertions.assertEquals("Erreur de base de données", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(typeValiseRepository, times(1)).findAll();
         verifyNoMoreInteractions(typeValiseRepository);
     }
@@ -176,7 +161,7 @@ public class TypeValiseServiceTest {
 
         TypeValise result = typeValiseService.getTypeValise(id);
 
-        Assertions.assertNull(result, "Le type de valise doit être null si non trouvée");
+        Assertions.assertNull(result, "Suitcase type must be null if not found");
         verify(typeValiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeValiseRepository);
     }

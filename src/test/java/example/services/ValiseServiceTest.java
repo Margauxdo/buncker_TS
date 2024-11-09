@@ -36,20 +36,20 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.createValise(valise);
 
-        Assertions.assertNotNull(result, "La valise ne doit pas être null");
+        Assertions.assertNotNull(result, "The suitcase must not be null");
         verify(valiseRepository, times(1)).save(valise);
         verifyNoMoreInteractions(valiseRepository);
     }
     @Test
     public void testCreateValise_Failure_Exception(){
         Valise valise = new Valise();
-        when(valiseRepository.save(valise)).thenThrow(new RuntimeException("Erreur de base de donnee"));
+        when(valiseRepository.save(valise)).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             valiseService.createValise(valise);
         });
 
-        Assertions.assertEquals("Erreur de base de donnee", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(valiseRepository, times(1)).save(valise);
         verifyNoMoreInteractions(valiseRepository);
     }
@@ -64,8 +64,8 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.updateValise( id, valise);
 
-        Assertions.assertNotNull(result, "La valise ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID de la valise doit correspondre");
+        Assertions.assertNotNull(result, "The suitcase must not be null");
+        Assertions.assertEquals(id, result.getId(), "Suitcase ID must match");
 
         verify(valiseRepository, times(1)).existsById(id);
         verify(valiseRepository, times(1)).save(valise);
@@ -75,16 +75,14 @@ public class ValiseServiceTest {
     public void testUpdateValise_Failure_Exception(){
         int id = 1;
         Valise valise = new Valise();
-        valise.setId(2); // ID différent pour déclencher l'exception
+        valise.setId(2);
 
-        // Pas besoin de simuler l'appel à existsById car l'exception sera levée avant
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             valiseService.updateValise( id, valise);
         });
 
-        Assertions.assertEquals("L'ID de la valise ne correspond pas", exception.getMessage());
+        Assertions.assertEquals("Suitcase ID does not match", exception.getMessage());
 
-        // On vérifie qu'aucune interaction avec le repository n'a eu lieu, car l'exception est levée avant.
         verify(valiseRepository, never()).existsById(id);
         verify(valiseRepository, never()).save(any(Valise.class));
         verifyNoMoreInteractions(valiseRepository);
@@ -109,7 +107,7 @@ public class ValiseServiceTest {
             valiseService.deleteValise(id);
         });
 
-        Assertions.assertEquals("La valise n'existe pas", exception.getMessage());
+        Assertions.assertEquals("The suitcase does not exist", exception.getMessage());
         verify(valiseRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(valiseRepository);
     }
@@ -123,8 +121,8 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.getValiseById(id);
 
-        Assertions.assertNotNull(result, "La valise ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID doit correspondre");
+        Assertions.assertNotNull(result, "The suitcase must not be null");
+        Assertions.assertEquals(id, result.getId(), "ID must match");
 
         verify(valiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(valiseRepository);
@@ -136,7 +134,7 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.getValiseById(id);
 
-        Assertions.assertNull(result, "La valise doit être null si non trouvée");
+        Assertions.assertNull(result, "Suitcase must be null if not found");
         verify(valiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(valiseRepository);
     }
@@ -148,19 +146,19 @@ public class ValiseServiceTest {
 
         List<Valise> result = valiseService.getAllValises();
 
-        Assertions.assertEquals(2, result.size(), "La liste des valises doit contenir 2 éléments");
+        Assertions.assertEquals(2, result.size(), "The suitcase list must contain 2 items");
         verify(valiseRepository, times(1)).findAll();
         verifyNoMoreInteractions(valiseRepository);
     }
     @Test
     public void testGetAllValises_Failure_Exception(){
-        when(valiseRepository.findAll()).thenThrow(new RuntimeException("Erreur de base de données"));
+        when(valiseRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             valiseService.getAllValises();
         });
 
-        Assertions.assertEquals("Erreur de base de données", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(valiseRepository, times(1)).findAll();
         verifyNoMoreInteractions(valiseRepository);
     }
@@ -175,7 +173,7 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.getValiseById(id);
 
-        Assertions.assertNull(result, "La valise doit être null si non trouvée");
+        Assertions.assertNull(result, "Suitcase must be null if not found");
         verify(valiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(valiseRepository);
     }

@@ -43,27 +43,31 @@ public class TypeRegleController {
            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
        }
     }
-    @PutMapping
-    public ResponseEntity<TypeRegle> updateTypeRegle(@RequestBody TypeRegle typeRegle, @PathVariable int id) {
+    @PutMapping("{id}")
+    public ResponseEntity<TypeRegle> updateTypeRegle(@PathVariable int id, @RequestBody TypeRegle typeRegle) {
         try {
-            TypeRegle updatedTypeReggle = typeRegleService.updateTypeRegle(id, typeRegle);
-            return updatedTypeReggle != null ? new ResponseEntity<>(updatedTypeReggle, HttpStatus.OK) :
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (IllegalArgumentException e) {
+            TypeRegle updatedTypeRegle = typeRegleService.updateTypeRegle(id, typeRegle);
+            return new ResponseEntity<>(updatedTypeRegle, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
     @DeleteMapping("{id}")
     public ResponseEntity<TypeRegle> deleteTypeRegle(@PathVariable int id) {
         try {
             typeRegleService.deleteTypeRegle(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (EntityNotFoundException e) { // Capture l'exception pour renvoyer 404
+        } catch (EntityNotFoundException e) { //  404
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }

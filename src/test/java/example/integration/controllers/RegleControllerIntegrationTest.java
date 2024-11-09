@@ -47,14 +47,12 @@ public class RegleControllerIntegrationTest {
     }
     @Test
     public void testReadAllRegles_ShouldReturnListOfRegles() throws Exception {
-        // Setup sample data
         Regle regle1 = new Regle();
         regle1.setCoderegle("2568L");
         regle1.setDateRegle(new Date());
         regle1.setNombreJours(25);
         regleRepository.save(regle1);
 
-        // Perform GET request without trailing slash
         mockMvc.perform(get("/api/regle")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -80,7 +78,7 @@ public class RegleControllerIntegrationTest {
     public void testReadRegleById_ShouldReturnNotFoundWhenRegleDoesNotExist() throws Exception {
         mockMvc.perform(get("/api/regle/{id}", -1)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound()); // Expecting 404 Not Found
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -114,7 +112,7 @@ public class RegleControllerIntegrationTest {
     }
     @Test
     public void testCreateRegle_ShouldReturnBadRequestForInvalidData() throws Exception {
-        String invalidRegleJson = "{\"coderegle\":\"\"}";  // Champ coderegle vide pour déclencher l'échec de validation
+        String invalidRegleJson = "{\"coderegle\":\"\"}";
 
         mockMvc.perform(post("/api/regle")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -122,6 +120,7 @@ public class RegleControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
                 .andExpect(jsonPath("$.coderegle").value("Le code de la règle est obligatoire"));
+
     }
 
 
@@ -151,8 +150,8 @@ public class RegleControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedRegleJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.coderegle").value("5688L")) // Chemin corrigé
-                .andExpect(jsonPath("$.nombreJours").value(32));   // Chemin corrigé pour `nombreJours`
+                .andExpect(jsonPath("$.coderegle").value("5688L"))
+                .andExpect(jsonPath("$.nombreJours").value(32));
     }
 
     @Test
@@ -166,7 +165,7 @@ public class RegleControllerIntegrationTest {
         mockMvc.perform(put("/api/regle/{id}", 99999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedRegleJson))
-                .andExpect(status().isNotFound()); // Expecting 404 Not Found
+                .andExpect(status().isNotFound());
     }
 
 
@@ -180,8 +179,7 @@ public class RegleControllerIntegrationTest {
         regle.setNombreJours(25);
         regleRepository.save(regle);
 
-        // JSON with empty coderegle to trigger validation
-        String invalidRegleJson = "{\"coderegle\":\"\"}";  // "coderegle" to match entity field
+        String invalidRegleJson = "{\"coderegle\":\"\"}";
 
         mockMvc.perform(put("/api/regle/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -201,7 +199,7 @@ public class RegleControllerIntegrationTest {
         regleRepository.save(regle);
         mockMvc.perform(delete("/api/regle/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent()); // Changez isOk() en isNoContent()
+                .andExpect(status().isNoContent());
     }
 
 

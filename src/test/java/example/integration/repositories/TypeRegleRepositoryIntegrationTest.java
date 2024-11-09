@@ -115,7 +115,7 @@ public class TypeRegleRepositoryIntegrationTest {
 
         assertThrows(Exception.class, () -> {
             typeRegleRepository.save(typeRegle);
-        }, "Une exception devrait être lancée si le nom est null");
+        }, "An exception should be thrown if the name is null");
     }
 
 
@@ -130,7 +130,7 @@ public class TypeRegleRepositoryIntegrationTest {
 
         assertThrows(Exception.class, () -> {
             typeRegleRepository.save(typeRegleB);
-        }, "Une exception devrait être lancée si un doublon de nom est inséré");
+        }, "An exception should be thrown if a duplicate name is inserted");
     }
 
 

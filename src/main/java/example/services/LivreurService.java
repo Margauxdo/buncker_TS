@@ -24,15 +24,13 @@ public class    LivreurService implements ILivreurService {
     @Override
     public Livreur createLivreur(Livreur livreur) {
         if (livreurRepository.existsByCodeLivreur(livreur.getCodeLivreur())) {
-            throw new ConflictException("Livreur with this code already exists.");
+            throw new ConflictException("delivery person with this code already exists.");
         }
         return livreurRepository.save(livreur);
     }
 
 
     @Override
-    // In LivreurService.java
-
     public Livreur updateLivreur(int id, Livreur livreur) {
         if (!livreurRepository.existsById(id)) {
             throw new RegleNotFoundException("Delivery person not found with ID " + id);
@@ -47,7 +45,7 @@ public class    LivreurService implements ILivreurService {
     @Override
     public void deleteLivreur(int id) {
         if (!livreurRepository.existsById(id)) {
-            throw new EntityNotFoundException("Livreur not found with ID: " + id);
+            throw new EntityNotFoundException("delivery person not found with ID: " + id);
         }
         livreurRepository.deleteById(id);
     }

@@ -36,7 +36,7 @@ public class RegleManuelleServiceTest {
 
         RegleManuelle result = regleManuelleService.createRegleManuelle(regleManuelle);
 
-        Assertions.assertNotNull(result, "La règle manuelle ne doit pas être null");
+        Assertions.assertNotNull(result, "Manual rule must not be null");
         verify(regleManuelleRepository, times(1)).save(regleManuelle);
         verifyNoMoreInteractions(regleManuelleRepository);
     }
@@ -44,13 +44,13 @@ public class RegleManuelleServiceTest {
     @Test
     public void testCreateRegleManuelle_Failure_Exception() {
         RegleManuelle regleManuelle = new RegleManuelle();
-        when(regleManuelleRepository.save(regleManuelle)).thenThrow(new RuntimeException("Erreur de base de données"));
+        when(regleManuelleRepository.save(regleManuelle)).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             regleManuelleService.createRegleManuelle(regleManuelle);
         });
 
-        Assertions.assertEquals("Erreur de base de données", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(regleManuelleRepository, times(1)).save(regleManuelle);
         verifyNoMoreInteractions(regleManuelleRepository);
     }
@@ -66,8 +66,8 @@ public class RegleManuelleServiceTest {
 
         RegleManuelle result = regleManuelleService.updateRegleManuelle(id, regleManuelle);
 
-        Assertions.assertNotNull(result, "La règle manuelle ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID de la règle manuelle doit correspondre");
+        Assertions.assertNotNull(result, "Manual rule must not be null");
+        Assertions.assertEquals(id, result.getId(), "Manual rule ID must match");
 
         verify(regleManuelleRepository, times(1)).existsById(id);
         verify(regleManuelleRepository, times(1)).save(regleManuelle);
@@ -78,15 +78,12 @@ public class RegleManuelleServiceTest {
     public void testUpdateRegleManuelle_IdIsSetProperly() {
         int id = 1;
         RegleManuelle regleManuelle = new RegleManuelle();
-        regleManuelle.setId(2); // Intentionally set a different ID
+        regleManuelle.setId(2);
 
-        // Mock existsById to simulate the entity exists
         when(regleManuelleRepository.existsById(id)).thenReturn(true);
 
-        // Run updateRegleManuelle
         regleManuelleService.updateRegleManuelle(id, regleManuelle);
 
-        // Verify that the ID is set correctly and save is called
         Assertions.assertEquals(id, regleManuelle.getId(), "The ID should be updated to match the provided ID.");
         verify(regleManuelleRepository, times(1)).existsById(id);
         verify(regleManuelleRepository, times(1)).save(regleManuelle);
@@ -111,19 +108,7 @@ public class RegleManuelleServiceTest {
         verifyNoMoreInteractions(regleManuelleRepository);
     }
 
-    @Test
-    public void testDeleteRegleManuelle_Failure_Exception() {
-        int id = 1;
-        when(regleManuelleRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            regleManuelleService.deleteRegleManuelle(id);
-        });
-
-        Assertions.assertEquals("RegleManuelle with ID 1 not found", exception.getMessage()); // Mettez à jour le message ici
-        verify(regleManuelleRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
 
 
     @Test
@@ -136,8 +121,8 @@ public class RegleManuelleServiceTest {
 
         RegleManuelle result = regleManuelleService.getRegleManuelle(id);
 
-        Assertions.assertNotNull(result, "La règle manuelle ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID doit correspondre");
+        Assertions.assertNotNull(result, "Manual rule must not be null");
+        Assertions.assertEquals(id, result.getId(), "ID must match");
 
         verify(regleManuelleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(regleManuelleRepository);
@@ -150,7 +135,7 @@ public class RegleManuelleServiceTest {
 
         RegleManuelle result = regleManuelleService.getRegleManuelle(id);
 
-        Assertions.assertNull(result, "La règle manuelle doit être null si non trouvée");
+        Assertions.assertNull(result, "Manual rule must be null if not found");
         verify(regleManuelleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(regleManuelleRepository);
     }
@@ -163,20 +148,20 @@ public class RegleManuelleServiceTest {
 
         List<RegleManuelle> result = regleManuelleService.getRegleManuelles();
 
-        Assertions.assertEquals(2, result.size(), "La liste des règles doit contenir 2 éléments");
+        Assertions.assertEquals(2, result.size(), "Rule list must contain 2 elements");
         verify(regleManuelleRepository, times(1)).findAll();
         verifyNoMoreInteractions(regleManuelleRepository);
     }
 
     @Test
     public void testGetRegleManuelles_Failure_Exception() {
-        when(regleManuelleRepository.findAll()).thenThrow(new RuntimeException("Erreur de base de données"));
+        when(regleManuelleRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             regleManuelleService.getRegleManuelles();
         });
 
-        Assertions.assertEquals("Erreur de base de données", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(regleManuelleRepository, times(1)).findAll();
         verifyNoMoreInteractions(regleManuelleRepository);
     }

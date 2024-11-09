@@ -77,19 +77,23 @@ public class TypeRegleControllerTest {
     public void testUpdateTypeRegle_Success() {
         TypeRegle updateTypeRegle = new TypeRegle();
         when(typeRegleService.updateTypeRegle(1, updateTypeRegle)).thenReturn(updateTypeRegle);
-        ResponseEntity<TypeRegle> response = typeRegleController.updateTypeRegle(updateTypeRegle, 1);
+        ResponseEntity<TypeRegle> response = typeRegleController.updateTypeRegle(1, updateTypeRegle);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     @Test
     public void testUpdateTypeRegle_Failure() {
         TypeRegle updateTypeRegle = new TypeRegle();
-        when(this.typeRegleService.updateTypeRegle(1, updateTypeRegle)).thenReturn(null);
-        ResponseEntity<TypeRegle> response = typeRegleController.updateTypeRegle(updateTypeRegle, 1);
+
+        doThrow(new EntityNotFoundException("Le type de règle n'existe pas"))
+                .when(this.typeRegleService).updateTypeRegle(1, updateTypeRegle);
+
+        ResponseEntity<TypeRegle> response = typeRegleController.updateTypeRegle(1, updateTypeRegle);
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+
     @Test
     public void testDeleteTypeRegle_Success() {
-        // Simule une suppression réussie sans retour de corps de réponse
         doNothing().when(typeRegleService).deleteTypeRegle(1);
         ResponseEntity<TypeRegle> response = typeRegleController.deleteTypeRegle(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
@@ -111,14 +115,12 @@ public class TypeRegleControllerTest {
     @Test
     public void testUpdateTypeRegle_InvalidInput() {
         TypeRegle invalidTypeRegle = new TypeRegle();
-        // Simule une saisie invalide en jetant une IllegalArgumentException
         when(typeRegleService.updateTypeRegle(1, invalidTypeRegle)).thenThrow(new IllegalArgumentException("Type de règle invalide"));
-        ResponseEntity<TypeRegle> response = typeRegleController.updateTypeRegle(invalidTypeRegle, 1);
+        ResponseEntity<TypeRegle> response = typeRegleController.updateTypeRegle(1, invalidTypeRegle);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
     @Test
     public void testDeleteTypeRegle_NotFound() {
-        // Simule une entité non trouvée en jetant une exception EntityNotFoundException
         doThrow(new EntityNotFoundException("Type de règle introuvable")).when(typeRegleService).deleteTypeRegle(1);
         ResponseEntity<TypeRegle> response = typeRegleController.deleteTypeRegle(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -132,7 +134,6 @@ public class TypeRegleControllerTest {
     @Test
     public void testCreateTypeRegle_Conflict() {
         TypeRegle typeRegle = new TypeRegle();
-        // Simule un conflit en jetant une IllegalStateException (conflit déjà existant)
         when(typeRegleService.createTypeRegle(any(TypeRegle.class)))
                 .thenThrow(new IllegalStateException("Conflit lors de la création du type de règle"));
         ResponseEntity<TypeRegle> response = typeRegleController.createTypeRegle(typeRegle);

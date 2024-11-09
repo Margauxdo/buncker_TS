@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,9 +45,13 @@ public class SortieSemaineControllerTest {
     @Test
     public void testGetAllSortieSemaine_Fail() {
         when(sortieSemaineService.getAllSortieSemaine()).thenThrow(new RuntimeException("error database"));
+
         ResponseEntity<List<SortieSemaine>> response = sortieSemaineController.getAllSortieSemaine();
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+
+
 
 
     @Test
@@ -94,25 +99,30 @@ public class SortieSemaineControllerTest {
     @Test
     public void testUpdateSortieSemaine_Fail() {
         SortieSemaine updateSortieSemaine = new SortieSemaine();
+
         when(sortieSemaineService.updateSortieSemaine(1, updateSortieSemaine)).thenReturn(null);
         ResponseEntity<SortieSemaine> response = sortieSemaineController.updateSortieSemaine(1, updateSortieSemaine);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+
     @Test
     public void testDeleteSortieSemaine_Success() {
         doNothing().when(sortieSemaineService).deleteSortieSemaine(1);
-        ResponseEntity<SortieSemaine> response = sortieSemaineController.deleteSortieSemaine(1);
+        ResponseEntity<Void> response = sortieSemaineController.deleteSortieSemaine(1);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
     public void testDeleteSortieSemaine_Fail() {
         doThrow(new RuntimeException("Internal server error")).when(sortieSemaineService).deleteSortieSemaine(1);
-        ResponseEntity<SortieSemaine> response = sortieSemaineController.deleteSortieSemaine(1);
+
+        ResponseEntity<Void> response = sortieSemaineController.deleteSortieSemaine(1);
+
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         verify(sortieSemaineService, times(1)).deleteSortieSemaine(1);
     }
+
 
     @Test
     public void testUpdateSortieSemaine_InvalidInput() {
@@ -125,14 +135,16 @@ public class SortieSemaineControllerTest {
     }
 
 
-
     @Test
-    public void testSortieSemaine_NotFound() {
-        when(sortieSemaineService.getAllSortieSemaine()).thenThrow(new IllegalArgumentException("sortie semaine not found"));
-        ResponseEntity<List<SortieSemaine>> response = sortieSemaineController.getAllSortieSemaine();
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+    public void testSortieSemaine_EmptyList() {
+        when(sortieSemaineService.getAllSortieSemaine()).thenReturn(Collections.emptyList());
 
+        ResponseEntity<List<SortieSemaine>> response = sortieSemaineController.getAllSortieSemaine();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isEmpty());
+    }
 
     @Test
     public void testSortieSemaineController() {

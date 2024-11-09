@@ -11,4 +11,7 @@ public interface ISortieSemaineService {
     void deleteSortieSemaine(int id);
     SortieSemaine getSortieSemaine(int id);
     List<SortieSemaine> getAllSortieSemaine();
+
+
+    boolean existsById(int id);
 }

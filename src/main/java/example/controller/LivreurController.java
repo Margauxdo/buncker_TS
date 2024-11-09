@@ -68,7 +68,7 @@ public class LivreurController {
         if (livreur.getNomLivreur() == null || livreur.getNomLivreur().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        livreur.setId(id);  // Utilisez l'ID de l'URL
+        livreur.setId(id);
         Livreur updatedLivreur = livreurService.updateLivreur(id, livreur);
         return updatedLivreur != null ? ResponseEntity.ok(updatedLivreur) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }

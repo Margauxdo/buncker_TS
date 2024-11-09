@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -33,7 +32,6 @@ public class RegleManuelleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Initialiser et sauvegarder l'entité RegleManuelle
         regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("admin1");
         regleManuelle.setDescriptionRegle("description de la regle");
@@ -49,21 +47,22 @@ public class RegleManuelleTest {
         regleManuelle.setFermeJS6(Boolean.FALSE);
         regleManuelle.setFermeJS7(Boolean.FALSE);
 
-        em.persist(regleManuelle); // Persist l'entité dans la base de données
-        em.flush(); // Force la persistance en base
-        em.refresh(regleManuelle); // Rafraîchit l'entité pour s'assurer que l'ID est chargé
+        em.persist(regleManuelle);
+        em.flush();
+        em.refresh(regleManuelle);
     }
 
     @Test
     public void testRegleManuellePersistence() {
-        // Vérifier que l'ID de regleManuelle est bien attribué après persistance
-        Assertions.assertNotNull(regleManuelle.getId(), "L'ID de la règle ne doit pas être nul après persistance");
+        Assertions.assertNotNull(regleManuelle.getId(),
+                "Rule ID must not be null after persistence");
     }
 
 
 @Test
     public void testRegleManuelleDescriptionRegle() {
-        Assertions.assertEquals(regleManuelle.getDescriptionRegle(), "description de la regle");
+        Assertions.assertEquals(regleManuelle.getDescriptionRegle(),
+                "description de la regle");
 
     }
     @Test
@@ -95,31 +94,52 @@ public class RegleManuelleTest {
     @Test
     public void testRegleManuelleFermeJSFlags() {
         // Verify each FermeJS flag is not null and check expected values if required
-        Assertions.assertNotNull(regleManuelle.getFermeJS1(), "FermeJS1 ne doit pas être nul");
-        Assertions.assertNotNull(regleManuelle.getFermeJS2(), "FermeJS2 ne doit pas être nul");
-        Assertions.assertNotNull(regleManuelle.getFermeJS3(), "FermeJS3 ne doit pas être nul");
-        Assertions.assertNotNull(regleManuelle.getFermeJS4(), "FermeJS4 ne doit pas être nul");
-        Assertions.assertNotNull(regleManuelle.getFermeJS5(), "FermeJS5 ne doit pas être nul");
-        Assertions.assertNotNull(regleManuelle.getFermeJS6(), "FermeJS6 ne doit pas être nul");
-        Assertions.assertNotNull(regleManuelle.getFermeJS7(), "FermeJS7 ne doit pas être nul");
+        Assertions.assertNotNull(regleManuelle.getFermeJS1(), "FermeJS1 must not be null");
+        Assertions.assertNotNull(regleManuelle.getFermeJS2(), "FermeJS2 must not be null");
+        Assertions.assertNotNull(regleManuelle.getFermeJS3(), "FermeJS3 must not be null");
+        Assertions.assertNotNull(regleManuelle.getFermeJS4(), "FermeJS4 must not be null");
+        Assertions.assertNotNull(regleManuelle.getFermeJS5(), "FermeJS5 must not be null");
+        Assertions.assertNotNull(regleManuelle.getFermeJS6(), "FermeJS6 must not be null");
+        Assertions.assertNotNull(regleManuelle.getFermeJS7(), "FermeJS7 must not be null");
 
-        // Retrieve the persisted entity from the repository
         Regle expectedRegle = regleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId(), "L'ID de RegleManuelle devrait correspondre à l'ID dans le repository");
+        Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId(), "The Manual Rule ID should match the ID in the repository");
     }
+
     @Test
-    public void testInheritedAttributesPersistence(){
-
+    public void testInheritedAttributesPersistence() {
+        RegleManuelle persistedRegle = em.find(RegleManuelle.class, regleManuelle.getId());
+        Assertions.assertNotNull(persistedRegle, "Manual rule should be persisted.");
+        Assertions.assertEquals("code 1234", persistedRegle.getCoderegle(),
+                "Code ruler should be 'code 1234'.");
     }
+
+
+
     @Test
-    public void testUpdateDescriptionRegle(){
+        public void testUpdateDescriptionRegle() {
+            regleManuelle.setDescriptionRegle("Nouvelle description");
+            em.merge(regleManuelle);
+            em.flush();
 
-    }
+            RegleManuelle updatedRegle = em.find(RegleManuelle.class, regleManuelle.getId());
+            Assertions.assertEquals("Nouvelle description", updatedRegle.getDescriptionRegle(),
+                    "Description Rule should be updated to 'Nouvelle description'.");
+        }
+
     @Test
-    public void testUpdateCreateurRegle(){
+    public void testUpdateCreateurRegle() {
+        regleManuelle.setCreateurRegle("new admin");
+        em.merge(regleManuelle);
+        em.flush();
 
+        RegleManuelle updatedRegle = em.find(RegleManuelle.class, regleManuelle.getId());
+        Assertions.assertEquals("new admin", updatedRegle.getCreateurRegle(),
+                "Creator Rule should be updated to 'new admin'.");
     }
-
 
 }
+
+
+
 

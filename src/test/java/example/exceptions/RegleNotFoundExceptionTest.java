@@ -8,7 +8,7 @@ public class RegleNotFoundExceptionTest {
     @Test
     void testRegleNotFoundExceptionMessage() {
         // Arrange
-        String expectedMessage = "Regle not found";
+        String expectedMessage = "Ruler not found";
 
         // Act
         RegleNotFoundException exception = new RegleNotFoundException(expectedMessage);
@@ -27,7 +27,7 @@ public class RegleNotFoundExceptionTest {
 
         // Assert
         assertNotNull(exception);
-        assertTrue(exception instanceof RuntimeException, "Exception should be a RuntimeException");
+        assertInstanceOf(RuntimeException.class, exception, "Exception should be a RuntimeException");
     }
 }
 

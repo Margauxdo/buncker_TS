@@ -28,7 +28,6 @@ public class MouvementServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // Test de création avec succès
     @Test
     public void testCreateMouvement_Success() {
         Mouvement mouvement = new Mouvement();
@@ -41,7 +40,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de création avec exception
     @Test
     public void testCreateMouvement_Failure_Exception() {
         Mouvement mouvement = new Mouvement();
@@ -56,12 +54,11 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de mise à jour avec succès
     @Test
     public void testUpdateMouvement_Success() {
         int id = 1;
         Mouvement mouvement = new Mouvement();
-        mouvement.setId(2); // ID différent pour simuler la mise à jour
+        mouvement.setId(2);
 
         when(mouvementRepository.existsById(id)).thenReturn(true);
         when(mouvementRepository.save(any(Mouvement.class))).thenAnswer(invocation -> {
@@ -84,11 +81,10 @@ public class MouvementServiceTest {
     public void testUpdateMouvement_Failure_Exception() {
         int id = 1;
         Mouvement mouvement = new Mouvement();
-        mouvement.setId(id); // ID identique pour déclencher l'exception
+        mouvement.setId(id);
 
         when(mouvementRepository.existsById(id)).thenReturn(false);
 
-        // S'assurer que l'exception est bien levée avec le bon message
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
             mouvementService.updateMouvement(id, mouvement);
         });
@@ -100,7 +96,6 @@ public class MouvementServiceTest {
     }
 
 
-    // Test de suppression avec succès
     @Test
     public void testDeleteMouvement_Success() {
         int id = 1;
@@ -112,7 +107,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de suppression avec exception
     @Test
     public void testDeleteMouvement_Failure_Exception() {
         int id = 1;
@@ -127,7 +121,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de récupération d'un mouvement par ID avec succès
     @Test
     public void testGetMouvementById_Success() {
         int id = 1;
@@ -145,7 +138,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de récupération d'un mouvement par ID qui n'existe pas
     @Test
     public void testGetMouvementById_Failure_Exception() {
         int id = 1;
@@ -159,7 +151,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de récupération de tous les mouvements
     @Test
     public void testGetAllMouvements_Success() {
         List<Mouvement> mouvements = new ArrayList<>();
@@ -175,7 +166,6 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test de récupération d'une liste vide
     @Test
     public void testGetAllMouvements_Failure_Exception() {
         when(mouvementRepository.findAll()).thenReturn(new ArrayList<>());
@@ -187,13 +177,11 @@ public class MouvementServiceTest {
         verifyNoMoreInteractions(mouvementRepository);
     }
 
-    // Test sans interaction avec mouvementRepository
     @Test
     public void testNoInteractionWithMouvementRepository_Success() {
         verifyNoInteractions(mouvementRepository);
     }
 
-    // Test avec interaction pour vérifier un échec attendu
     @Test
     public void testNoInteractionWithMouvementRepository_Failure_Exception() {
         mouvementService.getMouvementById(1);

@@ -44,29 +44,24 @@ public class RegleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Création et persistance du Client
         Client client = new Client();
-        client.setName("NomDuClient");
-        client.setEmail("email@exemple.com");
+        client.setName("CientA");
+        client.setEmail("clientA@exemple.com");
         em.persist(client);
 
-        // Création et persistance de la Formule
         Formule formule = new Formule();
         formule.setLibelle("LibelleFormule");
         formule.setFormule("ContenuFormule");
         em.persist(formule);
 
-        // Création et persistance de TypeRegle
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("TypeRegleTest");
         em.persist(typeRegle);
 
-        // Création et persistance de Valise
         Valise valise = new Valise();
         valise.setClient(client);
         em.persist(valise);
 
-        // Création et persistance de Regle
         regle = new Regle();
         regle.setFermeJS1(false);
         regle.setFermeJS2(false);
@@ -86,13 +81,11 @@ public class RegleTest {
         regle.setTypeRegle(typeRegle);
         regle.setValise(valise);
 
-        // Initialisation de la collection sortieSemaine
         List<SortieSemaine> sorties = new ArrayList<>();
         regle.setSortieSemaine(sorties);
         em.persist(regle);
         em.flush();
 
-        // Création et persistance de SortieSemaine
         SortieSemaine sortieSemaine = new SortieSemaine();
         sortieSemaine.setRegle(regle);
         sorties.add(sortieSemaine);
@@ -102,17 +95,20 @@ public class RegleTest {
 
     @Test
     public void testReglePersitence() {
-        Assertions.assertNotNull(regle.getId(), "Le id est null");
+        Assertions.assertNotNull(regle.getId(), "The id is null");
     }
 
     @Test
     public void testRegleReglePourSortie() {
         Assertions.assertEquals("PourSortie", regle.getReglePourSortie());
+
     }
 
     @Test
     public void testRegleCodeRegle() {
         Assertions.assertEquals("Coderegle", regle.getCoderegle());
+
+
     }
 
     @Test
@@ -145,6 +141,8 @@ public class RegleTest {
     @Test
     public void testRegleTypeEntree() {
         Assertions.assertEquals("typeEntree", regle.getTypeEntree());
+
+
     }
 
     @Test
@@ -187,6 +185,6 @@ public class RegleTest {
         em.flush();
 
         List<SortieSemaine> sorties = sortieSemaineRepository.findAll();
-        Assertions.assertTrue(sorties.isEmpty(), "Les sorties de la semaine n'ont pas été supprimées en cascade");
+        Assertions.assertTrue(sorties.isEmpty(), "This week's releases were not deleted in cascade");
     }
 }

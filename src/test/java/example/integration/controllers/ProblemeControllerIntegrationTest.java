@@ -44,43 +44,42 @@ public class ProblemeControllerIntegrationTest {
 
     @Test
     public void testUpdateProbleme_ShouldUpdateReturnSpecifiedProblem() throws Exception {
-        // Arrange: Create and save an initial Probleme instance
+        // Arrange
         Probleme probleme = new Probleme();
         probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
         problemeRepository.save(probleme);
 
-        // Prepare the updated probleme data
         Probleme updatedPb = new Probleme();
         updatedPb.setId(probleme.getId());
         updatedPb.setDetailsProbleme("updated details Probleme");
         updatedPb.setDescriptionProbleme("updated description probleme");
         String updatedPbJson = objectMapper.writeValueAsString(updatedPb);
 
-        // Act & Assert: Perform PUT request on the correct endpoint
-        mockMvc.perform(put("/api/pb/{id}", probleme.getId())  // Corrected endpoint
+        // Act & Assert
+        mockMvc.perform(put("/api/pb/{id}", probleme.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedPbJson))
-                .andExpect(status().isOk())  // Expecting 200 OK status
+                .andExpect(status().isOk())  // 200 code ok
                 .andExpect(jsonPath("$.descriptionProbleme").value("updated description probleme"))
-                .andExpect(jsonPath("$.detailsProbleme").value("updated details Probleme"));  // Corrected assertion
+                .andExpect(jsonPath("$.detailsProbleme").value("updated details Probleme"));
     }
 
 
     @Test
     public void testCreateProbleme_shouldCreateAndReturnTheNewProblem() throws Exception {
-        // Arrange: Create a new probleme object and convert it to JSON
+        // Arrange
         Probleme probleme = new Probleme();
         probleme.setDescriptionProbleme("descriptionProbleme");
         probleme.setDetailsProbleme("detailsProbleme");
         String problemJSON = objectMapper.writeValueAsString(probleme);
 
-        // Act & Assert: Perform POST request on the correct endpoint
-        mockMvc.perform(post("/api/pb")  // Corrected endpoint
+        // Act & Assert
+        mockMvc.perform(post("/api/pb")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(problemJSON))
-                .andExpect(status().isCreated())  // Expecting 201 CREATED
-                .andExpect(jsonPath("$.descriptionProbleme").value("descriptionProbleme"));  // Verify the response content
+                .andExpect(status().isCreated())  //201 created
+                .andExpect(jsonPath("$.descriptionProbleme").value("descriptionProbleme"));
     }
 
     @Test
@@ -93,48 +92,48 @@ public class ProblemeControllerIntegrationTest {
     }
     @Test
     public void testGetAllProblems_ShouldReturnAllProblems() throws Exception {
-        // Arrange: Create and save a Probleme instance
+        // Arrange
         Probleme probleme = new Probleme();
         probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
         problemeRepository.save(probleme);
 
-        // Act & Assert: Perform GET request on the correct endpoint
-        mockMvc.perform(get("/api/pb")  // Corrected endpoint
+        // Act & Assert
+        mockMvc.perform(get("/api/pb")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].descriptionProbleme").value("description probleme"))
-                .andExpect(jsonPath("$[0].detailsProbleme").value("details Probleme"));  // Corrected JSON path for the list
+                .andExpect(jsonPath("$[0].detailsProbleme").value("details Probleme"));
     }
 
     @Test
     public void testGetAllProblems_shouldReturnEmptyList() throws Exception {
-        // Act & Assert: Perform GET request on the correct endpoint for an empty list
-        mockMvc.perform(get("/api/pb")  // Corrected endpoint
+        // Act & Assert:
+        mockMvc.perform(get("/api/pb")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());  // Check if the returned list is empty
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
     public void testGetProblemById_shouldReturnProblemWhenItExists() throws Exception {
-        // Arrange: Create and save a Probleme instance
+        // Arrange
         Probleme probleme = new Probleme();
         probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
         problemeRepository.save(probleme);
 
-        // Act & Assert: Perform GET request on the correct endpoint
-        mockMvc.perform(get("/api/pb/{id}", probleme.getId())  // Corrected endpoint
+        // Act & Assert
+        mockMvc.perform(get("/api/pb/{id}", probleme.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())  // Expecting 200 OK status
                 .andExpect(jsonPath("$.descriptionProbleme").value("description probleme"))
-                .andExpect(jsonPath("$.detailsProbleme").value("details Probleme"));  // Verifying the detailsProbleme
+                .andExpect(jsonPath("$.detailsProbleme").value("details Probleme"));
     }
 
     @Test
     public void testGetProblemById_ShouldReturnIfTheProblemIDDoesNotExist() throws Exception {
-        mockMvc.perform(get("/api/mouvement/{id}",9999)
+        mockMvc.perform(get("/api/mouvement/{id}",999999)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -163,23 +162,23 @@ public class ProblemeControllerIntegrationTest {
         probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
         String updatedPbJson = objectMapper.writeValueAsString(probleme);
-        mockMvc.perform(put("/api/mouvement/{id}", 99999)
+        mockMvc.perform(put("/api/mouvement/{id}", 999999)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedPbJson))
                 .andExpect(status().isNotFound());
     }
     @Test
     public void testDeleteProbleme_ShouldSuccessfullyDeleteTheSpecifiedProblem() throws Exception {
-        // Arrange: Create and save a probleme instance in the repository
+        // Arrange
         Probleme probleme = new Probleme();
         probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
         probleme = problemeRepository.save(probleme);
 
-        // Act & Assert: Perform a DELETE request on the correct endpoint
+        // Act & Assert
         mockMvc.perform(delete("/api/pb/{id}", probleme.getId())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent()); // Expect 204 NO_CONTENT on successful deletion
+                .andExpect(status().isNoContent());
     }
 
 

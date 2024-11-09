@@ -44,11 +44,11 @@ public class RegleController {
             Regle newRegle = regleService.createRegle(regle);
             return ResponseEntity.status(HttpStatus.CREATED).body(newRegle);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Retourne 400 BAD_REQUEST en cas d'argument invalide
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); //404
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // Retourne 409 CONFLICT en cas de conflit
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 409 conflict
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Retourne 500 en cas d'erreur interne
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500
         }
     }
 
@@ -59,15 +59,15 @@ public class RegleController {
         try {
             Regle updatedRegle = regleService.updateRegle(id, regle);
             if (updatedRegle == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Retourne 404 si updatedRegle est null
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
             }
             return ResponseEntity.ok(updatedRegle);
         } catch (RegleNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Retourne 404 en cas d'exception
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Retourne 400 en cas de données invalides
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); //400
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Retourne 500 en cas d'erreur interne
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500
         }
     }
 

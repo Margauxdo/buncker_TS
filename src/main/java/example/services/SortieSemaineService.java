@@ -14,27 +14,29 @@ public class SortieSemaineService implements ISortieSemaineService {
     @Autowired
     private SortieSemaineRepository sortieSemaineRepository;
 
-    public SortieSemaineService(SortieSemaineRepository sortieSemaineRepository) {
-        this.sortieSemaineRepository = sortieSemaineRepository;
-    }
-
     @Override
-    public SortieSemaine createSortieSemaine(SortieSemaine semaine) {
-        return sortieSemaineRepository.save(semaine);
+    public SortieSemaine createSortieSemaine(SortieSemaine sortieSemaine) {
+        if (sortieSemaine.getRegle() == null) {
+            throw new IllegalArgumentException("The associated rule is mandatory");
+        }
+        return sortieSemaineRepository.save(sortieSemaine);
     }
 
     @Override
     public SortieSemaine updateSortieSemaine(int id, SortieSemaine sortieSemaine) {
         if (sortieSemaineRepository.existsById(id)) {
+            sortieSemaine.setId(id);
             return sortieSemaineRepository.save(sortieSemaine);
         } else {
-            throw new RuntimeException("week outing is not possible");
+            throw new IllegalArgumentException("Week Output Not Found for ID " + id);
         }
     }
 
-
     @Override
     public void deleteSortieSemaine(int id) {
+        if (!sortieSemaineRepository.existsById(id)) {
+            throw new IllegalArgumentException("Week Output Not Found for ID " + id);
+        }
         sortieSemaineRepository.deleteById(id);
     }
 
@@ -46,5 +48,10 @@ public class SortieSemaineService implements ISortieSemaineService {
     @Override
     public List<SortieSemaine> getAllSortieSemaine() {
         return sortieSemaineRepository.findAll();
+    }
+
+    @Override
+    public boolean existsById(int id) {
+        return false;
     }
 }

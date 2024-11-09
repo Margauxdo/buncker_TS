@@ -185,7 +185,7 @@ public class MouvementServiceIntegrationTest {
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date dateRP1 = dateFormat.parse("2024-08-21");
-            Date dateSP1 = dateFormat.parse("2024-11-30");  // Corrigé à 30 novembre, car novembre a 30 jours
+            Date dateSP1 = dateFormat.parse("2024-11-30");
 
             mouvement1 = Mouvement.builder()
                     .statutSortie("finalisé")

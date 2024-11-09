@@ -113,7 +113,7 @@ public class RegleServiceIntegrationTest {
         // Act
         savedR.setCoderegle("code regle B1");
         savedR.setTypeEntree("entree testB");
-        savedR.setReglePourSortie("regle B1");  // Ensure this field is updated
+        savedR.setReglePourSortie("regle B1");
         Regle updatedRegle = regleService.updateRegle(savedR.getId(), savedR);
 
         // Assert

@@ -75,7 +75,7 @@ public class RegleManuelleServiceIntegrationTest {
 
         // Assert
         RegleManuelle deletedRM = regleManuelleService.getRegleManuelle(savedRM.getId());
-        assertNull(deletedRM, "La règle manuelle devrait être supprimée et non retrouvée.");
+        assertNull(deletedRM, "The manual rule should be deleted and not found again.");
     }
 
 

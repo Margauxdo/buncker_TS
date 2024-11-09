@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class ClientServiceTest {
@@ -40,7 +41,7 @@ public class ClientServiceTest {
     public void testCreateClient_Failure_Exception(){
         Client client = new Client();
         when(clientRepository.save(client)).thenThrow(new RuntimeException("database error"));
-        Exception exception = Assertions.assertThrows(RuntimeException.class,()-> {
+        Exception exception = assertThrows(RuntimeException.class,()-> {
             clientService.createClient(client);
         });
         Assertions.assertEquals("database error",exception.getMessage(),
@@ -81,7 +82,7 @@ public class ClientServiceTest {
 
         when(clientRepository.existsById(id)).thenReturn(true);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(RuntimeException.class, () -> {
             clientService.updateClient(id, client);
         });
 
@@ -119,7 +120,7 @@ public class ClientServiceTest {
     public void testDeleteClient_Failure_Exception(){
         int id = 1;
         doThrow(new RuntimeException("database error")).when(clientRepository).deleteById(id);
-        Exception exception = Assertions.assertThrows(RuntimeException.class,()-> {
+        Exception exception = assertThrows(RuntimeException.class,()-> {
             clientService.deleteClient(id);
         });
         Assertions.assertEquals("database error", exception.getMessage(), "Exception message should match expected error");
@@ -162,7 +163,7 @@ public class ClientServiceTest {
     @Test
     public void testGetAllClients_Failure_Exception() {
         when(clientRepository.findAll()).thenThrow(new RuntimeException("database error"));
-        Exception exception = Assertions.assertThrows(RuntimeException.class,()-> {
+        Exception exception = assertThrows(RuntimeException.class,()-> {
             clientService.getAllClients();
         });
         Assertions.assertEquals("database error", exception.getMessage(), "Exception message should match expected error");
@@ -188,4 +189,14 @@ public class ClientServiceTest {
         verify(clientRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(clientRepository);
     }
+
+    @Test
+    public void testUpdateClient_ClientNotFound() {
+        when(clientRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> clientService.updateClient(1, new Client()));
+    }
+
+
+
 }

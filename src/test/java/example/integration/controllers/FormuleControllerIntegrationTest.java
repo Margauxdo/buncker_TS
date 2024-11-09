@@ -122,7 +122,7 @@ public class FormuleControllerIntegrationTest {
                 .build();
 
         // Act
-        mockMvc.perform(put("/api/formule/{id}", 999)
+        mockMvc.perform(put("/api/formule/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedFormule)))
         // Assert
@@ -149,7 +149,7 @@ public class FormuleControllerIntegrationTest {
     @Test
     public void testDeleteFormule_shouldReturnNotFoundWhenFormuleDoesNotExist() throws Exception {
         // Act
-        mockMvc.perform(delete("/api/formule/{id}", 999)
+        mockMvc.perform(delete("/api/formule/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
         // Assert
            .andExpect(status().isNotFound());

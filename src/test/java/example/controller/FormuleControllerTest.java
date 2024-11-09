@@ -42,7 +42,7 @@ public class FormuleControllerTest {
         List<Formule> result = formuleController.getAllFormules();
 
         assertNotNull(result);
-        assertEquals(1, result.size()); // Supposons qu'une Formule a été ajoutée
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class FormuleControllerTest {
 
     @Test
     public void testCreateFormule_InvalidInput() {
-        Formule invalidFormule = new Formule(); // Considérons qu'elle est invalide, ex. données nulles ou incorrectes
+        Formule invalidFormule = new Formule();
         when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
 
         ResponseEntity<Formule> response = formuleController.createFormule(invalidFormule);
@@ -142,7 +142,7 @@ public class FormuleControllerTest {
 
     @Test
     public void testUpdateFormule_InvalidInput() {
-        Formule invalidFormule = new Formule(); // Considérons qu'elle est invalide
+        Formule invalidFormule = new Formule();
         when(formuleService.updateFormule(eq(1), any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
 
         ResponseEntity<Formule> response = formuleController.updateFormule(1, invalidFormule);
@@ -160,7 +160,7 @@ public class FormuleControllerTest {
 
     @Test
     public void testCreateFormule_Conflict() {
-        Formule formule = new Formule(); // Par exemple, une Formule avec un nom en conflit
+        Formule formule = new Formule();
         when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalStateException("Conflict detected"));
 
         ResponseEntity<Formule> response = formuleController.createFormule(formule);

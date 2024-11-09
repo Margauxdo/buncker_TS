@@ -111,7 +111,6 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    //relation onetomany avec mouvement
     @OneToMany(mappedBy = "livreur", cascade = CascadeType.ALL)
     private List<Mouvement> mouvements;
 }

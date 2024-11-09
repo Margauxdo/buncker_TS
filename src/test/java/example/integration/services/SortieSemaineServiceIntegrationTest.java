@@ -79,8 +79,9 @@ public class SortieSemaineServiceIntegrationTest {
         SortieSemaine updatedSem = sortieSemaineService.updateSortieSemaine(savedSem.getId(), savedSem);
 
         // Assert
-        assertNotNull(updatedSem, "La mise à jour de SortieSemaine a échoué, l'entité est null");
-        assertEquals("569823ZZ", updatedSem.getRegle().getCoderegle(), "Le code de la règle n'a pas été mis à jour correctement.");
+        assertNotNull(updatedSem, "The update of SortieSemaine failed, the entity is nulll");
+        assertEquals("569823ZZ", updatedSem.getRegle().getCoderegle(),
+                "Rule code was not updated correctly.");
     }
 
 

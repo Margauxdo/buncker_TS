@@ -66,10 +66,6 @@ public class MouvementControllerIntegrationTest {
     }
 
 
-
-
-
-
     @Test
     public void testGetMouvementById_ShouldReturnMouvement_WhenMouvementExists() throws Exception {
         // Arrange
@@ -78,7 +74,6 @@ public class MouvementControllerIntegrationTest {
         mouvement1.setDateHeureMouvement(new Date());
         mouvementRepository.save(mouvement1);
 
-        // Format the date to match the response format (either `Z` or `+00:00`)
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String expectedDateRegex = dateFormat.format(mouvement1.getDateHeureMouvement()).replace("Z", "(Z|\\+00:00)");
@@ -97,7 +92,7 @@ public class MouvementControllerIntegrationTest {
 
     @Test
     public void testGetMouvementById_ShouldReturnNotFound_WhenMouvementDoesNotExist () throws Exception {
-        mockMvc.perform(get("/api/mouvement/{id}", 9999) // Correctly specifying the ID in the path
+        mockMvc.perform(get("/api/mouvement/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -154,12 +149,6 @@ public class MouvementControllerIntegrationTest {
     }
 
 
-
-
-
-
-
-
     @Test
     public void testUpdateMouvement_ShouldReturnNotFound_WhenMouvementDoesNotExist() throws Exception {
         Mouvement updatedMouvement1 = new Mouvement();
@@ -167,7 +156,7 @@ public class MouvementControllerIntegrationTest {
         updatedMouvement1.setDateHeureMouvement(new Date());
         String updatedMouvementJson = objectMapper.writeValueAsString(updatedMouvement1);
 
-        mockMvc.perform(put("/api/mouvement/{id}", 9999)
+        mockMvc.perform(put("/api/mouvement/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedMouvementJson))
                 .andExpect(status().isNotFound());
@@ -201,15 +190,12 @@ public class MouvementControllerIntegrationTest {
     }
     @Test
     public void testDeleteMouvement_ShouldReturnNotFound_WhenMouvementDoesNotExist() throws Exception {
-        mockMvc.perform(delete("/api/mouvement/{id}", 9999)
+        mockMvc.perform(delete("/api/mouvement/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void testDeleteMouvement_ShouldReturnInternalServerError_WhenExceptionThrown(){
 
-    }
 
 
 

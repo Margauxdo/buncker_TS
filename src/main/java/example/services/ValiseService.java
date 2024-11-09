@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entities.Valise;
+import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
 import example.repositories.ValiseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class ValiseService implements IValiseService {
     @Override
     public Valise updateValise(int id, Valise valise) {
         if (valise.getId() != id) {
-            throw new IllegalArgumentException("L'ID de la valise ne correspond pas");
+            throw new IllegalArgumentException("Suitcase ID does not match");
         }
         if (valiseRepository.existsById(id)) {
             valise.setId(id);
@@ -41,10 +42,12 @@ public class ValiseService implements IValiseService {
     @Override
     public void deleteValise(int id) {
         if (!valiseRepository.existsById(id)) {
-            throw new RuntimeException("La valise n'existe pas");
+            throw new ResourceNotFoundException("The suitcase does not exist");
         }
         valiseRepository.deleteById(id);
     }
+
+
 
 
     @Override

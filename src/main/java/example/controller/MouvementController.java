@@ -2,7 +2,6 @@ package example.controller;
 
 import example.entities.Mouvement;
 import example.interfaces.IMouvementService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,6 @@ public class MouvementController {
     @PostMapping
     public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
         try {
-            // Manual validation
             if (mouvement.getDateHeureMouvement() == null || mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -53,35 +51,26 @@ public class MouvementController {
     @PutMapping("/{id}")
     public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
         try {
-            // Vérifier si le Mouvement existe
             if (!mouvementService.existsById(id)) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Renvoie 404 si l'entité n'est pas trouvée
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
-            // Autres validations et mises à jour
             if (mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3
                     || mouvement.getDateHeureMouvement() == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Renvoie 400 si la validation échoue
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
-            return new ResponseEntity<>(updatedMouvement, HttpStatus.OK); // Renvoie 200 si tout est correct
+            return new ResponseEntity<>(updatedMouvement, HttpStatus.OK);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // En cas d'erreur serveur
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-
-
-
 
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteMouvement(@PathVariable int id) {
         try {
-            if (!mouvementService.existsById(id)) { // Check if the Mouvement exists
+            if (!mouvementService.existsById(id)) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             mouvementService.deleteMouvement(id);

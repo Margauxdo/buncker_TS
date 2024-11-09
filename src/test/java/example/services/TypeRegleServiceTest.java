@@ -35,7 +35,7 @@ public class TypeRegleServiceTest {
 
         TypeRegle result = typeRegleService.createTypeRegle(typeRegle);
 
-        Assertions.assertNotNull(result, "Le type de régle ne doit pas être null");
+        Assertions.assertNotNull(result, "Rule type must not be null");
         verify(typeRegleRepository, times(1)).save(typeRegle);
         verifyNoMoreInteractions(typeRegleRepository);
     }
@@ -43,13 +43,13 @@ public class TypeRegleServiceTest {
     @Test
     public void testCreateTypeRegle_Failure_Exception() {
         TypeRegle typeRegle = new TypeRegle();
-        when(typeRegleRepository.save(typeRegle)).thenThrow(new RuntimeException("Erreur de base de donnee"));
+        when(typeRegleRepository.save(typeRegle)).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             typeRegleService.createTypeRegle(typeRegle);
         });
 
-        Assertions.assertEquals("Erreur de base de donnee", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(typeRegleRepository, times(1)).save(typeRegle);
         verifyNoMoreInteractions(typeRegleRepository);
     }
@@ -65,8 +65,8 @@ public class TypeRegleServiceTest {
 
         TypeRegle result = typeRegleService.updateTypeRegle(id, typeRegle);
 
-        Assertions.assertNotNull(result, "Le type de régle ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID du type de la régle doit correspondre");
+        Assertions.assertNotNull(result, "Rule type must not be null");
+        Assertions.assertEquals(id, result.getId(), "Rule type ID must match");
 
         verify(typeRegleRepository, times(1)).existsById(id);
         verify(typeRegleRepository, times(1)).save(typeRegle);
@@ -77,16 +77,14 @@ public class TypeRegleServiceTest {
     public void testUpdateTypeRegle_Failure_Exception() {
         int id = 1;
         TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setId(2); // ID différent pour déclencher l'exception
+        typeRegle.setId(2);
 
-        // Pas besoin de simuler l'appel à existsById car l'exception sera levée avant
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             typeRegleService.updateTypeRegle(id, typeRegle);
         });
 
-        Assertions.assertEquals("L'ID du type de régle ne correspond pas", exception.getMessage());
+        Assertions.assertEquals("Rule type ID does not match", exception.getMessage());
 
-        // On vérifie qu'aucune interaction avec le repository n'a eu lieu, car l'exception est levée avant.
         verify(typeRegleRepository, never()).existsById(id);
         verify(typeRegleRepository, never()).save(any(TypeRegle.class));
         verifyNoMoreInteractions(typeRegleRepository);
@@ -114,10 +112,11 @@ public class TypeRegleServiceTest {
             typeRegleService.deleteTypeRegle(id);
         });
 
-        Assertions.assertEquals("Le type de régle n'existe pas", exception.getMessage());
+        Assertions.assertEquals("The rule type does not exist", exception.getMessage());
         verify(typeRegleRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(typeRegleRepository);
     }
+
 
     @Test
     public void testGetTypeRegle_Success() {
@@ -129,8 +128,8 @@ public class TypeRegleServiceTest {
 
         TypeRegle result = typeRegleService.getTypeRegle(id);
 
-        Assertions.assertNotNull(result, "Le type de régle ne doit pas être null");
-        Assertions.assertEquals(id, result.getId(), "L'ID doit correspondre");
+        Assertions.assertNotNull(result, "Rule type must not be null");
+        Assertions.assertEquals(id, result.getId(), "Rule type ID must match");
 
         verify(typeRegleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeRegleRepository);
@@ -143,7 +142,7 @@ public class TypeRegleServiceTest {
 
         TypeRegle result = typeRegleService.getTypeRegle(id);
 
-        Assertions.assertNull(result, "Le type de régle doit être null si non trouvée");
+        Assertions.assertNull(result, "Rule type must be null if not found");
         verify(typeRegleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeRegleRepository);
     }
@@ -155,19 +154,19 @@ public class TypeRegleServiceTest {
 
         List<TypeRegle> result = typeRegleService.getTypeRegles();
 
-        Assertions.assertEquals(2, result.size(), "La liste des types de regless doit contenir 2 éléments");
+        Assertions.assertEquals(2, result.size(), "Rule type list must contain 2 elements");
         verify(typeRegleRepository, times(1)).findAll();
         verifyNoMoreInteractions(typeRegleRepository);
     }
     @Test
     public void testGetTypeRegles_Failure_Exception(){
-        when(typeRegleRepository.findAll()).thenThrow(new RuntimeException("Erreur de base de données"));
+        when(typeRegleRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             typeRegleService.getTypeRegles();
         });
 
-        Assertions.assertEquals("Erreur de base de données", exception.getMessage());
+        Assertions.assertEquals("Database error", exception.getMessage());
         verify(typeRegleRepository, times(1)).findAll();
         verifyNoMoreInteractions(typeRegleRepository);
     }

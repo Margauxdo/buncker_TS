@@ -20,7 +20,7 @@ public class RegleService implements IRegleService {
     @Override
     public Regle createRegle(Regle regle) {
         if (regle == null) {
-            throw new IllegalArgumentException("Regle cannot be null");
+            throw new IllegalArgumentException("Ruler cannot be null");
         }
         return regleRepository.save(regle);
     }
@@ -43,10 +43,9 @@ public class RegleService implements IRegleService {
                     existingRegle.setCoderegle(regle.getCoderegle());
                     existingRegle.setDateRegle(regle.getDateRegle());
                     existingRegle.setNombreJours(regle.getNombreJours());
-                    // Mettre à jour d'autres champs si nécessaire
                     return regleRepository.save(existingRegle);
                 })
-                .orElseThrow(() -> new RegleNotFoundException("Règle avec l'ID " + id + " non trouvée"));
+                .orElseThrow(() -> new RegleNotFoundException("Ruler withID " + id + " not found"));
     }
 
 

@@ -40,7 +40,7 @@ public class ProblemeControllerTest {
     }
     @Test
     public void testGetAllProblems_Failure(){
-        when(problemeService.getAllProblemes()).thenThrow(new RuntimeException("Erreur de la base de donnee"));
+        when(problemeService.getAllProblemes()).thenThrow(new RuntimeException("Database invalid"));
         Assertions.assertThrows(RuntimeException.class, () -> problemeController.getAllProblemes());
     }
     @Test
@@ -67,7 +67,7 @@ public class ProblemeControllerTest {
     @Test
     public void testCreateProbleme_Failure(){
         Probleme probleme = new Probleme();
-        when(problemeService.createProbleme(any(Probleme.class))).thenThrow(new IllegalArgumentException("Probleme invalide"));
+        when(problemeService.createProbleme(any(Probleme.class))).thenThrow(new IllegalArgumentException("Invalid problem"));
         ResponseEntity<Probleme> result = problemeController.createProbleme(probleme);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
@@ -112,14 +112,11 @@ public class ProblemeControllerTest {
     }
     @Test
     public void testCreateProbleme_Conflict() {
-        // Arrange: Prepare a problem object and mock the service to throw an exception
         Probleme probleme = new Probleme();
         when(problemeService.createProbleme(any(Probleme.class))).thenThrow(new IllegalStateException("Conflit"));
 
-        // Act: Call the controller method
         ResponseEntity<Probleme> result = problemeController.createProbleme(probleme);
 
-        // Assert: Verify that the response status is 409 CONFLICT
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
     }
 
@@ -134,7 +131,7 @@ public class ProblemeControllerTest {
 
     @Test
     public void testGetAllProblemes_Exception(){
-        when(problemeService.getAllProblemes()).thenThrow(new RuntimeException("Erreur inattendue"));
+        when(problemeService.getAllProblemes()).thenThrow(new RuntimeException("Unexpected error"));
         Assertions.assertThrows(RuntimeException.class, () -> problemeController.getAllProblemes());
     }
 

@@ -127,7 +127,7 @@ class ClientControllerTest {
 
     @Test
     public void testUpdateClient_InvalidInput() {
-        Client invalidClient = new Client(); // Simulate invalid client data
+        Client invalidClient = new Client();
         when(clientService.updateClient(eq(1), any(Client.class)))
                 .thenThrow(new IllegalArgumentException("Invalid client data"));
 

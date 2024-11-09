@@ -46,15 +46,13 @@ public class RegleManuelleControllerIntegrationTest {
 
     @Test
     public void testGetRegleManuelleById_ShouldReturnRegleManuelle() throws Exception {
-        // Création de l'entité avec les champs requis
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("henri bernard");
-        regleManuelle.setDescriptionRegle("Description de test"); // Champ requis
-        regleManuelle.setCoderegle("CODE123"); // Champ requis
+        regleManuelle.setDescriptionRegle("Description de test");
+        regleManuelle.setCoderegle("CODE123");
 
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
-        // Test de la récupération de l'entité par ID
         mockMvc.perform(get("/regle-manuelle/{id}", regleManuelle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -66,7 +64,7 @@ public class RegleManuelleControllerIntegrationTest {
 
     @Test
     public void testGetRegleManuelleById_NotFound() throws Exception {
-        mockMvc.perform(get("/regle-manuelle/{id}", 999)
+        mockMvc.perform(get("/regle-manuelle/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -76,8 +74,8 @@ public class RegleManuelleControllerIntegrationTest {
         // Création d'une instance avec les champs requis
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("henri bernard");
-        regleManuelle.setDescriptionRegle("Description de test"); // Champ requis
-        regleManuelle.setCoderegle("CODE123"); // Champ requis
+        regleManuelle.setDescriptionRegle("Description de test");
+        regleManuelle.setCoderegle("CODE123");
 
         mockMvc.perform(post("/regle-manuelle")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,12 +96,11 @@ public class RegleManuelleControllerIntegrationTest {
     public void testUpdateRegleManuelle_ShouldUpdateAndReturnRegleManuelle() throws Exception {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("henri bernard");
-        regleManuelle.setDescriptionRegle("Description de test"); // Champ requis
-        regleManuelle.setCoderegle("CODE123"); // Champ requis
+        regleManuelle.setDescriptionRegle("Description de test");
+        regleManuelle.setCoderegle("CODE123");
 
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
-        // Mise à jour de l'entité
         regleManuelle.setCreateurRegle("julien Renard");
 
         mockMvc.perform(put("/regle-manuelle/{id}", regleManuelle.getId())
@@ -116,13 +113,12 @@ public class RegleManuelleControllerIntegrationTest {
 
     @Test
     public void testUpdateRegleManuelle_NotFound() throws Exception {
-        // Création d'une instance sans enregistrement en base
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("henri bernard");
-        regleManuelle.setDescriptionRegle("Description de test"); // Champ requis
-        regleManuelle.setCoderegle("CODE123"); // Champ requis
+        regleManuelle.setDescriptionRegle("Description de test");
+        regleManuelle.setCoderegle("CODE123");
 
-        mockMvc.perform(put("/regle-manuelle/{id}", 999)
+        mockMvc.perform(put("/regle-manuelle/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(regleManuelle)))
                 .andExpect(status().isNotFound());
@@ -135,7 +131,7 @@ public class RegleManuelleControllerIntegrationTest {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("henri bernard");
         regleManuelle.setDescriptionRegle("Description de test");
-        regleManuelle.setCoderegle("CODE123"); // Ajouter un code pour respecter la validation
+        regleManuelle.setCoderegle("CODE123");
 
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
@@ -147,7 +143,7 @@ public class RegleManuelleControllerIntegrationTest {
 
     @Test
     public void testDeleteRegleManuelle_NotFound() throws Exception {
-        mockMvc.perform(delete("/regle-manuelle/{id}", 999)
+        mockMvc.perform(delete("/regle-manuelle/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

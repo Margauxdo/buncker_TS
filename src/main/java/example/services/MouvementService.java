@@ -22,12 +22,13 @@ public class MouvementService implements IMouvementService {
 
     @Override
     public Mouvement createMouvement(Mouvement mouvement) {
+
         return mouvementRepository.save(mouvement);
     }
 
     public Mouvement updateMouvement(int id, Mouvement mouvement) {
         if (!mouvementRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mouvement not found"); // Custom exception ou message d'erreur 404
+            throw new EntityNotFoundException("Mouvement not found"); //404
         }
         return mouvementRepository.save(mouvement);
     }
@@ -41,6 +42,7 @@ public class MouvementService implements IMouvementService {
 
     @Override
     public List<Mouvement> getAllMouvements() {
+
         return mouvementRepository.findAll();
     }
 

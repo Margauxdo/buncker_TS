@@ -43,8 +43,8 @@ public class RegleManuelleController {
             RegleManuelle createdRegleManuelle = regleManuelleService.createRegleManuelle(regleManuelle);
             return new ResponseEntity<>(createdRegleManuelle, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Handle invalid input here
-        } catch (ConflictException e) { // Custom exception for conflict
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (ConflictException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,7 +60,7 @@ public class RegleManuelleController {
         try {
             RegleManuelle updatedRegleManuelle = regleManuelleService.updateRegleManuelle(id, regleManuelle);
             if (updatedRegleManuelle == null) {
-                throw new EntityNotFoundException("RegleManuelle not found with ID " + id);
+                throw new EntityNotFoundException("Manual ruler not found with ID " + id);
             }
             return new ResponseEntity<>(updatedRegleManuelle, HttpStatus.OK);
         } catch (EntityNotFoundException e) {

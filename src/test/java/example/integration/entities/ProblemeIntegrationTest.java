@@ -158,36 +158,29 @@ public class ProblemeIntegrationTest {
 
     @Test
     public void testCascadeDeleteProblemeWithValise() {
-        // Création et sauvegarde du client
         Client clientA = new Client();
         clientA.setName("Martin");
         clientA.setEmail("martin@example.com");
-        clientA = clientRepository.saveAndFlush(clientA);  // Attache le client au contexte de persistance
+        clientA = clientRepository.saveAndFlush(clientA);
 
-        // Création et sauvegarde de la valise
         Valise val1 = new Valise();
         val1.setClient(clientA);
-        val1 = valiseRepository.saveAndFlush(val1);  // Attache la valise au contexte de persistance
+        val1 = valiseRepository.saveAndFlush(val1);
 
-        // Création et sauvegarde du problème avec le client et la valise attachés
         Probleme probleme = new Probleme();
         probleme.setClient(clientA);
         probleme.setValise(val1);
         probleme.setDetailsProbleme("Détails du problème");
         probleme.setDescriptionProbleme("Description du problème");
-        Probleme savedProbleme = problemeRepository.saveAndFlush(probleme);  // Attache le problème au contexte de persistance
-
-        // Suppression du problème
+        Probleme savedProbleme = problemeRepository.saveAndFlush(probleme);
         problemeRepository.delete(savedProbleme);
-        problemeRepository.flush(); // Force la suppression dans la base de données
+        problemeRepository.flush();
 
-        // Suppression de la valise
         valiseRepository.delete(val1);
-        valiseRepository.flush();  // Force la suppression dans la base de données
+        valiseRepository.flush();
 
-        // Vérification que le problème n'existe plus
         Optional<Probleme> foundProbleme = problemeRepository.findById(savedProbleme.getId());
-        Assertions.assertFalse(foundProbleme.isPresent(), "Le problème devrait être supprimé.");
+        Assertions.assertFalse(foundProbleme.isPresent(), "The problem should be removed.");
     }
 
 

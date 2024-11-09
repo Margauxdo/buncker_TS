@@ -70,7 +70,7 @@ public class TypeRegleServiceIntegrationTest {
 
         // Assert
         boolean isDeleted = typeRegleRepository.findById(savedTR.getId()).isEmpty();
-        assertTrue(isDeleted, "L'entité TypeRegle devrait être supprimée de la base de données");
+        assertTrue(isDeleted, "The Rule Type entity should be deleted from the database");
     }
 
     @Test

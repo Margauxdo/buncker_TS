@@ -20,7 +20,7 @@ public class RegleManuelleService implements IRegleManuelleService {
     @Override
     public RegleManuelle createRegleManuelle(RegleManuelle regleManuelle) {
         if (regleManuelle == null) {
-            throw new IllegalArgumentException("La règle manuelle ne peut pas être null");
+            throw new IllegalArgumentException("Manual rule cannot be null");
         }
         return regleManuelleRepository.save(regleManuelle);
     }
@@ -28,7 +28,7 @@ public class RegleManuelleService implements IRegleManuelleService {
     @Override
     public RegleManuelle updateRegleManuelle(int id, RegleManuelle regleManuelle) {
         if (!regleManuelleRepository.existsById(id)) {
-            throw new EntityNotFoundException("RegleManuelle not found with ID " + id);
+            throw new EntityNotFoundException("Manual Ruler not found with ID " + id);
         }
         regleManuelle.setId(id);
         return regleManuelleRepository.save(regleManuelle);
@@ -38,7 +38,7 @@ public class RegleManuelleService implements IRegleManuelleService {
 
     public void deleteRegleManuelle(int id) {
         if (!regleManuelleRepository.existsById(id)) {
-            throw new EntityNotFoundException("RegleManuelle with ID " + id + " not found");
+            throw new EntityNotFoundException("Manual Ruler with ID " + id + " not found");
         }
         regleManuelleRepository.deleteById(id);
     }

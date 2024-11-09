@@ -11,11 +11,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 public class JourFerieControllerTest {
 
@@ -55,7 +52,7 @@ public class JourFerieControllerTest {
 
     @Test
     public void testGetJourFerie_NotFound() {
-        when(jourFerieService.getJourFerie(99)).thenReturn(null); // Supposons que 99 n'existe pas
+        when(jourFerieService.getJourFerie(9999)).thenReturn(null);
 
         ResponseEntity<JourFerie> result = jourFerieController.getJourFerie(99);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());

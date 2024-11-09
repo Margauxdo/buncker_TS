@@ -46,7 +46,7 @@ public class RetourSecuriteIntegrationTest {
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(1234L);
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecurite);
-        Assertions.assertNotNull(savedRs.getId(), "The retour securite id must be generated");
+        Assertions.assertNotNull(savedRs.getId(), "The safety return id must be generated");
         Assertions.assertEquals(client.getId(), savedRs.getClient().getId(), "The associated client must match");
     }
     @Test
@@ -74,7 +74,7 @@ public class RetourSecuriteIntegrationTest {
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             retourSecuriteRepository.save(retourSecurite);
-        }, "Une DataIntegrityViolationException est attendue à cause de l'absence du client.");
+        }, "A DataIntegrityViolationException is expected due to the client not being present.");
     }
 
 
@@ -112,7 +112,7 @@ public class RetourSecuriteIntegrationTest {
         retourSecuriteRepository.deleteById(savedRS.getId());
 
         Optional<RetourSecurite> foundRS = retourSecuriteRepository.findById(savedRS.getId());
-        Assertions.assertFalse(foundRS.isPresent(), "The retour securite id must be generated");
+        Assertions.assertFalse(foundRS.isPresent(), "The safety return id must be generated");
     }
     @Test
     public void testFindAllRetourSecurite() {
@@ -145,7 +145,7 @@ public class RetourSecuriteIntegrationTest {
     @Test
     public void testFindRetourSecuriteByIdNotFound(){
         Optional<RetourSecurite> foundRS = retourSecuriteRepository.findById(9999);
-        Assertions.assertFalse(foundRS.isPresent(), "The retour security id must be generated");
+        Assertions.assertFalse(foundRS.isPresent(), "The safety return id must be generated");
     }
     @Test
     public void testCascadeDeleteWithoutclient(){
@@ -179,7 +179,7 @@ public class RetourSecuriteIntegrationTest {
 
         Optional<RetourSecurite> foundRetourSecurite = retourSecuriteRepository.findById(retourSecurite.getId());
 
-        Assertions.assertTrue(foundRetourSecurite.isPresent(), "Return security should be found");
+        Assertions.assertTrue(foundRetourSecurite.isPresent(), "safety return should be found");
         Assertions.assertEquals(retourSecurite.getId(), foundRetourSecurite.get().getId(), "IDs should match");
     }
 
@@ -187,7 +187,7 @@ public class RetourSecuriteIntegrationTest {
     public void testFindById_ReturnSecuriteDoesNotExist() {
         Optional<RetourSecurite> foundRetourSecurite = retourSecuriteRepository.findById(99999);
 
-        Assertions.assertFalse(foundRetourSecurite.isPresent(), "RetourSecurite should not be found");
+        Assertions.assertFalse(foundRetourSecurite.isPresent(), "safety return should not be found");
     }
 
 }

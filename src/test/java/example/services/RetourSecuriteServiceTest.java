@@ -2,6 +2,7 @@ package example.services;
 
 import example.entities.RetourSecurite;
 import example.repositories.RetourSecuriteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,26 +55,31 @@ public class RetourSecuriteServiceTest {
     public void testUpdateRetourSecurite_Success() {
         int id = 1;
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setId(id); // L'ID doit correspondre ici
+        retourSecurite.setId(id);
+        retourSecurite.setNumero(12345L);
 
-        // Simuler l'existence de l'entité avec cet ID
-        when(retourSecuriteRepository.existsById(id)).thenReturn(true);
+        RetourSecurite existingRetourSecurite = new RetourSecurite();
+        existingRetourSecurite.setId(id);
+        existingRetourSecurite.setNumero(67890L);
 
-        // Simuler le comportement du save
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(existingRetourSecurite));
+
         when(retourSecuriteRepository.save(any(RetourSecurite.class))).thenReturn(retourSecurite);
 
-        // Appeler la méthode updateRetourSecurite
         RetourSecurite result = retourSecuriteService.updateRetourSecurite(id, retourSecurite);
 
-        // Vérifications
-        Assertions.assertNotNull(result, "Security should not be null");
+        // Assertions
+        Assertions.assertNotNull(result, "RetourSecurite should not be null");
         Assertions.assertEquals(id, result.getId(), "Wrong retour security id");
+        Assertions.assertEquals(12345L, result.getNumero(), "The numero field did not update correctly");
 
-        // Vérification des interactions
-        verify(retourSecuriteRepository, times(1)).existsById(id);
+
+        verify(retourSecuriteRepository, times(1)).findById(id);
         verify(retourSecuriteRepository, times(1)).save(retourSecurite);
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
+
+
 
 
     @Test
@@ -81,39 +87,65 @@ public class RetourSecuriteServiceTest {
         int id = 1;
         RetourSecurite retourSecurite = new RetourSecurite();
         retourSecurite.setId(id);
+        retourSecurite.setNumero(12345L);
 
-        // Simuler que l'ID n'existe pas
-        when(retourSecuriteRepository.existsById(id)).thenReturn(false);
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        // Assert
+        Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             retourSecuriteService.updateRetourSecurite(id, retourSecurite);
         });
 
-        Assertions.assertEquals("Safety return does not exist", exception.getMessage(), "Exception message should match expected error");
-        verify(retourSecuriteRepository, times(1)).existsById(id);
+        Assertions.assertEquals("Back Security not found with id: 1", exception.getMessage(),
+                "Exception message should match the expected error message.");
+
+        // Verify interactions
+        verify(retourSecuriteRepository, times(1)).findById(id);
         verify(retourSecuriteRepository, never()).save(any(RetourSecurite.class));
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
 
+
+
+
+
     @Test
     public void testDeleteRetourSecurite_Success() {
         int id = 1;
-        doNothing().when(retourSecuriteRepository).deleteById(id);
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setId(id);
+
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(retourSecurite));
+
+        doNothing().when(retourSecuriteRepository).delete(retourSecurite);
+
         retourSecuriteService.deleteRetourSecurite(id);
-        verify(retourSecuriteRepository, times(1)).deleteById(id);
+
+        verify(retourSecuriteRepository, times(1)).findById(id);
+        verify(retourSecuriteRepository, times(1)).delete(retourSecurite);
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
+
+
     @Test
     public void testDeleteRetourSecurite_Failure_Exception() {
-        int id =1;
-        doThrow(new RuntimeException("database error")).when(retourSecuriteRepository).deleteById(id);
+        int id = 1;
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setId(id);
+
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(retourSecurite));
+
+        doThrow(new RuntimeException("database error")).when(retourSecuriteRepository).delete(retourSecurite);
+
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             retourSecuriteService.deleteRetourSecurite(id);
         });
         Assertions.assertEquals("database error", exception.getMessage(), "Exception message should match expected error");
-        verify(retourSecuriteRepository, times(1)).deleteById(id);
+        verify(retourSecuriteRepository, times(1)).findById(id);
+        verify(retourSecuriteRepository, times(1)).delete(retourSecurite);
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
+
     @Test
     public void testGetRetourSecurite_Success() {
         int id = 1;
@@ -145,7 +177,7 @@ public class RetourSecuriteServiceTest {
         when(retourSecuriteRepository.findAll()).thenReturn(retourSecurites);
 
         List<RetourSecurite> result = retourSecuriteService.getAllRetourSecurites();
-        Assertions.assertFalse(result.isEmpty(), "Security list should not be empty"); // Vérifier que la liste n'est pas vide
+        Assertions.assertFalse(result.isEmpty(), "Security list should not be empty");
         verify(retourSecuriteRepository, times(1)).findAll();
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
@@ -162,7 +194,6 @@ public class RetourSecuriteServiceTest {
     public void testNoInteractionWithRetourSecuriteRepository_Success(){
         verifyNoInteractions(retourSecuriteRepository);
     }
-    @Test
-    public void testNoInteractionWithRetourSecuriteRepository_Failure_Exception() {}
+
 
 }

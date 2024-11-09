@@ -26,7 +26,7 @@ public class SortieSemaine {
     private int id;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "sortie_semaine")  // Si le nom de la colonne dans la base de données est différent
+    @Column(name = "sortie_semaine")
     private Date dateSortieSemaine;
 
 

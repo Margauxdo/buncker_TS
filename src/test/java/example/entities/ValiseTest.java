@@ -38,24 +38,20 @@ public class ValiseTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Créer et persister un client pour la valise
         Client client1 = new Client();
         client1.setName("Doe");
         client1.setEmail("doe@example.com");
         em.persist(client1);
 
-        // Initialiser TypeValise avec une chaîne pour le propriétaire
         TypeValise type1 = new TypeValise();
-        type1.setProprietaire("Créateur de la règle");
-        type1.setDescription("Description du type de valise");
+        type1.setProprietaire("ClientA");
+        type1.setDescription("La valise appartient au Client A");
         em.persist(type1);
 
-        // Créer et persister une règle pour la valise avec un coderegle non nul
         Regle regle1 = new Regle();
-        regle1.setCoderegle("CODE123");  // Initialisation de 'coderegle'
+        regle1.setCoderegle("CODE123");
         em.persist(regle1);
 
-        // Créer et persister une liste de mouvements pour la valise
         Mouvement mouvement1 = new Mouvement();
         Mouvement mouvement2 = new Mouvement();
         List<Mouvement> mouvementList = new ArrayList<>();
@@ -64,10 +60,9 @@ public class ValiseTest {
         em.persist(mouvement1);
         em.persist(mouvement2);
 
-        // Initialiser et persister l'objet valise avec tous les champs nécessaires
         valise = new Valise();
         valise.setNumeroValise(1234L);
-        valise.setDescription("description de la valise");
+        valise.setDescription("la valise a pour numero 1234L");
         valise.setClient(client1);
         valise.setTypevalise(type1);
         valise.setDateCreation(sdf.parse("2016-02-20"));
@@ -77,7 +72,7 @@ public class ValiseTest {
         valise.setMouvementList(mouvementList);
         valise.setNumeroDujeu("numero du jeu");
         valise.setRefClient("ref client");
-        valise.setRegleSortie(regle1);  // Associe la règle avec la valise
+        valise.setRegleSortie(regle1);
         valise.setSortie(sdf.parse("2016-02-20"));
 
         em.persist(valise);
@@ -86,14 +81,14 @@ public class ValiseTest {
 
     @Test
     public void testValisePersistence() {
-        // Vérifie que l'objet valise a bien été persisté et a un ID non nul
-        Assertions.assertNotNull(valise.getId(), "L'ID de la valise ne doit pas être nul après la persistance");
+        Assertions.assertNotNull(valise.getId(), "Suitcase ID must not be null after persistence");
     }
 
     @Test
     public void testValiseDescription() {
-        Assertions.assertEquals(valise.getDescription(), "description de la valise");
+        Assertions.assertEquals(valise.getDescription(), "la valise a pour numero 1234L");
     }
+
     @Test
     public void testValiseNumeroValise() {
         Assertions.assertEquals(valise.getNumeroValise(), 1234L);
@@ -104,42 +99,41 @@ public class ValiseTest {
     }
     @Test
     public void testValiseSortie() throws ParseException {
-        // Format de date utilisé dans setUp()
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date expectedDate = sdf.parse("2016-02-20");
 
-        Assertions.assertNotNull(valise.getSortie(), "La date de sortie ne doit pas être nulle");
-        Assertions.assertEquals(expectedDate, valise.getSortie(), "La date de sortie doit correspondre à la valeur initiale");
+        Assertions.assertNotNull(valise.getSortie(), "Release date must not be zero");
+        Assertions.assertEquals(expectedDate, valise.getSortie(), "The release date must match the initial value");
     }
 
     @Test
     public void testValiseDateDernierMouvement () throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date expectedDate = sdf.parse("2024-02-20");
-        Assertions.assertNotNull(valise.getDateDernierMouvement(),"La date de dernier mouvement ne doit pas etre null");
-        Assertions.assertEquals(expectedDate,valise.getDateDernierMouvement(),"La date de dernier mouvement doit correspondre à la valeure initiale");
+        Assertions.assertNotNull(valise.getDateDernierMouvement(),"Last movement date must not be null");
+        Assertions.assertEquals(expectedDate,valise.getDateDernierMouvement(),"The last movement date must match the initial value");
     }
     @Test
     public void testValiseDateSortiePrevue() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date expectedDate = sdf.parse("2024-10-02");
-        Assertions.assertNotNull(valise.getDateSortiePrevue(),"La date de sortie prevue ne doit pas être null");
-        Assertions.assertEquals( expectedDate, valise.getDateSortiePrevue(),"La date de sortie prévue doit correspondre à la valeure initiale");
+        Assertions.assertNotNull(valise.getDateSortiePrevue(),"The expected release date must not be null");
+        Assertions.assertEquals( expectedDate, valise.getDateSortiePrevue(),"The expected release date must match the initial value");
     }
     @Test
     public void testValiseDateRetourPrevue() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date expectedDate = sdf.parse("2024-09-02");
-        Assertions.assertNotNull(valise.getDateRetourPrevue(),"La date de retour prevue ne doit pas être null");
-        Assertions.assertEquals( expectedDate, valise.getDateRetourPrevue(),"La date de retour prévue doit correspondre à la valeure initiale");
+        Assertions.assertNotNull(valise.getDateRetourPrevue(),"The expected return date must not be null");
+        Assertions.assertEquals( expectedDate, valise.getDateRetourPrevue(),"The expected return date must match the initial value");
 
     }
     @Test
     public void testValiseDateCreation() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date expectedDate = sdf.parse("2016-02-20");
-        Assertions.assertNotNull(valise.getDateCreation(),"La date de créationne doit pas être null");
-        Assertions.assertEquals( expectedDate, valise.getDateCreation(),"La date de création doit correspondre à la valeure initiale");
+        Assertions.assertNotNull(valise.getDateCreation(),"Creation date must not be null");
+        Assertions.assertEquals( expectedDate, valise.getDateCreation(),"The creation date must match the initial value");
 
     }
     @Test
@@ -151,49 +145,44 @@ public class ValiseTest {
     @Test
     public void testValiseClientNull() {
         Valise valiseWithoutClient = new Valise();
-        valiseWithoutClient.setDescription("Valise sans client");
+        valiseWithoutClient.setDescription("Suitcase without customer");
         valiseWithoutClient.setTypevalise(valise.getTypevalise());
         valiseWithoutClient.setRegleSortie(valise.getRegleSortie());
 
         Assertions.assertThrows(PersistenceException.class, () -> {
             em.persist(valiseWithoutClient);
             em.flush();
-        }, "La persistance devrait échouer si le client de la valise est nul");
+        }, "Persistence should fail if the suitcase client is null");
     }
 
 
     @Test
     public void testUpdateClientAssociation() {
-        // Créer et persister un nouveau client avec toutes les valeurs nécessaires
         Client newClient = new Client();
         newClient.setName("Smith");
-        newClient.setEmail("smith@example.com");  // Ensure the email field is set
-        newClient.setAdresse("rue de paris 75000 Paris");  // Add any other required fields
+        newClient.setEmail("smith@example.com");
+        newClient.setAdresse("rue de paris 75000 Paris");
         em.persist(newClient);
         em.flush();
 
-        // Récupérer la valise et vérifier son client actuel
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals("Doe", foundValise.getClient().getName(), "Le client initial devrait être 'Doe'");
+        Assertions.assertEquals("Doe", foundValise.getClient().getName(), "The initial client should be 'Doe'");
 
-        // Associer la valise au nouveau client
         foundValise.setClient(newClient);
         em.merge(foundValise);
         em.flush();
 
-        // Vérifier que la valise est désormais associée au nouveau client
         Valise updatedValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals("Smith", updatedValise.getClient().getName(), "La valise devrait être associée au nouveau client 'Smith'");
+        Assertions.assertEquals("Smith", updatedValise.getClient().getName(), "The suitcase should be associated with the new client 'Smith'");
 
-        // Vérifier que l'ancien client n'a plus cette valise dans sa liste de valises
-        Client oldClient = em.find(Client.class, clientRepository.findAll().get(0).getId());  // Fetch the old client from the repository
-        Assertions.assertFalse(oldClient.getValises().contains(updatedValise), "L'ancien client ne devrait plus avoir cette valise associée");
+        Client oldClient = em.find(Client.class, clientRepository.findAll().get(0).getId());
+        Assertions.assertFalse(oldClient.getValises().contains(updatedValise), "The old customer should no longer have this suitcase associated");
     }
 
     @Test
     public void testValiseRegleAssociation() {
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertNotNull(foundValise.getRegleSortie(), "La valise doit être associée à une règle.");
+        Assertions.assertNotNull(foundValise.getRegleSortie(), "The suitcase must be associated with a rule");
     }
 
     @Test
@@ -201,20 +190,20 @@ public class ValiseTest {
         Valise valiseWithoutRegle = new Valise();
         valiseWithoutRegle.setClient(valise.getClient());
         valiseWithoutRegle.setTypevalise(valise.getTypevalise());
-        valiseWithoutRegle.setDescription("Valise sans règle");
+        valiseWithoutRegle.setDescription("Suitcase without ruler");
 
         em.persist(valiseWithoutRegle);
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valiseWithoutRegle.getId());
-        Assertions.assertNull(foundValise.getRegleSortie(), "La règle de la valise devrait être nulle.");
+        Assertions.assertNull(foundValise.getRegleSortie(), "The suitcase rule should be null");
     }
 
 
     @Test
     public void testUpdateRegleAssociation() {
         Regle newRegle = new Regle();
-        newRegle.setCoderegle("NEWCODE123");  // Ensure 'coderegle' is set
+        newRegle.setCoderegle("NEWCODE123");
         em.persist(newRegle);
         em.flush();
 
@@ -223,27 +212,27 @@ public class ValiseTest {
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals(newRegle.getId(), foundValise.getRegleSortie().getId(), "La règle associée devrait être mise à jour.");
+        Assertions.assertEquals(newRegle.getId(), foundValise.getRegleSortie().getId(), "The associated rule should be updated.");
     }
 
 
     @Test
     public void testValiseTypeValiseAssociation() {
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertNotNull(foundValise.getTypevalise(), "La valise doit être associée à un type de valise.");
+        Assertions.assertNotNull(foundValise.getTypevalise(), "The suitcase must be associated with a suitcase type.");
     }
 
     @Test
     public void testValiseTypeValiseNull() {
         Valise valiseWithoutTypeValise = new Valise();
         valiseWithoutTypeValise.setClient(valise.getClient());
-        valiseWithoutTypeValise.setDescription("Valise sans type de valise");
+        valiseWithoutTypeValise.setDescription("Suitcase without suitcase type");
 
         em.persist(valiseWithoutTypeValise);
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valiseWithoutTypeValise.getId());
-        Assertions.assertNull(foundValise.getTypevalise(), "Le type de valise de la valise devrait être nul.");
+        Assertions.assertNull(foundValise.getTypevalise(), "The suitcase type of the suitcase should be zero.");
     }
 
 
@@ -252,8 +241,8 @@ public class ValiseTest {
     @Test
     public void testUpdateTypeValiseAssociation() {
         TypeValise newTypeValise = new TypeValise();
-        newTypeValise.setProprietaire("Nouveau Propriétaire");
-        newTypeValise.setDescription("Nouveau Type de Valise");
+        newTypeValise.setProprietaire("New Owner");
+        newTypeValise.setDescription("New Type of Suitcase");
         em.persist(newTypeValise);
         em.flush();
 
@@ -262,15 +251,15 @@ public class ValiseTest {
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals(newTypeValise.getId(), foundValise.getTypevalise().getId(), "Le type de valise associé devrait être mis à jour.");
+        Assertions.assertEquals(newTypeValise.getId(), foundValise.getTypevalise().getId(), "The associated suitcase type should be updated.");
     }
 
 
     @Test
     public void testValiseMouvementListAssociation() {
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertNotNull(foundValise.getMouvementList(), "La liste des mouvements de la valise ne devrait pas être nulle.");
-        Assertions.assertEquals(2, foundValise.getMouvementList().size(), "La valise devrait être associée à deux mouvements.");
+        Assertions.assertNotNull(foundValise.getMouvementList(), "The suitcase movement list should not be zero.");
+        Assertions.assertEquals(2, foundValise.getMouvementList().size(), "The suitcase should be associated with two movements.");
     }
 
     @Test
@@ -281,17 +270,23 @@ public class ValiseTest {
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals(3, foundValise.getMouvementList().size(), "La liste des mouvements devrait contenir trois éléments.");
+        Assertions.assertEquals(3, foundValise.getMouvementList().size(), "The movement list should contain three items.");
     }
 
     @Test
     public void testCascadeDeleteMouvementList() {
+        em.createQuery("DELETE FROM Probleme p WHERE p.valise.id = :valiseId")
+                .setParameter("valiseId", valise.getId())
+                .executeUpdate();
+
         em.remove(valise);
         em.flush();
 
         List<Mouvement> remainingMouvements = em.createQuery("SELECT m FROM Mouvement m", Mouvement.class).getResultList();
-        Assertions.assertTrue(remainingMouvements.isEmpty(), "Tous les mouvements associés devraient être supprimés en cascade.");
+        Assertions.assertTrue(remainingMouvements.isEmpty(), "All associated movements should be deleted in cascade.");
     }
+
+
 
     @Test
     public void testUpdateMouvementListAssociation() {
@@ -303,8 +298,8 @@ public class ValiseTest {
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals(1, foundValise.getMouvementList().size(), "La liste des mouvements devrait être mise à jour.");
-        Assertions.assertEquals(newMouvement.getId(), foundValise.getMouvementList().get(0).getId(), "Le mouvement associé devrait être mis à jour.");
+        Assertions.assertEquals(1, foundValise.getMouvementList().size(), "The list of movements should be updated.");
+        Assertions.assertEquals(newMouvement.getId(), foundValise.getMouvementList().get(0).getId(), "The associated movement should be updated.");
     }
 
 

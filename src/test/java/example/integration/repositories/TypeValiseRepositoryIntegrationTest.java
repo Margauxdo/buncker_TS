@@ -88,7 +88,7 @@ public class TypeValiseRepositoryIntegrationTest {
     public void testFindByIdNotFound() {
 
         Optional<TypeValise> typeValise = typeValiseRepository.findById(9999);
-        assertFalse(typeValise.isPresent(), "Aucun TypeValise ne devrait être trouvé pour cet ID inexistant");
+        assertFalse(typeValise.isPresent(), "No Suitcase Type should be found for this non-existent ID");
     }
 
     @Test
@@ -105,7 +105,7 @@ public class TypeValiseRepositoryIntegrationTest {
         Optional<TypeValise> foundTV = typeValiseRepository.findById(updatedTV.getId());
         assertTrue(foundTV.isPresent());
         assertEquals("Jean Corotte", foundTV.get().getProprietaire());
-        assertEquals("Description de la valise spécifié au client", foundTV.get().getDescription());  // Correction ici
+        assertEquals("Description de la valise spécifié au client", foundTV.get().getDescription());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class TypeValiseRepositoryIntegrationTest {
         assertFalse(foundTV.isPresent(), "Le TypeValise devrait être supprimé");
 
         List<Valise> valisesAfterDelete = valiseRepository.findAll();
-        assertTrue(valisesAfterDelete.isEmpty(), "Les valises associées au TypeValise devraient être supprimées en cascade");
+        assertTrue(valisesAfterDelete.isEmpty(), "Suitcases associated with SuitcaseType should be deleted in cascade");
     }
 
     @Test
@@ -187,7 +187,7 @@ public class TypeValiseRepositoryIntegrationTest {
 
         assertThrows(Exception.class, () -> {
             typeValiseRepository.save(typeValiseB);
-        }, "Une exception devrait être lancée en raison de la contrainte d'unicité");
+        }, "An exception should be thrown due to the uniqueness constraint");
     }
 
 

@@ -179,7 +179,6 @@ public class LivreurControllerIntegrationTest {
 
     @Test
     public void testUpdateLivreur_shouldReturnNotFoundForNonExistentId() throws Exception {
-        // Créer un Livreur avec des données fictives
         Livreur updatedLivreur = new Livreur();
         updatedLivreur.setNomLivreur("Non-existent");
         updatedLivreur.setCodeLivreur("99999M");
@@ -189,7 +188,7 @@ public class LivreurControllerIntegrationTest {
         mockMvc.perform(put("/api/livreur/{id}", 9999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedLivreurJson))
-                .andExpect(status().isNotFound()); // Vérifie que la réponse est bien 404
+                .andExpect(status().isNotFound()); //  404
     }
 
 

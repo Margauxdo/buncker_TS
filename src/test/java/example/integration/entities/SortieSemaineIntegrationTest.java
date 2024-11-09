@@ -93,7 +93,7 @@ public class SortieSemaineIntegrationTest {
         semaineRepository.deleteById(savedSortie.getId());
 
         Optional<SortieSemaine> foundSortie = semaineRepository.findById(savedSortie.getId());
-        Assertions.assertFalse(foundSortie.isPresent(), "La sortie supprimée ne doit plus être présente dans la base");
+        Assertions.assertFalse(foundSortie.isPresent(), "The deleted output should no longer be present in the database");
     }
 
     @Test

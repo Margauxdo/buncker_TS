@@ -11,4 +11,5 @@ import java.util.List;
 public interface ProblemeRepository extends JpaRepository<Probleme, Integer> {
     List<Probleme> findByValise(Valise valise);
     boolean existsByDescriptionProblemeAndDetailsProbleme(String descriptionProbleme, String detailsProbleme);
+    void deleteAllByValise(Valise valise);
 }

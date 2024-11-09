@@ -13,5 +13,5 @@ public interface ValiseRepository extends JpaRepository<Valise, Integer> {
     Valise findByNumeroValise(Long numeroValise);
     Valise findByRefClient(String refClient);
     List<Valise> findByClient(Client client);
-    List<Valise> findByRegleSortie(Regle regle);  // Change to 'findByRegleSortie'
+    List<Valise> findByRegleSortie(Regle regle);
 }

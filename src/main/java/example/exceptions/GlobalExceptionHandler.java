@@ -41,12 +41,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    // Gestion des exceptions inattendues
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleAllUncaughtException(Exception ex) {
-        ex.printStackTrace(); // Optionnel : remplacez ceci par un logger en production
-        return new ResponseEntity<>("Une erreur inattendue est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("An unexpected error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
 
 }
