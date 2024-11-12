@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 @RestController
@@ -17,8 +20,13 @@ public class ClientController {
     @Autowired
     private IClientService clientService;
 
+    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+
+
     @GetMapping
     public ResponseEntity<List<Client>> getAllClients() {
+        logger.error("RAS      RAS      RAS         RASRASRASRASRAS");
         List<Client> clients = clientService.getAllClients();
         return new ResponseEntity<>(clients, HttpStatus.OK);
     }
@@ -32,14 +40,19 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<Client> createClient(@Valid @RequestBody Client client) {
+        logger.info(" entrée --> Create client {}", client);
         try {
             Client newClient = clientService.createClient(client);
+           logger.info(" Client Créer --> Create client {}}", client);
             return new ResponseEntity<>(newClient, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
+            logger.error("Create client - IllegalArgumentException");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (IllegalStateException e) {
+            logger.error("Create client - IllegalStateException");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
+            logger.error("Create client - RuntimeException");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

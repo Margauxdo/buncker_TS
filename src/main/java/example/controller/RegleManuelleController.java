@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/regle-manuelle")
+@RequestMapping("/api/regle-manuelle")
 public class RegleManuelleController {
 
     private final IRegleManuelleService regleManuelleService;

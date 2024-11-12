@@ -31,7 +31,7 @@ public class FormuleViewController {
     }
 
     @PostMapping("/create")
-    public String createFormule(@ModelAttribute Formule formule) {
+    public String createFormule(@ModelAttribute("formule") Formule formule) {
         formuleService.createFormule(formule);
         return "redirect:/formules";
     }
@@ -47,14 +47,14 @@ public class FormuleViewController {
 
     // Enregistrer les modifications
     @PostMapping("/edit/{id}")
-    public String updateFormule(@PathVariable int id, @ModelAttribute Formule formule) {
+    public String updateFormule(@PathVariable int id, @ModelAttribute("formule") Formule formule) {
         formuleService.updateFormule(id, formule);
         return "redirect:/formules";
     }
 
     // Supprimer une formule
     @GetMapping("/delete/{id}")
-    public String deleteFormule(@PathVariable int id) {
+    public String deleteFormule(@PathVariable("id") int id) {
         formuleService.deleteFormule(id);
         return "redirect:/formules";
     }

@@ -13,7 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/regle")
+@RequestMapping("/api/regles")
 @Validated
 public class RegleController {
 

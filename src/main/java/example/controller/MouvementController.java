@@ -4,17 +4,25 @@ import example.entities.Mouvement;
 import example.interfaces.IMouvementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/mouvement")
+@RequestMapping("/api/mouvements")
 public class MouvementController {
 
     @Autowired
     private IMouvementService mouvementService;
+
+    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(MouvementController.class);
+
 
     @GetMapping
     public List<Mouvement> getAllMouvements() {
@@ -31,16 +39,25 @@ public class MouvementController {
 
     @PostMapping
     public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
+       logger.info("entrée --> create mouvement{} " ,mouvement);
         try {
             if (mouvement.getDateHeureMouvement() == null || mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3) {
+                logger.info("entrée --> create mouvement{} " ,mouvement);
+
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
+            logger.info("Mouement creer --> create mouvement{} " ,mouvement);
+
             return new ResponseEntity<>(createdMouvement, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
+            logger.info("Create mouvement --> IllegalArgumentException");
+
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
+            logger.info("Create mouvement --> RuntimeException");
+
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

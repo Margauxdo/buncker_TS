@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 @RestController
@@ -18,6 +21,10 @@ public class FormuleController {
 
     @Autowired
     private IFormuleService formuleService;
+
+    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+
 
     @ExceptionHandler(FormuleNotFoundException.class)
     public ResponseEntity<String> handleFormuleNotFoundException(FormuleNotFoundException ex) {

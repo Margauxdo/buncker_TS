@@ -32,14 +32,14 @@ public class JourFerieViewController {
 
     // Créer un nouveau jour férié
     @PostMapping("/createJF")
-    public String createJourFerie(@ModelAttribute JourFerie jourFerie) {
+    public String createJourFerie(@ModelAttribute("jourFerie") JourFerie jourFerie) {
         jourFerieService.saveJourFerie(jourFerie);
         return "redirect:/jourferies";
     }
 
     // Afficher le formulaire de modification de jour férié
     @GetMapping("/editJF/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    public String showEditForm(@PathVariable("id") int id, Model model) {
         JourFerie jourFerie = jourFerieService.getJourFerie(id);
         model.addAttribute("jourFerie", jourFerie);
         return "jourferies/editJF";
@@ -47,7 +47,7 @@ public class JourFerieViewController {
 
     // Mettre à jour un jour férié
     @PostMapping("/editJF/{id}")
-    public String updateJourFerie(@PathVariable int id, @ModelAttribute JourFerie jourFerie) {
+    public String updateJourFerie(@PathVariable("id") int id, @ModelAttribute("jourFerie") JourFerie jourFerie) {
         jourFerie.setId(id);
         jourFerieService.saveJourFerie(jourFerie);
         return "redirect:/jourferies";
@@ -55,7 +55,7 @@ public class JourFerieViewController {
 
     // Supprimer un jour férié
     @GetMapping("/deleteJF/{id}")
-    public String deleteJourFerie(@PathVariable int id) {
+    public String deleteJourFerie(@PathVariable("id") int id) {
         jourFerieService.saveJourFerie(jourFerieService.getJourFerie(id));
         return "redirect:/jourferies";
     }

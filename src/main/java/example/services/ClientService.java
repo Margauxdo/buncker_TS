@@ -11,12 +11,12 @@ import java.util.List;
 @Service
 public class ClientService implements IClientService {
 
-@Autowired
-private ClientRepository clientRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
-public ClientService(ClientRepository clientRepository) {
-    this.clientRepository = clientRepository;
-}
+    public ClientService(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
 
     @Override
     public Client createClient(Client client) {
