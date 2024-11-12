@@ -1,2 +1,4 @@
-package example.controller;public class MouvementViewController {
+package example.controller;
+
+public class MouvementViewController {
 }

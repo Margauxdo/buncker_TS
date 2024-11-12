@@ -1,2 +1,4 @@
-package example.controller;public class ProblemeViewController {
+package example.controller;
+
+public class ProblemeViewController {
 }

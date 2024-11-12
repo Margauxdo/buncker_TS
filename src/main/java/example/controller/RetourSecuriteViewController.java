@@ -1,2 +1,4 @@
-package example.controller;public class RetourSecuriteViewController {
+package example.controller;
+
+public class RetourSecuriteViewController {
 }

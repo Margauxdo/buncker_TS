@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liste des Formules</title>
+</head>
+<body>
+<h1>Liste des Formules</h1>
+<a href="/formules/create">Ajouter une nouvelle formule</a>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Libellé</th>
+        <th>Formule</th>
+    </tr>
+    <tr th:each="formule : ${formules}">
+        <td th:text="${formule.id}"></td>
+        <td th:text="${formule.libelle}"></td>
+        <td th:text="${formule.formule}"></td>
+        <td>
+            <a th:href="@{/formules/edit/{id}(id=${formule.id})}">Modifier</a> |
+            <a th:href="@{/formules/delete/{id}(id=${formule.id})}">Supprimer</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

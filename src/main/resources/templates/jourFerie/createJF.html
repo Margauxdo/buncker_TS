@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un Jour Férié</title>
+</head>
+<body>
+<h1>Ajouter un Nouveau Jour Férié</h1>
+<form th:action="@{/jourferies/createJF}" th:object="${jourFerie}" method="post">
+    <label>Règle :
+        <select th:field="*{regle.id}">
+            <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.nom}"></option>
+        </select>
+    </label>
+    <br><br>
+    <label>Jours Fériés :
+        <input type="date" th:field="*{jourFerie.joursFerieList}" multiple required/>
+    </label>
+    <br><br>
+    <button type="submit">Enregistrer</button>
+</form>
+</body>
+</html>

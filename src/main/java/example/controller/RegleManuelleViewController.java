@@ -1,2 +1,4 @@
-package example.controller;public class RegleManuelleViewController {
+package example.controller;
+
+public class RegleManuelleViewController {
 }

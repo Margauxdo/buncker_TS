@@ -1,2 +1,4 @@
-package example.controller;public class RegleViewController {
+package example.controller;
+
+public class RegleViewController {
 }

@@ -1,2 +1,4 @@
-package example.controller;public class ValiseViewController {
+package example.controller;
+
+public class ValiseViewController {
 }

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Modifier Formule</title>
+</head>
+<body>
+<h1>Modifier Formule</h1>
+<form th:action="@{/formules/edit/{id}(id=${formule.id})}" th:object="${formule}" method="post">
+    <label>Libellé : <input type="text" th:field="*{libelle}" required /></label><br>
+    <label>Formule : <input type="text" th:field="*{formule}" required /></label><br>
+    <button type="submit">Enregistrer</button>
+</form>
+</body>
+</html>

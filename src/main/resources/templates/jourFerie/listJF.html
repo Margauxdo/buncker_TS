@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Jours Fériés</title>
+</head>
+<body>
+<h1>Liste des Jours Fériés</h1>
+<a href="/jourferies/createJF">Ajouter un nouveau jour férié</a>
+<table >
+    <tr>
+        <th>ID</th>
+        <th>Règle</th>
+        <th>Jours Fériés</th>
+
+    </tr>
+    <tr th:each="jourFerie : ${jourFeries}">
+        <td th:text="${jourFerie.id}"></td>
+        <td th:text="${jourFerie.regle.nom}"></td>
+        <td>
+            <ul>
+                <li th:each="jour : ${jourFerie.joursFerieList}" th:text="${#dates.format(jour, 'dd/MM/yyyy')}"></li>
+            </ul>
+        </td>
+        <td>
+            <a th:href="@{/jourferies/editJF/{id}(id=${jourFerie.id})}">Modifier</a> |
+            <a th:href="@{/jourferies/deleteJF/{id}(id=${jourFerie.id})}" onclick="return confirm('Voulez-vous vraiment supprimer ce jour férié ?')">Supprimer</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

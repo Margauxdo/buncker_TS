@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un client</title>
+</head>
+<body>
+<h1>Ajouter un client</h1>
+<form th:action="@{/clients/createClient}" th:object="${client}" method="post">
+    <label>Nom: <input type="text" th:field="*{name}" required></label><br>
+    <label>Email: <input type="text" th:field="*{email}" required></label><br>
+    <label>Adresse: <input type="text" th:field="*{adresse}" ></label><br>
+    <label>Ville: <input type="text" th:field="*{ville}" ></label><br>
+    <label>Téléphone: <input type="text" th:field="*{telephoneExploitation}" ></label><br>
+    <label>Personnel et Fonction: <input type="text" th:field="*{personnelEtFonction}" ></label><br>
+    <label>Ramassage 1: <input type="text" th:field="*{ramassage1}" ></label><br>
+    <label>Ramassage 2: <input type="text" th:field="*{ramassage2}" ></label><br>
+    <label>Ramassage 3: <input type="text" th:field="*{ramassage3}" ></label><br>
+    <label>Ramassage 4: <input type="text" th:field="*{ramassage4}" ></label><br>
+    <label>Ramassage 5: <input type="text" th:field="*{ramassage5}" ></label><br>
+    <label>Ramassage 6: <input type="text" th:field="*{ramassage6}" ></label><br>
+    <label>Ramassage 7: <input type="text" th:field="*{ramassage7}" ></label><br>
+    <label>Envoi par défaut: <input type="text" th:field="*{envoiparDefaut}"></label><br>
+    <label>Mémo de retour sécurité 1: <input type="text" th:field="*{memoRetourSecurite1}" required></label><br>
+    <label>Mémo de retour sécurité 2: <input type="text" th:field="*{memoRetourSecurite2}" required></label><br>
+    <button type="submit">Enregistrer</button>
+
+</form>
+
+</body>
+</html>

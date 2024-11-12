@@ -1,2 +1,4 @@
-package example.controller;public class TypeValiseViewController {
+package example.controller;
+
+public class TypeValiseViewController {
 }

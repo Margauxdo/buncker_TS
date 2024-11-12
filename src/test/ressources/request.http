@@ -1,0 +1,266 @@
+### Section 1 : API REST pour l'entité Client
+
+### Obtenir tous les clients
+GET http://localhost:8080/api/clients
+Content-Type: application/json
+
+###
+
+### Obtenir un client par ID
+GET http://localhost:8080/api/clients/1
+Content-Type: application/json
+
+###
+
+### Créer un nouveau client
+POST http://localhost:8080/api/clients
+Content-Type: application/json
+
+{
+  "name": "Client Test",
+  "email": "test@example.com",
+  "adresse": "123 Rue de Paris",
+  "ville": "Paris",
+  "telephoneExploitation": "0123456789",
+  "personnelEtFonction": "Responsable",
+  "ramassage1": "Lundi",
+  "ramassage2": "Mardi",
+  "ramassage3": "Mercredi",
+  "ramassage4": "Jeudi",
+  "ramassage5": "Vendredi",
+  "ramassage6": "Samedi",
+  "ramassage7": "Dimanche",
+  "envoiparDefaut": "Paris",
+  "memoRetourSecurite1": "Mémo 1",
+  "memoRetourSecurite2": "Mémo 2"
+}
+
+###
+
+### Mettre à jour un client
+PUT http://localhost:8080/api/clients/1
+Content-Type: application/json
+
+{
+  "name": "Updated Client",
+  "email": "updated@example.com",
+  "adresse": "456 Avenue de Lyon",
+  "ville": "Lyon",
+  "telephoneExploitation": "0987654321",
+  "personnelEtFonction": "Directeur",
+  "ramassage1": "Lundi",
+  "ramassage2": "Mardi",
+  "ramassage3": "Mercredi",
+  "ramassage4": "Jeudi",
+  "ramassage5": "Vendredi",
+  "ramassage6": "Samedi",
+  "ramassage7": "Dimanche",
+  "envoiparDefaut": "Lyon",
+  "memoRetourSecurite1": "Updated Mémo 1",
+  "memoRetourSecurite2": "Updated Mémo 2"
+}
+
+###
+
+### Supprimer un client
+DELETE http://localhost:8080/api/clients/1
+Content-Type: application/json
+
+###
+
+### Section 2 : Vues Thymeleaf pour l'entité Client
+
+### Afficher la liste des clients
+GET http://localhost:8080/clients
+
+###
+
+### Afficher le formulaire de création de client
+GET http://localhost:8080/clients/createClient
+
+###
+
+### Créer un nouveau client (formulaire web)
+POST http://localhost:8080/clients/createClient
+Content-Type: application/x-www-form-urlencoded
+
+name=ClientTest&email=test@example.com&adresse=123RueParis&ville=Paris&telephoneExploitation=0123456789&memoRetourSecurite1=Memo1&memoRetourSecurite2=Memo2
+
+###
+
+### Afficher le formulaire de modification de client
+GET http://localhost:8080/clients/editClient/1
+
+###
+
+### Mettre à jour un client (formulaire web)
+POST http://localhost:8080/clients/editClient/1
+Content-Type: application/x-www-form-urlencoded
+
+name=UpdatedClient&email=updated@example.com&adresse=456AvenueLyon&ville=Lyon&telephoneExploitation=0987654321&memoRetourSecurite1=UpdatedMemo1&memoRetourSecurite2=UpdatedMemo2
+
+###
+
+### Supprimer un client
+GET http://localhost:8080/clients/deleteClient/1
+
+###
+
+### Section 3 : API REST pour l'entité Formule
+
+### Obtenir toutes les formules
+GET http://localhost:8080/api/formule
+Content-Type: application/json
+
+###
+
+### Obtenir une formule par ID
+GET http://localhost:8080/api/formule/1
+Content-Type: application/json
+
+###
+
+### Créer une nouvelle formule
+POST http://localhost:8080/api/formule
+Content-Type: application/json
+
+{
+  "libelle": "test libelle",
+  "formule": "test formule"
+}
+
+###
+
+### Mettre à jour une formule
+PUT http://localhost:8080/api/formule/1
+Content-Type: application/json
+
+{
+  "libelle": "updated libelle",
+  "formule": "updated formule"
+}
+
+###
+
+### Supprimer une formule
+DELETE http://localhost:8080/api/formule/1
+Content-Type: application/json
+
+###
+
+### Section 4 : Vues Thymeleaf pour l'entité Formule
+
+### Afficher la liste des formules
+GET http://localhost:8080/formules
+
+###
+
+### Afficher le formulaire de création de formule
+GET http://localhost:8080/formules/create
+
+###
+
+### Créer une nouvelle formule (formulaire web)
+POST http://localhost:8080/formules/create
+Content-Type: application/x-www-form-urlencoded
+
+libelle=testlibelle&formule=testFormule
+
+###
+
+### Afficher le formulaire de modification de formule
+GET http://localhost:8080/formules/edit/1
+
+###
+
+### Mettre à jour une formule (formulaire web)
+POST http://localhost:8080/formules/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+libelle=updatedlibelle&formule=updatedFormule
+
+###
+
+### Supprimer une formule
+GET http://localhost:8080/formules/delete/1
+
+
+### Obtenir tous les jours fériés
+GET http://localhost:8080/api-jourferie
+Content-Type: application/json
+
+###
+
+### Obtenir un jour férié par ID
+GET http://localhost:8080/api-jourferie/1
+Content-Type: application/json
+
+###
+
+### Créer un nouveau jour férié
+POST http://localhost:8080/api-jourferie
+Content-Type: application/json
+
+{
+  "regle": {
+    "id": 1
+  },
+  "joursFerieList": ["2024-12-25", "2024-01-01"]
+}
+
+###
+
+### Mettre à jour un jour férié
+PUT http://localhost:8080/api-jourferie/1
+Content-Type: application/json
+
+{
+  "regle": {
+    "id": 2
+  },
+  "joursFerieList": ["2024-12-31", "2024-11-11"]
+}
+
+###
+
+### Supprimer un jour férié
+DELETE http://localhost:8080/api-jourferie/1
+Content-Type: application/json
+
+###
+
+### Section 6 : Vues Thymeleaf pour l'entité JourFerie
+
+### Afficher la liste des jours fériés
+GET http://localhost:8080/jourferies
+
+###
+
+### Afficher le formulaire de création de jour férié
+GET http://localhost:8080/jourferies/createJF
+
+###
+
+### Créer un nouveau jour férié (formulaire web)
+POST http://localhost:8080/jourferies/createJF
+Content-Type: application/x-www-form-urlencoded
+
+regle.id=1&joursFerieList=2024-12-25&joursFerieList=2024-01-01
+
+###
+
+### Afficher le formulaire de modification de jour férié
+GET http://localhost:8080/jourferies/editJF/1
+
+###
+
+### Mettre à jour un jour férié (formulaire web)
+POST http://localhost:8080/jourferies/editJF/1
+Content-Type: application/x-www-form-urlencoded
+
+regle.id=2&joursFerieList=2024-12-31&joursFerieList=2024-11-11
+
+###
+
+### Supprimer un jour férié
+GET http://localhost:8080/jourferies/deleteJF/1

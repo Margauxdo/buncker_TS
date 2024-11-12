@@ -1,2 +1,4 @@
-package example.controller;public class SortieSemaineViewController {
+package example.controller;
+
+public class SortieSemaineViewController {
 }
