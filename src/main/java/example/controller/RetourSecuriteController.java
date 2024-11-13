@@ -33,7 +33,7 @@ public class RetourSecuriteController {
     }
 
 
-    @PostMapping("/retourSecurite")
+    @PostMapping
     public ResponseEntity<RetourSecurite> createRetourSecurite(@Valid @RequestBody RetourSecurite retourSecurite) {
         try {
             RetourSecurite createdRetourSecurite = retourSecuriteService.createRetourSecurite(retourSecurite);

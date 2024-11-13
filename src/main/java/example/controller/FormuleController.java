@@ -51,6 +51,8 @@ public class FormuleController {
 
     @PostMapping
     public ResponseEntity<Formule> createFormule(@Valid @RequestBody Formule formule) {
+
+
         try {
             Formule createdFormule = formuleService.createFormule(formule);
             return new ResponseEntity<>(createdFormule, HttpStatus.CREATED);
@@ -59,9 +61,12 @@ public class FormuleController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        logger.error("Erreur inattendue lors de la création de la formule : ", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+
+
+}
 
 
     @PutMapping("/{id}")

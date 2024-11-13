@@ -1,16 +1,16 @@
-### Section 1 : API REST pour l'entité Client
+# Section 1 : API REST pour l'entité Client
 
 ### Obtenir tous les clients
 GET http://localhost:8080/api/clients
 Content-Type: application/json
 
-###
+
 
 ### Obtenir un client par ID
-GET http://localhost:8080/api/clients/13
+GET http://localhost:8080/api/clients/1
 Content-Type: application/json
 
-###
+
 
 ### Créer un nouveau client
 POST http://localhost:8080/api/clients
@@ -35,16 +35,16 @@ Content-Type: application/json
   "memoRetourSecurite2": "Mémo 2"
 }
 
-###
+
 
 ### Mettre à jour un client
-PUT http://localhost:8080/api/clients/20
+PUT http://localhost:8080/api/clients/1
 Content-Type: application/json
 
 {
-  "id": 20,
-  "name": "Updated Client test 5",
-  "email": "updated@example.com",
+  "id": 1,
+  "name": "Updated Client test 1",
+  "email": "client1@example.com",
   "adresse": "456 Avenue de Lyon",
   "ville": "Lyon",
   "telephoneExploitation": "0987654321",
@@ -61,8 +61,6 @@ Content-Type: application/json
   "memoRetourSecurite2": "Updated Mémo 2"
 }
 
-###
-
 ### Supprimer un client
 DELETE http://localhost:8080/api/clients/13
 Content-Type: application/json
@@ -70,49 +68,45 @@ Content-Type: application/json
 
 
 
-### Section 2 : API REST pour l'entité Formule
+## Section 2 : API REST pour l'entité Formule
 
 ### Obtenir toutes les formules
 GET http://localhost:8080/api/formules
 Content-Type: application/json
 
-###
 
 ### Obtenir une formule par ID
-GET http://localhost:8080/api/formules/2
+GET http://localhost:8080/api/formules/9
 Content-Type: application/json
 
-###
 
 ### Créer une nouvelle formule
 POST http://localhost:8080/api/formules
 Content-Type: application/json
 
 {
-  "libelle": "libelle BDD",
-  "formule": "test formule 25",
-  "regle": {
-    "id": 1
-  }
+  "libelle": "libelle valise regle client",
+  "formule": "test formule exception"
+
 }
 
 
 ###
 
 ### Mettre à jour une formule
-PUT http://localhost:8080/api/formules/1
+PUT http://localhost:8080/api/formules/8
 Content-Type: application/json
 
 {
-  "id": 1,
-  "libelle": "updated libelle original",
-  "formule": "updated formule"
+  "id": 8,
+  "libelle": " updated libelle valise regle client",
+  "formule": "test formule exception"
 }
 
 ###
 
 ### Supprimer une formule
-DELETE http://localhost:8080/api/formules/2
+DELETE http://localhost:8080/api/formules/9
 Content-Type: application/json
 
 
@@ -152,25 +146,6 @@ Content-Type: application/json
 
 
 
-###
-
-### Mettre à jour une formule
-PUT http://localhost:8080/api/formules/1
-Content-Type: application/json
-
-{
-  "id": 1,
-  "libelle": "updated libelle original",
-  "formule": "updated formule"
-}
-
-###
-
-### Supprimer une formule
-DELETE http://localhost:8080/api/formules/2
-Content-Type: application/json
-
-
 
 ### Section 4 : API REST pour l'entité livreur
 ### Obtenir tous les livreurs
@@ -191,10 +166,10 @@ Content-Type: application/json
 
 {
 
-  "codeLivreur": "Clo56254",
+  "codeLivreur": "Clo52564",
   "motDePasse": "AW58al",
-  "nomLivreur": "Dutertre",
-  "prenomLivreur": "Julien",
+  "nomLivreur": "Dubois",
+  "prenomLivreur": "Gilles",
   "numeroCartePro": "DJ.5869",
   "telephonePortable": "0625896595",
   "telephoneKobby": "03254895263",
@@ -205,7 +180,7 @@ Content-Type: application/json
 
 ###
 
-### Mettre à jour une formule
+### Mettre à jour un livreur
 PUT http://localhost:8080/api/livreurs/2
 Content-Type: application/json
 
@@ -224,8 +199,8 @@ Content-Type: application/json
 
 ###
 
-### Supprimer une formule
-DELETE http://localhost:8080/api/livreurs/3
+### Supprimer un livreur
+DELETE http://localhost:8080/api/livreurs/2
 Content-Type: application/json
 
 ### Section 5 : API REST pour l'entité Mouvement
@@ -236,7 +211,7 @@ Content-Type: application/json
 ###
 
 ### Obtenir un mouvement par ID
-GET http://localhost:8080/api/mouvements/3
+GET http://localhost:8080/api/mouvements/1
 Content-Type: application/json
 
 ###
@@ -246,16 +221,10 @@ POST http://localhost:8080/api/mouvements
 Content-Type: application/json
 
 {
-  "dateHeureMouvement": "2024-11-12T10:30:00",
-  "statutSortie": "en cours",
-  "dateSortiePrevue": "2024-11-15T09:00:00",
-  "dateRetourPrevue": "2024-11-20T18:00:00",
-  "valise": {
-    "id": 1
-  },
-  "livreur": {
-    "id": 2
-  }
+  "dateHeureMouvement": "2024-10-12T10:30:00",
+  "statutSortie": "finished",
+  "dateSortiePrevue": "2024-12-15T09:00:00",
+  "dateRetourPrevue": "2024-11-28T18:00:00"
 }
 
 
@@ -271,50 +240,40 @@ Content-Type: application/json
   "dateHeureMouvement": "2024-11-13T12:00:00",
   "statutSortie": "terminé",
   "dateSortiePrevue": "2024-11-15T09:00:00",
-  "dateRetourPrevue": "2024-11-20T18:00:00",
-  "valise": {
-    "id": 1
-  },
-  "livreur": {
-    "id": 2
-  }
+  "dateRetourPrevue": "2024-11-20T18:00:00"
+
 }
 
 
 ###
 
 ### Supprimer un mouvement
-DELETE http://localhost:8080/api/mouvement/3
+DELETE http://localhost:8080/api/mouvement/2
 Content-Type: application/json
+
 
 ### Section 6 : API REST pour l'entité Probleme
 ### Obtenir tous les problèmes
-GET http://localhost:8080/api/problemes
+GET http://localhost:8080/api/pb
 Accept: application/json
 
 
 ###
 
 ### Obtenir un problème par ID
-GET http://localhost:8080/api/problemes/2
+GET http://localhost:8080/api/pb/1
 Accept: application/json
 
 
 ###
 
 ### Créer un nouveau problème
-POST http://localhost:8080/api/problemes
+POST http://localhost:8080/api/pb
 Content-Type: application/json
 
 {
-  "descriptionProbleme": "Test de la description de mon problème",
-  "detailsProbleme": "Détails de mes problèmes",
-  "valise": {
-    "id": 1
-  },
-  "client": {
-    "id": 7
-  }
+  "descriptionProbleme": "Test de la description pbAV",
+  "detailsProbleme": "Détails du pb-AV v.1"
 }
 
 
@@ -323,27 +282,22 @@ Content-Type: application/json
 ###
 
 ### Mettre à jour un problème
-PUT http://localhost:8080/api/problemes/3
+PUT http://localhost:8080/api/pb/1
 Content-Type: application/json
 
 {
-  "id": 3,
-  "descriptionProbleme": "Mise à jour de la description de mon problème",
-  "detailsProbleme": "Mise à jour des détails de tous mes problèmes",
-  "valise": {
-    "id": 1
-  },
-  "client": {
-    "id": 2
-  }
+  "id": 1,
+  "descriptionProbleme": "Test de la description pbAV v.1",
+  "detailsProbleme": "Détails du pb-AV v.1.1"
 }
+
 
 
 
 ###
 
 ### Supprimer un problème
-DELETE http://localhost:8080/api/problemes/3
+DELETE http://localhost:8080/api/pb/1
 Accept: application/json
 
 
@@ -356,7 +310,7 @@ Accept: application/json
 ###
 
 ### Obtenir une regle par ID
-GET http://localhost:8080/api/regles/2
+GET http://localhost:8080/api/regles/3
 Accept: application/json
 
 
@@ -366,7 +320,7 @@ POST http://localhost:8080/api/regles
 Content-Type: application/json
 
 {
-  "reglePourSortie": "Règle de sortie",
+  "reglePourSortie": "Règle entree",
   "coderegle": "R12345",
   "dateRegle": "2024-11-12T10:30:00",
   "nombreJours": 5,
@@ -374,13 +328,7 @@ Content-Type: application/json
   "fermeJS1": true,
   "fermeJS2": false,
   "typeEntree": "Normale",
-  "nbjsmEntree": 7,
-  "typeRegle": {
-    "id": 1
-  },
-  "formule": {
-    "id": 2
-  }
+  "nbjsmEntree": 7
 }
 
 
@@ -404,13 +352,7 @@ Content-Type: application/json
   "fermeJS1": false,
   "fermeJS2": true,
   "typeEntree": "Spéciale",
-  "nbjsmEntree": 14,
-  "typeRegle": {
-    "id": 1
-  },
-  "formule": {
-    "id": 2
-  }
+  "nbjsmEntree": 14
 }
 
 
@@ -430,7 +372,7 @@ Accept: application/json
 ###
 
 ### Obtenir une regle manuelle par ID
-GET http://localhost:8080/api/regle-manuelle/2
+GET http://localhost:8080/api/regle-manuelle/5
 Accept: application/json
 
 
@@ -440,14 +382,11 @@ POST http://localhost:8080/api/regle-manuelle
 Content-Type: application/json
 
 {
-  "coderegle": "RGM-123",
-  "reglePourSortie": "Règle de sortie manuelle",
-  "dateRegle": "2024-11-12T10:30:00",
+  "coderegle": "RWA-125",
+  "reglePourSortie": "Règle de sortie manuelle 1-2",
+  "dateRegle": "2024-10-12T10:30:00",
   "descriptionRegle": "Description de la règle manuelle",
-  "createurRegle": "Jean Bernard",
-  "formule": {
-    "id": 2
-  }
+  "createurRegle": " Dubois Heri"
 }
 
 
@@ -455,11 +394,11 @@ Content-Type: application/json
 ###
 
 ### Mettre à jour une règle manuelle
-PUT http://localhost:8080/api/regles-manuelles/3
+PUT http://localhost:8080/api/regle-manuelle/5
 Content-Type: application/json
 
 {
-  "id": 3,
+  "id": 5,
   "coderegle": "RGM-456",
   "reglePourSortie": "Mise à jour de la règle de sortie manuelle",
   "dateRegle": "2024-12-01T09:00:00",
@@ -495,13 +434,14 @@ POST http://localhost:8080/api/retourSecurite
 Content-Type: application/json
 
 {
-  "numero": 255,
+  "numero": 199999,
   "datesecurite": "2024-11-12T10:30:00",
-  "cloture": true,
+  "cloture": false,
   "dateCloture": "2024-11-12T10:30:00",
   "client": {
-    "id": 1
+    "id": 13
   }
+
 }
 
 
@@ -509,11 +449,11 @@ Content-Type: application/json
 ###
 
 ### Mettre à jour un retour sécurité
-PUT http://localhost:8080/api/retourSecurite/1
+PUT http://localhost:8080/api/retourSecurite/2
 Content-Type: application/json
 
 {
-  "id": 1,
+  "id": 2,
   "numero": 255,
   "datesecurite": "2024-11-12T10:30:00",
   "cloture": true,
@@ -530,32 +470,35 @@ Content-Type: application/json
 
 ###
 ### Supprimer un retour sécurité
-DELETE http://localhost:8080/api/retourSecurite/3
+DELETE http://localhost:8080/api/retourSecurite/2
 Accept: application/json
 
-### Section 10 : API REST pour l'entité Sortie Semaine
+## Section 10 : API REST pour l'entité Sortie Semaine
 ### Obtenir tous les Sortie Semaine
 GET http://localhost:8080/api/sortieSemaine
 Accept: application/json
 
 
-###
+
 
 ### Obtenir une Sortie Semaine par ID
 GET http://localhost:8080/api/sortieSemaine/2
 Accept: application/json
 
 
-###
+### Créer une nouvelle SortieSemaine
 POST http://localhost:8080/api/sortieSemaine
 Content-Type: application/json
 
 {
   "dateSortieSemaine": "2024-11-12",
   "regle": {
-    "id": 1
+    "id": 4
   }
 }
+
+
+
 
 
 ###
@@ -572,12 +515,12 @@ Content-Type: application/json
 }
 
 
-###
+
 ### Supprimer un Sortie Semaine
 DELETE http://localhost:8080/api/sortieSemaine/2
 Accept: application/json
 
-### Section 11 : API REST pour l'entité Type Regle
+##Section 11 : API REST pour l'entité Type Regle
 ### Obtenir tous les Type Regle
 GET http://localhost:8080/api/typeRegle
 Accept: application/json
@@ -586,7 +529,7 @@ Accept: application/json
 ###
 
 ### Obtenir une Type Regle par ID
-GET http://localhost:8080/api/typeRegle/2
+GET http://localhost:8080/api/typeRegle/4
 Accept: application/json
 
 ###
@@ -595,26 +538,26 @@ POST http://localhost:8080/api/typeRegle
 Content-Type: application/json
 
 {
-  "nomTypeRegle": "Type de règle A"
+  "nomTypeRegle": "Type de règle B"
 }
 
 
 ###
 ###modifier le type de regle
 
-PUT http://localhost:8080/api/typeRegle/1
+PUT http://localhost:8080/api/typeRegle/4
 Content-Type: application/json
 
 {
-  "id": 1,
-  "nomTypeRegle": "Type de règle B"
+  "id": 4,
+  "nomTypeRegle": "Type de règle  de type4"
 }
 
 
 
 ###
 ### Supprimer un Type Regle
-DELETE http://localhost:8080/api/typeRegle/2
+DELETE http://localhost:8080/api/typeRegle/4
 Accept: application/json
 
 ### Section 12 : API REST pour l'entité Type Valise
@@ -625,7 +568,7 @@ Accept: application/json
 ###
 
 ### Obtenir un type de valise par ID
-GET http://localhost:8080/api/typeValise/5
+GET http://localhost:8080/api/typeValise/3
 Accept: application/json
 
 ###
@@ -642,11 +585,11 @@ Content-Type: application/json
 ###
 
 ### Mettre à jour un type de valise
-PUT http://localhost:8080/api/typeValise/5
+PUT http://localhost:8080/api/typeValise/3
 Content-Type: application/json
 
 {
-  "id": 5,
+  "id": 3,
   "proprietaire": "Société XYZ",
   "description": "Valise de transport sécurisé"
 }
@@ -654,31 +597,31 @@ Content-Type: application/json
 ###
 
 ### Supprimer un type de valise
-DELETE http://localhost:8080/api/typeValise/1
+DELETE http://localhost:8080/api/typeValise/3
 Accept: application/json
 
 ### Section 13 : API REST pour l'entité Valise
 
 ### Obtenir toutes les valises
-GET http://localhost:8080/api/valises
+GET http://localhost:8080/api/valise
 Accept: application/json
 
 ###
 
 ### Obtenir une valise par ID
-GET http://localhost:8080/api/valises/1
+GET http://localhost:8080/api/valise/1
 Accept: application/json
 
 ###
 
 ### Créer une nouvelle valise
-POST http://localhost:8080/api/valises
+POST http://localhost:8080/api/valise
 Content-Type: application/json
 
 {
-  "description": "Valise de transport sécurisé",
-  "numeroValise": 123456,
-  "refClient": "REF-789",
+  "description": "Valise de transport spécialisé",
+  "numeroValise": 125656,
+  "refClient": "REF-795",
   "sortie": "2024-11-15T10:30:00",
   "dateDernierMouvement": "2024-11-14T09:00:00",
   "dateSortiePrevue": "2024-11-16T09:00:00",
@@ -687,19 +630,13 @@ Content-Type: application/json
   "numeroDujeu": "DU-001",
   "client": {
     "id": 1
-  },
-  "regleSortie": {
-    "id": 2
-  },
-  "typevalise": {
-    "id": 3
   }
 }
 
 ###
 
 ### Mettre à jour une valise
-PUT http://localhost:8080/api/valises/1
+PUT http://localhost:8080/api/valise/1
 Content-Type: application/json
 
 {
@@ -715,19 +652,13 @@ Content-Type: application/json
   "numeroDujeu": "DU-002",
   "client": {
     "id": 1
-  },
-  "regleSortie": {
-    "id": 2
-  },
-  "typevalise": {
-    "id": 3
   }
 }
 
 ###
 
 ### Supprimer une valise
-DELETE http://localhost:8080/api/valises/1
+DELETE http://localhost:8080/api/valise/1
 Accept: application/json
 
 ###

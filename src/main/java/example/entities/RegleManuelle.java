@@ -1,5 +1,6 @@
 package example.entities;
 
+import jakarta.persistence.DiscriminatorValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@DiscriminatorValue("MANUELLE")
 public class RegleManuelle extends Regle {
 
 

@@ -1,5 +1,6 @@
 package example.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -62,6 +63,7 @@ public class Formule {
 
     @ManyToOne
     @JoinColumn(name = "regle_id", nullable = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Regle regle;
 
 
