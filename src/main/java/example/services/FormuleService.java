@@ -1,9 +1,11 @@
 package example.services;
 
 import example.entities.Formule;
+import example.entities.Regle;
 import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
+import example.repositories.RegleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +16,28 @@ public class FormuleService implements IFormuleService {
 
     @Autowired
     private FormuleRepository formuleRepository;
+    @Autowired
+    private RegleRepository regleRepository;
 
     public FormuleService(FormuleRepository formuleRepository) {
+
         this.formuleRepository = formuleRepository;
+        this.regleRepository = regleRepository;
     }
 
     @Override
     public Formule createFormule(Formule formule) {
+        System.out.println("Formule reçue : " + formule);
+        System.out.println("Regle ID : " + (formule.getRegle() != null ? formule.getRegle().getId() : "Aucune Regle"));
+
+        if (formule.getRegle() == null || !regleRepository.existsById(formule.getRegle().getId())) {
+            throw new IllegalArgumentException("Regle not found with ID: " + formule.getRegle().getId());
+        }
 
         return formuleRepository.save(formule);
     }
+
+
 
 
     @Override

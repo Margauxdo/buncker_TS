@@ -1,9 +1,12 @@
 package example.services;
 
+import example.entities.Formule;
 import example.entities.RegleManuelle;
 import example.interfaces.IRegleManuelleService;
+import example.repositories.FormuleRepository;
 import example.repositories.RegleManuelleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +15,12 @@ import java.util.List;
 public class RegleManuelleService implements IRegleManuelleService {
 
     private final RegleManuelleRepository regleManuelleRepository;
+    private final FormuleRepository formuleRepository;
 
-    public RegleManuelleService(RegleManuelleRepository regleManuelleRepository) {
+    @Autowired
+    public RegleManuelleService(RegleManuelleRepository regleManuelleRepository, FormuleRepository formuleRepository) {
         this.regleManuelleRepository = regleManuelleRepository;
+        this.formuleRepository = formuleRepository;
     }
 
     @Override
@@ -22,8 +28,26 @@ public class RegleManuelleService implements IRegleManuelleService {
         if (regleManuelle == null) {
             throw new IllegalArgumentException("Manual rule cannot be null");
         }
-        return regleManuelleRepository.save(regleManuelle);
+
+        System.out.println("RegleManuelle reçue : " + regleManuelle);
+        System.out.println("Formule ID : " + (regleManuelle.getFormule() != null ? regleManuelle.getFormule().getId() : "Aucune Formule"));
+
+        try {
+            if (regleManuelle.getFormule() != null) {
+                int formuleId = regleManuelle.getFormule().getId();
+                Formule formule = formuleRepository.findById(formuleId)
+                        .orElseThrow(() -> new EntityNotFoundException("Formule not found with ID: " + formuleId));
+                regleManuelle.setFormule(formule);
+            }
+
+            return regleManuelleRepository.save(regleManuelle);
+        } catch (Exception e) {
+            e.printStackTrace(); // Affiche la trace complète de l'erreur
+            throw new RuntimeException("Erreur lors de la création de la RegleManuelle", e);
+        }
     }
+
+
 
     @Override
     public RegleManuelle updateRegleManuelle(int id, RegleManuelle regleManuelle) {

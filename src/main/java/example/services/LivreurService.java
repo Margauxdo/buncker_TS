@@ -1,10 +1,12 @@
 package example.services;
 
 import example.entities.Livreur;
+import example.entities.Mouvement;
 import example.exceptions.ConflictException;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.ILivreurService;
 import example.repositories.LivreurRepository;
+import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,17 +19,35 @@ public class    LivreurService implements ILivreurService {
     @Autowired
     private LivreurRepository livreurRepository;
 
+    @Autowired
+    private MouvementRepository mouvementRepository;
+
     public LivreurService(LivreurRepository livreurRepository) {
+
         this.livreurRepository = livreurRepository;
+        this.mouvementRepository = mouvementRepository;
     }
 
     @Override
     public Livreur createLivreur(Livreur livreur) {
         if (livreurRepository.existsByCodeLivreur(livreur.getCodeLivreur())) {
-            throw new ConflictException("delivery person with this code already exists.");
+            throw new ConflictException("Delivery person with this code already exists.");
         }
+
+        if (livreur.getMouvements() != null) {
+            List<Mouvement> mouvements = livreur.getMouvements().stream()
+                    .map(mouvement -> mouvementRepository.findById(mouvement.getId())
+                            .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + mouvement.getId())))
+                    .toList();
+
+            // Associe chaque mouvement au livreur
+            mouvements.forEach(mouvement -> mouvement.setLivreur(livreur));
+            livreur.setMouvements(mouvements);
+        }
+
         return livreurRepository.save(livreur);
     }
+
 
 
     @Override

@@ -1,5 +1,6 @@
 package example.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -112,6 +113,7 @@ public class Livreur {
     private String telephoneAlphapage;
 
     @OneToMany(mappedBy = "livreur", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Mouvement> mouvements;
 }
 
