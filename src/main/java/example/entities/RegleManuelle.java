@@ -26,11 +26,4 @@ public class RegleManuelle extends Regle {
     @NotEmpty(message = "Creator cannot be empty")
     private String createurRegle;
 
-    public void setCreateurRegle(String createurRegle) {
-        this.createurRegle = createurRegle;
-    }
-
-    public void setDescriptionRegle(String descriptionRegle) {
-        this.descriptionRegle = descriptionRegle;
-    }
 }

@@ -42,7 +42,7 @@ public class SortieSemaineRepositoryIntegrationTest {
         regle.setCoderegle("code 2524Al");
         regleRepository.save(regle);
         SortieSemaine sortieSem = new SortieSemaine();
-        sortieSem.setSortieSemaine(new Date());
+        sortieSem.setDateSortieSemaine(new Date());
         sortieSem.setRegle(regle);
         SortieSemaine savedSS = sortieSemaineRepository.save(sortieSem);
         assertNotNull(savedSS.getId());
@@ -55,7 +55,7 @@ public class SortieSemaineRepositoryIntegrationTest {
         regle.setCoderegle("code 2524Al");
         regleRepository.save(regle);
         SortieSemaine ss = new SortieSemaine();
-        ss.setSortieSemaine(new Date());
+        ss.setDateSortieSemaine(new Date());
         ss.setRegle(regle);
         SortieSemaine savedSS = sortieSemaineRepository.save(ss);
         Optional<SortieSemaine> foundSS = sortieSemaineRepository.findById(savedSS.getId());
@@ -68,7 +68,7 @@ public class SortieSemaineRepositoryIntegrationTest {
         regle.setCoderegle("code 2524Al");
         regleRepository.save(regle);
         SortieSemaine ss = new SortieSemaine();
-        ss.setSortieSemaine(new Date());
+        ss.setDateSortieSemaine(new Date());
         ss.setRegle(regle);
         SortieSemaine savedSS = sortieSemaineRepository.save(ss);
         sortieSemaineRepository.deleteById(ss.getId());
@@ -81,7 +81,7 @@ public class SortieSemaineRepositoryIntegrationTest {
         regleA.setCoderegle("code 2524Al");
         regleRepository.save(regleA);
         SortieSemaine ss = new SortieSemaine();
-        ss.setSortieSemaine(new Date());
+        ss.setDateSortieSemaine(new Date());
         ss.setRegle(regleA);
         SortieSemaine savedSS = sortieSemaineRepository.save(ss);
         savedSS.setRegle(regleA);
@@ -100,11 +100,11 @@ public class SortieSemaineRepositoryIntegrationTest {
         regleB.setCoderegle("code 2568Bl");
         regleRepository.save(regleB);
         SortieSemaine ssA = new SortieSemaine();
-        ssA.setSortieSemaine(new Date());
+        ssA.setDateSortieSemaine(new Date());
         ssA.setRegle(regleA);
         sortieSemaineRepository.save(ssA);
         SortieSemaine ssB = new SortieSemaine();
-        ssB.setSortieSemaine(new Date());
+        ssB.setDateSortieSemaine(new Date());
         ssB.setRegle(regleB);
         sortieSemaineRepository.save(ssB);
         List<SortieSemaine> listSS = sortieSemaineRepository.findAll();

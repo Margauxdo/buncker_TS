@@ -65,8 +65,8 @@ public class ClientControllerIntegrationTest {
         client.setTelephoneExploitation("123456789");
         client.setVille("Ville");
         client.setEnvoiparDefaut("EnvoiParDefaut");
-        client.setMemoRetourSecurité1("Memo1");
-        client.setMemoRetourSecurité2("Memo2");
+        client.setMemoRetourSecurite1("Memo1");
+        client.setMemoRetourSecurite1("Memo2");
         client.setTypeSuivie("TypeSuivi");
         client.setCodeClient("CodeClient");
 

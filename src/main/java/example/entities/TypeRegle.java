@@ -21,40 +21,7 @@ public class TypeRegle {
     @Column(name = "id_typeRegle")
     private int id;
 
-    public String getNomTypeRegle() {
-        return nomTypeRegle;
-    }
 
-    public void setNomTypeRegle(String nomTypeRegle) {
-        this.nomTypeRegle = nomTypeRegle;
-    }
-
-    public List<Regle> getListTypesRegles() {
-
-        return listTypesRegles;
-    }
-
-    public void setListTypesRegles(List<Regle> listTypesRegles) {
-        this.listTypesRegles = listTypesRegles;
-    }
-
-    public String getTypeRegle() {
-
-        return nomTypeRegle;
-    }
-
-    public void setTypeRegle(String typeRegle) {
-
-        this.nomTypeRegle = nomTypeRegle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Column(name = "nom_type_regle", unique = true, nullable = false)
     private String nomTypeRegle;

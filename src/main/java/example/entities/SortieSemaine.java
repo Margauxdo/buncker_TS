@@ -16,9 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class SortieSemaine {
-    public void setDateSortieSemaine(Date dateSortieSemaine) {
-        this.dateSortieSemaine = dateSortieSemaine;
-    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,29 +28,7 @@ public class SortieSemaine {
     private Date dateSortieSemaine;
 
 
-    public Regle getRegle() {
-        return regle;
-    }
 
-    public void setRegle(Regle regle) {
-        this.regle = regle;
-    }
-
-    public Date getDateSortieSemaine() {
-        return dateSortieSemaine;
-    }
-
-    public void setSortieSemaine(Date sortieSemaine) {
-        this.dateSortieSemaine = sortieSemaine;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "regle_id", nullable = false)

@@ -66,7 +66,7 @@ public class RegleControllerTest {
     public void testCreateRegle_Success(){
         Regle regle = new Regle();
         when(regleService.createRegle(regle)).thenReturn(regle);
-        ResponseEntity<Regle> result = regleController.createRegle(regle);
+        ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
         Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
         Assertions.assertEquals(regle, result.getBody());
     }
@@ -76,7 +76,7 @@ public class RegleControllerTest {
 
         when(regleService.createRegle(regle)).thenThrow(new IllegalArgumentException("Rule invalid"));
 
-        ResponseEntity<Regle> result = regleController.createRegle(regle);
+        ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode(), "Expected BAD_REQUEST status");
     }
@@ -142,7 +142,7 @@ public class RegleControllerTest {
         when(regleService.createRegle(any(Regle.class)))
                 .thenThrow(new IllegalStateException("Conflict Detected"));
 
-        ResponseEntity<Regle> result = regleController.createRegle(regle);
+        ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
 
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // 409
     }
@@ -160,7 +160,7 @@ public class RegleControllerTest {
         when(regleService.createRegle(any(Regle.class)))
                 .thenThrow(new IllegalStateException("Conflict Detected"));
 
-        ResponseEntity<Regle> result = regleController.createRegle(regle);
+        ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
 
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "Expected CONFLICT status");
     }
@@ -171,7 +171,7 @@ public class RegleControllerTest {
         Regle regle = new Regle();
         when(regleService.createRegle(any(Regle.class)))
                 .thenThrow(new RuntimeException("Internal server error"));
-        ResponseEntity<Regle> result = regleController.createRegle(regle);
+        ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 

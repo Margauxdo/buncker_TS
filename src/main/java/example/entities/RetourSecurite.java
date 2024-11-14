@@ -34,52 +34,5 @@ public class RetourSecurite {
     private Client client;
 
 
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public Date getDateCloture() {
-        return dateCloture;
-    }
-
-    public void setDateCloture(Date dateCloture) {
-        this.dateCloture = dateCloture;
-    }
-
-    public Boolean getCloture() {
-        return cloture;
-    }
-
-    public void setCloture(Boolean cloture) {
-        this.cloture = cloture;
-    }
-
-    public Date getDatesecurite() {
-        return datesecurite;
-    }
-
-    public void setDatesecurite(Date datesecurite) {
-        this.datesecurite = datesecurite;
-    }
-
-    public Long getNumero() {
-        return numero;
-    }
-
-    public void setNumero(Long numero) {
-        this.numero = numero;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }
 
