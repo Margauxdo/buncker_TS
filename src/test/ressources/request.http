@@ -93,9 +93,6 @@ Content-Type: application/json
 }
 
 
-
-###
-
 ### Mettre à jour une formule
 PUT http://localhost:8080/api/formules/1
 Content-Type: application/json
@@ -109,14 +106,13 @@ Content-Type: application/json
   }
 }
 
-###
 
 ### Supprimer une formule
 DELETE http://localhost:8080/api/formules/9
 Content-Type: application/json
 
 
-### Section 3 : API REST pour l'entité JourFerie
+## Section 3 : API REST pour l'entité JourFerie
 
 ### Obtenir toutes les jours feries
 GET http://localhost:8080/api/jourferies
@@ -143,23 +139,16 @@ Content-Type: application/json
 }
 
 
-
-
-
-
-
 ### Section 4 : API REST pour l'entité livreur
 ### Obtenir tous les livreurs
 GET http://localhost:8080/api/livreurs
 Content-Type: application/json
 
-###
 
 ### Obtenir un livreurpar ID
 GET http://localhost:8080/api/livreurs/11
 Content-Type: application/json
 
-###
 
 ### Créer une nouveau livreur
 POST http://localhost:8080/api/livreurs
@@ -191,9 +180,6 @@ Content-Type: application/json
 }
 
 
-
-###
-
 ### Mettre à jour un livreur
 PUT http://localhost:8080/api/livreurs/11
 Content-Type: application/json
@@ -218,25 +204,20 @@ Content-Type: application/json
   ]
 }
 
-
-###
-
 ### Supprimer un livreur
 DELETE http://localhost:8080/api/livreurs/10
 Content-Type: application/json
 
-### Section 5 : API REST pour l'entité Mouvement
+## Section 5 : API REST pour l'entité Mouvement
 ### Obtenir tous les mouvements
 GET http://localhost:8080/api/mouvements
 Content-Type: application/json
 
-###
 
 ### Obtenir un mouvement par ID
 GET http://localhost:8080/api/mouvements/3
 Content-Type: application/json
 
-###
 
 ### Créer un nouveau mouvement
 POST http://localhost:8080/api/mouvements
@@ -255,9 +236,6 @@ Content-Type: application/json
   }
 }
 
-
-
-###
 
 ### Mettre à jour un mouvement
 PUT http://localhost:8080/api/mouvements/2
@@ -279,35 +257,28 @@ Content-Type: application/json
 }
 
 
-###
-
 ### Supprimer un mouvement
 DELETE http://localhost:8080/api/mouvement/2
 Content-Type: application/json
 
 
-### Section 6 : API REST pour l'entité Probleme
+## Section 6 : API REST pour l'entité Probleme
 ### Obtenir tous les problèmes
 GET http://localhost:8080/api/pb
 Accept: application/json
 
-
-###
-
 ### Obtenir un problème par ID
-GET http://localhost:8080/api/pb/1
+GET http://localhost:8080/api/pb/3
 Accept: application/json
 
-
-###
 
 ### Créer un nouveau problème
 POST http://localhost:8080/api/pb
 Content-Type: application/json
 
 {
-  "descriptionProbleme": "Test de la description pbAV-v2",
-  "detailsProbleme": "Détails du pb-AV v.1.2",
+  "descriptionProbleme": "pbAV-v2",
+  "detailsProbleme": "Détails du probleme avec pour description test",
   "valise": {
     "id": 1
   },
@@ -317,64 +288,53 @@ Content-Type: application/json
 }
 
 
-
-
-###
-
 ### Mettre à jour un problème
-PUT http://localhost:8080/api/pb/2
+PUT http://localhost:8080/api/pb/3
 Content-Type: application/json
 
 {
-  "id": 2,
-  "descriptionProbleme": "Test de la description pbAV-v2",
-  "detailsProbleme": "Détails du pb-AV v.1.2",
+  "id": 3,
+  "descriptionProbleme": " Test pbAV-v2",
+  "detailsProbleme": "DTest  du probleme avec pour description test",
   "valise": {
-    "id": 1
+    "id": 2
   },
   "client": {
-    "id": 1
+    "id": 3
   }
 }
 
-
-
-
-###
 
 ### Supprimer un problème
 DELETE http://localhost:8080/api/pb/1
 Accept: application/json
 
 
-### Section 7 : API REST pour l'entité Régle
+## Section 7 : API REST pour l'entité Régle
 ### Obtenir tous les regles
 GET http://localhost:8080/api/regles
 Accept: application/json
 
 
-###
-
 ### Obtenir une regle par ID
-GET http://localhost:8080/api/regles/3
+GET http://localhost:8080/api/regles/14
 Accept: application/json
 
 
-###
 ### Créer une nouvelle règle
 POST http://localhost:8080/api/regles
 Content-Type: application/json
 
 {
-  "reglePourSortie": "Règle pour mettre fin à la valise",
-  "coderegle": "R12345",
-  "dateRegle": "2024-11-12T10:30:00",
-  "nombreJours": 5,
-  "calculCalendaire": 10,
+  "reglePourSortie": "Nouvelle règle Sortie Testv2.2",
+  "coderegle": "R45790",
+  "dateRegle": "2024-12-12T10:30:00",
+  "nombreJours": 25,
+  "calculCalendaire": 12,
   "fermeJS1": true,
   "fermeJS2": false,
   "typeEntree": "Normale",
-  "nbjsmEntree": 7,
+  "nbjsmEntree": 55,
   "formule": {
     "id": 1
   },
@@ -385,17 +345,12 @@ Content-Type: application/json
 
 
 
-
-
-
-###
-
 ### Mettre à jour une règle
-PUT http://localhost:8080/api/regles/3
+PUT http://localhost:8080/api/regles/14
 Content-Type: application/json
 
 {
-  "id": 3,
+  "id": 14,
   "reglePourSortie": "Mise à jour de la règle",
   "coderegle": "R54321",
   "dateRegle": "2024-12-01T09:00:00",
@@ -414,83 +369,72 @@ Content-Type: application/json
 }
 
 
-
-
-###
 ### Supprimer une règle
 DELETE http://localhost:8080/api/regles/3
 Accept: application/json
 
-### Section 8 : API REST pour l'entité Régle Manuelle
+## Section 8 : API REST pour l'entité Régle Manuelle
 ### Obtenir tous les regles manuelles
 GET http://localhost:8080/api/regle-manuelle
 Accept: application/json
 
 
-###
-
 ### Obtenir une regle manuelle par ID
-GET http://localhost:8080/api/regle-manuelle/5
+GET http://localhost:8080/api/regle-manuelle/16
 Accept: application/json
 
 
-###
 ### Créer une nouvelle règle manuelle
 POST http://localhost:8080/api/regle-manuelle
 Content-Type: application/json
 
 {
-  "coderegle": "RWA-125",
-  "reglePourSortie": "Règle de sortie manuelle 1-2",
+  "coderegle": "RWA-125-v2.2",
+  "reglePourSortie": "Règle de sortie manuelle 1-2.22",
   "dateRegle": "2024-10-12T10:30:00",
   "descriptionRegle": "Description de la règle manuelle",
   "createurRegle": "Dubois Heri",
   "formule": {
     "id": 1
   }
+
 }
 
 
-
-
-###
-
 ### Mettre à jour une règle manuelle
-PUT http://localhost:8080/api/regle-manuelle/5
+PUT http://localhost:8080/api/regle-manuelle/16
 Content-Type: application/json
 
 {
-  "id": 5,
-  "coderegle": "RGM-456",
-  "reglePourSortie": "Mise à jour de la règle de sortie manuelle",
-  "dateRegle": "2024-12-01T09:00:00",
-  "descriptionRegle": "Mise à jour de la description de la règle manuelle",
-  "createurRegle": "Jean Bernard"
+  "id": 16,
+  "coderegle": "RWA-125-v2.3",
+  "reglePourSortie": "Règle de sortie manuelle 1-2.3",
+  "dateRegle": "2024-10-12T10:30:00",
+  "descriptionRegle": "Description de la règle manuelle",
+  "createurRegle": "Dubois Heri",
+  "formule": {
+    "id": 1
+  }
+
 }
 
 
 
-
-
-###
 ### Supprimer une règle manuelle
 DELETE http://localhost:8080/api/regle-manuelle/3
 Accept: application/json
 
-### Section 9 : API REST pour l'entité Retour Sécurité
+## Section 9 : API REST pour l'entité Retour Sécurité
 ### Obtenir tous les retour sécurité
 GET http://localhost:8080/api/retourSecurite
 Accept: application/json
 
-
-###
 
 ### Obtenir une retour sécurité par ID
 GET http://localhost:8080/api/retourSecurite/2
 Accept: application/json
 
 
-###
 ### Créer un nouveau retour sécurité
 POST http://localhost:8080/api/retourSecurite
 Content-Type: application/json
@@ -506,9 +450,6 @@ Content-Type: application/json
 
 }
 
-
-
-###
 
 ### Mettre à jour un retour sécurité
 PUT http://localhost:8080/api/retourSecurite/2
@@ -526,11 +467,6 @@ Content-Type: application/json
 }
 
 
-
-
-
-
-###
 ### Supprimer un retour sécurité
 DELETE http://localhost:8080/api/retourSecurite/2
 Accept: application/json
@@ -541,12 +477,9 @@ GET http://localhost:8080/api/sortieSemaine
 Accept: application/json
 
 
-
-
 ### Obtenir une Sortie Semaine par ID
 GET http://localhost:8080/api/sortieSemaine/1
 Accept: application/json
-
 
 ### Créer une nouvelle SortieSemaine
 POST http://localhost:8080/api/sortieSemaine
@@ -592,7 +525,7 @@ Accept: application/json
 ###
 
 ### Obtenir une Type Regle par ID
-GET http://localhost:8080/api/typeRegle/4
+GET http://localhost:8080/api/typeRegle/3
 Accept: application/json
 
 ###
@@ -601,19 +534,22 @@ POST http://localhost:8080/api/typeRegle
 Content-Type: application/json
 
 {
-  "nomTypeRegle": "Type de règle B"
+  "nomTypeRegle": "Type de règle AB",
+  "listTypesRegles": []
 }
+
 
 
 ###
 ###modifier le type de regle
 
-PUT http://localhost:8080/api/typeRegle/4
+PUT http://localhost:8080/api/typeRegle/3
 Content-Type: application/json
 
 {
-  "id": 4,
-  "nomTypeRegle": "Type de règle  de type4"
+  "id": 3,
+  "nomTypeRegle": "Type AB-V2.2",
+  "listTypesRegles": []
 }
 
 
@@ -641,10 +577,13 @@ POST http://localhost:8080/api/typeValise
 Content-Type: application/json
 
 {
-  "proprietaire": "Société bancaire nationale",
-  "description": "Valise de transport fragile",
-  "valises": [1, 2]
+  "proprietaire": "X11-V2.21",
+  "description": "Valise V2.21 test",
+  "valises": [
+  ]
 }
+
+
 
 
 

@@ -3,6 +3,8 @@ package example.services;
 import example.entities.Probleme;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,15 +22,20 @@ public class ProblemeService implements IProblemeService {
 
     @Override
     public Probleme createProbleme(Probleme probleme) {
+        System.out.println("Vérification d'un problème existant : " + probleme.getDescriptionProbleme() + ", " + probleme.getDetailsProbleme());
+
         boolean exists = problemeRepository.existsByDescriptionProblemeAndDetailsProbleme(
                 probleme.getDescriptionProbleme(), probleme.getDetailsProbleme());
 
+        System.out.println("Existence : " + exists);
+
         if (exists) {
-            throw new IllegalStateException("Duplicate problem detected");
+            throw new IllegalStateException("Un problème avec cette description et ces détails existe déjà.");
         }
 
         return problemeRepository.save(probleme);
     }
+
 
     @Override
     public Probleme updateProbleme(int id, Probleme probleme) {

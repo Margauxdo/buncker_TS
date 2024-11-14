@@ -24,7 +24,6 @@ public class TypeValiseService implements ITypeValiseService {
         this.valiseRepository = valiseRepository;
     }
 
-
     @Override
     public TypeValise createTypeValise(TypeValise typeValise) {
         if (typeValise == null) {
@@ -35,30 +34,35 @@ public class TypeValiseService implements ITypeValiseService {
         System.out.println("TypeValise reçu : " + typeValise);
         System.out.println("Propriétaire : " + typeValise.getProprietaire());
         System.out.println("Description : " + typeValise.getDescription());
-        System.out.println("Valises : " + (typeValise.getValises() != null ? typeValise.getValises() : "Aucune valise"));
+        System.out.println("Valises reçues : " + (typeValise.getValises() != null ? typeValise.getValises() : "Aucune valise"));
 
         try {
+            // Récupérer explicitement les valises existantes à partir de leurs IDs
             if (typeValise.getValises() != null && !typeValise.getValises().isEmpty()) {
-                List<Valise> existingValises = new ArrayList<>();
+                List<Valise> managedValises = new ArrayList<>();
                 for (Valise valise : typeValise.getValises()) {
-                    // Récupérer explicitement chaque valise de la base de données
-                    Valise existingValise = valiseRepository.findById(valise.getId())
+                    // Récupérer la valise depuis la base de données
+                    Valise managedValise = valiseRepository.findById(valise.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + valise.getId()));
-                    existingValises.add(existingValise);
+                    managedValise.setTypevalise(typeValise);
+                    managedValises.add(managedValise);
                 }
-                // Associer les valises récupérées
-                typeValise.setValises(existingValises);
+                // Associer la liste des valises récupérées
+                typeValise.setValises(managedValises);
             }
 
-            // Log pour vérifier l'état avant la sauvegarde
-            System.out.println("TypeValise avant sauvegarde : " + typeValise);
+            // Ajoutez cette ligne ici, avant la sauvegarde
+            System.out.println("Avant la sauvegarde de TypeValise : " + typeValise);
 
+            // Sauvegarder le TypeValise
             return typeValiseRepository.save(typeValise);
         } catch (Exception e) {
-            e.printStackTrace(); // Afficher la trace complète de l'erreur
+            e.printStackTrace();
             throw new RuntimeException("Erreur lors de la création de TypeValise", e);
         }
     }
+
+
 
 
 

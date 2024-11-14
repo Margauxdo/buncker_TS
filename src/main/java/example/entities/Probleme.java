@@ -50,7 +50,7 @@ public class Probleme {
     @Column(name = "id_probleme")
     private int id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String descriptionProbleme;
     private String detailsProbleme;
 

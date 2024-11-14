@@ -36,21 +36,21 @@ public class RegleController {
     }
 
     @PostMapping
-    public ResponseEntity<Regle> createRegle(@RequestBody @Valid Regle regle) {
+    public ResponseEntity<?> createRegle(@RequestBody @Valid Regle regle) {
         try {
             if (regleService.regleExists(regle.getCoderegle())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Le code de la règle '" + regle.getCoderegle() + "' existe déjà.");
             }
             Regle newRegle = regleService.createRegle(regle);
             return ResponseEntity.status(HttpStatus.CREATED).body(newRegle);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); //404
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 409 conflict
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requête invalide : " + e.getMessage());
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne du serveur.");
         }
     }
+
 
 
 

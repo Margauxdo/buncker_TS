@@ -55,6 +55,7 @@ public class ValiseService implements IValiseService {
         return valiseRepository.findById(id).orElse(null);
     }
 
+
     @Override
     public List<Valise> getAllValises() {
         return valiseRepository.findAll();

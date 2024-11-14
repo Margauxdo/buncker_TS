@@ -34,14 +34,15 @@ public class ProblemeController {
         try {
             Probleme newProbleme = problemeService.createProbleme(probleme);
             return new ResponseEntity<>(newProbleme, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 
