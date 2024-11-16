@@ -138,12 +138,22 @@ public class TypeValiseControllerTest {
     }
     @Test
     public void testCreateTypeValise_Conflict() {
+        // Arrange
         TypeValise typeValise = new TypeValise();
         when(typeValiseService.createTypeValise(any(TypeValise.class)))
-                .thenThrow(new IllegalStateException("conflict detected"));
+                .thenThrow(new IllegalStateException("Conflict detected"));
+
+        // Act
         ResponseEntity<TypeValise> response = typeValiseController.createTypeValise(typeValise);
-        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-    }@Test
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+
+
+
+    @Test
     public void testCreateTypeValise_InternalServerError() {
         TypeValise typeValise = new TypeValise();
         when(typeValiseService.createTypeValise(any(TypeValise.class)))

@@ -2,25 +2,30 @@ package example.controller;
 
 import example.entities.Client;
 import example.entities.Valise;
+import example.exceptions.GlobalExceptionHandler;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
 import example.repositories.ClientRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 
 public class ValiseControllerTest {
 
@@ -33,6 +38,7 @@ public class ValiseControllerTest {
 
     @Mock
     private ClientRepository clientRepository;
+
 
     @BeforeEach
     public void setUp() {
@@ -47,12 +53,12 @@ public class ValiseControllerTest {
         when(valiseService.getAllValises()).thenReturn(valises);
 
         ResponseEntity<List<Valise>> responseEntity = valiseController.getAllValises();
-        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         List<Valise> response = responseEntity.getBody();
 
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(valises.size(), response.size());
+        assertEquals(valises.size(), response.size());
     }
 
     @Test
@@ -65,13 +71,13 @@ public class ValiseControllerTest {
         Valise valise = new Valise();
         when(valiseService.getValiseById(1)).thenReturn(valise);
         ResponseEntity<Valise> response = valiseController.getValiseById(1);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     @Test
     public void testGetValiseById_Failure() {
         when(valiseService.getValiseById(1)).thenReturn(null);
         ResponseEntity<Valise> response = valiseController.getValiseById(1);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
     @Test
     public void testCreateValise_Success() {
@@ -90,8 +96,8 @@ public class ValiseControllerTest {
 
         ResponseEntity<Valise> response = valiseController.createValise(valise);
 
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assertions.assertEquals(valise, response.getBody());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(valise, response.getBody());
     }
 
 
@@ -100,34 +106,34 @@ public class ValiseControllerTest {
         Valise valise = new Valise();
         when(valiseService.createValise(valise)).thenThrow(new IllegalArgumentException("suitcase invalid"));
         ResponseEntity<Valise> response = valiseController.createValise(valise);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
     @Test
     public void testUpdateValise_Success() {
         Valise updatedValise = new Valise();
         when(valiseService.updateValise(1, updatedValise)).thenReturn(updatedValise);
         ResponseEntity<Valise> response = valiseController.updateValise(updatedValise, 1);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(updatedValise, response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedValise, response.getBody());
     }
     @Test
     public void testUpdateValise_Failure() {
         Valise updatedValise = new Valise();
         when(valiseService.updateValise(1, updatedValise)).thenReturn(null);
         ResponseEntity<Valise> response = valiseController.updateValise(updatedValise, 1);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
     @Test
     public void testDeleteValise_Success() {
         doNothing().when(valiseService).deleteValise(1);
         ResponseEntity<Void> response = valiseController.deleteValise(1);
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
     @Test
     public void testDeleteValise_Failure() {
         doThrow(new RuntimeException("Internal error")).when(valiseService).deleteValise(1);
         ResponseEntity<Void> response = valiseController.deleteValise(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         verify(valiseService).deleteValise(1);
 
     }
@@ -136,7 +142,7 @@ public class ValiseControllerTest {
         Valise invalidValise = new Valise();
         when(valiseService.createValise(invalidValise)).thenThrow(new IllegalArgumentException("suitcase invalid"));
         ResponseEntity<Valise> response = valiseController.createValise(invalidValise);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
     @Test
     public void testUpdateValise_InvalidInput() {
@@ -144,7 +150,7 @@ public class ValiseControllerTest {
         when(valiseService.updateValise(anyInt(), any(Valise.class)))
                 .thenThrow(new IllegalArgumentException("suitcase invalid"));
         ResponseEntity<Valise> response = valiseController.updateValise(invalidValise, 1);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
@@ -153,7 +159,7 @@ public class ValiseControllerTest {
 
         ResponseEntity<Void> response = valiseController.deleteValise(1);
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
@@ -173,7 +179,7 @@ public class ValiseControllerTest {
 
         ResponseEntity<Valise> response = valiseController.createValise(valise);
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
 
@@ -195,15 +201,14 @@ public class ValiseControllerTest {
         valise.setClient(client);
 
         when(clientRepository.findById(1)).thenReturn(Optional.of(client));
-
         when(valiseService.createValise(any(Valise.class)))
-                .thenThrow(new IllegalStateException("conflict detected"));
+                .thenThrow(new IllegalStateException("Conflict detected"));
 
         ResponseEntity<Valise> response = valiseController.createValise(valise);
 
-        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNull(response.getBody());
     }
-
 
 
     @Test
@@ -224,7 +229,7 @@ public class ValiseControllerTest {
 
         ResponseEntity<Valise> response = valiseController.createValise(valise);
 
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
 
@@ -235,7 +240,7 @@ public class ValiseControllerTest {
         when(valiseService.updateValise(anyInt(), any(Valise.class)))
                 .thenThrow(new IllegalStateException("conflict detected"));
         ResponseEntity<Valise> response = valiseController.updateValise(valise, 1);
-        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
     @Test
@@ -244,7 +249,7 @@ public class ValiseControllerTest {
         when(valiseService.updateValise(anyInt(), any(Valise.class)))
                 .thenThrow(new RuntimeException("internal error"));
         ResponseEntity<Valise> response = valiseController.updateValise(valise, 1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
 

@@ -1,7 +1,9 @@
 package example.integration.services;
 
 import example.entities.Formule;
+import example.entities.Regle;
 import example.repositories.FormuleRepository;
+import example.repositories.RegleRepository;
 import example.services.FormuleService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,9 @@ public class FormuleServiceIntegrationTest {
     @Autowired
     private FormuleRepository formuleRepository;
 
+    @Autowired
+    private RegleRepository regleRepository;
+
     private Formule formule;
 
     @BeforeEach
@@ -39,6 +44,13 @@ public class FormuleServiceIntegrationTest {
     }
     @Test
     public void testCreateFormule() {
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
+        regle = regleRepository.save(regle);
+
+        formule.setRegle(regle);
+
         // Act
         Formule savedFormule = formuleService.createFormule(formule);
 
@@ -47,10 +59,17 @@ public class FormuleServiceIntegrationTest {
         assertNotNull(savedFormule.getId());
         assertEquals("libellé 1", savedFormule.getLibelle());
         assertEquals("formule standard", savedFormule.getFormule());
+        assertEquals(regle.getId(), savedFormule.getRegle().getId());
     }
+
     @Test
     public void testUpdateFormule() {
         // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
+        regle = regleRepository.save(regle);
+
+        formule.setRegle(regle);
         Formule savedFormule = formuleService.createFormule(formule);
 
         // Act
@@ -63,21 +82,31 @@ public class FormuleServiceIntegrationTest {
         assertEquals(savedFormule.getId(), updatedFormule.getId());
         assertEquals("libelle 25", updatedFormule.getLibelle());
         assertEquals("formule avancée", updatedFormule.getFormule());
+        assertEquals(regle.getId(), updatedFormule.getRegle().getId());
     }
+
 
     @Test
     public void testGetFormuleById() {
         // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
+        regle = regleRepository.save(regle);
+
+        formule.setRegle(regle);
         Formule savedFormule = formuleService.createFormule(formule);
 
-        //Act
+        // Act
         Formule formuleById = formuleService.getFormuleById(savedFormule.getId());
 
-        //Assert
+        // Assert
         assertNotNull(formuleById);
         assertEquals(savedFormule.getId(), formuleById.getId());
         assertEquals("libellé 1", formuleById.getLibelle());
+        assertEquals("formule standard", formuleById.getFormule());
+        assertEquals(regle.getId(), formuleById.getRegle().getId());
     }
+
     @Test
     public void testGetAllFormules() {
         // Arrange : Crée deux instances de Formule et les enregistre dans le repository
@@ -108,14 +137,20 @@ public class FormuleServiceIntegrationTest {
 
     @Test
     public void testDeleteFormule() {
-        //Arrange
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
+        regle = regleRepository.save(regle);
+
+        formule.setRegle(regle);
         Formule savedFormule = formuleService.createFormule(formule);
 
-        //Act
+        // Act
         formuleService.deleteFormule(savedFormule.getId());
 
-        //Assert
+        // Assert
         Formule deletedFormule = formuleService.getFormuleById(savedFormule.getId());
-        assertNull(deletedFormule);
+        assertNull(deletedFormule, "La Formule devrait être supprimée et ne devrait pas être récupérable par ID");
     }
+
 }

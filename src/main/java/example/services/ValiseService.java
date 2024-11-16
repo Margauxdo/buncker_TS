@@ -52,8 +52,13 @@ public class ValiseService implements IValiseService {
 
     @Override
     public Valise getValiseById(int id) {
-        return valiseRepository.findById(id).orElse(null);
+        Valise valise = valiseRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Valise not found"));
+        if (valise.getMouvementList() != null) {
+            valise.getMouvementList().size();
+        }
+        return valise;
     }
+
 
 
     @Override

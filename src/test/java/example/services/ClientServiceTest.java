@@ -82,16 +82,17 @@ public class ClientServiceTest {
 
         when(clientRepository.existsById(id)).thenReturn(true);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             clientService.updateClient(id, client);
         });
 
-        Assertions.assertEquals("Expression not valid", exception.getMessage(), "Exception message should match expected error");
+        Assertions.assertEquals("Client ID mismatch", exception.getMessage(), "Exception message should match expected error");
 
         verify(clientRepository, times(1)).existsById(id);
         verify(clientRepository, never()).save(any(Client.class));
         verifyNoMoreInteractions(clientRepository);
     }
+
     @Test
     public void testUpdateClient_Success_WhenIdMatches() {
         int id = 1;
@@ -188,8 +189,8 @@ public class ClientServiceTest {
             clientService.updateClient(id, client);
         });
 
-        Assertions.assertEquals("Client not found", exception.getMessage(),
-                "The exception should correspond to 'Client not found'");
+        Assertions.assertEquals("Client not found with ID 1", exception.getMessage(),
+                "The exception should correspond to 'Client not found with ID 1'");
 
         verify(clientRepository, times(1)).existsById(id);
         verify(clientRepository, never()).save(any(Client.class));

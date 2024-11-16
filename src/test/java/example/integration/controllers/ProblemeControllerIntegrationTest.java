@@ -85,7 +85,7 @@ public class ProblemeControllerIntegrationTest {
     @Test
     public void testCreateProbleme_shouldShouldReturnForInvalidProblemData() throws Exception {
         String problemJSON = "{\"descriptionProbleme\":\"descriptionProbleme\"}";
-        mockMvc.perform(post("/api/mouvement")
+        mockMvc.perform(post("/api/pb")
         .contentType(MediaType.APPLICATION_JSON)
                 .content(problemJSON))
                 .andExpect(status().isBadRequest());
@@ -133,7 +133,7 @@ public class ProblemeControllerIntegrationTest {
 
     @Test
     public void testGetProblemById_ShouldReturnIfTheProblemIDDoesNotExist() throws Exception {
-        mockMvc.perform(get("/api/mouvement/{id}",999999)
+        mockMvc.perform(get("/api/pb/{id}",999999)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -162,7 +162,7 @@ public class ProblemeControllerIntegrationTest {
         probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
         String updatedPbJson = objectMapper.writeValueAsString(probleme);
-        mockMvc.perform(put("/api/mouvement/{id}", 999999)
+        mockMvc.perform(put("/api/pb/{id}", 999999)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedPbJson))
                 .andExpect(status().isNotFound());
@@ -184,7 +184,7 @@ public class ProblemeControllerIntegrationTest {
 
     @Test
     public void testdeleteProblemee_ShouldReturnIfProblemIddoesNotExist() throws Exception {
-        mockMvc.perform(delete("/api/mouvement/{id}",99999)
+        mockMvc.perform(delete("/api/pb/{id}",99999)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

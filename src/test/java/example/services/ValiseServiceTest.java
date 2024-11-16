@@ -2,6 +2,7 @@ package example.services;
 
 import example.entities.TypeValise;
 import example.entities.Valise;
+import example.exceptions.ResourceNotFoundException;
 import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,16 +129,21 @@ public class ValiseServiceTest {
         verifyNoMoreInteractions(valiseRepository);
     }
     @Test
-    public void testGetValiseById_Failure_Exception(){
+    public void testGetValiseById_Failure_Exception() {
+        // Arrange
         int id = 1;
         when(valiseRepository.findById(id)).thenReturn(Optional.empty());
 
-        Valise result = valiseService.getValiseById(id);
+        // Act & Assert
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            valiseService.getValiseById(id);
+        }, "Expected ResourceNotFoundException to be thrown");
 
-        Assertions.assertNull(result, "Suitcase must be null if not found");
+        // Vérifications
         verify(valiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(valiseRepository);
     }
+
     @Test
     public void testGetAllValises_Success(){
         List<Valise> valiseList = List.of(new Valise(), new Valise());
@@ -168,15 +174,20 @@ public class ValiseServiceTest {
     }
     @Test
     public void testNoInteractionTypeValiseRepository_Failure_Exception() {
+        // Arrange
         int id = 1;
         when(valiseRepository.findById(id)).thenReturn(Optional.empty());
 
-        Valise result = valiseService.getValiseById(id);
+        // Act & Assert
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            valiseService.getValiseById(id);
+        }, "Expected ResourceNotFoundException to be thrown when the suitcase is not found");
 
-        Assertions.assertNull(result, "Suitcase must be null if not found");
+        // Vérifications
         verify(valiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(valiseRepository);
     }
+
 
 
 

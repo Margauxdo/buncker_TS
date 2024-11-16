@@ -38,7 +38,7 @@ public class FormuleControllerIntegrationTest {
     @Test
     public void testGetAllFormules_shouldReturnEmptyList() throws Exception {
         // Act
-        mockMvc.perform(get("/api/formule")
+        mockMvc.perform(get("/api/formules")
                         .contentType(MediaType.APPLICATION_JSON))
         // Assert
                 .andExpect(status().isOk())
@@ -48,7 +48,7 @@ public class FormuleControllerIntegrationTest {
     @Test
     public void testGetFormuleById_shouldReturnNotFound() throws Exception {
         // Act
-        mockMvc.perform(get("/api/formule/{id}", 1)
+        mockMvc.perform(get("/api/formules/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON))
         // Assert
                 .andExpect(status().isNotFound());
@@ -63,7 +63,7 @@ public class FormuleControllerIntegrationTest {
                 .build();
 
         // Act
-        mockMvc.perform(post("/api/formule")
+        mockMvc.perform(post("/api/formules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(formule)))
         // Assert
@@ -80,7 +80,7 @@ public class FormuleControllerIntegrationTest {
                 .build();
 
         // Act et Assert
-        mockMvc.perform(post("/api/formule")
+        mockMvc.perform(post("/api/formules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(formule)))
                 .andExpect(status().isBadRequest());
@@ -104,7 +104,7 @@ public class FormuleControllerIntegrationTest {
                 .build();
 
         // Act
-        mockMvc.perform(put("/api/formule/{id}", savedFormule.getId())
+        mockMvc.perform(put("/api/formules/{id}", savedFormule.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedFormule)))
         // Assert
@@ -122,7 +122,7 @@ public class FormuleControllerIntegrationTest {
                 .build();
 
         // Act
-        mockMvc.perform(put("/api/formule/{id}", 999999)
+        mockMvc.perform(put("/api/formules/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedFormule)))
         // Assert
@@ -140,7 +140,7 @@ public class FormuleControllerIntegrationTest {
         Formule savedFormule = formuleRepository.save(formule);
 
         // Act
-        mockMvc.perform(delete("/api/formule/{id}", savedFormule.getId())
+        mockMvc.perform(delete("/api/formules/{id}", savedFormule.getId())
              .contentType(MediaType.APPLICATION_JSON))
         // Assert
             .andExpect(status().isNoContent());
@@ -149,7 +149,7 @@ public class FormuleControllerIntegrationTest {
     @Test
     public void testDeleteFormule_shouldReturnNotFoundWhenFormuleDoesNotExist() throws Exception {
         // Act
-        mockMvc.perform(delete("/api/formule/{id}", 999999)
+        mockMvc.perform(delete("/api/formules/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
         // Assert
            .andExpect(status().isNotFound());

@@ -50,10 +50,11 @@ public class RegleManuelleServiceTest {
             regleManuelleService.createRegleManuelle(regleManuelle);
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage());
+        Assertions.assertEquals("Erreur lors de la création de la RegleManuelle", exception.getMessage());
         verify(regleManuelleRepository, times(1)).save(regleManuelle);
         verifyNoMoreInteractions(regleManuelleRepository);
     }
+
 
     @Test
     public void testUpdateRegleManuelle_Success() {

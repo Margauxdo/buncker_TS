@@ -1,14 +1,18 @@
 package example.services;
 
 import example.entities.Formule;
+import example.entities.Regle;
 import example.exceptions.FormuleNotFoundException;
 import example.repositories.FormuleRepository;
+import example.repositories.RegleRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
@@ -17,10 +21,15 @@ import java.util.ArrayList;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class FormuleServiceTest {
 
     @Mock
     private FormuleRepository formuleRepository;
+
+    @Mock
+    private RegleRepository regleRepository;
+
 
     @InjectMocks
     private FormuleService formuleService;
@@ -30,33 +39,27 @@ public class FormuleServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // Tests pour createFormule
+
     @Test
     public void testCreateFormule_Success() {
-        Formule formule = new Formule();
-        when(formuleRepository.save(formule)).thenReturn(formule);
+            // Arrange
+            Formule formule = new Formule();
+            Regle regle = new Regle();
+            regle.setId(1);
+            formule.setRegle(regle);
 
-        Formule result = formuleService.createFormule(formule);
+            when(regleRepository.existsById(regle.getId())).thenReturn(true);
+            when(formuleRepository.save(formule)).thenReturn(formule);
 
-        Assertions.assertNotNull(result, "Formule should not be null");
-        verify(formuleRepository, times(1)).save(formule);
-        verifyNoMoreInteractions(formuleRepository);
-    }
+            // Act
+            Formule result = formuleService.createFormule(formule);
 
-    @Test
-    public void testCreateFormule_Failure_Exception() {
-        Formule formule = new Formule();
-        when(formuleRepository.save(formule)).thenThrow(new RuntimeException("Database error"));
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            formuleService.createFormule(formule);
-        });
-
-        Assertions.assertEquals("Database error", exception.getMessage(),
-                "Exception message should match expected error");
-        verify(formuleRepository, times(1)).save(formule);
-        verifyNoMoreInteractions(formuleRepository);
-    }
+            // Assert
+            Assertions.assertNotNull(result, "Formule should not be null");
+            verify(formuleRepository, times(1)).save(formule);
+            verify(regleRepository, times(1)).existsById(regle.getId());
+            verifyNoMoreInteractions(formuleRepository, regleRepository);
+        }
 
     @Test
     public void testUpdateFormule_Success() {

@@ -50,7 +50,7 @@ public class JourFerieControllerIntegrationTest {
     @Test
     public void testGetAllHolidays_shouldReturnEmptyList() throws Exception {
         // Act
-        mockMvc.perform(get("/api-jourferie")
+        mockMvc.perform(get("/api/jourferies")
                         .contentType(MediaType.APPLICATION_JSON))
                 // Assert
                 .andExpect(status().isOk())
@@ -60,7 +60,7 @@ public class JourFerieControllerIntegrationTest {
     @Test
     public void testGetHolidayById_shouldReturnNotFound() throws Exception {
         // Act
-        mockMvc.perform(get("/api-jourferie/{id}", 1)
+        mockMvc.perform(get("/api/jourferies/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON))
                 // Assert
                 .andExpect(status().isNotFound());
@@ -79,7 +79,7 @@ public class JourFerieControllerIntegrationTest {
         jourFerie.setJoursFerieList(Collections.singletonList(new Date()));
 
         // Act & Assert
-        mockMvc.perform(post("/api-jourferie")
+        mockMvc.perform(post("/api/jourferies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(jourFerie)))
                 .andExpect(status().isCreated())
@@ -88,16 +88,10 @@ public class JourFerieControllerIntegrationTest {
     }
 
 
-
-
-
-
-
-
     @Test
     public void testGetHolidayById_shouldReturnBadRequestForInvalidId() throws Exception {
         // Act
-        mockMvc.perform(get("/api-jourferie/{id}", -1)
+        mockMvc.perform(get("/api/jourferies/{id}", -1)
                         .contentType(MediaType.APPLICATION_JSON))
                 // Assert
                 .andExpect(status().isBadRequest());
@@ -106,7 +100,7 @@ public class JourFerieControllerIntegrationTest {
 
     @Test
     public void testGetHolidayById_shouldReturnNotFoundForNonExistentId() throws Exception {
-        mockMvc.perform(get("/api-jourferie/{id}", 999999)
+        mockMvc.perform(get("/api/jourferies/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 // Assert
                 .andExpect(status().isNotFound());

@@ -42,7 +42,9 @@ public class Valise {
     private Regle regleSortie;
 
     @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Mouvement> mouvementList = new ArrayList<>();
+
 
     @ManyToOne
     @JoinColumn(name = "typevalise_id" )

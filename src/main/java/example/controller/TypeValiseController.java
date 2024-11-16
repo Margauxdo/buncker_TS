@@ -8,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,12 +29,15 @@ public class TypeValiseController {
         return new ResponseEntity<>(typeValises, HttpStatus.OK).getBody();
     }
 
+    @Transactional
     @GetMapping("{id}")
     ResponseEntity<TypeValise> getTypeValise(@PathVariable int id) {
         TypeValise typeValise = typeValiseService.getTypeValise(id);
         return typeValise != null ? new ResponseEntity<>(typeValise, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
 
     @PostMapping
     public ResponseEntity<TypeValise> createTypeValise(@RequestBody TypeValise typeValise) {

@@ -41,18 +41,19 @@ public class TypeValiseServiceTest {
         verifyNoMoreInteractions(typeValiseRepository);
     }
     @Test
-    public void testCreateTypeValise_Failure_Exception(){
+    public void testCreateTypeValise_Failure_Exception() {
         TypeValise typeValise = new TypeValise();
-        when(typeValiseRepository.save(typeValise)).thenThrow(new RuntimeException("Database error"));
+        when(typeValiseRepository.save(typeValise)).thenThrow(new RuntimeException("Erreur lors de la création de TypeValise"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             typeValiseService.createTypeValise(typeValise);
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage());
+        Assertions.assertEquals("Erreur lors de la création de TypeValise", exception.getMessage());
         verify(typeValiseRepository, times(1)).save(typeValise);
         verifyNoMoreInteractions(typeValiseRepository);
     }
+
     @Test
     public void testUpdateTypeValise_Success(){
         int id = 1;

@@ -1,6 +1,7 @@
 package example.controller;
 
 import example.entities.Regle;
+import example.exceptions.GlobalExceptionHandler;
 import example.interfaces.IRegleService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -17,6 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@Import(GlobalExceptionHandler.class)
 public class RegleControllerTest {
 
     @InjectMocks
@@ -136,16 +139,7 @@ public class RegleControllerTest {
         ResponseEntity<Void> result = regleController.deleteRegle(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
-    @Test
-    public void testCreateRegle_NotFound() {
-        Regle regle = new Regle();
-        when(regleService.createRegle(any(Regle.class)))
-                .thenThrow(new IllegalStateException("Conflict Detected"));
 
-        ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
-
-        Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode()); // 409
-    }
 
 
     @Test
@@ -157,13 +151,17 @@ public class RegleControllerTest {
     public void testCreateRegle_Conflict() {
         Regle regle = new Regle();
 
+        // Configuration du mock pour lever une IllegalStateException
         when(regleService.createRegle(any(Regle.class)))
                 .thenThrow(new IllegalStateException("Conflict Detected"));
 
+        // Exécution de la méthode du contrôleur
         ResponseEntity<Regle> result = (ResponseEntity<Regle>) regleController.createRegle(regle);
 
+        // Vérification du statut HTTP attendu
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "Expected CONFLICT status");
     }
+
 
 
     @Test

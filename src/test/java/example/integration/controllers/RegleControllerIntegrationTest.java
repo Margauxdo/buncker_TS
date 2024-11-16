@@ -53,7 +53,7 @@ public class RegleControllerIntegrationTest {
         regle1.setNombreJours(25);
         regleRepository.save(regle1);
 
-        mockMvc.perform(get("/api/regle")
+        mockMvc.perform(get("/api/regles")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].coderegle").value("2568L"));
@@ -67,7 +67,7 @@ public class RegleControllerIntegrationTest {
         regle.setNombreJours(25);
         regleRepository.save(regle);
 
-        mockMvc.perform(get("/api/regle/{id}", regle.getId())
+        mockMvc.perform(get("/api/regles/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.coderegle").value("2568L"))
@@ -76,7 +76,7 @@ public class RegleControllerIntegrationTest {
 
     @Test
     public void testReadRegleById_ShouldReturnNotFoundWhenRegleDoesNotExist() throws Exception {
-        mockMvc.perform(get("/api/regle/{id}", -1)
+        mockMvc.perform(get("/api/regles/{id}", -1)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()); // 404
     }
@@ -89,7 +89,7 @@ public class RegleControllerIntegrationTest {
         regle.setNombreJours(25);
         String regleJson = objectMapper.writeValueAsString(regle);
 
-        mockMvc.perform(post("/api/regle")
+        mockMvc.perform(post("/api/regles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(regleJson))
                 .andExpect(status().isCreated())
@@ -105,7 +105,7 @@ public class RegleControllerIntegrationTest {
         regle.setNombreJours(25);
         regleRepository.save(regle);
         String regleJson = objectMapper.writeValueAsString(regle);
-        mockMvc.perform(post("/api/regle")
+        mockMvc.perform(post("/api/regles")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(regleJson))
                 .andExpect(status().isConflict());
@@ -114,7 +114,7 @@ public class RegleControllerIntegrationTest {
     public void testCreateRegle_ShouldReturnBadRequestForInvalidData() throws Exception {
         String invalidRegleJson = "{\"coderegle\":\"\"}";
 
-        mockMvc.perform(post("/api/regle")
+        mockMvc.perform(post("/api/regles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidRegleJson))
                 .andExpect(status().isBadRequest())
@@ -146,7 +146,7 @@ public class RegleControllerIntegrationTest {
 
         String updatedRegleJson = objectMapper.writeValueAsString(updatedRegle);
 
-        mockMvc.perform(put("/api/regle/{id}", regle.getId())
+        mockMvc.perform(put("/api/regles/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedRegleJson))
                 .andExpect(status().isOk())
@@ -162,7 +162,7 @@ public class RegleControllerIntegrationTest {
         updatedRegle.setNombreJours(258);
         String updatedRegleJson = objectMapper.writeValueAsString(updatedRegle);
 
-        mockMvc.perform(put("/api/regle/{id}", 99999)
+        mockMvc.perform(put("/api/regles/{id}", 99999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedRegleJson))
                 .andExpect(status().isNotFound());
@@ -181,7 +181,7 @@ public class RegleControllerIntegrationTest {
 
         String invalidRegleJson = "{\"coderegle\":\"\"}";
 
-        mockMvc.perform(put("/api/regle/{id}", regle.getId())
+        mockMvc.perform(put("/api/regles/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidRegleJson))
                 .andExpect(status().isBadRequest())
@@ -197,7 +197,7 @@ public class RegleControllerIntegrationTest {
         regle.setDateRegle(new Date());
         regle.setNombreJours(25);
         regleRepository.save(regle);
-        mockMvc.perform(delete("/api/regle/{id}", regle.getId())
+        mockMvc.perform(delete("/api/regles/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }

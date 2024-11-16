@@ -20,8 +20,10 @@ public class Probleme {
     @Column(name = "id_probleme")
     private int id;
 
-    @Column(nullable = false)
+    @Column(name = "description_probleme", unique = true, nullable = false)
     private String descriptionProbleme;
+
+
     private String detailsProbleme;
 
     @ManyToOne(cascade = CascadeType.REMOVE)

@@ -33,7 +33,6 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void getAllClients_shouldReturnClients_whenClientsExist() throws Exception {
-        // Arrange
         Client client = new Client();
         client.setName("Nom Test");
         client.setAdresse("Adresse Test");
@@ -48,12 +47,13 @@ public class ClientControllerIntegrationTest {
 
         clientRepository.save(client);
 
-        // Act & Assert
         mockMvc.perform(get("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name", is("Nom Test")));
+                .andExpect(jsonPath("$[0].name").value("Nom Test"));
     }
+
+
 
     @Test
     public void getClientById_shouldReturnClient_whenClientExists() throws Exception {
@@ -66,7 +66,7 @@ public class ClientControllerIntegrationTest {
         client.setVille("Ville");
         client.setEnvoiparDefaut("EnvoiParDefaut");
         client.setMemoRetourSecurite1("Memo1");
-        client.setMemoRetourSecurite1("Memo2");
+        client.setMemoRetourSecurite2("Memo2");
         client.setTypeSuivie("TypeSuivi");
         client.setCodeClient("CodeClient");
 
@@ -76,8 +76,10 @@ public class ClientControllerIntegrationTest {
         mockMvc.perform(get("/api/clients/{id}", client.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Nom Test")));
+                .andExpect(jsonPath("$.name").value("Nom Test"))
+                .andExpect(jsonPath("$.email").value("email@example.com"));
     }
+
 
     @Test
     public void getClientById_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {

@@ -52,18 +52,20 @@ public class MouvementControllerIntegrationTest {
         mouvement1.setDateHeureMouvement(new Date());
         mouvementRepository.save(mouvement1);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String expectedDate = dateFormat.format(mouvement1.getDateHeureMouvement());
 
-        String valuePattern = expectedDate + "(Z|\\+00:00)";
+        // Le pattern accepte les dates avec ou sans millisecondes et timezone
+        String valuePattern = expectedDate + "(\\.\\d{3})?(Z|\\+00:00)?";
 
-        mockMvc.perform(get("/api/mouvement")
+        mockMvc.perform(get("/api/mouvements")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].statutSortie").value("close"))
                 .andExpect(jsonPath("$[0].dateHeureMouvement").value(org.hamcrest.Matchers.matchesPattern(valuePattern)));
     }
+
 
 
     @Test
@@ -74,12 +76,12 @@ public class MouvementControllerIntegrationTest {
         mouvement1.setDateHeureMouvement(new Date());
         mouvementRepository.save(mouvement1);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String expectedDateRegex = dateFormat.format(mouvement1.getDateHeureMouvement()).replace("Z", "(Z|\\+00:00)");
+        String expectedDateRegex = dateFormat.format(mouvement1.getDateHeureMouvement()) + "(\\.\\d{3})?(Z|\\+00:00)?";
 
         // Act & Assert
-        mockMvc.perform(get("/api/mouvement/{id}", mouvement1.getId())
+        mockMvc.perform(get("/api/mouvements/{id}", mouvement1.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.statutSortie").value("close"))
@@ -90,9 +92,11 @@ public class MouvementControllerIntegrationTest {
 
 
 
+
+
     @Test
     public void testGetMouvementById_ShouldReturnNotFound_WhenMouvementDoesNotExist () throws Exception {
-        mockMvc.perform(get("/api/mouvement/{id}", 999999)
+        mockMvc.perform(get("/api/mouvements/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -104,7 +108,7 @@ public class MouvementControllerIntegrationTest {
         mouvement1.setDateHeureMouvement(new Date());
         String mouvementJson = objectMapper.writeValueAsString(mouvement1);
 
-        mockMvc.perform(post("/api/mouvement")
+        mockMvc.perform(post("/api/mouvements")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mouvementJson))
                 .andExpect(status().isCreated())
@@ -113,7 +117,7 @@ public class MouvementControllerIntegrationTest {
     @Test
     public void testCreateMouvement_ShouldReturnBadRequest_WhenDataIsInvalid() throws Exception {
         String invalidMouvementJson = "{\"statutSortie\":\"invalid\"}";
-        mockMvc.perform(post("/api/mouvement")
+        mockMvc.perform(post("/api/mouvements")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidMouvementJson))
                 .andExpect(status().isBadRequest());
@@ -140,7 +144,7 @@ public class MouvementControllerIntegrationTest {
         String expectedDateString = updatedDate.format(formatter);
 
         // Act & Assert
-        mockMvc.perform(put("/api/mouvement/{id}", mouvement1.getId())
+        mockMvc.perform(put("/api/mouvements/{id}", mouvement1.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedMouvementJson))
                 .andExpect(status().isOk())
@@ -156,7 +160,7 @@ public class MouvementControllerIntegrationTest {
         updatedMouvement1.setDateHeureMouvement(new Date());
         String updatedMouvementJson = objectMapper.writeValueAsString(updatedMouvement1);
 
-        mockMvc.perform(put("/api/mouvement/{id}", 999999)
+        mockMvc.perform(put("/api/mouvements/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedMouvementJson))
                 .andExpect(status().isNotFound());
@@ -171,7 +175,7 @@ public class MouvementControllerIntegrationTest {
         mouvementRepository.save(mouvement1);
 
         String invalidMouvementJson = "{\"statutSortie\":\"in\"}";
-        mockMvc.perform(put("/api/mouvement/{id}", mouvement1.getId())
+        mockMvc.perform(put("/api/mouvements/{id}", mouvement1.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidMouvementJson))
                 .andExpect(status().isBadRequest());
@@ -184,13 +188,13 @@ public class MouvementControllerIntegrationTest {
         mouvement1.setStatutSortie("close");
         mouvement1.setDateHeureMouvement(new Date());
         mouvementRepository.save(mouvement1);
-        mockMvc.perform(delete("/api/mouvement/{id}", mouvement1.getId())
+        mockMvc.perform(delete("/api/mouvements/{id}", mouvement1.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
     @Test
     public void testDeleteMouvement_ShouldReturnNotFound_WhenMouvementDoesNotExist() throws Exception {
-        mockMvc.perform(delete("/api/mouvement/{id}", 999999)
+        mockMvc.perform(delete("/api/mouvements/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

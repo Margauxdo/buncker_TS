@@ -3,6 +3,7 @@ package example.integration.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.entities.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,22 +40,27 @@ public class RegleManuelleControllerIntegrationTest {
 
     @Test
     public void testGetAllRegleManuelles_ShouldReturnEmptyList() throws Exception {
-        mockMvc.perform(get("/regle-manuelle")
+        mockMvc.perform(get("/api/regle-manuelle")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
+
     @Test
+    @Transactional
     public void testGetRegleManuelleById_ShouldReturnRegleManuelle() throws Exception {
+        // Arrange
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("henri bernard");
         regleManuelle.setDescriptionRegle("Description de test");
         regleManuelle.setCoderegle("CODE123");
 
+        // Sauvegarder l'objet dans la base de données
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
-        mockMvc.perform(get("/regle-manuelle/{id}", regleManuelle.getId())
+        // Act & Assert
+        mockMvc.perform(get("/api/regle-manuelle/{id}", regleManuelle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.createurRegle", is("henri bernard")))
@@ -62,9 +69,14 @@ public class RegleManuelleControllerIntegrationTest {
     }
 
 
+
+
+
+
+
     @Test
     public void testGetRegleManuelleById_NotFound() throws Exception {
-        mockMvc.perform(get("/regle-manuelle/{id}", 999999)
+        mockMvc.perform(get("/api/regle-manuelle/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -77,7 +89,7 @@ public class RegleManuelleControllerIntegrationTest {
         regleManuelle.setDescriptionRegle("Description de test");
         regleManuelle.setCoderegle("CODE123");
 
-        mockMvc.perform(post("/regle-manuelle")
+        mockMvc.perform(post("/api/regle-manuelle")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(regleManuelle)))
                 .andExpect(status().isCreated())
@@ -103,7 +115,7 @@ public class RegleManuelleControllerIntegrationTest {
 
         regleManuelle.setCreateurRegle("julien Renard");
 
-        mockMvc.perform(put("/regle-manuelle/{id}", regleManuelle.getId())
+        mockMvc.perform(put("/api/regle-manuelle/{id}", regleManuelle.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(regleManuelle)))
                 .andExpect(status().isOk())
@@ -118,7 +130,7 @@ public class RegleManuelleControllerIntegrationTest {
         regleManuelle.setDescriptionRegle("Description de test");
         regleManuelle.setCoderegle("CODE123");
 
-        mockMvc.perform(put("/regle-manuelle/{id}", 999999)
+        mockMvc.perform(put("/api/regle-manuelle/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(regleManuelle)))
                 .andExpect(status().isNotFound());
@@ -135,7 +147,7 @@ public class RegleManuelleControllerIntegrationTest {
 
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
-        mockMvc.perform(delete("/regle-manuelle/{id}", regleManuelle.getId())
+        mockMvc.perform(delete("/api/regle-manuelle/{id}", regleManuelle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -143,7 +155,7 @@ public class RegleManuelleControllerIntegrationTest {
 
     @Test
     public void testDeleteRegleManuelle_NotFound() throws Exception {
-        mockMvc.perform(delete("/regle-manuelle/{id}", 999999)
+        mockMvc.perform(delete("/api/regle-manuelle/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

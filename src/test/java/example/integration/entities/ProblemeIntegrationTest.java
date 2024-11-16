@@ -6,25 +6,40 @@ import example.entities.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.springframework.transaction.PlatformTransactionManager;
+
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@Transactional
 @ActiveProfiles("integrationtest")
 public class ProblemeIntegrationTest {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
     private ProblemeRepository problemeRepository;
@@ -76,32 +91,40 @@ public class ProblemeIntegrationTest {
 
     @Test
     public void testSaveProblemeWithDuplicateDescriptionThrowsException() {
-        Client clientA = new Client();
-        clientA.setName("Martin");
-        clientA.setEmail("martin@example.com");
-        clientRepository.save(clientA);
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
-        Valise val1 = new Valise();
-        val1.setClient(clientA);
-        valiseRepository.save(val1);
+        try {
+            Client clientA = new Client();
+            clientA.setName("Martin");
+            clientA.setEmail("martin@example.com");
+            clientRepository.save(clientA);
 
-        Probleme probleme1 = new Probleme();
-        probleme1.setClient(clientA);
-        probleme1.setValise(val1);
-        probleme1.setDetailsProbleme("First problem details");
-        probleme1.setDescriptionProbleme("Same description");
+            Valise val1 = new Valise();
+            val1.setClient(clientA);
+            valiseRepository.save(val1);
 
-        problemeRepository.saveAndFlush(probleme1);
+            Probleme probleme1 = new Probleme();
+            probleme1.setClient(clientA);
+            probleme1.setValise(val1);
+            probleme1.setDetailsProbleme("First problem details");
+            probleme1.setDescriptionProbleme("Same description");
 
-        Probleme probleme2 = new Probleme();
-        probleme2.setClient(clientA);
-        probleme2.setValise(val1);
-        probleme2.setDetailsProbleme("Second problem details");
-        probleme2.setDescriptionProbleme("Same description");
+            problemeRepository.saveAndFlush(probleme1);
 
-        Assertions.assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
-            problemeRepository.saveAndFlush(probleme2);
-        });
+            Probleme probleme2 = new Probleme();
+            probleme2.setClient(clientA);
+            probleme2.setValise(val1);
+            probleme2.setDetailsProbleme("Second problem details");
+            probleme2.setDescriptionProbleme("Same description");
+
+            Assertions.assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
+                problemeRepository.save(probleme2);
+                entityManager.flush();
+            });
+
+        } finally {
+            transactionManager.rollback(status);
+        }
     }
 
 

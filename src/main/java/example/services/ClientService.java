@@ -3,6 +3,7 @@ package example.services;
 import example.entities.Client;
 import example.interfaces.IClientService;
 import example.repositories.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,16 +27,17 @@ public class ClientService implements IClientService {
     @Override
     public Client updateClient(int id, Client client) {
         if (!clientRepository.existsById(id)) {
-            throw new RuntimeException("Client not found");
+            throw new EntityNotFoundException("Client not found with ID " + id);
         }
 
         if (client.getId() != id) {
-            throw new RuntimeException("Expression not valid");
+            throw new IllegalArgumentException("Client ID mismatch");
         }
 
         client.setId(id);
         return clientRepository.save(client);
     }
+
 
 
 
@@ -56,6 +58,7 @@ public class ClientService implements IClientService {
     public List<Client> getAllClients() {
         return clientRepository.findAll();
     }
+
     @Override
     public boolean existsById(int id) {
         return clientRepository.existsById(id);

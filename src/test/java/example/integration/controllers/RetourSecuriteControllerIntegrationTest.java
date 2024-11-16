@@ -69,7 +69,7 @@ public class RetourSecuriteControllerIntegrationTest {
         retourSecurite.setCloture(false);
         retourSecurite.setClient(client);
 
-        mvc.perform(post("/api/retourSecurite/retourSecurite")
+        mvc.perform(post("/api/retourSecurite")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(retourSecurite)))
                 .andExpect(status().isCreated())
@@ -79,13 +79,15 @@ public class RetourSecuriteControllerIntegrationTest {
 
 
 
+
     @Test
     public void testCreateRS_ShouldReturnBadRequestWhenRetourSecuriteIsNullOrInvalid() throws Exception {
-        mvc.perform(post("/api/retourSecurite/retourSecurite")
+        mvc.perform(post("/api/retourSecurite")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isBadRequest());
     }
+
 
     @Test
     public void testUpdateRS_ShouldReturnBadRequestWhenUpdateDataIsInvalid() throws Exception {

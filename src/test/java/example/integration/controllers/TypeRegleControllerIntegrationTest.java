@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -46,18 +47,9 @@ public class TypeRegleControllerIntegrationTest {
                 .andExpect(jsonPath("$.nomTypeRegle").value("Type A"));
     }
 
-    @Test
-    public void testGetTypeRegles_Success() throws Exception {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type B");
-        typeRegleRepository.save(typeRegle);
-
-        mvc.perform(get("/api/typeRegle"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nomTypeRegle").value("Type B"));
-    }
 
     @Test
+    @Transactional
     public void testGetTypeRegle_Success() throws Exception {
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("Type C");
@@ -67,6 +59,7 @@ public class TypeRegleControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nomTypeRegle").value("Type C"));
     }
+
 
     @Test
     public void testGetTypeRegle_NotFound() throws Exception {

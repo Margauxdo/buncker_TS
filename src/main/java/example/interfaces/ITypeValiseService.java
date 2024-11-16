@@ -13,5 +13,4 @@ public interface ITypeValiseService {
     List<TypeValise> getTypeValises();
 
 
-
 }

@@ -3,6 +3,7 @@ package example.integration.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.entities.TypeValise;
 import example.repositories.TypeValiseRepository;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,6 +36,7 @@ public class TypeValiseControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         typeValiseRepository.deleteAll();
+
     }
 
 
@@ -80,16 +85,27 @@ public class TypeValiseControllerIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
+
     @Test
+    @Transactional
     public void testGetTypeValise_Success() throws Exception {
         TypeValise typeValise = new TypeValise();
         typeValise.setDescription("Valise de Luxe");
         typeValise.setProprietaire("Alex Smith");
-        typeValise = typeValiseRepository.save(typeValise);
+        typeValise = typeValiseRepository.saveAndFlush(typeValise);
+
+        typeValise = typeValiseRepository.findById(typeValise.getId()).orElseThrow();
+        Hibernate.initialize(typeValise.getValises());
 
         mvc.perform(get("/api/typeValise/{id}", typeValise.getId()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Valise de Luxe"))
+                .andExpect(jsonPath("$.proprietaire").value("Alex Smith"));
     }
+
+
+
+
 
     @Test
     public void testUpdateTypeValise_Success() throws Exception {
