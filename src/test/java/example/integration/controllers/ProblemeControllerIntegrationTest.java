@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import example.entities.Probleme;
 import example.repositories.ProblemeRepository;
 import example.services.ProblemeService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,13 +84,19 @@ public class ProblemeControllerIntegrationTest {
     }
 
     @Test
-    public void testCreateProbleme_shouldShouldReturnForInvalidProblemData() throws Exception {
-        String problemJSON = "{\"descriptionProbleme\":\"descriptionProbleme\"}";
+    public void testCreateProbleme_shouldReturnBadRequestForInvalidProblemData() throws Exception {
+        // Exemple de données avec un champ obligatoire manquant
+        String problemJSON = "{\"descriptionProbleme\":\"descriptionProbleme\"}"; // detailsProbleme est manquant ici
+
         mockMvc.perform(post("/api/pb")
-        .contentType(MediaType.APPLICATION_JSON)
-                .content(problemJSON))
-                .andExpect(status().isBadRequest());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(problemJSON))
+                .andExpect(status().isBadRequest()); // S'attend à une réponse 400
     }
+
+
+
+
     @Test
     public void testGetAllProblems_ShouldReturnAllProblems() throws Exception {
         // Arrange
@@ -157,16 +164,21 @@ public class ProblemeControllerIntegrationTest {
 
 
     @Test
-    public void testupdateProbleme_ShouldReturnIfTheProblemID() throws Exception {
+    public void testUpdateProbleme_ShouldReturnNotFoundIfTheProblemIDDoesNotExist() throws Exception {
         Probleme probleme = new Probleme();
-        probleme.setDetailsProbleme("details Probleme");
         probleme.setDescriptionProbleme("description probleme");
+        probleme.setDetailsProbleme("details Probleme");
+
         String updatedPbJson = objectMapper.writeValueAsString(probleme);
+
         mockMvc.perform(put("/api/pb/{id}", 999999)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updatedPbJson))
-                .andExpect(status().isNotFound());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedPbJson))
+                .andExpect(status().isNotFound());  // Attendez un code de statut 404
     }
+
+
+
     @Test
     public void testDeleteProbleme_ShouldSuccessfullyDeleteTheSpecifiedProblem() throws Exception {
         // Arrange
@@ -183,9 +195,12 @@ public class ProblemeControllerIntegrationTest {
 
 
     @Test
-    public void testdeleteProblemee_ShouldReturnIfProblemIddoesNotExist() throws Exception {
-        mockMvc.perform(delete("/api/pb/{id}",99999)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+    public void testDeleteProbleme_ShouldReturnNotFoundIfProblemIdDoesNotExist() throws Exception {
+        // Test de suppression avec un ID qui n'existe pas
+        mockMvc.perform(delete("/api/pb/{id}", 99999)  // ID invalide
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());  // Vérifie que le code de réponse est 404
     }
+
+
 }

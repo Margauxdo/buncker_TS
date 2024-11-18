@@ -176,6 +176,7 @@ class ClientIntegrationTest {
 
     @Test
     void testClientRelationshipWithProbleme() {
+        // Arrange
         Client client = new Client();
         client.setName("Client Test");
         client.setEmail("client@test.com");
@@ -184,12 +185,18 @@ class ClientIntegrationTest {
         Probleme probleme = new Probleme();
         probleme.setClient(client);
         probleme.setDescriptionProbleme("Problème de test");
+        probleme.setDetailsProbleme("Détails du problème"); // Ajoutez ce champ obligatoire
         problemeRepository.save(probleme);
 
+        // Act
         List<Probleme> problemes = problemeRepository.findByClientId(client.getId());
-        assertFalse(problemes.isEmpty());
+
+        // Assert
+        assertFalse(problemes.isEmpty(), "La liste des problèmes ne doit pas être vide");
         assertEquals(client.getId(), problemes.get(0).getClient().getId());
+        assertEquals("Problème de test", problemes.get(0).getDescriptionProbleme());
     }
+
 
 
 

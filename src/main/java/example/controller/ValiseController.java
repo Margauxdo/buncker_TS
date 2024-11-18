@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static example.services.ValiseService.logger;
+
 @RestController
 @RequestMapping("/api/valise")
 public class ValiseController {
@@ -42,49 +44,33 @@ public class ValiseController {
     @GetMapping("{id}")
     public ResponseEntity<Valise> getValiseById(@PathVariable int id) {
         Valise valise = valiseService.getValiseById(id);
-        return valise != null ? new ResponseEntity<>(valise, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (valise == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(valise, HttpStatus.OK);
     }
+
+
 
     @PostMapping
     public ResponseEntity<Valise> createValise(@RequestBody Valise valise) {
         try {
-            // Vérification du client
-            if (valise.getClient() == null || valise.getClient().getId() == 0) {
-                throw new IllegalArgumentException("Client ID is required");
-            }
-
-            Client client = clientRepository.findById(valise.getClient().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Client not found with ID: " + valise.getClient().getId()));
-            valise.setClient(client);
-
-            // Vérification de la règle
-            if (valise.getRegleSortie() != null && valise.getRegleSortie().getId() != 0) {
-                Regle regle = regleRepository.findById(valise.getRegleSortie().getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Regle not found with ID: " + valise.getRegleSortie().getId()));
-                valise.setRegleSortie(regle);
-            }
-
-            // Vérification du type de valise
-            if (valise.getTypevalise() != null && valise.getTypevalise().getId() != 0) {
-                TypeValise typeValise = typeValiseRepository.findById(valise.getTypevalise().getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("TypeValise not found with ID: " + valise.getTypevalise().getId()));
-                valise.setTypevalise(typeValise);
-            }
-
-            Valise newValise = valiseService.createValise(valise);
-            return new ResponseEntity<>(newValise, HttpStatus.CREATED);
+            Valise createdValise = valiseService.createValise(valise);
+            return new ResponseEntity<>(createdValise, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
+            logger.error("Argument invalide : {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (ResourceNotFoundException e) {
+            logger.error("Ressource non trouvée : {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            logger.error("Erreur interne du serveur : {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
 
 
 

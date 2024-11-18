@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entities.Probleme;
+import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;
 import org.springframework.http.HttpStatus;
@@ -40,23 +41,25 @@ public class ProblemeService implements IProblemeService {
     @Override
     public Probleme updateProbleme(int id, Probleme probleme) {
         if (!problemeRepository.existsById(id)) {
-            throw new RuntimeException("Problem not found");
+            throw new ResourceNotFoundException("Problem not found with ID: " + id);  // Lever une exception spécifique ici
         }
 
         if (probleme == null || probleme.getId() != id) {
-            throw new RuntimeException("Problem ID does not match expected ID");
+            throw new IllegalArgumentException("Problem ID does not match expected ID");
         }
 
         return problemeRepository.save(probleme);
     }
 
+
     @Override
     public void deleteProbleme(int id) {
         if (!problemeRepository.existsById(id)) {
-            throw new RuntimeException("Problem not found");
+            throw new ResourceNotFoundException("Problem not found with ID: " + id);
         }
         problemeRepository.deleteById(id);
     }
+
 
     @Override
     public Probleme getProblemeById(int id) {

@@ -1,13 +1,17 @@
 package example.controller;
 
 import example.entities.Probleme;
+import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IProblemeService;
+import example.repositories.ProblemeRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/pb")
@@ -15,6 +19,8 @@ public class ProblemeController {
 
     @Autowired
     private IProblemeService problemeService;
+    @Autowired
+    private ProblemeRepository problemeRepository;
 
     @GetMapping
     public List<Probleme> getAllProblemes() {
@@ -30,7 +36,7 @@ public class ProblemeController {
     }
 
     @PostMapping
-    public ResponseEntity<Probleme> createProbleme(@RequestBody Probleme probleme) {
+    public ResponseEntity<Probleme> createProbleme(@Valid @RequestBody Probleme probleme) {
         try {
             Probleme newProbleme = problemeService.createProbleme(probleme);
             return new ResponseEntity<>(newProbleme, HttpStatus.CREATED);
@@ -43,30 +49,47 @@ public class ProblemeController {
         }
     }
 
-
-
-
     @PutMapping("{id}")
     public ResponseEntity<Probleme> updateProbleme(@PathVariable int id, @RequestBody Probleme probleme) {
         try {
             Probleme updatedProbleme = problemeService.updateProbleme(id, probleme);
-            return updatedProbleme != null ? new ResponseEntity<>(updatedProbleme, HttpStatus.OK)
-                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (updatedProbleme == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.ok(updatedProbleme);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Gérer l'exception de manière cohérente
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+
+
+
+
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteProbleme(@PathVariable int id) {
         try {
+            Optional<Probleme> existingProbleme = problemeRepository.findById(id);
+            if (existingProbleme.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
             problemeService.deleteProbleme(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
+            // Si une RuntimeException est levée, on retourne INTERNAL_SERVER_ERROR
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
+
 
 }

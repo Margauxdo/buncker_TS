@@ -7,7 +7,7 @@ Content-Type: application/json
 
 
 ### Obtenir un client par ID
-GET http://localhost:8080/api/clients/1
+GET http://localhost:8080/api/clients/4
 Content-Type: application/json
 
 
@@ -17,11 +17,11 @@ POST http://localhost:8080/api/clients
 Content-Type: application/json
 
 {
-  "name": "Client 2",
-  "email": "client2@example.com",
-  "adresse": "123 Rue de Paris",
-  "ville": "Lille",
-  "telephoneExploitation": "0123456789",
+  "name": "Client XY",
+  "email": "clientXY@example.com",
+  "adresse": "123 Rue de la guinguette",
+  "ville": "Paris",
+  "telephoneExploitation": "0123489659",
   "personnelEtFonction": "Responsable",
   "ramassage1": "Lundi",
   "ramassage2": "Mardi",
@@ -38,13 +38,13 @@ Content-Type: application/json
 
 
 ### Mettre à jour un client
-PUT http://localhost:8080/api/clients/1
+PUT http://localhost:8080/api/clients/4
 Content-Type: application/json
 
 {
-  "id": 1,
-  "name": "Updated Client test 1",
-  "email": "client1@example.com",
+  "id": 4,
+  "name": "Updated client",
+  "email": "client4@example.com",
   "adresse": "456 Avenue de Lyon",
   "ville": "Lyon",
   "telephoneExploitation": "0987654321",
@@ -85,8 +85,8 @@ POST http://localhost:8080/api/formules
 Content-Type: application/json
 
 {
-  "libelle": "libelle valise regle AB-v1 client",
-  "formule": "test formule  regle AB-v1",
+  "libelle": "libelle valise regle AB-v2 client",
+  "formule": "test formule  regle AB-v2",
   "regle": {
     "id": 1
   }
@@ -120,7 +120,7 @@ Content-Type: application/json
 
 
 ### Obtenir un jour ferié par ID
-GET http://localhost:8080/api/jourferies/1
+GET http://localhost:8080/api/jourferies/20
 Content-Type: application/json
 
 
@@ -133,10 +133,11 @@ Content-Type: application/json
     "id": 1
   },
   "joursFerieList": [
-    "2025-01-25T00:00:00",
-    "2020-08-25T00:00:00"
+    "2024-12-25T00:00:00",
+    "2023-01-10T00:00:00"
   ]
 }
+
 
 
 ### Section 4 : API REST pour l'entité livreur
@@ -146,7 +147,7 @@ Content-Type: application/json
 
 
 ### Obtenir un livreurpar ID
-GET http://localhost:8080/api/livreurs/11
+GET http://localhost:8080/api/livreurs/3
 Content-Type: application/json
 
 
@@ -155,10 +156,10 @@ POST http://localhost:8080/api/livreurs
 Content-Type: application/json
 
 {
-  "codeLivreur": "AV-5869",
+  "codeLivreur": "AV-5870",
   "motDePasse": "1234",
-  "nomLivreur": "Martin",
-  "prenomLivreur": "Jules",
+  "nomLivreur": "Doe",
+  "prenomLivreur": "Jogn",
   "numeroCartePro": "DJ.5869",
   "telephonePortable": "0625896595",
   "telephoneKobby": "03254895263",
@@ -181,25 +182,31 @@ Content-Type: application/json
 
 
 ### Mettre à jour un livreur
-PUT http://localhost:8080/api/livreurs/11
+PUT http://localhost:8080/api/livreurs/3
 Content-Type: application/json
 
 {
-  "id": 11,
-  "codeLivreur": "AW-V59",
-  "motDePasse": "1234AbcD",
+  "id": 3,
+  "codeLivreur": "AV-5890",
+  "motDePasse": "1584",
   "nomLivreur": "Doe",
-  "prenomLivreur": "John",
-  "numeroCartePro": "JM.AW586",
-  "telephonePortable": "0625358695",
-  "telephoneKobby": "0325458965",
-  "telephoneAlphapage": "0956852563",
+  "prenomLivreur": "Jogn",
+  "numeroCartePro": "DJ.5869",
+  "telephonePortable": "0625896595",
+  "telephoneKobby": "03254895263",
+  "telephoneAlphapage": "0956855896",
   "mouvements": [
     {
-      "id": 1
+      "id": 1,
+      "dateHeureMouvement": "2024-11-12T08:30:00",
+      "dateRetourPrevue": "2024-11-13T18:00:00",
+      "dateSortiePrevue": "2024-11-12T09:00:00"
     },
     {
-      "id": 2
+      "id": 2,
+      "dateHeureMouvement": "2024-11-14T10:00:00",
+      "dateRetourPrevue": "2024-11-15T19:00:00",
+      "dateSortiePrevue": "2024-11-14T11:00:00"
     }
   ]
 }
@@ -224,12 +231,12 @@ POST http://localhost:8080/api/mouvements
 Content-Type: application/json
 
 {
-  "dateHeureMouvement": "2024-08-12T10:30:00",
-  "statutSortie": "en cours",
-  "dateSortiePrevue": "2024-12-15T09:00:00",
+  "dateHeureMouvement": "2024-06-02T10:30:00",
+  "statutSortie": "finish",
+  "dateSortiePrevue": "2024-10-15T09:00:00",
   "dateRetourPrevue": "2024-11-28T18:00:00",
   "valise": {
-    "id": 1
+    "id": 30
   },
   "livreur": {
     "id": 2
@@ -238,22 +245,21 @@ Content-Type: application/json
 
 
 ### Mettre à jour un mouvement
-PUT http://localhost:8080/api/mouvements/2
+PUT http://localhost:8080/api/mouvements/3
 Content-Type: application/json
 
 {
-  "id": 2,
-  "dateHeureMouvement": "2024-11-13T12:00:00",
-  "statutSortie": "terminé",
-  "dateSortiePrevue": "2024-11-15T09:00:00",
-  "dateRetourPrevue": "2024-11-20T18:00:00",
+  "id": 3,
+  "dateHeureMouvement": "2024-01-02T10:30:07",
+  "statutSortie": "finish",
+  "dateSortiePrevue": "2024-10-15T09:00:00",
+  "dateRetourPrevue": "2024-12-20T18:00:00",
   "valise": {
-    "id": 1
+    "id": 30
   },
   "livreur": {
-    "id": 2
+    "id": 1
   }
-
 }
 
 
@@ -268,7 +274,7 @@ GET http://localhost:8080/api/pb
 Accept: application/json
 
 ### Obtenir un problème par ID
-GET http://localhost:8080/api/pb/3
+GET http://localhost:8080/api/pb/2
 Accept: application/json
 
 
@@ -277,30 +283,30 @@ POST http://localhost:8080/api/pb
 Content-Type: application/json
 
 {
-  "descriptionProbleme": "pbAV-v2",
+  "descriptionProbleme": "probleme de taille technique",
   "detailsProbleme": "Détails du probleme avec pour description test",
   "valise": {
-    "id": 1
+    "id": 30
   },
   "client": {
-    "id": 1
+    "id": 4
   }
 }
 
 
 ### Mettre à jour un problème
-PUT http://localhost:8080/api/pb/3
+PUT http://localhost:8080/api/pb/2
 Content-Type: application/json
 
 {
-  "id": 3,
-  "descriptionProbleme": " Test pbAV-v2",
-  "detailsProbleme": "DTest  du probleme avec pour description test",
+  "id": 2,
+  "descriptionProbleme": "probleme de taille technique",
+  "detailsProbleme": "Détails du probleme avec pour description test",
   "valise": {
-    "id": 2
+    "id": 1
   },
   "client": {
-    "id": 3
+    "id": 4
   }
 }
 
@@ -317,7 +323,7 @@ Accept: application/json
 
 
 ### Obtenir une regle par ID
-GET http://localhost:8080/api/regles/14
+GET http://localhost:8080/api/regles/4
 Accept: application/json
 
 
@@ -326,45 +332,44 @@ POST http://localhost:8080/api/regles
 Content-Type: application/json
 
 {
-  "reglePourSortie": "Nouvelle règle Sortie Testv2.2",
-  "coderegle": "R45790",
-  "dateRegle": "2024-12-12T10:30:00",
-  "nombreJours": 25,
-  "calculCalendaire": 12,
+  "reglePourSortie": "Test XYv2.2",
+  "coderegle": "R45589",
+  "dateRegle": "2023-12-12T10:30:00",
+  "nombreJours": 450,
+  "calculCalendaire": 10,
   "fermeJS1": true,
   "fermeJS2": false,
   "typeEntree": "Normale",
-  "nbjsmEntree": 55,
+  "nbjsmEntree": 50,
   "formule": {
-    "id": 1
+    "id": 2
   },
   "typeRegle": {
-    "id": 1
+    "id": 2
   }
 }
 
 
 
 ### Mettre à jour une règle
-PUT http://localhost:8080/api/regles/14
+PUT http://localhost:8080/api/regles/4
 Content-Type: application/json
 
 {
-  "id": 14,
-  "reglePourSortie": "Mise à jour de la règle",
-  "coderegle": "R54321",
-  "dateRegle": "2024-12-01T09:00:00",
-  "nombreJours": 10,
-  "calculCalendaire": 20,
-  "fermeJS1": false,
-  "fermeJS2": true,
-  "typeEntree": "Spéciale",
-  "nbjsmEntree": 14,
+  "reglePourSortie": "Test  Regle sortieXYv2.2",
+  "coderegle": "R45589",
+  "dateRegle": "2023-12-12T10:30:00",
+  "nombreJours": 450,
+  "calculCalendaire": 10,
+  "fermeJS1": true,
+  "fermeJS2": false,
+  "typeEntree": "Normale",
+  "nbjsmEntree": 50,
   "formule": {
-    "id": 1
+    "id": 2
   },
   "typeRegle": {
-    "id": 1
+    "id": 2
   }
 }
 
@@ -380,7 +385,7 @@ Accept: application/json
 
 
 ### Obtenir une regle manuelle par ID
-GET http://localhost:8080/api/regle-manuelle/16
+GET http://localhost:8080/api/regle-manuelle/5
 Accept: application/json
 
 
@@ -389,31 +394,31 @@ POST http://localhost:8080/api/regle-manuelle
 Content-Type: application/json
 
 {
-  "coderegle": "RWA-125-v2.2",
-  "reglePourSortie": "Règle de sortie manuelle 1-2.22",
-  "dateRegle": "2024-10-12T10:30:00",
+  "coderegle": "RWA-VOL 3",
+  "reglePourSortie": "Règle de sortie manuelle 3",
+  "dateRegle": "2023-10-12T10:30:00",
   "descriptionRegle": "Description de la règle manuelle",
-  "createurRegle": "Dubois Heri",
+  "createurRegle": "Dutois Jean",
   "formule": {
-    "id": 1
+    "id": 2
   }
 
 }
 
 
 ### Mettre à jour une règle manuelle
-PUT http://localhost:8080/api/regle-manuelle/16
+PUT http://localhost:8080/api/regle-manuelle/5
 Content-Type: application/json
 
 {
-  "id": 16,
-  "coderegle": "RWA-125-v2.3",
-  "reglePourSortie": "Règle de sortie manuelle 1-2.3",
-  "dateRegle": "2024-10-12T10:30:00",
+  "id": 5,
+  "coderegle": "RWA-VOL 3.1",
+  "reglePourSortie": "Règle de sortie manuelle 3",
+  "dateRegle": "2023-10-12T10:30:00",
   "descriptionRegle": "Description de la règle manuelle",
-  "createurRegle": "Dubois Heri",
+  "createurRegle": "Dutois Jean",
   "formule": {
-    "id": 1
+    "id": 2
   }
 
 }
@@ -431,7 +436,7 @@ Accept: application/json
 
 
 ### Obtenir une retour sécurité par ID
-GET http://localhost:8080/api/retourSecurite/2
+GET http://localhost:8080/api/retourSecurite/5
 Accept: application/json
 
 
@@ -440,31 +445,33 @@ POST http://localhost:8080/api/retourSecurite
 Content-Type: application/json
 
 {
-  "numero": 199999,
-  "datesecurite": "2024-11-12T10:30:00",
+  "numero": 256859,
+  "datesecurite": "2024-10-10T10:30:00",
   "cloture": false,
-  "dateCloture": "2024-11-12T10:30:00",
+  "dateCloture": "2024-12-12T10:30:00",
   "client": {
-    "id": 1
+    "id": 2
   }
 
 }
 
 
 ### Mettre à jour un retour sécurité
-PUT http://localhost:8080/api/retourSecurite/2
+PUT http://localhost:8080/api/retourSecurite/5
 Content-Type: application/json
 
 {
-  "id": 2,
-  "numero": 255,
-  "datesecurite": "2024-11-12T10:30:00",
-  "cloture": true,
-  "dateCloture": "2024-11-12T10:30:00",
+  "id": 5,
+  "numero": 256785,
+  "datesecurite": "2024-10-10T10:30:00",
+  "cloture": false,
+  "dateCloture": "2024-12-12T10:30:00",
   "client": {
     "id": 1
   }
+
 }
+
 
 
 ### Supprimer un retour sécurité
@@ -478,7 +485,7 @@ Accept: application/json
 
 
 ### Obtenir une Sortie Semaine par ID
-GET http://localhost:8080/api/sortieSemaine/1
+GET http://localhost:8080/api/sortieSemaine/3
 Accept: application/json
 
 ### Créer une nouvelle SortieSemaine
@@ -486,27 +493,24 @@ POST http://localhost:8080/api/sortieSemaine
 Content-Type: application/json
 
 {
-  "dateSortieSemaine": "2024-12-12T00:00:00",
+  "dateSortieSemaine": "2024-10-21T18:30:00",
   "regle": {
-    "id": 1
+    "id": 4
   }
 }
 
 
 
-
-
-
 ###
 
-PUT http://localhost:8080/api/sortieSemaine/1
+PUT http://localhost:8080/api/sortieSemaine/3
 Content-Type: application/json
 
 {
-  "id": 2,
-  "dateSortieSemaine": "2024-12-12T00:00:00",
+  "id": 3,
+  "dateSortieSemaine": "2024-10-21T18:30:00",
   "regle": {
-    "id": 1
+    "id": 4
   }
 }
 
@@ -525,7 +529,7 @@ Accept: application/json
 ###
 
 ### Obtenir une Type Regle par ID
-GET http://localhost:8080/api/typeRegle/3
+GET http://localhost:8080/api/typeRegle/6
 Accept: application/json
 
 ###
@@ -534,7 +538,7 @@ POST http://localhost:8080/api/typeRegle
 Content-Type: application/json
 
 {
-  "nomTypeRegle": "Type de règle AB",
+  "nomTypeRegle": "liste des types de regles",
   "listTypesRegles": []
 }
 
@@ -543,12 +547,12 @@ Content-Type: application/json
 ###
 ###modifier le type de regle
 
-PUT http://localhost:8080/api/typeRegle/3
+PUT http://localhost:8080/api/typeRegle/6
 Content-Type: application/json
 
 {
-  "id": 3,
-  "nomTypeRegle": "Type AB-V2.2",
+  "id": 6,
+  "nomTypeRegle": "liste de tous les types de regles",
   "listTypesRegles": []
 }
 
@@ -567,7 +571,7 @@ Accept: application/json
 ###
 
 ### Obtenir un type de valise par ID
-GET http://localhost:8080/api/typeValise/1
+GET http://localhost:8080/api/typeValise/6
 Accept: application/json
 
 ###
@@ -577,29 +581,25 @@ POST http://localhost:8080/api/typeValise
 Content-Type: application/json
 
 {
-  "proprietaire": "X11-V2.21",
-  "description": "Valise V2.21 test",
+  "proprietaire": "Julien hercourt",
+  "description": "Valise XY test",
   "valises": [
   ]
 }
 
 
-
-
-
-
-
-
 ###
 
 ### Mettre à jour un type de valise
-PUT http://localhost:8080/api/typeValise/3
+PUT http://localhost:8080/api/typeValise/6
 Content-Type: application/json
 
 {
-  "id": 3,
-  "proprietaire": "Société XYZ",
-  "description": "Valise de transport sécurisé"
+  "id": 6,
+  "proprietaire": "Julien Delabille",
+  "description": "Valise XY test",
+  "valises": [
+  ]
 }
 
 ###
@@ -617,7 +617,7 @@ Accept: application/json
 ###
 
 ### Obtenir une valise par ID
-GET http://localhost:8080/api/valise/2
+GET http://localhost:8080/api/valise/31
 Accept: application/json
 
 ###
@@ -627,23 +627,23 @@ POST http://localhost:8080/api/valise
 Content-Type: application/json
 
 {
-  "description": "Valise de transport spécialisé",
-  "numeroValise": 125656,
-  "refClient": "REF-795",
-  "sortie": "2024-11-15T10:30:00",
-  "dateDernierMouvement": "2024-11-14T09:00:00",
-  "dateSortiePrevue": "2024-11-16T09:00:00",
-  "dateRetourPrevue": "2024-11-20T18:00:00",
-  "dateCreation": "2024-11-10T08:00:00",
-  "numeroDujeu": "DU-001",
+  "description": "Valise client XY",
+  "numeroValise": 125895,
+  "refClient": "REF-812",
+  "sortie": "2025-01-15T10:30:00",
+  "dateDernierMouvement": "2024-10-14T09:00:00",
+  "dateSortiePrevue": "2024-11-16T09:22:00",
+  "dateRetourPrevue": "2024-10-20T18:30:00",
+  "dateCreation": "2024-10-10T08:00:00",
+  "numeroDujeu": "DU-123",
   "client": {
-    "id": 1
+    "id": 2
   },
   "regle": {
-    "id": 1
+    "id": 2
   },
   "typevalise": {
-    "id": 1
+    "id": 4
   }
 }
 
@@ -651,28 +651,28 @@ Content-Type: application/json
 ###
 
 ### Mettre à jour une valise
-PUT http://localhost:8080/api/valise/2
+PUT http://localhost:8080/api/valise/31
 Content-Type: application/json
 
 {
-  "id": 2,
-  "description": "Valise de transport fragile",
-  "numeroValise": 654321,
-  "refClient": "REF-123",
-  "sortie": "2024-12-01T12:00:00",
-  "dateDernierMouvement": "2024-12-02T14:00:00",
-  "dateSortiePrevue": "2024-12-03T09:00:00",
-  "dateRetourPrevue": "2024-12-10T18:00:00",
-  "dateCreation": "2024-11-25T08:00:00",
-  "numeroDujeu": "DU-002",
+  "id": 31,
+  "description": "Valise client XY12",
+  "numeroValise": 125898,
+  "refClient": "REF-812",
+  "sortie": "2025-01-15T10:30:00",
+  "dateDernierMouvement": "2024-10-14T09:00:00",
+  "dateSortiePrevue": "2024-11-16T09:22:00",
+  "dateRetourPrevue": "2024-10-20T18:30:00",
+  "dateCreation": "2024-10-10T08:00:00",
+  "numeroDujeu": "DU-123",
   "client": {
-    "id": 1
+    "id": 4
   },
   "regle": {
-    "id": 1
+    "id": 2
   },
   "typevalise": {
-    "id": 1
+    "id": 4
   }
 }
 
@@ -683,6 +683,9 @@ DELETE http://localhost:8080/api/valise/1
 Accept: application/json
 
 ###
+
+
+
 
 
 

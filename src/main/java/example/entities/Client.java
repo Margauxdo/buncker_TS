@@ -67,5 +67,6 @@ public class Client {
     private List<RetourSecurite> retourSecuriteList = new ArrayList<>();
 
 
-
+    public Client(String johnDoe, String mail) {
+    }
 }

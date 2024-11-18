@@ -33,7 +33,7 @@ public class TypeValise {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Valise> valises = new ArrayList<>();
+
 }

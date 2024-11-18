@@ -85,12 +85,14 @@ public class ProblemeTest {
         Probleme problemeWithoutDescription = new Probleme();
         problemeWithoutDescription.setClient(probleme.getClient());
         problemeWithoutDescription.setValise(probleme.getValise());
+        problemeWithoutDescription.setDetailsProbleme("Details sans description");
 
-        Assertions.assertThrows(PersistenceException.class, () -> {
+        Assertions.assertThrows(jakarta.validation.ConstraintViolationException.class, () -> {
             em.persist(problemeWithoutDescription);
             em.flush();
-        }, "Persistence should fail if descriptionProbleme is null");
+        }, "La validation devrait échouer si descriptionProbleme est null");
     }
+
 
     @Test
     public void testUpdateProblemeDetails() {

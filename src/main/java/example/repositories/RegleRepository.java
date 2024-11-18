@@ -9,4 +9,6 @@ public interface RegleRepository extends JpaRepository<Regle, Integer> {
 
 
     boolean existsByCoderegle(String coderegle);
+
+
 }

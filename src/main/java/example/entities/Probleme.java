@@ -1,6 +1,8 @@
 package example.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +22,12 @@ public class Probleme {
     @Column(name = "id_probleme")
     private int id;
 
-    @Column(name = "description_probleme", unique = true, nullable = false)
+    @NotBlank(message = "required problem description")
+   @Column(name = "description_probleme", unique = true, nullable = false)
     private String descriptionProbleme;
 
 
+    @NotBlank(message = "required problem details")
     private String detailsProbleme;
 
     @ManyToOne(cascade = CascadeType.REMOVE)

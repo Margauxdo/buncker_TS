@@ -6,6 +6,8 @@ import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,11 @@ public class FormuleService implements IFormuleService {
     @Autowired
     private RegleRepository regleRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
+
     public FormuleService(FormuleRepository formuleRepository) {
+
+
 
         this.formuleRepository = formuleRepository;
         this.regleRepository = regleRepository;
@@ -27,15 +33,18 @@ public class FormuleService implements IFormuleService {
 
     @Override
     public Formule createFormule(Formule formule) {
-        System.out.println("Formule reçue : " + formule);
-        System.out.println("Regle ID : " + (formule.getRegle() != null ? formule.getRegle().getId() : "Aucune Regle"));
+        logger.info("Création de la formule avec les détails: {}", formule);
 
         if (formule.getRegle() == null || !regleRepository.existsById(formule.getRegle().getId())) {
+            logger.error("Regle not found with ID: {}", formule.getRegle().getId());
             throw new IllegalArgumentException("Regle not found with ID: " + formule.getRegle().getId());
         }
 
-        return formuleRepository.save(formule);
+        Formule createdFormule = formuleRepository.save(formule);
+        logger.info("Formule créée avec succès : {}", createdFormule);
+        return createdFormule;
     }
+
 
 
 

@@ -144,6 +144,8 @@ public class ValiseServiceTest {
         verifyNoMoreInteractions(valiseRepository);
     }
 
+
+
     @Test
     public void testGetAllValises_Success(){
         List<Valise> valiseList = List.of(new Valise(), new Valise());

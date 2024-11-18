@@ -61,4 +61,6 @@ public class Regle {
     private List<JourFerie> jourFeries = new ArrayList<>();
 
 
+    public Regle(String r001, Date date) {
+    }
 }

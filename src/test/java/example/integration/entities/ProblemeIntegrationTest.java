@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -117,10 +118,11 @@ public class ProblemeIntegrationTest {
             probleme2.setDetailsProbleme("Second problem details");
             probleme2.setDescriptionProbleme("Same description");
 
-            Assertions.assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
+            Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
                 problemeRepository.save(probleme2);
                 entityManager.flush();
             });
+
 
         } finally {
             transactionManager.rollback(status);
@@ -275,24 +277,29 @@ public class ProblemeIntegrationTest {
 
     @Test
     public void testSaveProblemeWithoutDescriptionThrowsException() {
+        // Créer un client et l'enregistrer
         Client clientA = new Client();
         clientA.setName("Martin");
         clientA.setEmail("martin@example.com");
         clientRepository.save(clientA);
 
+        // Créer une valise et l'enregistrer
         Valise val1 = new Valise();
         val1.setClient(clientA);
         valiseRepository.save(val1);
 
+        // Créer un problème sans description
         Probleme probleme = new Probleme();
         probleme.setClient(clientA);
         probleme.setValise(val1);
         probleme.setDetailsProbleme("Details without description");
 
-        Assertions.assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
+        // S'attendre à une ConstraintViolationException
+        Assertions.assertThrows(jakarta.validation.ConstraintViolationException.class, () -> {
             problemeRepository.saveAndFlush(probleme);
         });
     }
+
     @Test
     public void testFindProblemesByValise() {
         Client clientA = new Client();
@@ -327,21 +334,27 @@ public class ProblemeIntegrationTest {
 
     @Test
     void testProblemeRelationWithClient() {
+        // Création du client
         Client client = new Client();
         client.setName("Test Client");
         client.setEmail("test@example.com");
         clientRepository.save(client);
 
+        // Création du problème avec les données requises
         Probleme probleme = new Probleme();
         probleme.setClient(client);
         probleme.setDescriptionProbleme("Problème de test");
+        probleme.setDetailsProbleme("Détails du problème requis");
         problemeRepository.save(probleme);
 
+        // Récupération et vérification du problème
         Optional<Probleme> found = problemeRepository.findById(probleme.getId());
-        assertTrue(found.isPresent());
+        assertTrue(found.isPresent(), "Le problème doit être trouvé");
         assertEquals("Test Client", found.get().getClient().getName());
         assertEquals("Problème de test", found.get().getDescriptionProbleme());
+        assertEquals("Détails du problème requis", found.get().getDetailsProbleme());
     }
+
 
 
 

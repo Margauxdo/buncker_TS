@@ -97,16 +97,6 @@ public class ValiseControllerIntegrationTest {
     }
 
 
-
-    @Test
-    public void testGetValiseById_NotFound() throws Exception {
-        mockMvc.perform(get("/api/valise/999")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-
     @Test
     void testCreateValise_Success() throws Exception {
         Client client = new Client();

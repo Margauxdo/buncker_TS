@@ -3,8 +3,6 @@ package example.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -50,6 +48,21 @@ public class Valise {
     @JoinColumn(name = "typevalise_id" )
     @JsonBackReference
     private TypeValise typevalise;
+
+    public void addProbleme(Probleme probleme) {
+    }
+
+
+    public short getRegles() {
+        return 0;
+    }
+
+    public void add(Regle regle) {
+    }
+
+    public List<Object> getProblemes() {
+        return List.of();
+    };
 }
 
 

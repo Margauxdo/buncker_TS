@@ -6,6 +6,8 @@ import example.entities.Regle;
 import example.repositories.RegleRepository;
 import example.services.RegleService;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.Hibernate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,20 +48,26 @@ public class RegleControllerIntegrationTest {
         regleRepository.deleteAll();
     }
     @Test
+    @Transactional
     public void testReadAllRegles_ShouldReturnListOfRegles() throws Exception {
+        // Création et sauvegarde de la règle
         Regle regle1 = new Regle();
         regle1.setCoderegle("2568L");
         regle1.setDateRegle(new Date());
         regle1.setNombreJours(25);
         regleRepository.save(regle1);
 
+        // Exécuter la requête
         mockMvc.perform(get("/api/regles")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].coderegle").value("2568L"));
     }
 
+
+
     @Test
+    @Transactional
     public void testReadRegleById_ShouldReturnRegleWhenExists() throws Exception {
         Regle regle = new Regle();
         regle.setCoderegle("2568L");

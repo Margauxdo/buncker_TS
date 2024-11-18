@@ -2,7 +2,9 @@ package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.entities.Formule;
+import example.entities.Regle;
 import example.repositories.FormuleRepository;
+import example.repositories.RegleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,6 +33,8 @@ public class FormuleControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private RegleRepository regleRepository;
 
     @BeforeEach
     public void setUp() {
@@ -57,20 +63,30 @@ public class FormuleControllerIntegrationTest {
     @Test
     public void testCreateFormule_shouldReturnCreatedFormule() throws Exception {
         // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("R001");
+        regle.setReglePourSortie("Sortie spéciale");
+        regle.setDateRegle(new Date());
+        regle = regleRepository.save(regle);
+
         Formule formule = Formule.builder()
                 .libelle("Libelle Test")
                 .formule("Formule Test")
+                .regle(regle)
                 .build();
 
         // Act
         mockMvc.perform(post("/api/formules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(formule)))
-        // Assert
+                // Assert
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.libelle", is("Libelle Test")))
-                .andExpect(jsonPath("$.formule", is("Formule Test")));
+                .andExpect(jsonPath("$.formule", is("Formule Test")))
+                .andExpect(jsonPath("$.regle.coderegle", is("R001")));
     }
+
+
 
     @Test
     public void testCreateFormule_shouldReturnBadRequestForInvalidData() throws Exception {

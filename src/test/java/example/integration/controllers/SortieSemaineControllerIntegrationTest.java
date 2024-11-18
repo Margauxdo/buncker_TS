@@ -8,6 +8,8 @@ import example.entities.Regle;
 import example.entities.SortieSemaine;
 import example.repositories.RegleRepository;
 import example.repositories.SortieSemaineRepository;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +125,7 @@ public class SortieSemaineControllerIntegrationTest {
     }
 
     @Test
+    @Transactional
     public void testGetAllSortieSemaine_Success() throws Exception {
         // Arrange
         Regle regle = new Regle();
@@ -133,12 +136,19 @@ public class SortieSemaineControllerIntegrationTest {
         sortieSemaine.setDateSortieSemaine(new Date());
         sortieSemaine.setRegle(regle);
         sortieSemaineRepository.save(sortieSemaine);
+
+        // Charger explicitement la collection "sortieSemaine" pour éviter LazyInitializationException
+        regle = regleRepository.findById(regle.getId()).orElseThrow();
+        regle.getSortieSemaine().size(); // Initialiser la collection en accédant à sa taille
+
         // Act & Assert
         mvc.perform(get("/api/sortieSemaine")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty());
     }
+
+
 
 
 

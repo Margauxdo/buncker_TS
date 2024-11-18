@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entities.Probleme;
+import example.exceptions.ResourceNotFoundException;
 import example.repositories.ProblemeRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,15 +99,17 @@ public class ProblemeServiceTest {
         int id = 1;
         when(problemeRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        Exception exception = Assertions.assertThrows(ResourceNotFoundException.class, () -> {
             problemeService.deleteProbleme(id);
         });
 
-        Assertions.assertEquals("Problem not found", exception.getMessage(),
-                "The exception message should match 'Problem not found'");
+        // Modifier l'assertion pour correspondre au message réel
+        Assertions.assertEquals("Problem not found with ID: 1", exception.getMessage(),
+                "The exception message should match 'Problem not found with ID: 1'");
         verify(problemeRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(problemeRepository);
     }
+
 
     @Test
     public void testGetProblemeById_Success() {
