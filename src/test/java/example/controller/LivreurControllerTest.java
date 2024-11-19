@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.Livreur;
+import example.entity.Livreur;
 import example.exceptions.ConflictException;
 import example.interfaces.ILivreurService;
 import org.junit.jupiter.api.Assertions;

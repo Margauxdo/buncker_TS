@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.SortieSemaine;
+import example.entity.SortieSemaine;
 import example.interfaces.ISortieSemaineService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

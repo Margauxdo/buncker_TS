@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.JourFerie;
+import example.entity.JourFerie;
 import example.repositories.JourFerieRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

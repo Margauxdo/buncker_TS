@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.Probleme;
+import example.entity.Probleme;
 import example.exceptions.ResourceNotFoundException;
 import example.repositories.ProblemeRepository;
 import org.junit.jupiter.api.Assertions;

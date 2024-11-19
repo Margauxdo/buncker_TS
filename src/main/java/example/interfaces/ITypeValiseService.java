@@ -1,7 +1,6 @@
 package example.interfaces;
 
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.TypeValise;
 
 import java.util.List;
 

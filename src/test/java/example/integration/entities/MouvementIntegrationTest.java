@@ -1,9 +1,9 @@
 package example.integration.entities;
 
-import example.entities.Client;
-import example.entities.Livreur;
-import example.entities.Mouvement;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Livreur;
+import example.entity.Mouvement;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest

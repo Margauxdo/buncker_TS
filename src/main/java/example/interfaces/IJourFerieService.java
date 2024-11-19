@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.JourFerie;
+import example.entity.JourFerie;
 
 import java.util.List;
 

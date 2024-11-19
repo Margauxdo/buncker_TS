@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 
 import java.util.List;
 

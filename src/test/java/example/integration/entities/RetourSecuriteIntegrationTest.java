@@ -1,7 +1,7 @@
 package example.integration.entities;
 
-import example.entities.Client;
-import example.entities.RetourSecurite;
+import example.entity.Client;
+import example.entity.RetourSecurite;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +14,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

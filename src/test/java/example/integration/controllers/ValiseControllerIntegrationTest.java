@@ -2,8 +2,8 @@ package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import example.entities.Client;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
 import jakarta.transaction.Transactional;
@@ -16,8 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

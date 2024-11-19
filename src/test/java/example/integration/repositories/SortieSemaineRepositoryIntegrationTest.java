@@ -1,7 +1,7 @@
 package example.integration.repositories;
 
-import example.entities.Regle;
-import example.entities.SortieSemaine;
+import example.entity.Regle;
+import example.entity.SortieSemaine;
 import example.repositories.RegleRepository;
 import example.repositories.SortieSemaineRepository;
 import jakarta.transaction.Transactional;

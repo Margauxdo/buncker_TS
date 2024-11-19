@@ -1,7 +1,7 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entities.TypeRegle;
+import example.entity.TypeRegle;
 import example.repositories.TypeRegleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

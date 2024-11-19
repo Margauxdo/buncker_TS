@@ -1,7 +1,7 @@
 package example.services;
 
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.TypeValise;
+import example.entity.Valise;
 import example.interfaces.ITypeValiseService;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;

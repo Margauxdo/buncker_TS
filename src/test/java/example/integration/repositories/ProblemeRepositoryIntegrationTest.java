@@ -1,8 +1,8 @@
 package example.integration.repositories;
 
-import example.entities.Client;
-import example.entities.Probleme;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Probleme;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;

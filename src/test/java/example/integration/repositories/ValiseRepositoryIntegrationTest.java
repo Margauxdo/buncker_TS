@@ -1,9 +1,9 @@
 package example.integration.repositories;
 
-import example.entities.Client;
-import example.entities.Regle;
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Regle;
+import example.entity.TypeValise;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.RegleRepository;
 import example.repositories.TypeValiseRepository;

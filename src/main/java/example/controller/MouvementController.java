@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

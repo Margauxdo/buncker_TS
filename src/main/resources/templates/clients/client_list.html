@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liste des Clients</title>
+</head>
+<body>
+<h1>Liste des Clients</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Ville</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.name}"></td>
+        <td th:text="${client.email}"></td>
+        <td th:text="${client.adresse}"></td>
+        <td th:text="${client.telephoneExploitation}"></td>
+        <td th:text="${client.ville}"></td>
+        <td th:text="${client.PersonnelEtFonction}"></td>
+        <td th:text="${client.ramassage1}"></td>
+        <td th:text="${client.ramassage2}"></td>
+        <td th:text="${client.ramassage3}"></td>
+        <td th:text="${client.ramassage4}"></td>
+        <td th:text="${client.ramassage5}"></td>
+        <td th:text="${client.ramassage6}"></td>
+        <td th:text="${client.ramassage7}"></td>
+        <td th:text="${client.EnvoiparDefaut}"></td>
+        <td th:text="${client.MemoRetourSecurite1}"></td>
+        <td th:text="${client.MemoRetourSecurite2}"></td>
+        <td>
+            <a th:href="@{'/clients/view/' + ${client.id}}">Détails</a>
+            <a th:href="@{'/clients/edit/' + ${client.id}}">Modifier</a>
+            <form th:action="@{'/clients/delete/' + ${client.id}}" method="post" style="display:inline;">
+                <button type="submit">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a href="/clients/create">Ajouter un Client</a>
+</body>
+</html>
+

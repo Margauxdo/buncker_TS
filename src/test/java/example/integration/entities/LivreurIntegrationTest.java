@@ -1,7 +1,7 @@
 package example.integration.entities;
 
-import example.entities.Livreur;
-import example.entities.Mouvement;
+import example.entity.Livreur;
+import example.entity.Mouvement;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
 import org.junit.jupiter.api.Assertions;

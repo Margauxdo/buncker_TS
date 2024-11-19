@@ -1,8 +1,8 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entities.JourFerie;
-import example.entities.Regle;
+import example.entity.JourFerie;
+import example.entity.Regle;
 import example.repositories.JourFerieRepository;
 import example.repositories.RegleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

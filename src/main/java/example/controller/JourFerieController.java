@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.JourFerie;
+import example.entity.JourFerie;
 import example.interfaces.IJourFerieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.Client;
+import example.entity.Client;
 import example.interfaces.IClientService;
 import example.repositories.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;

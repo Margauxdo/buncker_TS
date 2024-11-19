@@ -1,6 +1,6 @@
 package example.integration.entities;
 
-import example.entities.TypeValise;
+import example.entity.TypeValise;
 import example.repositories.ClientRepository;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;

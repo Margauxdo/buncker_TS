@@ -1,7 +1,7 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entities.Livreur;
+import example.entity.Livreur;
 import example.repositories.LivreurRepository;
 import example.services.LivreurService;
 import org.hibernate.Hibernate;

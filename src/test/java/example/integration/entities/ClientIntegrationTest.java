@@ -1,8 +1,8 @@
     package example.integration.entities;
 
-import example.entities.Client;
-import example.entities.Probleme;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Probleme;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;
@@ -12,12 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;

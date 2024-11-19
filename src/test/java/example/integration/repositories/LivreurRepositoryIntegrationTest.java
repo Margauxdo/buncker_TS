@@ -1,5 +1,5 @@
 package example.integration.repositories;
-import example.entities.Livreur;
+import example.entity.Livreur;
 import example.repositories.LivreurRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;

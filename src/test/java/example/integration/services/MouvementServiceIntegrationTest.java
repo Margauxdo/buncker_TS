@@ -1,9 +1,9 @@
 package example.integration.services;
 
-import example.entities.Client;
-import example.entities.Livreur;
-import example.entities.Mouvement;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Livreur;
+import example.entity.Mouvement;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;

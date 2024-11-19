@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.JourFerie;
+import example.entity.JourFerie;
 import example.interfaces.IJourFerieService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

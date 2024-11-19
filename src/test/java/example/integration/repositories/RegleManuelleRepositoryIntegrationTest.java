@@ -1,8 +1,8 @@
 package example.integration.repositories;
 
-import example.entities.RegleManuelle;
-import example.entities.TypeRegle;
-import example.entities.Valise;
+import example.entity.RegleManuelle;
+import example.entity.TypeRegle;
+import example.entity.Valise;
 import example.repositories.RegleManuelleRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;

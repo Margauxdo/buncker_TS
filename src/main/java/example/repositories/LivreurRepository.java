@@ -1,6 +1,6 @@
 package example.repositories;
 
-import example.entities.Livreur;
+import example.entity.Livreur;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

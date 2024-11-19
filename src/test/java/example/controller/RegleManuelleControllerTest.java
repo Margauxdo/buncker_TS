@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.RegleManuelle;
+import example.entity.RegleManuelle;
 import example.exceptions.ConflictException;
 import example.interfaces.IRegleManuelleService;
 import jakarta.persistence.EntityNotFoundException;

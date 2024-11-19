@@ -1,6 +1,6 @@
 package example.integration.entities;
 
-import example.entities.RegleManuelle;
+import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;

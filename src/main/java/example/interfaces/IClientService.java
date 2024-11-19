@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.Client;
+import example.entity.Client;
 
 import java.util.List;
 

@@ -1,8 +1,7 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 import example.repositories.MouvementRepository;
 import example.services.MouvementService;
 import org.junit.jupiter.api.BeforeEach;

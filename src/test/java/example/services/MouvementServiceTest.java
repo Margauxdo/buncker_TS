@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 import example.repositories.MouvementRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

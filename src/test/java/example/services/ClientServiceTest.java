@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.Client;
+import example.entity.Client;
 import example.repositories.ClientRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

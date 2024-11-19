@@ -1,11 +1,7 @@
 package example.controller;
 
-import example.entities.TypeValise;
-import example.entities.Valise;
-import example.exceptions.ResourceNotFoundException;
-import example.interfaces.ITypeRegleService;
+import example.entity.TypeValise;
 import example.interfaces.ITypeValiseService;
-import example.repositories.TypeValiseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

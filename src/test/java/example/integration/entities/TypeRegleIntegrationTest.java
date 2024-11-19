@@ -1,7 +1,7 @@
 package example.integration.entities;
 
-import example.entities.Regle;
-import example.entities.TypeRegle;
+import example.entity.Regle;
+import example.entity.TypeRegle;
 import example.repositories.RegleRepository;
 import example.repositories.TypeRegleRepository;
 import org.junit.jupiter.api.BeforeEach;

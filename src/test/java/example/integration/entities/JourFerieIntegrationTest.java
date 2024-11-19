@@ -1,10 +1,9 @@
 package example.integration.entities;
 
-import example.entities.JourFerie;
-import example.entities.Regle;
+import example.entity.JourFerie;
+import example.entity.Regle;
 import example.repositories.JourFerieRepository;
 import example.repositories.RegleRepository;
-import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.Formule;
+import example.entity.Formule;
 import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import jakarta.validation.Valid;

@@ -1,8 +1,6 @@
 package example.services;
 
-import example.entities.Client;
-import example.entities.Formule;
-import example.entities.Livreur;
+import example.entity.Livreur;
 import example.exceptions.RegleNotFoundException;
 import example.repositories.LivreurRepository;
 import jakarta.persistence.EntityNotFoundException;

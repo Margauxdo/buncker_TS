@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.RetourSecurite;
+import example.entity.RetourSecurite;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.Regle;
+import example.entity.Regle;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.RegleRepository;

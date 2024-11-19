@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.Probleme;
+import example.entity.Probleme;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;

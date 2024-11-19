@@ -1,7 +1,7 @@
 package example.integration.services;
 
-import example.entities.JourFerie;
-import example.entities.Regle;
+import example.entity.JourFerie;
+import example.entity.Regle;
 import example.repositories.JourFerieRepository;
 import example.repositories.RegleRepository;
 import example.services.JourFerieService;

@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.Probleme;
+import example.entity.Probleme;
 
 import java.util.List;
 

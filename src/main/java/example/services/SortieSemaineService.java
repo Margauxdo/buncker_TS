@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.SortieSemaine;
+import example.entity.SortieSemaine;
 import example.interfaces.ISortieSemaineService;
 import example.repositories.SortieSemaineRepository;
 import org.springframework.beans.factory.annotation.Autowired;

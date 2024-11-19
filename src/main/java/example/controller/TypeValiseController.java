@@ -1,7 +1,7 @@
 package example.controller;
 
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.TypeValise;
+import example.entity.Valise;
 import example.interfaces.ITypeValiseService;
 import example.interfaces.IValiseService;
 import jakarta.persistence.EntityNotFoundException;

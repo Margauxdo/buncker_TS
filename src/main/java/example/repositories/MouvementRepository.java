@@ -1,6 +1,6 @@
 package example.repositories;
 
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

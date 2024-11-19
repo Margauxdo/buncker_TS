@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.TypeRegle;
+import example.entity.TypeRegle;
 import example.interfaces.ITypeRegleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;

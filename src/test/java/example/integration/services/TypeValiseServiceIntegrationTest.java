@@ -1,6 +1,6 @@
 package example.integration.services;
 
-import example.entities.TypeValise;
+import example.entity.TypeValise;
 import example.repositories.TypeValiseRepository;
 import example.services.TypeValiseService;
 import jakarta.transaction.Transactional;

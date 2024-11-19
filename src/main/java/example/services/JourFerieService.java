@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.JourFerie;
+import example.entity.JourFerie;
 import example.interfaces.IJourFerieService;
 import example.repositories.JourFerieRepository;
 import org.springframework.beans.factory.annotation.Autowired;

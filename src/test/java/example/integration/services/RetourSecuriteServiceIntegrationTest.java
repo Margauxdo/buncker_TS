@@ -1,12 +1,11 @@
 package example.integration.services;
 
-import example.entities.Client;
-import example.entities.RetourSecurite;
+import example.entity.Client;
+import example.entity.RetourSecurite;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
 import example.services.RetourSecuriteService;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

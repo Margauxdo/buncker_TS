@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
 import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;

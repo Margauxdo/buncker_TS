@@ -1,7 +1,7 @@
 package example.integration.repositories;
 
-import example.entities.Client;
-import example.entities.RetourSecurite;
+import example.entity.Client;
+import example.entity.RetourSecurite;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
 import jakarta.transaction.Transactional;

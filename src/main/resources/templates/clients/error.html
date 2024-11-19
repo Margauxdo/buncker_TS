@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Erreur</title>
+</head>
+<body>
+<h1>Une Erreur s'est Produite</h1>
+<p th:text="${errorMessage}">Un message d'erreur sera affiché ici.</p>
+
+<!-- Affichage des erreurs de validation si disponibles -->
+<div th:if="${validationErrors != null}">
+    <h2>Erreurs de Validation :</h2>
+    <ul>
+        <li th:each="error : ${validationErrors}" th:text="${error.key + ' : ' + error.value}"></li>
+    </ul>
+</div>
+
+<a href="/clients/list">Retour à la liste</a>
+</body>
+</html>

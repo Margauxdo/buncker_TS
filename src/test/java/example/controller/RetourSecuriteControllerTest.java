@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.RetourSecurite;
+import example.entity.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;

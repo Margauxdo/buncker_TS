@@ -1,7 +1,6 @@
 package example.controller;
 
-import example.entities.Formule;
-import example.entities.Mouvement;
+import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

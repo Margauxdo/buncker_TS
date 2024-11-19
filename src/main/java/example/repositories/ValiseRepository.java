@@ -1,8 +1,8 @@
 package example.repositories;
 
-import example.entities.Client;
-import example.entities.Regle;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Regle;
+import example.entity.Valise;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,12 +1,9 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entities.Regle;
+import example.entity.Regle;
 import example.repositories.RegleRepository;
 import example.services.RegleService;
-import jakarta.validation.ConstraintViolationException;
-import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 

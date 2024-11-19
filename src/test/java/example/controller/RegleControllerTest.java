@@ -1,9 +1,8 @@
 package example.controller;
 
-import example.entities.Regle;
+import example.entity.Regle;
 import example.exceptions.GlobalExceptionHandler;
 import example.interfaces.IRegleService;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.Livreur;
+import example.entity.Livreur;
 
 import java.util.List;
 

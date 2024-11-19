@@ -1,7 +1,7 @@
 package example.services;
 
-import example.entities.Livreur;
-import example.entities.Mouvement;
+import example.entity.Livreur;
+import example.entity.Mouvement;
 import example.exceptions.ConflictException;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.ILivreurService;

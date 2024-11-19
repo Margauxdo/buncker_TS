@@ -1,19 +1,24 @@
 package example.services;
 
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
+import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -21,6 +26,9 @@ public class ValiseServiceTest {
 
     @Mock
     private ValiseRepository valiseRepository;
+
+    @Mock
+    private ClientRepository clientRepository;
 
     @InjectMocks
     private ValiseService valiseService;
@@ -31,29 +39,59 @@ public class ValiseServiceTest {
     }
 
     @Test
-    public void testCreateValise_Success(){
+    @ExtendWith(MockitoExtension.class)
+    public void testCreateValise_Success() {
+        Client client = new Client();
+        client.setId(1);
+        client.setName("name client");
+        client.setEmail("testclient@gmail.com");
+
         Valise valise = new Valise();
-        when(valiseRepository.save(valise)).thenReturn(valise);
+        valise.setClient(client);
+        valise.setDescription("Valise de transport spécialisé");
+        valise.setNumeroValise(12565657L);
+        valise.setRefClient("REF-7952");
+
+        when(clientRepository.findById(client.getId())).thenReturn(java.util.Optional.of(client)); // Mock du clientRepository
+        when(valiseRepository.save(valise)).thenReturn(valise); // Mock du valiseRepository
 
         Valise result = valiseService.createValise(valise);
 
-        Assertions.assertNotNull(result, "The suitcase must not be null");
-        verify(valiseRepository, times(1)).save(valise);
-        verifyNoMoreInteractions(valiseRepository);
+        assertNotNull(result, "The suitcase must not be null");
+        verify(valiseRepository, times(1)).save(valise); // Vérifie que save a bien été appelé une fois
+        verifyNoMoreInteractions(valiseRepository); // Vérifie qu'il n'y a pas d'autres appels aux mocks
     }
+
     @Test
-    public void testCreateValise_Failure_Exception(){
+    @ExtendWith(MockitoExtension.class)
+    public void testCreateValise_Failure_Exception() {
+        Client client = new Client();
+        client.setId(1);
+
         Valise valise = new Valise();
-        when(valiseRepository.save(valise)).thenThrow(new RuntimeException("Database error"));
+        valise.setClient(client);  // Assigner le client valide
+        valise.setDescription("Valise de transport spécialisé");
+        valise.setNumeroValise(12565657L);
+        valise.setRefClient("REF-7952");
+
+        when(clientRepository.findById(client.getId())).thenReturn(java.util.Optional.of(client));
+
+        when(valiseRepository.save(valise)).thenThrow(new RuntimeException("Erreur interne lors de la création de la valise"));
 
         Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
             valiseService.createValise(valise);
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage());
+        Assertions.assertEquals("Erreur interne lors de la création de la valise", exception.getMessage());
+
         verify(valiseRepository, times(1)).save(valise);
         verifyNoMoreInteractions(valiseRepository);
     }
+
+
+
+
+
     @Test
     public void testUpdateValise_Success(){
         int id = 1;
@@ -65,7 +103,7 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.updateValise( id, valise);
 
-        Assertions.assertNotNull(result, "The suitcase must not be null");
+        assertNotNull(result, "The suitcase must not be null");
         Assertions.assertEquals(id, result.getId(), "Suitcase ID must match");
 
         verify(valiseRepository, times(1)).existsById(id);
@@ -122,7 +160,7 @@ public class ValiseServiceTest {
 
         Valise result = valiseService.getValiseById(id);
 
-        Assertions.assertNotNull(result, "The suitcase must not be null");
+        assertNotNull(result, "The suitcase must not be null");
         Assertions.assertEquals(id, result.getId(), "ID must match");
 
         verify(valiseRepository, times(1)).findById(id);

@@ -1,11 +1,9 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entities.Probleme;
+import example.entity.Probleme;
 import example.repositories.ProblemeRepository;
 import example.services.ProblemeService;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

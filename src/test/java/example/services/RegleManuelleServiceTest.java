@@ -1,9 +1,7 @@
 package example.services;
 
-import example.entities.RegleManuelle;
-import example.entities.SortieSemaine;
+import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

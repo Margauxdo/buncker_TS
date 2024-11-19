@@ -1,6 +1,6 @@
 package example.repositories;
 
-import example.entities.Formule;
+import example.entity.Formule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

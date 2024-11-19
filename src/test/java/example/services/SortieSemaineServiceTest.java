@@ -1,7 +1,7 @@
 package example.services;
 
-import example.entities.Regle;
-import example.entities.SortieSemaine;
+import example.entity.Regle;
+import example.entity.SortieSemaine;
 import example.repositories.SortieSemaineRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

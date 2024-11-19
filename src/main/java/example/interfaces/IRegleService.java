@@ -1,6 +1,6 @@
 package example.interfaces;
 
-import example.entities.Regle;
+import example.entity.Regle;
 
 import java.util.List;
 

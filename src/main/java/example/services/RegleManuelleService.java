@@ -1,7 +1,7 @@
 package example.services;
 
-import example.entities.Formule;
-import example.entities.RegleManuelle;
+import example.entity.Formule;
+import example.entity.RegleManuelle;
 import example.interfaces.IRegleManuelleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleManuelleRepository;

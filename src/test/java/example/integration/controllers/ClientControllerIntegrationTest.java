@@ -1,6 +1,6 @@
 package example.integration.controllers;
 
-import example.entities.Client;
+import example.entity.Client;
 import example.repositories.ClientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

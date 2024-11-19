@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Détails du Client</title>
+</head>
+<body>
+<h1>Détails du Client</h1>
+<p><strong>Nom:</strong> <span th:text="${client.name}"></span></p>
+<p><strong>Email:</strong> <span th:text="${client.email}"></span></p>
+<p><strong>Adresse:</strong> <span th:text="${client.adresse}"></span></p>
+<p><strong>Téléphone:</strong> <span th:text="${client.telephoneExploitation}"></span></p>
+<p><strong>Ville:</strong> <span th:text="${client.ville}"></span></p>
+<p><strong>Fonction:</strong> <span th:text="${client.PersonnelEtFonction}"></span></p>
+<p><strong>Ramassage 1:</strong> <span th:text="${client.ramassage1}"></span></p>
+<p><strong>Ramassage 2:</strong> <span th:text="${client.ramassage2}"></span></p>
+<p><strong>Ramassage 3:</strong> <span th:text="${client.ramassage3}"></span></p>
+<p><strong>Ramassage 4:</strong> <span th:text="${client.ramassage4}"></span></p>
+<p><strong>Ramassage 5:</strong> <span th:text="${client.ramassage5}"></span></p>
+<p><strong>Ramassage 6:</strong> <span th:text="${client.ramassage6}"></span></p>
+<p><strong>Ramassage 7:</strong> <span th:text="${client.ramassage7}"></span></p>
+<p><strong>Envoi par défaut:</strong> <span th:text="${client.EnvoiparDefaut}"></span></p>
+<p><strong>Mémo retour Sécurité 1:</strong> <span th:text="${client.MemoRetourSecurite1}"></span></p>
+<p><strong>Mémo retour Sécurité 2:</strong> <span th:text="${client.MemoRetourSecurite2}"></span></p>
+
+<a href="/clients/list">Retour à la liste</a>
+</body>
+</html>
+

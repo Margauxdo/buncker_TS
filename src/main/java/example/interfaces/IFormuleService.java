@@ -1,7 +1,7 @@
 package example.interfaces;
 
 
-import example.entities.Formule;
+import example.entity.Formule;
 
 import java.util.List;
 

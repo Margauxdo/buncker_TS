@@ -1,6 +1,6 @@
 package example.integration.services;
 
-import example.entities.*;
+import example.entity.*;
 import example.exceptions.RegleNotFoundException;
 import example.repositories.*;
 import example.services.RegleService;

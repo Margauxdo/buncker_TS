@@ -1,6 +1,6 @@
 package example.repositories;
 
-import example.entities.TypeValise;
+import example.entity.TypeValise;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

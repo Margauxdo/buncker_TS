@@ -1,6 +1,6 @@
 package example.integration.entities;
 
-import example.entities.*;
+import example.entity.*;
 import example.repositories.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;

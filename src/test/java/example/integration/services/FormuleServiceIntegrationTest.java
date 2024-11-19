@@ -1,7 +1,7 @@
 package example.integration.services;
 
-import example.entities.Formule;
-import example.entities.Regle;
+import example.entity.Formule;
+import example.entity.Regle;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
 import example.services.FormuleService;

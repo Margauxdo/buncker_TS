@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.RetourSecurite;
+import example.entity.RetourSecurite;
 import example.repositories.RetourSecuriteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;

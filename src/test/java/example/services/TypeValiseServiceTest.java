@@ -1,8 +1,6 @@
 package example.services;
 
-import example.entities.RegleManuelle;
-import example.entities.TypeRegle;
-import example.entities.TypeValise;
+import example.entity.TypeValise;
 import example.repositories.TypeValiseRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

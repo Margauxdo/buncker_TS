@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.Regle;
+import example.entity.Regle;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import org.springframework.beans.factory.annotation.Autowired;

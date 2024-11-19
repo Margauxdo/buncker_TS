@@ -1,7 +1,7 @@
 package example.repositories;
 
-import example.entities.Probleme;
-import example.entities.Valise;
+import example.entity.Probleme;
+import example.entity.Valise;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

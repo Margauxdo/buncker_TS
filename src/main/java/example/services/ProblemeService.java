@@ -1,11 +1,9 @@
 package example.services;
 
-import example.entities.Probleme;
+import example.entity.Probleme;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

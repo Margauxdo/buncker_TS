@@ -1,7 +1,6 @@
 package example.services;
 
-import example.entities.Formule;
-import example.entities.Regle;
+import example.entity.Formule;
 import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;

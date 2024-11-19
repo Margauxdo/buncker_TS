@@ -1,16 +1,12 @@
 package example.controller;
 
-import example.entities.Client;
-import example.entities.Regle;
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.Valise;
 import example.interfaces.IValiseService;
 import example.exceptions.ResourceNotFoundException;
 import example.repositories.ClientRepository;
 import example.repositories.RegleRepository;
 import example.repositories.TypeValiseRepository;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package example.services;
 
-import example.entities.TypeRegle;
+import example.entity.TypeRegle;
 import example.interfaces.ITypeRegleService;
 import example.repositories.TypeRegleRepository;
 import jakarta.persistence.EntityNotFoundException;

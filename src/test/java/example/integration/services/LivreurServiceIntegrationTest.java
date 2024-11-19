@@ -1,6 +1,6 @@
 package example.integration.services;
 
-import example.entities.Livreur;
+import example.entity.Livreur;
 import example.repositories.LivreurRepository;
 import example.services.LivreurService;
 import jakarta.transaction.Transactional;

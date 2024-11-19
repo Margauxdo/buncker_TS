@@ -1,9 +1,9 @@
 package example.services;
 
-import example.entities.Client;
-import example.entities.Regle;
-import example.entities.TypeValise;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Regle;
+import example.entity.TypeValise;
+import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
 import example.repositories.ClientRepository;
@@ -73,10 +73,11 @@ public class ValiseService implements IValiseService {
             Valise savedValise = valiseRepository.save(valise);
             logger.debug("Valise créée avec succès : {}", savedValise);
             return savedValise;
-        } catch (Exception e) {
+        }catch (Exception e) {
             logger.error("Erreur lors de la création de la valise : {}", e.getMessage(), e);
             throw new RuntimeException("Erreur interne lors de la création de la valise", e);
         }
+
     }
 
 

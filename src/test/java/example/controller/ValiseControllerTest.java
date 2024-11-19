@@ -1,7 +1,7 @@
 package example.controller;
 
-import example.entities.Client;
-import example.entities.Valise;
+import example.entity.Client;
+import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
 import example.repositories.ClientRepository;

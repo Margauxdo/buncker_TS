@@ -1,9 +1,9 @@
 package example.integration.repositories;
 
-import example.entities.Formule;
-import example.entities.Regle;
-import example.entities.TypeRegle;
-import example.entities.Valise;
+import example.entity.Formule;
+import example.entity.Regle;
+import example.entity.TypeRegle;
+import example.entity.Valise;
 import example.repositories.RegleRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

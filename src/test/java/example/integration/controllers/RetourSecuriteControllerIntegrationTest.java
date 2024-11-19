@@ -1,9 +1,8 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import example.controller.RetourSecuriteController;
-import example.entities.Client;
-import example.entities.RetourSecurite;
+import example.entity.Client;
+import example.entity.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;

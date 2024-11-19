@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entities.SortieSemaine;
+import example.entity.SortieSemaine;
 import example.interfaces.ISortieSemaineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
