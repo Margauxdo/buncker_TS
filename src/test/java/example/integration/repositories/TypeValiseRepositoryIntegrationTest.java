@@ -57,7 +57,7 @@ public class TypeValiseRepositoryIntegrationTest {
 
         List<Valise> valises = new ArrayList<>();
         valises.add(valise);
-        typeValise.setValises(valises);
+        typeValise.setValise(valise);
 
         TypeValise savedTV = typeValiseRepository.save(typeValise);
         assertNotNull(savedTV.getId());
@@ -162,7 +162,7 @@ public class TypeValiseRepositoryIntegrationTest {
 
         List<Valise> valises = new ArrayList<>();
         valises.add(valise);
-        typeValise.setValises(valises);
+        typeValise.setValise(valise);
 
         typeValiseRepository.save(typeValise);
         typeValiseRepository.deleteById(typeValise.getId());

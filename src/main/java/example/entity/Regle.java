@@ -1,5 +1,6 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -43,22 +44,38 @@ public class Regle {
     private String typeEntree;
     private Long NBJSMEntree;
 
-    @OneToOne(mappedBy = "regleSortie")
+    @ManyToOne
+    @JoinColumn(name = "valise_id")
     private Valise valise;
+
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regle")
     private List<SortieSemaine> sortieSemaine = new ArrayList<>();
 
-    @ManyToOne
+    @OneToMany
     @JoinColumn(name = "type_regle_id")
-    private TypeRegle typeRegle;
+    private List<TypeRegle> typeRegles = new ArrayList<>();
+
+    @ManyToOne
+    @Column(name = "regleManuelle_id")
+    private RegleManuelle regleManuelle;
 
     @ManyToOne
     @JoinColumn(name = "formule_id", nullable = true)
     private Formule formule;
 
-    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<JourFerie> jourFeries = new ArrayList<>();
+
+    @ManyToOne
+    @Column(name = "valise_id")
+    private Valise valiseId;
+
+    @OneToMany
+    @Column(name = "client_id")
+    private List<Client> clients = new ArrayList<>();
+
+    @ManyToOne
+    @Column(name = "jourFerie_id")
+    private JourFerie jourFerie;
 
 
     public Regle(String r001, Date date) {

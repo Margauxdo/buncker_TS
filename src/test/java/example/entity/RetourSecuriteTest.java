@@ -15,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -41,7 +42,7 @@ public class RetourSecuriteTest {
         em.flush();
 
         retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients((List<Client>) em.createQuery("select c from RetourSecurite c").getResultList());
         retourSecurite.setCloture(Boolean.FALSE);
         retourSecurite.setNumero(25689568965L);
         retourSecurite.setDatesecurite(sdf.parse("2020-02-25"));
@@ -85,17 +86,17 @@ public class RetourSecuriteTest {
 
     @Test
     public void testRetourSecuriteClientAssociation() {
-        Assertions.assertNotNull(retourSecurite.getClient(),
+        Assertions.assertNotNull(retourSecurite.getClients(),
                 "The client associated with the Security return must not be null");
         Client expectedClient = clientRepository.findAll().get(0);
-        Assertions.assertEquals(expectedClient, retourSecurite.getClient(),
+        Assertions.assertEquals(expectedClient, retourSecurite.getClients(),
                 "The associated client must match the persistent client");
     }
 
     @Test
     public void testNonNullNumero() {
         RetourSecurite retourSecuriteWithoutNumero = new RetourSecurite();
-        retourSecuriteWithoutNumero.setClient(retourSecurite.getClient());
+        retourSecuriteWithoutNumero.setClients(retourSecurite.getClients());
         retourSecuriteWithoutNumero.setDatesecurite(retourSecurite.getDatesecurite());
 
         Assertions.assertThrows(PersistenceException.class, () -> {

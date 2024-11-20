@@ -42,34 +42,22 @@ public class TypeValiseController {
     @PostMapping
     public ResponseEntity<TypeValise> createTypeValise(@RequestBody TypeValise typeValise) {
         try {
-            if (typeValise == null) {
+            if (typeValise == null || typeValise.getValise() == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            System.out.println("TypeValise reçu : " + typeValise);
-            System.out.println("Valises reçues : " + (typeValise.getValises() != null ? typeValise.getValises() : "Aucune valise"));
-
-            // Si des valises sont associées, récupérez-les explicitement depuis la base de données
-            if (typeValise.getValises() != null && !typeValise.getValises().isEmpty()) {
-                List<Valise> attachedValises = new ArrayList<>();
-                for (Valise valise : typeValise.getValises()) {
-                    Valise managedValise = valiseService.getValiseById(valise.getId());
-                    if (managedValise == null) {
-                        throw new EntityNotFoundException("Valise not found with ID: " + valise.getId());
-                    }
-                    managedValise.setTypevalise(typeValise); // Associe la valise au TypeValise
-                    attachedValises.add(managedValise);
-                }
-                typeValise.setValises(attachedValises);
+            Valise managedValise = valiseService.getValiseById(typeValise.getValise().getId());
+            if (managedValise == null) {
+                throw new EntityNotFoundException("Valise not found with ID: " + typeValise.getValise().getId());
             }
 
-            // Sauvegarder le TypeValise
+            typeValise.setValise(managedValise);
             TypeValise createdTypeValise = typeValiseService.createTypeValise(typeValise);
             return new ResponseEntity<>(createdTypeValise, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT); // Conflit détecté
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

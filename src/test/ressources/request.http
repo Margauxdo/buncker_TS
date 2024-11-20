@@ -1,24 +1,24 @@
 # Section 1 : API REST pour l'entité Client
 
-### Obtenir tous les clients
-GET http://localhost:8080/api/clients
+### Obtenir tous les clients API REST
+GET http://localhost:8080/clients/api
 Content-Type: application/json
 
 
 
-### Obtenir un client par ID
-GET http://localhost:8080/api/clients/4
+### Obtenir un client par ID API REST
+GET http://localhost:8080/clients/api/1
 Content-Type: application/json
 
 
 
-### Créer un nouveau client
-POST http://localhost:8080/api/clients
+### Créer un nouveau client API REST
+POST http://localhost:8080/clients/api
 Content-Type: application/json
 
 {
-  "name": "Client XY",
-  "email": "clientXY@example.com",
+  "name": "Client testXX",
+  "email": "clientXX@example.com",
   "adresse": "123 Rue de la guinguette",
   "ville": "Paris",
   "telephoneExploitation": "0123489659",
@@ -37,12 +37,12 @@ Content-Type: application/json
 
 
 
-### Mettre à jour un client
-PUT http://localhost:8080/api/clients/4
+### Mettre à jour un client API REST
+PUT http://localhost:8080/clients/api/1
 Content-Type: application/json
 
 {
-  "id": 4,
+  "id": 1,
   "name": "Updated client",
   "email": "client4@example.com",
   "adresse": "456 Avenue de Lyon",
@@ -61,26 +61,60 @@ Content-Type: application/json
   "memoRetourSecurite2": "Updated Mémo 2"
 }
 
-### Supprimer un client
-DELETE http://localhost:8080/api/clients/13
+### Supprimer un client API REST
+DELETE http://localhost:8080/clients/api/13
 Content-Type: application/json
 
+###  Liste de tous les clients Thymeleaf
+GET http://localhost:8080/clients/list
 
 
+
+### Detail d'un client avec Thymeleaf
+GET http://localhost:8080/clients/view/1
+
+
+### Formulaire de création d'un client avec Thymeleaf
+GET  http://localhost:8080/clients/create
+
+
+
+### Soumettre le formulaire de création d'un client avec Thymeleaf
+POST http://localhost:8080/clients/create
+Content-Type: application/x-www-form-urlencoded
+
+##name=Client+Thymeleaf&email=client@ example.com&adresse=10+Rue+Paris&ville=Paris&telephoneExploitation=0123456789&personnelEtFonction=Responsable
+
+
+### Afficher formulaire de modification d'un client avec Thymeleaf
+GET http://localhost:8080/clients/edit/1
+
+
+### Soumettre le formulaire de modification d'un client avec Thymeleaf
+POST http://localhost:8080/clients/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+##id=1&name=Updated+Client&email=updated@ example.com&adresse=15+Rue+Lyon&ville=Lyon&telephoneExploitation=0987654321&personnelEtFonction=Directeur
+
+
+
+
+### Supression d'un client avec Thymeleaf
+POST http://localhost:8080/clients/delete/1
 
 ## Section 2 : API REST pour l'entité Formule
 
-### Obtenir toutes les formules
+### Obtenir toutes les formules API REST
 GET http://localhost:8080/api/formules
 Content-Type: application/json
 
 
-### Obtenir une formule par ID
+### Obtenir une formule par ID API REST
 GET http://localhost:8080/api/formules/1
 Content-Type: application/json
 
 
-### Créer une nouvelle formule
+### Créer une nouvelle formule API REST
 POST http://localhost:8080/api/formules
 Content-Type: application/json
 
@@ -93,7 +127,7 @@ Content-Type: application/json
 }
 
 
-### Mettre à jour une formule
+### Mettre à jour une formule API REST
 PUT http://localhost:8080/api/formules/1
 Content-Type: application/json
 
@@ -107,24 +141,24 @@ Content-Type: application/json
 }
 
 
-### Supprimer une formule
+### Supprimer une formule API REST
 DELETE http://localhost:8080/api/formules/9
 Content-Type: application/json
 
 
 ## Section 3 : API REST pour l'entité JourFerie
 
-### Obtenir toutes les jours feries
+### Obtenir toutes les jours feries API REST
 GET http://localhost:8080/api/jourferies
 Content-Type: application/json
 
 
-### Obtenir un jour ferié par ID
+### Obtenir un jour ferié par ID API REST
 GET http://localhost:8080/api/jourferies/20
 Content-Type: application/json
 
 
-### Créer un nouveau jour férié
+### Créer un nouveau jour férié API REST
 POST http://localhost:8080/api/jourferies
 Content-Type: application/json
 
@@ -140,18 +174,18 @@ Content-Type: application/json
 
 
 
-### Section 4 : API REST pour l'entité livreur
+### Section 4 : API REST pour l'entité livreur API REST
 ### Obtenir tous les livreurs
 GET http://localhost:8080/api/livreurs
 Content-Type: application/json
 
 
-### Obtenir un livreurpar ID
+### Obtenir un livreurpar ID API REST
 GET http://localhost:8080/api/livreurs/3
 Content-Type: application/json
 
 
-### Créer une nouveau livreur
+### Créer une nouveau livreur API REST
 POST http://localhost:8080/api/livreurs
 Content-Type: application/json
 
@@ -181,7 +215,7 @@ Content-Type: application/json
 }
 
 
-### Mettre à jour un livreur
+### Mettre à jour un livreur API REST
 PUT http://localhost:8080/api/livreurs/3
 Content-Type: application/json
 
@@ -211,22 +245,22 @@ Content-Type: application/json
   ]
 }
 
-### Supprimer un livreur
+### Supprimer un livreur API REST
 DELETE http://localhost:8080/api/livreurs/10
 Content-Type: application/json
 
 ## Section 5 : API REST pour l'entité Mouvement
-### Obtenir tous les mouvements
+### Obtenir tous les mouvements API REST
 GET http://localhost:8080/api/mouvements
 Content-Type: application/json
 
 
-### Obtenir un mouvement par ID
+### Obtenir un mouvement par ID API REST
 GET http://localhost:8080/api/mouvements/3
 Content-Type: application/json
 
 
-### Créer un nouveau mouvement
+### Créer un nouveau mouvement API REST
 POST http://localhost:8080/api/mouvements
 Content-Type: application/json
 
@@ -244,7 +278,7 @@ Content-Type: application/json
 }
 
 
-### Mettre à jour un mouvement
+### Mettre à jour un mouvement API REST
 PUT http://localhost:8080/api/mouvements/3
 Content-Type: application/json
 
@@ -263,22 +297,22 @@ Content-Type: application/json
 }
 
 
-### Supprimer un mouvement
+### Supprimer un mouvement API REST
 DELETE http://localhost:8080/api/mouvement/2
 Content-Type: application/json
 
 
 ## Section 6 : API REST pour l'entité Probleme
-### Obtenir tous les problèmes
+### Obtenir tous les problèmes API REST
 GET http://localhost:8080/api/pb
 Accept: application/json
 
-### Obtenir un problème par ID
+### Obtenir un problème par ID API REST
 GET http://localhost:8080/api/pb/2
 Accept: application/json
 
 
-### Créer un nouveau problème
+### Créer un nouveau problème API REST
 POST http://localhost:8080/api/pb
 Content-Type: application/json
 
@@ -294,7 +328,7 @@ Content-Type: application/json
 }
 
 
-### Mettre à jour un problème
+### Mettre à jour un problème API REST
 PUT http://localhost:8080/api/pb/2
 Content-Type: application/json
 
@@ -311,23 +345,23 @@ Content-Type: application/json
 }
 
 
-### Supprimer un problème
+### Supprimer un problème API REST
 DELETE http://localhost:8080/api/pb/1
 Accept: application/json
 
 
 ## Section 7 : API REST pour l'entité Régle
-### Obtenir tous les regles
+### Obtenir tous les regles API REST
 GET http://localhost:8080/api/regles
 Accept: application/json
 
 
-### Obtenir une regle par ID
+### Obtenir une regle par ID API REST
 GET http://localhost:8080/api/regles/4
 Accept: application/json
 
 
-### Créer une nouvelle règle
+### Créer une nouvelle règle API REST
 POST http://localhost:8080/api/regles
 Content-Type: application/json
 
@@ -351,7 +385,7 @@ Content-Type: application/json
 
 
 
-### Mettre à jour une règle
+### Mettre à jour une règle API REST
 PUT http://localhost:8080/api/regles/4
 Content-Type: application/json
 
@@ -374,22 +408,22 @@ Content-Type: application/json
 }
 
 
-### Supprimer une règle
+### Supprimer une règle API REST
 DELETE http://localhost:8080/api/regles/3
 Accept: application/json
 
 ## Section 8 : API REST pour l'entité Régle Manuelle
-### Obtenir tous les regles manuelles
+### Obtenir tous les regles manuelles API REST
 GET http://localhost:8080/api/regle-manuelle
 Accept: application/json
 
 
-### Obtenir une regle manuelle par ID
+### Obtenir une regle manuelle par ID API REST
 GET http://localhost:8080/api/regle-manuelle/5
 Accept: application/json
 
 
-### Créer une nouvelle règle manuelle
+### Créer une nouvelle règle manuelle API REST
 POST http://localhost:8080/api/regle-manuelle
 Content-Type: application/json
 
@@ -406,7 +440,7 @@ Content-Type: application/json
 }
 
 
-### Mettre à jour une règle manuelle
+### Mettre à jour une règle manuelle API REST
 PUT http://localhost:8080/api/regle-manuelle/5
 Content-Type: application/json
 
@@ -425,22 +459,22 @@ Content-Type: application/json
 
 
 
-### Supprimer une règle manuelle
+### Supprimer une règle manuelle API REST
 DELETE http://localhost:8080/api/regle-manuelle/3
 Accept: application/json
 
 ## Section 9 : API REST pour l'entité Retour Sécurité
-### Obtenir tous les retour sécurité
+### Obtenir tous les retour sécurité API REST
 GET http://localhost:8080/api/retourSecurite
 Accept: application/json
 
 
-### Obtenir une retour sécurité par ID
+### Obtenir une retour sécurité par ID API REST
 GET http://localhost:8080/api/retourSecurite/5
 Accept: application/json
 
 
-### Créer un nouveau retour sécurité
+### Créer un nouveau retour sécurité API REST
 POST http://localhost:8080/api/retourSecurite
 Content-Type: application/json
 
@@ -456,7 +490,7 @@ Content-Type: application/json
 }
 
 
-### Mettre à jour un retour sécurité
+### Mettre à jour un retour sécurité API REST
 PUT http://localhost:8080/api/retourSecurite/5
 Content-Type: application/json
 
@@ -474,21 +508,21 @@ Content-Type: application/json
 
 
 
-### Supprimer un retour sécurité
+### Supprimer un retour sécurité API REST
 DELETE http://localhost:8080/api/retourSecurite/2
 Accept: application/json
 
 ## Section 10 : API REST pour l'entité Sortie Semaine
-### Obtenir tous les Sortie Semaine
+### Obtenir tous les Sortie Semaine API REST
 GET http://localhost:8080/api/sortieSemaine
 Accept: application/json
 
 
-### Obtenir une Sortie Semaine par ID
+### Obtenir une Sortie Semaine par ID API REST
 GET http://localhost:8080/api/sortieSemaine/3
 Accept: application/json
 
-### Créer une nouvelle SortieSemaine
+### Créer une nouvelle SortieSemaine API REST
 POST http://localhost:8080/api/sortieSemaine
 Content-Type: application/json
 
@@ -501,7 +535,7 @@ Content-Type: application/json
 
 
 
-###
+### Modifier sortie semaine API REST
 
 PUT http://localhost:8080/api/sortieSemaine/3
 Content-Type: application/json
@@ -516,24 +550,23 @@ Content-Type: application/json
 
 
 
-### Supprimer un Sortie Semaine
+### Supprimer un Sortie Semaine API REST
 DELETE http://localhost:8080/api/sortieSemaine/2
 Accept: application/json
 
 ##Section 11 : API REST pour l'entité Type Regle
-### Obtenir tous les Type Regle
+### Obtenir tous les Type Regle API REST
 GET http://localhost:8080/api/typeRegle
 Accept: application/json
 
 
-###
 
-### Obtenir une Type Regle par ID
+### Obtenir une Type Regle par ID API REST
 GET http://localhost:8080/api/typeRegle/6
 Accept: application/json
 
-###
-### creer Type Regle
+
+### creer Type Regle API REST
 POST http://localhost:8080/api/typeRegle
 Content-Type: application/json
 
@@ -543,9 +576,7 @@ Content-Type: application/json
 }
 
 
-
-###
-###modifier le type de regle
+###Modifier le type de regle API REST
 
 PUT http://localhost:8080/api/typeRegle/6
 Content-Type: application/json
@@ -557,26 +588,22 @@ Content-Type: application/json
 }
 
 
-
-###
-### Supprimer un Type Regle
+### Supprimer un Type Regle API REST
 DELETE http://localhost:8080/api/typeRegle/4
 Accept: application/json
 
-### Section 12 : API REST pour l'entité Type Valise
-### Obtenir tous les types de valises
+##Section 12 : API REST pour l'entité Type Valise
+### Obtenir tous les types de valises API REST
 GET http://localhost:8080/api/typeValise
 Accept: application/json
 
-###
 
-### Obtenir un type de valise par ID
+### Obtenir un type de valise par ID API REST
 GET http://localhost:8080/api/typeValise/6
 Accept: application/json
 
-###
 
-### Créer un nouveau type de valise
+### Créer un nouveau type de valise API REST
 POST http://localhost:8080/api/typeValise
 Content-Type: application/json
 
@@ -588,9 +615,7 @@ Content-Type: application/json
 }
 
 
-###
-
-### Mettre à jour un type de valise
+### Mettre à jour un type de valise API REST
 PUT http://localhost:8080/api/typeValise/6
 Content-Type: application/json
 
@@ -602,27 +627,23 @@ Content-Type: application/json
   ]
 }
 
-###
 
-### Supprimer un type de valise
+### Supprimer un type de valise API REST
 DELETE http://localhost:8080/api/typeValise/3
 Accept: application/json
 
-### Section 13 : API REST pour l'entité Valise
+##Section 13 : API REST pour l'entité Valise
 
-### Obtenir toutes les valises
+### Obtenir toutes les valises API REST
 GET http://localhost:8080/api/valise
 Accept: application/json
 
-###
-
-### Obtenir une valise par ID
+### Obtenir une valise par ID API REST
 GET http://localhost:8080/api/valise/31
 Accept: application/json
 
-###
 
-### Créer une nouvelle valise
+### Créer une nouvelle valise API REST
 POST http://localhost:8080/api/valise
 Content-Type: application/json
 
@@ -648,9 +669,8 @@ Content-Type: application/json
 }
 
 
-###
 
-### Mettre à jour une valise
+### Mettre à jour une valise API REST
 PUT http://localhost:8080/api/valise/31
 Content-Type: application/json
 
@@ -676,13 +696,11 @@ Content-Type: application/json
   }
 }
 
-###
 
-### Supprimer une valise
+### Supprimer une valise API REST
 DELETE http://localhost:8080/api/valise/1
 Accept: application/json
 
-###
 
 
 

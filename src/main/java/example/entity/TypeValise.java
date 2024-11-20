@@ -31,7 +31,8 @@ public class TypeValise {
     @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "typevalise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Valise> valises = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "valise_id", nullable = false) // Correction ici
+    private Valise valise;
 
 }

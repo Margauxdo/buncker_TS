@@ -1,8 +1,10 @@
 package example.controller;
 
+import example.entity.Formule;
 import example.entity.Regle;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
+import example.repositories.FormuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ public class RegleController {
 
     @Autowired
     private IRegleService regleService;
+
+    @Autowired
+    private FormuleRepository formuleRepository;
 
     @GetMapping
     public ResponseEntity<List<Regle>> readRegles() {
@@ -42,6 +47,13 @@ public class RegleController {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body("Le code de la règle '" + regle.getCoderegle() + "' existe déjà.");
             }
+            // Gestion de la relation avec Formule (si elle existe)
+            if (regle.getFormule() != null) {
+                Formule formule = formuleRepository.findById(regle.getFormule().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Formule non trouvée."));
+                regle.setFormule(formule);
+            }
+
             Regle newRegle = regleService.createRegle(regle);
             return ResponseEntity.status(HttpStatus.CREATED).body(newRegle);
         } catch (IllegalArgumentException e) {
@@ -50,6 +62,7 @@ public class RegleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne du serveur.");
         }
     }
+
 
 
 

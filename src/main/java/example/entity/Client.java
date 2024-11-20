@@ -34,7 +34,7 @@ public class Client {
     private String email;
     private String telephoneExploitation;
     private String ville;
-    private String PersonnelEtFonction;
+    private String personnelEtFonction;
 
     private String ramassage1;
     private String ramassage2;
@@ -43,9 +43,9 @@ public class Client {
     private String ramassage5;
     private String ramassage6;
     private String ramassage7;
-    private String EnvoiparDefaut;
-    private String MemoRetourSecurite1;
-    private String MemoRetourSecurite2;
+    private String envoiparDefaut;
+    private String memoRetourSecurite1;
+    private String memoRetourSecurite2;
     private String typeSuivie; //TODO:? verifier//
 
     public Client(
@@ -61,12 +61,16 @@ public class Client {
 
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @Column(name = "pb_id")
     private List<Probleme> problemes;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<RetourSecurite> retourSecuriteList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "retourSecurite_id")
+    private RetourSecurite retourSecurite;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regle_id")
+    private Regle regle;
 
 
-    public Client(String johnDoe, String mail) {
-    }
 }

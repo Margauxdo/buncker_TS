@@ -2,6 +2,7 @@ package example.controller;
 
 import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -37,51 +38,35 @@ public class MouvementController {
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
-       logger.info("entrée --> create mouvement{} " ,mouvement);
-        try {
-            if (mouvement.getDateHeureMouvement() == null || mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3) {
-                logger.info("entrée --> create mouvement{} " ,mouvement);
+        @PostMapping
+        public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
+            try {
+                if (mouvement.getDateHeureMouvement() == null || mouvement.getStatutSortie() == null) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
 
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
+                return new ResponseEntity<>(createdMouvement, HttpStatus.CREATED);
+            } catch (RuntimeException e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-            Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
-            logger.info("Mouement creer --> create mouvement{} " ,mouvement);
-
-            return new ResponseEntity<>(createdMouvement, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            logger.info("Create mouvement --> IllegalArgumentException");
-
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            logger.info("Create mouvement --> RuntimeException");
-
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
 
+        @PutMapping("/{id}")
+        public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
+            try {
+                if (!mouvementService.existsById(id)) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
 
-
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
-        try {
-            if (!mouvementService.existsById(id)) {
+                Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
+                return new ResponseEntity<>(updatedMouvement, HttpStatus.OK);
+            } catch (EntityNotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } catch (RuntimeException e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            if (mouvement.getStatutSortie() == null || mouvement.getStatutSortie().length() < 3
-                    || mouvement.getDateHeureMouvement() == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            Mouvement updatedMouvement = mouvementService.updateMouvement(id, mouvement);
-            return new ResponseEntity<>(updatedMouvement, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
 
 
     @DeleteMapping("{id}")
@@ -95,7 +80,7 @@ public class MouvementController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }}
 
 
-}
+

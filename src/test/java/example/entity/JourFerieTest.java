@@ -1,5 +1,6 @@
 package example.entity;
 
+import example.repositories.RegleRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,19 +26,20 @@ public class JourFerieTest {
     private EntityManager entityManager;
 
     private JourFerie jourFerie;
+    @Autowired
+    private RegleRepository regleRepository;
 
     @BeforeEach
     public void setUp() {
         Regle regle = new Regle();
-        regle.setCoderegle("Code123"); // Ajoutez une valeur pour le champ obligatoire `coderegle`
+        regle.setCoderegle("Code123");
         regle.setDateRegle(new Date());
+        regleRepository.save(regle);
 
-        // Persist une instance de `Regle` avant de créer `JourFerie`
         entityManager.persist(regle);
 
-        // Initialisation de l'entité `JourFerie`
         jourFerie = new JourFerie();
-        jourFerie.setRegle(regle);  // Association avec une `Regle`
+        jourFerie.setRegles((List<Regle>) regle);
         jourFerie.setJoursFerieList(Arrays.asList(new Date(), new Date()));
     }
 
@@ -61,25 +63,40 @@ public class JourFerieTest {
         JourFerie retrievedJourFerie = entityManager.find(JourFerie.class, jourFerie.getId());
 
         // Vérifie que la relation avec `Regle` est bien établie
-        assertNotNull(retrievedJourFerie.getRegle());
-        assertEquals(jourFerie.getRegle().getId(), retrievedJourFerie.getRegle().getId());
+        assertNotNull(retrievedJourFerie.getRegles());
+        assertEquals(jourFerie.getRegles().get(jourFerie.getId()), retrievedJourFerie.getJoursFerieList().get(1));
     }
 
 
     @Test
     public void testJoursFerieListPersistence() {
-        // Persist de `JourFerie` avec la liste des jours fériés
         entityManager.persist(jourFerie);
         entityManager.flush();
 
-        // Charge `JourFerie` depuis la base de données
         JourFerie retrievedJourFerie = entityManager.find(JourFerie.class, jourFerie.getId());
 
-        // Vérifie que la liste des jours fériés est bien sauvegardée
         List<Date> joursFerieList = retrievedJourFerie.getJoursFerieList();
         assertNotNull(joursFerieList);
         assertEquals(2, joursFerieList.size());
     }
+    @Test
+    public void testRelationWithFormule() {
+        Formule formule = new Formule();
+        formule.setFormule("Formule Test");
+        entityManager.persist(formule);
+
+        JourFerie jourFerie = new JourFerie();
+        jourFerie.setJoursFerieList((List<Date>) formule); // Ajout de la relation
+        jourFerie.setJoursFerieList(Arrays.asList(new Date()));
+
+        entityManager.persist(jourFerie);
+        entityManager.flush();
+
+        JourFerie retrievedJourFerie = entityManager.find(JourFerie.class, jourFerie.getId());
+        assertNotNull(retrievedJourFerie.getJoursFerieList());
+        assertEquals(((List<?>) formule).get(1), retrievedJourFerie.getJoursFerieList().get(1));
+    }
+
 
 }
 

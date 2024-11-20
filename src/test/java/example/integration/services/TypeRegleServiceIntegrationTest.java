@@ -1,5 +1,6 @@
 package example.integration.services;
 
+import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.repositories.TypeRegleRepository;
 import example.services.TypeRegleService;
@@ -101,6 +102,25 @@ public class TypeRegleServiceIntegrationTest {
         assertNotNull(typeRegles);
         assertEquals(2, typeRegles.size());
     }
+
+    @Test
+    public void testCreateTypeRegle_WithRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("ServiceRegle");
+
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Type D")
+                .regle(regle)
+                .build();
+
+        TypeRegle savedTypeRegle = typeRegleService.createTypeRegle(typeRegle);
+
+        assertNotNull(savedTypeRegle);
+        assertEquals("Type D", savedTypeRegle.getNomTypeRegle());
+        assertNotNull(savedTypeRegle.getRegle());
+        assertEquals("ServiceRegle", savedTypeRegle.getRegle().getCoderegle());
+    }
+
 
 }
 

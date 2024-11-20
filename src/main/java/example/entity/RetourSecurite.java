@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "retourSecurite")
@@ -29,10 +30,12 @@ public class RetourSecurite {
 
     private Date dateCloture;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Client> clients;
 
+    @ManyToOne
+    @JoinColumn(name = "mouvement_id", nullable = false)
+    private Mouvement mouvement;
 
 }
 

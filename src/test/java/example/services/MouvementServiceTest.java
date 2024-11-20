@@ -1,5 +1,6 @@
 package example.services;
 
+import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.repositories.MouvementRepository;
 import org.junit.jupiter.api.Assertions;
@@ -9,10 +10,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class MouvementServiceTest {
@@ -35,7 +39,7 @@ public class MouvementServiceTest {
 
         Mouvement result = mouvementService.createMouvement(mouvement);
 
-        Assertions.assertNotNull(result, "Mouvement should not be null");
+        assertNotNull(result, "Mouvement should not be null");
         verify(mouvementRepository, times(1)).save(mouvement);
         verifyNoMoreInteractions(mouvementRepository);
     }
@@ -49,7 +53,7 @@ public class MouvementServiceTest {
             mouvementService.createMouvement(mouvement);
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage(), "Exception message should match expected error");
+        assertEquals("Database error", exception.getMessage(), "Exception message should match expected error");
         verify(mouvementRepository, times(1)).save(mouvement);
         verifyNoMoreInteractions(mouvementRepository);
     }
@@ -69,8 +73,8 @@ public class MouvementServiceTest {
 
         Mouvement result = mouvementService.updateMouvement(id, mouvement);
 
-        Assertions.assertNotNull(result, "Mouvement should not be null");
-        Assertions.assertEquals(id, result.getId(), "Mouvement ID should be updated");
+        assertNotNull(result, "Mouvement should not be null");
+        assertEquals(id, result.getId(), "Mouvement ID should be updated");
 
         verify(mouvementRepository, times(1)).existsById(id);
         verify(mouvementRepository, times(1)).save(mouvement);
@@ -88,7 +92,7 @@ public class MouvementServiceTest {
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
             mouvementService.updateMouvement(id, mouvement);
         });
-        Assertions.assertEquals("Mouvement not found", exception.getMessage());
+        assertEquals("Mouvement not found", exception.getMessage());
 
         verify(mouvementRepository, times(1)).existsById(id);
         verify(mouvementRepository, never()).save(any(Mouvement.class));
@@ -116,7 +120,7 @@ public class MouvementServiceTest {
             mouvementService.deleteMouvement(id);
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage());
+        assertEquals("Database error", exception.getMessage());
         verify(mouvementRepository, times(1)).deleteById(id);
         verifyNoMoreInteractions(mouvementRepository);
     }
@@ -131,8 +135,8 @@ public class MouvementServiceTest {
 
         Mouvement result = mouvementService.getMouvementById(id);
 
-        Assertions.assertNotNull(result, "Mouvement should not be null");
-        Assertions.assertEquals(id, result.getId(), "Mouvement ID should match");
+        assertNotNull(result, "Mouvement should not be null");
+        assertEquals(id, result.getId(), "Mouvement ID should match");
 
         verify(mouvementRepository, times(1)).findById(id);
         verifyNoMoreInteractions(mouvementRepository);
@@ -161,7 +165,7 @@ public class MouvementServiceTest {
 
         List<Mouvement> result = mouvementService.getAllMouvements();
 
-        Assertions.assertEquals(2, result.size(), "The list of mouvements should contain 2 elements");
+        assertEquals(2, result.size(), "The list of mouvements should contain 2 elements");
         verify(mouvementRepository, times(1)).findAll();
         verifyNoMoreInteractions(mouvementRepository);
     }
@@ -189,5 +193,19 @@ public class MouvementServiceTest {
             verifyNoInteractions(mouvementRepository);
         });
     }
+
+    @Test
+    public void testCreateMouvement_WithLivreurs() {
+        Mouvement mouvement = new Mouvement();
+        mouvement.setLivreurs(Collections.singletonList(new Livreur()));
+
+        when(mouvementRepository.save(any(Mouvement.class))).thenReturn(mouvement);
+
+        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
+
+        assertNotNull(createdMouvement);
+        assertEquals(1, createdMouvement.getLivreurs().size());
+    }
+
 }
 

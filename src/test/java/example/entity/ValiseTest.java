@@ -64,7 +64,7 @@ public class ValiseTest {
         valise.setNumeroValise(1234L);
         valise.setDescription("la valise a pour numero 1234L");
         valise.setClient(client1);
-        valise.setTypevalise(type1);
+        valise.setTypeValiseList((List<TypeValise>) type1);
         valise.setDateCreation(sdf.parse("2016-02-20"));
         valise.setDateDernierMouvement(sdf.parse("2024-02-20"));
         valise.setDateRetourPrevue(sdf.parse("2024-09-02"));
@@ -72,7 +72,7 @@ public class ValiseTest {
         valise.setMouvementList(mouvementList);
         valise.setNumeroDujeu("numero du jeu");
         valise.setRefClient("ref client");
-        valise.setRegleSortie(regle1);
+        valise.setRegleSortie((List<Regle>) regle1);
         valise.setSortie(sdf.parse("2016-02-20"));
 
         em.persist(valise);
@@ -146,7 +146,7 @@ public class ValiseTest {
     public void testValiseClientNull() {
         Valise valiseWithoutClient = new Valise();
         valiseWithoutClient.setDescription("Suitcase without customer");
-        valiseWithoutClient.setTypevalise(valise.getTypevalise());
+        valiseWithoutClient.setTypeValiseList(valise.getTypeValiseList());
         valiseWithoutClient.setRegleSortie(valise.getRegleSortie());
 
         Assertions.assertThrows(PersistenceException.class, () -> {
@@ -189,7 +189,7 @@ public class ValiseTest {
     public void testValiseRegleNull() {
         Valise valiseWithoutRegle = new Valise();
         valiseWithoutRegle.setClient(valise.getClient());
-        valiseWithoutRegle.setTypevalise(valise.getTypevalise());
+        valiseWithoutRegle.setTypeValiseList(valise.getTypeValiseList());
         valiseWithoutRegle.setDescription("Suitcase without ruler");
 
         em.persist(valiseWithoutRegle);
@@ -207,19 +207,19 @@ public class ValiseTest {
         em.persist(newRegle);
         em.flush();
 
-        valise.setRegleSortie(newRegle);
+        valise.setRegleSortie((List<Regle>) newRegle);
         em.merge(valise);
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals(newRegle.getId(), foundValise.getRegleSortie().getId(), "The associated rule should be updated.");
+        Assertions.assertEquals(newRegle.getId(), foundValise.getRegleSortie().get(1), "The associated rule should be updated.");
     }
 
 
     @Test
     public void testValiseTypeValiseAssociation() {
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertNotNull(foundValise.getTypevalise(), "The suitcase must be associated with a suitcase type.");
+        Assertions.assertNotNull(foundValise.getTypeValiseList(), "The suitcase must be associated with a suitcase type.");
     }
 
     @Test
@@ -232,7 +232,7 @@ public class ValiseTest {
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valiseWithoutTypeValise.getId());
-        Assertions.assertNull(foundValise.getTypevalise(), "The suitcase type of the suitcase should be zero.");
+        Assertions.assertNull(foundValise.getTypeValiseList(), "The suitcase type of the suitcase should be zero.");
     }
 
 
@@ -246,12 +246,12 @@ public class ValiseTest {
         em.persist(newTypeValise);
         em.flush();
 
-        valise.setTypevalise(newTypeValise);
+        valise.setTypeValiseList((List<TypeValise>) newTypeValise);
         em.merge(valise);
         em.flush();
 
         Valise foundValise = em.find(Valise.class, valise.getId());
-        Assertions.assertEquals(newTypeValise.getId(), foundValise.getTypevalise().getId(), "The associated suitcase type should be updated.");
+        Assertions.assertEquals(newTypeValise.getId(), foundValise.getTypeValiseList().get(0), "The associated suitcase type should be updated.");
     }
 
 

@@ -4,6 +4,7 @@ import example.entity.RegleManuelle;
 import example.exceptions.ConflictException;
 import example.interfaces.IRegleManuelleService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,14 +43,16 @@ public class RegleManuelleController {
         try {
             RegleManuelle createdRegleManuelle = regleManuelleService.createRegleManuelle(regleManuelle);
             return new ResponseEntity<>(createdRegleManuelle, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (ConstraintViolationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Violation des contraintes
         } catch (ConflictException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
 
     @PutMapping("/{id}")

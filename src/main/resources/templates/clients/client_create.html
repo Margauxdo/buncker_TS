@@ -1,58 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+
     <title>Créer un Client</title>
 </head>
 <body>
 <h1>Créer un Nouveau Client</h1>
 <form th:action="@{/clients/create}" th:object="${client}" method="post">
     <label for="name">Nom:</label>
-    <input type="text" id="name" th:field="*{client.name}" required />
+    <input type="text" id="name" th:field="*{name}" required />
+
     <br>
     <label for="email">Email:</label>
-    <input type="email" id="email" th:field="*{client.email}" required />
+    <input type="email" id="email" th:field="*{email}" required />
     <br>
     <label for="adresse">Adresse:</label>
-    <input type="text" id="adresse" th:field="*{client.adresse}" />
+    <input type="text" id="adresse" th:field="*{adresse}" />
     <br>
     <label for="telephoneExploitation">Téléphone:</label>
-    <input type="text" id="telephoneExploitation" th:field="*{client.telephoneExploitation}" />
+    <input type="text" id="telephoneExploitation" th:field="*{telephoneExploitation}" />
     <br>
     <label for="ville">Ville:</label>
-    <input type="text" id="ville" th:field="*{client.ville}" />
+    <input type="text" id="ville" th:field="*{ville}" />
     <br>
-    <label for="PersonnelEtFonction">Fonction:</label>
-    <input type="text" id="PersonnelEtFonction" th:field="*{client.PersonnelEtFonction}" />
+    <label for="personnelEtFonction">Fonction:</label>
+    <input type="text" id="personnelEtFonction" th:field="*{personnelEtFonction}" />
+
     <br>
     <label for="ramassage1">Ramassage 1:</label>
-    <input type="text" id="ramassage1" th:field="*{client.ramassage1}" />
+    <input type="text" id="ramassage1" th:field="*{ramassage1}" />
     <br>
     <label for="ramassage2">Ramassage 2:</label>
-    <input type="text" id="ramassage2" th:field="*{client.ramassage2}" />
+    <input type="text" id="ramassage2" th:field="*{ramassage2}" />
     <br>
     <label for="ramassage3">Ramassage 3:</label>
-    <input type="text" id="ramassage3" th:field="*{client.ramassage3}" />
+    <input type="text" id="ramassage3" th:field="*{ramassage3}" />
     <br>
     <label for="ramassage4">Ramassage 4:</label>
-    <input type="text" id="ramassage4" th:field="*{client.ramassage4}" />
+    <input type="text" id="ramassage4" th:field="*{ramassage4}" />
     <br>
     <label for="ramassage5">Ramassage 5:</label>
-    <input type="text" id="ramassage5" th:field="*{client.ramassage5}" />
+    <input type="text" id="ramassage5" th:field="*{ramassage5}" />
     <br>
     <label for="ramassage6">Ramassage 6:</label>
-    <input type="text" id="ramassage6" th:field="*{client.ramassage6}" />
+    <input type="text" id="ramassage6" th:field="*{ramassage6}" />
     <br>
     <label for="ramassage7">Ramassage 7:</label>
-    <input type="text" id="ramassage7" th:field="*{client.ramassage7}" />
+    <input type="text" id="ramassage7" th:field="*{ramassage7}" />
     <br>
-    <label for="EnvoiparDefaut">Envoie par default:</label>
-    <input type="text" id="EnvoiparDefaut" th:field="*{client.EnvoiparDefaut}" />
+    <label for="envoiparDefaut">Envoie par default:</label>
+    <input type="text" id="envoiparDefaut" th:field="*{envoiparDefaut}" />
     <br>
-    <label for="MemoRetourSecurite1">Mémo retour sécurité 1:</label>
-    <input type="text" id="MemoRetourSecurite1" th:field="*{client.MemoRetourSecurite1}" />
+    <label for="memoRetourSecurite1">Mémo retour sécurité 1:</label>
+    <input type="text" id="memoRetourSecurite1" th:field="*{memoRetourSecurite1}" />
     <br>
-    <label for="MemoRetourSecurite2">Mémo retour sécurité 2:</label>
-    <input type="text" id="MemoRetourSecurite2" th:field="*{client.MemoRetourSecurite2}" />
+    <label for="memoRetourSecurite2">Mémo retour sécurité 2:</label>
+    <input type="text" id="memoRetourSecurite2" th:field="*{memoRetourSecurite2}" />
     <br>
 
     <button type="submit">Créer</button>

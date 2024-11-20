@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ConcurrentModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class FormuleControllerTest {
         formules.add(new Formule());
         when(formuleService.getAllFormules()).thenReturn(formules);
 
-        List<Formule> result = formuleController.getAllFormules();
+        List<Formule> result = formuleController.getAllFormulesApi();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -46,7 +47,7 @@ public class FormuleControllerTest {
     public void testGetAllFormules_Failure() {
         when(formuleService.getAllFormules()).thenThrow(new RuntimeException("Erreur de la base de données"));
 
-        assertThrows(RuntimeException.class, () -> formuleController.getAllFormules());
+        assertThrows(RuntimeException.class, () -> formuleController.getAllFormulesApi());
     }
 
     @Test
@@ -54,7 +55,7 @@ public class FormuleControllerTest {
         Formule formule = new Formule();
         when(formuleService.getFormuleById(1)).thenReturn(formule);
 
-        ResponseEntity<Formule> response = formuleController.getFormuleById(1);
+        ResponseEntity<Formule> response = formuleController.getFormuleByIdApi(1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(formule, response.getBody());
@@ -64,7 +65,7 @@ public class FormuleControllerTest {
     public void testGetFormuleById_Failure() {
         when(formuleService.getFormuleById(1)).thenReturn(null);
 
-        ResponseEntity<Formule> response = formuleController.getFormuleById(1);
+        ResponseEntity<Formule> response = formuleController.getFormuleByIdApi(1);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -74,28 +75,57 @@ public class FormuleControllerTest {
         Formule formule = new Formule();
         when(formuleService.createFormule(any(Formule.class))).thenReturn(formule);
 
-        ResponseEntity<Formule> response = formuleController.createFormule(formule);
+        String response = formuleController.createFormule(formule, new ConcurrentModel());
+
+        assertEquals("redirect:/formules/list", response);
+    }
+    @Test
+    public void testCreateFormuleApi_Success() {
+        Formule formule = new Formule();
+        when(formuleService.createFormule(any(Formule.class))).thenReturn(formule);
+
+        ResponseEntity<Formule> response = formuleController.createFormuleApi(formule);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(formule, response.getBody());
     }
 
     @Test
-    public void testCreateFormule_Failure() {
-        Formule formule = new Formule();
-        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalArgumentException("Formule invalide"));
+    public void testCreateFormuleApi_Failure() {
+        // Cas d'échec avec l'API REST
+        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
 
-        ResponseEntity<Formule> response = formuleController.createFormule(formule);
+        ResponseEntity<Formule> response = formuleController.createFormuleApi(new Formule());
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
+
+
+
+    @Test
+    public void testCreateFormule_Failure() {
+        doThrow(new IllegalArgumentException("Formule invalide"))
+                .when(formuleService).createFormule(any(Formule.class));
+
+        ConcurrentModel model = new ConcurrentModel();
+
+        String response = formuleController.createFormule(new Formule(), model);
+
+        assertEquals("formule_create", response);
+
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Formule invalide", model.getAttribute("errorMessage"));
+    }
+
+
+
 
     @Test
     public void testUpdateFormule_Success() {
         Formule updatedFormule = new Formule();
         when(formuleService.updateFormule(1, updatedFormule)).thenReturn(updatedFormule);
 
-        ResponseEntity<Formule> response = formuleController.updateFormule(1, updatedFormule);
+        ResponseEntity<Formule> response = formuleController.updateFormuleApi(1, updatedFormule);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedFormule, response.getBody());
@@ -106,7 +136,7 @@ public class FormuleControllerTest {
         Formule updatedFormule = new Formule();
         when(formuleService.updateFormule(1, updatedFormule)).thenReturn(null);
 
-        ResponseEntity<Formule> response = formuleController.updateFormule(1, updatedFormule);
+        ResponseEntity<Formule> response = formuleController.updateFormuleApi(1, updatedFormule);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -115,7 +145,7 @@ public class FormuleControllerTest {
     public void testDeleteFormule_Success() {
         doNothing().when(formuleService).deleteFormule(1);
 
-        ResponseEntity<Formule> response = formuleController.deleteFormule(1);
+        ResponseEntity<Formule> response = formuleController.deleteFormuleApi(1);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
@@ -124,25 +154,33 @@ public class FormuleControllerTest {
     public void testDeleteFormule_Failure() {
         doThrow(new RuntimeException("Formule non trouvée")).when(formuleService).deleteFormule(1);
 
-        assertThrows(RuntimeException.class, () -> formuleController.deleteFormule(1));
+        assertThrows(RuntimeException.class, () -> formuleController.deleteFormuleApi(1));
     }
 
     @Test
     public void testCreateFormule_InvalidInput() {
-        Formule invalidFormule = new Formule();
-        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
+        doThrow(new IllegalArgumentException("Invalid data"))
+                .when(formuleService).createFormule(any(Formule.class));
 
-        ResponseEntity<Formule> response = formuleController.createFormule(invalidFormule);
+        ConcurrentModel model = new ConcurrentModel();
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        String response = formuleController.createFormule(new Formule(), model);
+
+        assertEquals("formule_create", response);
+
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Invalid data", model.getAttribute("errorMessage"));
     }
+
+
+
 
     @Test
     public void testUpdateFormule_InvalidInput() {
         Formule invalidFormule = new Formule();
         when(formuleService.updateFormule(eq(1), any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
 
-        ResponseEntity<Formule> response = formuleController.updateFormule(1, invalidFormule);
+        ResponseEntity<Formule> response = formuleController.updateFormuleApi(1, invalidFormule);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
@@ -150,20 +188,20 @@ public class FormuleControllerTest {
     public void testDeleteFormule_NotFound() {
         doThrow(new IllegalArgumentException("Formule not found")).when(formuleService).deleteFormule(1);
 
-        ResponseEntity<Formule> response = formuleController.deleteFormule(1);
+        ResponseEntity<Formule> response = formuleController.deleteFormuleApi(1);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
-    public void testCreateFormule_Conflict() {
-        Formule formule = new Formule();
+    public void testCreateFormuleApi_Conflict() {
         when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalStateException("Conflict detected"));
 
-        ResponseEntity<Formule> response = formuleController.createFormule(formule);
+        ResponseEntity<Formule> response = formuleController.createFormuleApi(new Formule());
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
+
 
 
 

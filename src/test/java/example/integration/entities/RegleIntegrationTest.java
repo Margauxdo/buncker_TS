@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -168,10 +169,10 @@ public class RegleIntegrationTest {
 
         Regle regle = new Regle();
         regle.setCoderegle("R008");
-        regle.setTypeRegle(savedTypeRegle);
+        regle.setTypeRegles((List<TypeRegle>) typeRegle);
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
-        assertEquals("Type A", savedRegle.getTypeRegle().getNomTypeRegle());
+        assertEquals("Type A", savedRegle.getTypeRegles().get(0).getNomTypeRegle());
     }
 
     @Test
@@ -205,7 +206,7 @@ public class RegleIntegrationTest {
         Valise valise = new Valise();
         valise.setDescription("ValiseTest");
         valise.setClient(client);
-        valise.setRegleSortie(regle);
+        valise.setRegleSortie((List<Regle>) regle);
 
         regle.setValise(valise);
 
@@ -223,7 +224,7 @@ public class RegleIntegrationTest {
         regleRepository.saveAndFlush(regle);
 
         JourFerie jourFerie = new JourFerie();
-        jourFerie.setRegle(regle);
+        jourFerie.setRegles((List<Regle>) regle);
         jourFerieRepository.saveAndFlush(jourFerie);
 
         jourFerieRepository.deleteByRegleId(regle.getId());

@@ -193,6 +193,26 @@ class ClientIntegrationTest {
         assertEquals(client.getId(), problemes.get(0).getClient().getId());
         assertEquals("Problème de test", problemes.get(0).getDescriptionProbleme());
     }
+    @Test
+    public void testCascadeSaveAndDeleteClient() {
+        Client client = new Client();
+        client.setName("Client with Valise");
+        client.setEmail("test@relation.com");
+
+        Valise valise = new Valise();
+        valise.setClient(client);
+        client.getValises().add(valise);
+
+        clientRepository.save(client);
+
+        Optional<Client> savedClient = clientRepository.findById(client.getId());
+        Assertions.assertTrue(savedClient.isPresent());
+        Assertions.assertEquals(1, savedClient.get().getValises().size());
+
+        clientRepository.delete(client);
+        Assertions.assertTrue(valiseRepository.findAll().isEmpty());
+    }
+
 
 
 

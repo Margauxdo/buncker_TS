@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Détails de la formule</title>
+</head>
+<body>
+<h1>Détails de la formule</h1>
+<p><strong>Libelle:</strong> <span th:text="${formule.libelle}"></span></p>
+<p><strong>Formule:</strong> <span th:text="${formule.formule}"></span></p>
+<p><strong>Regle:</strong> <span th:text="${formule.regle}"></span></p>
+
+<a href="/formules/list">Retour à la liste</a>
+</body>
+</html>
+

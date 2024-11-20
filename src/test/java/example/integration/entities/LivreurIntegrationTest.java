@@ -47,7 +47,7 @@ public class LivreurIntegrationTest {
         livreur1.setMotDePasse("1234");
 
         Mouvement mouvement1 = new Mouvement();
-        mouvement1.setLivreur(livreur1);
+        mouvement1.setLivreurs((List<Livreur>) livreur1);
 
 
         Livreur savedLivreur = livreurRepository.save(livreur1);
@@ -151,10 +151,10 @@ public class LivreurIntegrationTest {
         livreur.setCodeLivreur("1234");
 
         Mouvement mouvement1 = new Mouvement();
-        mouvement1.setLivreur(livreur);
+        mouvement1.setLivreurs((List<Livreur>) livreur);
 
-        livreur.setMouvements(new ArrayList<>());
-        livreur.getMouvements().add(mouvement1);
+        livreur.setMouvement(mouvement1);
+        livreur.getMouvement().setLivreurs((List<Livreur>) livreur);
 
         livreurRepository.saveAndFlush(livreur);
 
@@ -198,12 +198,12 @@ public class LivreurIntegrationTest {
         livreurRepository.save(livreur);
 
         Mouvement mouvement = new Mouvement();
-        mouvement.setLivreur(livreur);
+        mouvement.setLivreurs((List<Livreur>) livreur);
         mouvementRepository.save(mouvement);
 
         Optional<Mouvement> found = mouvementRepository.findById(mouvement.getId());
         assertTrue(found.isPresent());
-        assertEquals(livreur.getId(), found.get().getLivreur().getId());
+        assertEquals(livreur.getId(), found.get().getLivreurs().get(0).getId());
     }
 
 

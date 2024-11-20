@@ -37,7 +37,7 @@ public class ClientServiceIntegrationTest {
                 .adresse("123 Main St")
                 .telephoneExploitation("555-1234")
                 .ville("Springfield")
-                .PersonnelEtFonction("Manager")
+                .personnelEtFonction("Manager")
                 .build();
     }
 
@@ -108,7 +108,7 @@ public class ClientServiceIntegrationTest {
                 .adresse("456 Main St")
                 .telephoneExploitation("555-5678")
                 .ville("Springfield")
-                .PersonnelEtFonction("Supervisor")
+                .personnelEtFonction("Supervisor")
                 .build();
 
         clientService.createClient(client);

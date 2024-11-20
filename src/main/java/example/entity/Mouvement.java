@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "mouvement")
@@ -26,12 +27,16 @@ public class Mouvement {
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
 
-    @ManyToOne
+    @OneToMany
     @JoinColumn(name = "valise_id")
-    private Valise valise;
+    private List<Valise> valises;
 
-    @ManyToOne
-    @JoinColumn(name = "livreur_id")
+    @OneToMany(mappedBy = "mouvement", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
-    private Livreur livreur;
+    private List<Livreur> livreurs;
+
+
+    @OneToMany
+    @JoinColumn(name = "retourSecurite_id")
+    private List<RetourSecurite> retourSecurites;
 }

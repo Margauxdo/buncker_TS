@@ -26,44 +26,16 @@ public class TypeValiseService implements ITypeValiseService {
 
     @Override
     public TypeValise createTypeValise(TypeValise typeValise) {
-        if (typeValise == null) {
-            throw new IllegalArgumentException("TypeValise cannot be null");
+        if (typeValise == null || typeValise.getValise() == null) {
+            throw new IllegalArgumentException("TypeValise or its associated Valise cannot be null");
         }
 
-        // Log pour vérifier l'objet reçu
-        System.out.println("TypeValise reçu : " + typeValise);
-        System.out.println("Propriétaire : " + typeValise.getProprietaire());
-        System.out.println("Description : " + typeValise.getDescription());
-        System.out.println("Valises reçues : " + (typeValise.getValises() != null ? typeValise.getValises() : "Aucune valise"));
+        Valise managedValise = valiseRepository.findById(typeValise.getValise().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + typeValise.getValise().getId()));
 
-        try {
-            // Récupérer explicitement les valises existantes à partir de leurs IDs
-            if (typeValise.getValises() != null && !typeValise.getValises().isEmpty()) {
-                List<Valise> managedValises = new ArrayList<>();
-                for (Valise valise : typeValise.getValises()) {
-                    // Récupérer la valise depuis la base de données
-                    Valise managedValise = valiseRepository.findById(valise.getId())
-                            .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + valise.getId()));
-                    managedValise.setTypevalise(typeValise);
-                    managedValises.add(managedValise);
-                }
-                // Associer la liste des valises récupérées
-                typeValise.setValises(managedValises);
-            }
-
-            // Ajoutez cette ligne ici, avant la sauvegarde
-            System.out.println("Avant la sauvegarde de TypeValise : " + typeValise);
-
-            // Sauvegarder le TypeValise
-            return typeValiseRepository.save(typeValise);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erreur lors de la création de TypeValise", e);
-        }
+        typeValise.setValise(managedValise);
+        return typeValiseRepository.save(typeValise);
     }
-
-
-
 
 
     @Override

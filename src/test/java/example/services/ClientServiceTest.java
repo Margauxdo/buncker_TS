@@ -51,6 +51,25 @@ public class ClientServiceTest {
 
     }
     @Test
+    public void testPartialUpdateClient() {
+        Client existingClient = new Client();
+        existingClient.setName("Original Name");
+        existingClient.setEmail("original@example.com");
+
+        when(clientRepository.findById(1)).thenReturn(Optional.of(existingClient));
+
+        Client update = new Client();
+        update.setName("Updated Name");
+
+        when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Client updatedClient = clientService.updateClient(1, update);
+
+        Assertions.assertEquals("Updated Name", updatedClient.getName());
+        Assertions.assertEquals("original@example.com", updatedClient.getEmail());
+    }
+
+    @Test
     public void testUpdateClient_Success() {
         int id = 1;
         Client client = new Client();

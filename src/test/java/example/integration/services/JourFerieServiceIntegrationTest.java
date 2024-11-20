@@ -1,7 +1,9 @@
 package example.integration.services;
 
+import example.entity.Formule;
 import example.entity.JourFerie;
 import example.entity.Regle;
+import example.repositories.FormuleRepository;
 import example.repositories.JourFerieRepository;
 import example.repositories.RegleRepository;
 import example.services.JourFerieService;
@@ -12,11 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -32,6 +37,8 @@ public class JourFerieServiceIntegrationTest {
     private JourFerie jourFerie;
     @Autowired
     private RegleRepository regleRepository;
+    @Autowired
+    private FormuleRepository formuleRepository;
 
     @BeforeEach
     void setUp() {
@@ -43,7 +50,7 @@ public class JourFerieServiceIntegrationTest {
         regle = regleRepository.save(regle);
 
         jourFerie = JourFerie.builder()
-                .regle(regle)
+                .regles((List<Regle>) regle)
                 .build();
     }
 
@@ -61,7 +68,7 @@ public class JourFerieServiceIntegrationTest {
         assertNotNull(retrievedJourFerie, "Le jour férié ne devrait pas être null");
         assertEquals(jourFerie.getId(), retrievedJourFerie.getId(), "L'ID du jour férié devrait correspondre");
         assertEquals(jourFerie.getJoursFerieList(), retrievedJourFerie.getJoursFerieList(), "La liste des jours fériés devrait correspondre");
-        assertEquals(jourFerie.getRegle().getId(), retrievedJourFerie.getRegle().getId(), "La règle associée devrait correspondre");
+        assertEquals(jourFerie.getRegles().get(1), retrievedJourFerie.getRegles().get(1), "La règle associée devrait correspondre");
     }
 
     @Test
@@ -103,4 +110,21 @@ public class JourFerieServiceIntegrationTest {
         JourFerie deletedJourFerie = jourFerieService.getJourFerie(jourFerie.getId());
         assertNull(deletedJourFerie, "Le jour férié devrait être null après suppression");
     }
+    @Test
+    public void testSaveJourFerieWithFormule() {
+        Formule formule = new Formule();
+        formule.setFormule("Formule Test");
+        formuleRepository.save(formule);
+
+        JourFerie jourFerie = new JourFerie();
+        jourFerie.setJoursFerieList((List<Date>) formule); // Relation avec Formule
+
+        when(jourFerieRepository.save(jourFerie)).thenReturn(jourFerie);
+
+        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
+
+        assertNotNull(savedJourFerie.getJoursFerieList());
+        assertEquals("Formule Test", savedJourFerie.getJoursFerieList().get(1));
+    }
+
 }

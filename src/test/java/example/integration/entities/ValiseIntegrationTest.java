@@ -70,8 +70,8 @@ public class ValiseIntegrationTest {
                 .refClient("REF123")
                 .dateCreation(new Date())
                 .client(client)
-                .regleSortie(regle)
-                .typevalise(typeValise)
+                .regleSortie((List<Regle>) regle)
+                .typeValiseList((List<TypeValise>) typeValise)
                 .build();
 
         valise = valiseRepository.save(valise);
@@ -82,8 +82,8 @@ public class ValiseIntegrationTest {
         assertNotNull(valise.getId(), "L'ID de la valise doit être généré après la sauvegarde.");
         assertEquals("Valise de test", valise.getDescription());
         assertEquals(client.getId(), valise.getClient().getId());
-        assertEquals(regle.getId(), valise.getRegleSortie().getId());
-        assertEquals(typeValise.getId(), valise.getTypevalise().getId());
+        assertEquals(regle.getId(), valise.getRegleSortie().get(0));
+        assertEquals(typeValise.getId(), valise.getTypeValiseList().get(0));
     }
 
     @Test

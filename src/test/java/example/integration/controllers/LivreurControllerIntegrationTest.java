@@ -63,7 +63,7 @@ public class LivreurControllerIntegrationTest {
         livreur = livreurRepository.save(livreur);
 
         // Initialiser explicitement la collection
-        Hibernate.initialize(livreur.getMouvements());
+        Hibernate.initialize(livreur.getMouvement());
 
         mockMvc.perform(get("/api/livreurs/{id}", livreur.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -89,21 +89,7 @@ public class LivreurControllerIntegrationTest {
     }
 
 
-    @Test
-    public void testCreateLivreur_shouldReturnCreated() throws Exception {
-        Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Doe");
-        livreur.setPrenomLivreur("John");
-        livreur.setCodeLivreur("25658AW");
-        livreur.setNumeroCartePro("125896");
-        String livreurJson = objectMapper.writeValueAsString(livreur);
 
-        mockMvc.perform(post("/api/livreurs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(livreurJson))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nomLivreur").value("Doe"));
-    }
 
     @Test
     public void testCreateLivreur_shouldReturnBadRequestForInvalidData() throws Exception {
@@ -237,4 +223,19 @@ public class LivreurControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+    public void testCreateLivreur_shouldReturnCreated() throws Exception {
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("12345")
+                .build();
+
+        mockMvc.perform(post("/api/livreurs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livreur)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nomLivreur").value("John Doe"));
+    }
+
 }

@@ -20,25 +20,6 @@ public class MouvementService implements IMouvementService {
     } ;
 
 
-    @Override
-    public Mouvement createMouvement(Mouvement mouvement) {
-
-        return mouvementRepository.save(mouvement);
-    }
-
-    public Mouvement updateMouvement(int id, Mouvement mouvement) {
-        if (!mouvementRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mouvement not found"); //404
-        }
-        return mouvementRepository.save(mouvement);
-    }
-
-
-
-    @Override
-    public void deleteMouvement(int id) {
-            mouvementRepository.deleteById(id);
-    }
 
     @Override
     public List<Mouvement> getAllMouvements() {
@@ -56,4 +37,31 @@ public class MouvementService implements IMouvementService {
         return mouvementRepository.existsById(id);
     }
 
-}
+
+    @Override
+        public Mouvement createMouvement(Mouvement mouvement) {
+            return mouvementRepository.save(mouvement);
+        }
+
+    @Override
+        public Mouvement updateMouvement(int id, Mouvement mouvement) {
+            Mouvement existingMouvement = mouvementRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + id));
+
+            existingMouvement.setDateHeureMouvement(mouvement.getDateHeureMouvement());
+            existingMouvement.setStatutSortie(mouvement.getStatutSortie());
+            existingMouvement.setDateSortiePrevue(mouvement.getDateSortiePrevue());
+            existingMouvement.setDateRetourPrevue(mouvement.getDateRetourPrevue());
+
+            return mouvementRepository.save(existingMouvement);
+        }
+
+    @Override
+        public void deleteMouvement(int id) {
+            if (!mouvementRepository.existsById(id)) {
+                throw new EntityNotFoundException("Mouvement not found with ID: " + id);
+            }
+            mouvementRepository.deleteById(id);
+        }
+    }
+

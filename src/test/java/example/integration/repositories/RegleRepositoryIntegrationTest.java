@@ -1,11 +1,10 @@
 package example.integration.repositories;
 
-import example.entity.Formule;
-import example.entity.Regle;
-import example.entity.TypeRegle;
-import example.entity.Valise;
+import example.entity.*;
 import example.repositories.RegleRepository;
+import example.repositories.SortieSemaineRepository;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RegleRepositoryIntegrationTest {
     @Autowired
     private RegleRepository regleRepository;
+    @Autowired
+    private SortieSemaineRepository sortieSemaineRepository;
 
     @BeforeEach
     public void setUp() {
@@ -43,7 +45,7 @@ public class RegleRepositoryIntegrationTest {
         Regle regle = new Regle();
         regle.setCoderegle("AW5698");
         regle.setFormule(form);
-        regle.setTypeRegle(tp);
+        regle.getTypeRegles().add(tp);
         regle.setValise(val);
         Regle savedregle = regleRepository.save(regle);
         assertNotNull(savedregle.getId());
@@ -121,17 +123,26 @@ public class RegleRepositoryIntegrationTest {
         assertEquals("libelle test regle", foundregle.get().getFormule().getLibelle());
     }
     @Test
-    public void testFindRegleByTypeRegle(){
+    public void testFindRegleByTypeRegle() {
+        // Arrange
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("Type ABC");
+
         Regle regle = new Regle();
         regle.setCoderegle("AW5698");
-        regle.setTypeRegle(typeRegle);
-        Regle savedregle = regleRepository.save(regle);
-        Optional<Regle> foundregle = regleRepository.findById(savedregle.getId());
-        assertTrue(foundregle.isPresent());
-        assertEquals("Type ABC", foundregle.get().getTypeRegle().getNomTypeRegle());
+        regle.getTypeRegles().add(typeRegle);
+
+        Regle savedRegle = regleRepository.saveAndFlush(regle);
+
+        // Act
+        Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
+
+        // Assert
+        assertTrue(foundRegle.isPresent());
+        assertFalse(foundRegle.get().getTypeRegles().isEmpty(), "TypeRegles list should not be empty");
+        assertEquals("Type ABC", foundRegle.get().getTypeRegles().get(0).getNomTypeRegle());
     }
+
     @Test
     public void testFindRegleByValise(){
         Valise val = new Valise();
@@ -177,6 +188,25 @@ public class RegleRepositoryIntegrationTest {
         List<Regle> reglesWithoutFormule = regleRepository.findAll();
         assertNull(reglesWithoutFormule.get(0).getFormule());
     }
+    @Test
+    public void testOrphanRemovalForSortieSemaine() {
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("OrphanTest");
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        sortieSemaine.setDateSortieSemaine(new Date());
+        sortieSemaine.setRegle(regle);
+        regle.getSortieSemaine().add(sortieSemaine);
+        regleRepository.saveAndFlush(regle);
+
+        // Act
+        regle.getSortieSemaine().clear();
+        regleRepository.saveAndFlush(regle);
+
+        // Assert
+        Assertions.assertTrue(sortieSemaineRepository.findAll().isEmpty(), "Orphan removal did not occur for SortieSemaine");
+    }
+
 
 
 

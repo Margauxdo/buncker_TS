@@ -49,13 +49,13 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu = new RetourSecurite();
         retourSecu.setNumero(2546L);
         retourSecu.setDatesecurite(new Date());
-        retourSecu.setClient(savedClient);
+        retourSecu.setClients((List<Client>) client);
 
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecu);
 
         assertNotNull(savedRs.getId());
         assertEquals(2546L, savedRs.getNumero());
-        assertEquals(savedClient.getId(), savedRs.getClient().getId());
+        assertEquals(savedClient.getId(), savedRs.getClients().get(0).getId());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu = new RetourSecurite();
         retourSecu.setNumero(2546L);
         retourSecu.setDatesecurite(new Date());
-        retourSecu.setClient(client);
+        retourSecu.setClients((List<Client>) client);
 
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecu);
         Optional<RetourSecurite> foundRs = retourSecuriteRepository.findById(savedRs.getId());
@@ -88,7 +88,7 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu = new RetourSecurite();
         retourSecu.setNumero(2546L);
         retourSecu.setDatesecurite(new Date());
-        retourSecu.setClient(savedClient);
+        retourSecu.setClients((List<Client>) client);
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecu);
 
         retourSecuriteRepository.deleteById(savedRs.getId());
@@ -108,7 +108,7 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu = new RetourSecurite();
         retourSecu.setNumero(2546L);
         retourSecu.setDatesecurite(new Date());
-        retourSecu.setClient(savedClient);
+        retourSecu.setClients((List<Client>) client);
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecu);
 
         savedRs.setNumero(1254L);
@@ -118,7 +118,7 @@ public class RetourSecuriteIntegrationTest {
         Optional<RetourSecurite> foundRs = retourSecuriteRepository.findById(updatedRs.getId());
         assertTrue(foundRs.isPresent());
         assertEquals(1254L, foundRs.get().getNumero());
-        assertEquals(savedClient.getId(), foundRs.get().getClient().getId());
+        assertEquals(savedClient.getId(), foundRs.get().getClients().get(0).getId());
     }
 
 
@@ -137,12 +137,12 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu1 = new RetourSecurite();
         retourSecu1.setNumero(2546L);
         retourSecu1.setDatesecurite(new Date());
-        retourSecu1.setClient(client1);
+        retourSecu1.setClients((List<Client>) client1);
 
         RetourSecurite retourSecu2 = new RetourSecurite();
         retourSecu2.setNumero(1254L);
         retourSecu2.setDatesecurite(new Date());
-        retourSecu2.setClient(client2);
+        retourSecu2.setClients((List<Client>) client2);
         retourSecuriteRepository.save(retourSecu1);
         retourSecuriteRepository.save(retourSecu2);
 
@@ -162,7 +162,7 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu = new RetourSecurite();
         retourSecu.setNumero(2546L);
         retourSecu.setDatesecurite(new Date());
-        retourSecu.setClient(client);
+        retourSecu.setClients((List<Client>) client);
 
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecu);
         retourSecuriteRepository.deleteById(savedRs.getId());
@@ -181,14 +181,14 @@ public class RetourSecuriteIntegrationTest {
         RetourSecurite retourSecu = new RetourSecurite();
         retourSecu.setNumero(2546L);
         retourSecu.setDatesecurite(new Date());
-        retourSecu.setClient(client);
+        retourSecu.setClients((List<Client>) client);
         retourSecuriteRepository.save(retourSecu);
 
         Optional<RetourSecurite> foundRs = retourSecuriteRepository.findByNumero(2546L);
 
         assertTrue(foundRs.isPresent());
         assertEquals(2546L, foundRs.get().getNumero());
-        assertEquals(client.getId(), foundRs.get().getClient().getId());
+        assertEquals(client.getId(), foundRs.get().getClients().get(1).getId());
     }
 
 }

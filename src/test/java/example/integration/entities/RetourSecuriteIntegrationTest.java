@@ -4,6 +4,8 @@ import example.entity.Client;
 import example.entity.RetourSecurite;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,9 @@ public class RetourSecuriteIntegrationTest {
     @Autowired
     private ClientRepository clientRepository;
 
+    @PersistenceContext
+    private EntityManager em;
+
     @BeforeEach
     public void setUp() {
         retourSecuriteRepository.deleteAll();
@@ -41,12 +47,12 @@ public class RetourSecuriteIntegrationTest {
         client.setName("Albert");
         clientRepository.save(client);
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(1234L);
         RetourSecurite savedRs = retourSecuriteRepository.save(retourSecurite);
         Assertions.assertNotNull(savedRs.getId(), "The safety return id must be generated");
-        Assertions.assertEquals(client.getId(), savedRs.getClient().getId(), "The associated client must match");
+        Assertions.assertEquals(client.getId(), savedRs.getClients().get(0), "The associated client must match");
     }
     @Test
     public void testUpdateRetourSecurite() {
@@ -55,7 +61,7 @@ public class RetourSecuriteIntegrationTest {
         client.setName("Albert");
         clientRepository.save(client);
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(1234L);
         RetourSecurite savedRS = retourSecuriteRepository.save(retourSecurite);
@@ -87,7 +93,7 @@ public class RetourSecuriteIntegrationTest {
         clientRepository.save(client);
 
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
 
 
@@ -104,7 +110,7 @@ public class RetourSecuriteIntegrationTest {
         client.setName("Albert");
         clientRepository.save(client);
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(1234L);
         RetourSecurite savedRS = retourSecuriteRepository.save(retourSecurite);
@@ -126,13 +132,13 @@ public class RetourSecuriteIntegrationTest {
         clientRepository.save(clientB);
 
         RetourSecurite retourSecuriteC = new RetourSecurite();
-        retourSecuriteC.setClient(clientA);
+        retourSecuriteC.setClients(new ArrayList<>());
         retourSecuriteC.setDatesecurite(new Date());
         retourSecuriteC.setNumero(1001L);
         retourSecuriteRepository.save(retourSecuriteC);
 
         RetourSecurite retourSecuriteD = new RetourSecurite();
-        retourSecuriteD.setClient(clientB);
+        retourSecuriteD.setClients(new ArrayList<>());
         retourSecuriteD.setDatesecurite(new Date());
         retourSecuriteD.setNumero(1002L);
         retourSecuriteRepository.save(retourSecuriteD);
@@ -153,7 +159,7 @@ public class RetourSecuriteIntegrationTest {
         client.setName("Albert");
         clientRepository.save(client);
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(1234L);
         retourSecuriteRepository.save(retourSecurite);
@@ -171,7 +177,7 @@ public class RetourSecuriteIntegrationTest {
         clientRepository.save(client);
 
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(12345L);
         retourSecuriteRepository.save(retourSecurite);
@@ -188,5 +194,25 @@ public class RetourSecuriteIntegrationTest {
 
         Assertions.assertFalse(foundRetourSecurite.isPresent(), "safety return should not be found");
     }
+    @Test
+    public void testCascadeDeleteClients() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("test@example.com");
+        em.persist(client);
+
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setClients(new ArrayList<>());
+        retourSecurite.setNumero(12345L);
+        em.persist(retourSecurite);
+        em.flush();
+
+        em.remove(retourSecurite);
+        em.flush();
+
+        List<Client> clients = em.createQuery("SELECT c FROM Client c", Client.class).getResultList();
+        Assertions.assertTrue(clients.isEmpty(), "Clients should be deleted due to cascade.");
+    }
+
 
 }

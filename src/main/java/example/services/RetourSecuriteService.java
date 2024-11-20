@@ -15,15 +15,10 @@ public class RetourSecuriteService implements IRetourSecuriteService {
     @Autowired
     private RetourSecuriteRepository retourSecuriteRepository;
 
-    public RetourSecuriteService(RetourSecuriteRepository retourSecuriteRepository) {
-        this.retourSecuriteRepository = retourSecuriteRepository;
-    }
-
     @Override
     public RetourSecurite createRetourSecurite(RetourSecurite retourSecurite) {
         return retourSecuriteRepository.save(retourSecurite);
     }
-
 
     @Override
     public RetourSecurite updateRetourSecurite(int id, RetourSecurite retourSecurite) {
@@ -32,21 +27,23 @@ public class RetourSecuriteService implements IRetourSecuriteService {
         }
 
         RetourSecurite existingRetourSecurite = retourSecuriteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Back Security not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("RetourSecurite not found with id: " + id));
 
         existingRetourSecurite.setNumero(retourSecurite.getNumero());
+        existingRetourSecurite.setDatesecurite(retourSecurite.getDatesecurite());
+        existingRetourSecurite.setCloture(retourSecurite.getCloture());
+        existingRetourSecurite.setDateCloture(retourSecurite.getDateCloture());
+        existingRetourSecurite.setMouvement(retourSecurite.getMouvement());
+
         return retourSecuriteRepository.save(existingRetourSecurite);
     }
-
 
     @Override
     public void deleteRetourSecurite(int id) {
         RetourSecurite retourSecurite = retourSecuriteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Back Security not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("RetourSecurite not found with id: " + id));
         retourSecuriteRepository.delete(retourSecurite);
     }
-
-
 
     @Override
     public RetourSecurite getRetourSecurite(int id) {

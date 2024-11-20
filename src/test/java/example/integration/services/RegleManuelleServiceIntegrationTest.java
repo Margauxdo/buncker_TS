@@ -3,7 +3,9 @@ package example.integration.services;
 import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
 import example.services.RegleManuelleService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
@@ -114,4 +117,28 @@ public class RegleManuelleServiceIntegrationTest {
         assertNotNull(regleManuelleList);
         assertEquals(2, regleManuelleList.size());
     }
+
+    @Test
+    public void testDeleteRegleManuelle_NotFound() {
+        int id = 999;
+        when(regleManuelleRepository.existsById(id)).thenReturn(false);
+
+        Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            regleManuelleService.deleteRegleManuelle(id);
+        });
+
+        Assertions.assertEquals("Manual rule not found with ID: " + id, exception.getMessage());
+        verify(regleManuelleRepository, times(1)).existsById(id);
+        verifyNoMoreInteractions(regleManuelleRepository);
+    }
+    @Test
+    public void testCascadeDeleteRegleManuelle() {
+        RegleManuelle savedRegle = regleManuelleService.createRegleManuelle(regleManuelle);
+        regleManuelleService.deleteRegleManuelle(savedRegle.getId());
+
+        RegleManuelle deletedRegle = regleManuelleService.getRegleManuelle(savedRegle.getId());
+        Assertions.assertNull(deletedRegle, "Manual rule should be deleted and not found again");
+    }
+
+
 }

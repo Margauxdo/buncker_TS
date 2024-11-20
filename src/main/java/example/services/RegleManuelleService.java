@@ -25,12 +25,12 @@ public class RegleManuelleService implements IRegleManuelleService {
 
     @Override
     public RegleManuelle createRegleManuelle(RegleManuelle regleManuelle) {
-        if (regleManuelle == null) {
-            throw new IllegalArgumentException("Manual rule cannot be null");
+        if (regleManuelle.getFormule() != null) {
+            int formuleId = regleManuelle.getFormule().getId();
+            Formule formule = formuleRepository.findById(formuleId)
+                    .orElseThrow(() -> new EntityNotFoundException("La formule avec l'ID " + formuleId + " est introuvable"));
+            regleManuelle.setFormule(formule);
         }
-
-        System.out.println("RegleManuelle reçue : " + regleManuelle);
-        System.out.println("Formule ID : " + (regleManuelle.getFormule() != null ? regleManuelle.getFormule().getId() : "Aucune Formule"));
 
         try {
             if (regleManuelle.getFormule() != null) {

@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,8 +68,8 @@ public class MouvementIntegrationTest {
         mouvement.setStatutSortie("En cours");
         mouvement.setDateSortiePrevue(new Date());
         mouvement.setDateRetourPrevue(new Date());
-        mouvement.setValise(valise);
-        mouvement.setLivreur(livreur);
+        mouvement.setValises((List<Valise>) valise);
+        mouvement.setLivreurs((List<Livreur>) livreur);
 
         Mouvement savedMouvement = mouvementRepository.save(mouvement);
 
@@ -133,8 +134,8 @@ public class MouvementIntegrationTest {
         Mouvement mouvement = new Mouvement();
         mouvement.setDateHeureMouvement(new Date());
         mouvement.setStatutSortie("En cours");
-        mouvement.setValise(valise);
-        mouvement.setLivreur(livreur);
+        mouvement.setValises((List<Valise>) valise);
+        mouvement.setLivreurs((List<Livreur>) livreur);
 
         mouvementRepository.save(mouvement);
         mouvementRepository.delete(mouvement);
@@ -149,12 +150,12 @@ public class MouvementIntegrationTest {
         livreurRepository.save(livreur);
 
         Mouvement mouvement = new Mouvement();
-        mouvement.setLivreur(livreur);
+        mouvement.setLivreurs((List<Livreur>) livreur);
         mouvementRepository.save(mouvement);
 
         Optional<Mouvement> found = mouvementRepository.findById(mouvement.getId());
         assertTrue(found.isPresent());
-        Assertions.assertEquals("Jules verne", found.get().getLivreur().getNomLivreur());
+        Assertions.assertEquals("Jules verne", found.get().getLivreurs().get(0).getNomLivreur());
     }
 
     @Test

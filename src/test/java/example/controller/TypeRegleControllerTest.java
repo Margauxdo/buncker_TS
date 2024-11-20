@@ -1,5 +1,6 @@
 package example.controller;
 
+import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.interfaces.ITypeRegleService;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,7 +37,7 @@ public class TypeRegleControllerTest {
         List<TypeRegle> typeRegles = new ArrayList<>();
         typeRegles.add(new TypeRegle());
         when(typeRegleService.getTypeRegles()).thenReturn(typeRegles);
-        List<TypeRegle> result = typeRegleController.getTypeRegles();
+        List<TypeRegle> result = (List<TypeRegle>) typeRegleController.getTypeRegles();
         Assertions.assertNotNull(result);
         Assertions.assertEquals(typeRegles.size(), result.size());
     }
@@ -95,13 +96,13 @@ public class TypeRegleControllerTest {
     @Test
     public void testDeleteTypeRegle_Success() {
         doNothing().when(typeRegleService).deleteTypeRegle(1);
-        ResponseEntity<TypeRegle> response = typeRegleController.deleteTypeRegle(1);
+        ResponseEntity<Void> response = typeRegleController.deleteTypeRegle(1);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
     @Test
     public void testDeleteTypeRegle_Failure() {
         doThrow(new RuntimeException("Internal error")).when(typeRegleService).deleteTypeRegle(1);
-        ResponseEntity<TypeRegle> response = typeRegleController.deleteTypeRegle(1);
+        ResponseEntity<Void> response = typeRegleController.deleteTypeRegle(1);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         verify(typeRegleService, times(1)).deleteTypeRegle(1);
     }
@@ -122,7 +123,7 @@ public class TypeRegleControllerTest {
     @Test
     public void testDeleteTypeRegle_NotFound() {
         doThrow(new EntityNotFoundException("Type de règle introuvable")).when(typeRegleService).deleteTypeRegle(1);
-        ResponseEntity<TypeRegle> response = typeRegleController.deleteTypeRegle(1);
+        ResponseEntity<Void> response = typeRegleController.deleteTypeRegle(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
@@ -139,5 +140,23 @@ public class TypeRegleControllerTest {
         ResponseEntity<TypeRegle> response = typeRegleController.createTypeRegle(typeRegle);
         Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
+    @Test
+    public void testCreateTypeRegle_WithRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("RegleCode1");
+
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Type A");
+        typeRegle.setRegle(regle);
+
+        when(typeRegleService.createTypeRegle(typeRegle)).thenReturn(typeRegle);
+
+        ResponseEntity<TypeRegle> response = typeRegleController.createTypeRegle(typeRegle);
+
+        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        Assertions.assertEquals("Type A", response.getBody().getNomTypeRegle());
+        Assertions.assertEquals("RegleCode1", response.getBody().getRegle().getCoderegle());
+    }
+
 
 }

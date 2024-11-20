@@ -38,26 +38,29 @@ public class LivreurController {
         return ResponseEntity.ok(livreurs);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Livreur> getLivreurById(@PathVariable("id") int id) {
-        if (id < 0) {
-            throw new IllegalArgumentException("Invalid ID: " + id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Livreur> getLivreurById(@PathVariable int id) {
+        try {
+            Livreur livreur = livreurService.getLivreurById(id);
+            if (livreur == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.ok(livreur);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        Livreur livreur = livreurService.getLivreurById(id);
-        return livreur != null ? ResponseEntity.ok(livreur) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PostMapping
     public ResponseEntity<Livreur> createLivreur(@RequestBody Livreur livreur) {
-        if (livreur.getNomLivreur() == null || livreur.getNomLivreur().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
         try {
             Livreur createdLivreur = livreurService.createLivreur(livreur);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdLivreur);
         } catch (ConflictException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (RuntimeException e) {
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

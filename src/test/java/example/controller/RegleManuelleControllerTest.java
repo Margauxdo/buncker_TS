@@ -101,13 +101,7 @@ public class RegleManuelleControllerTest {
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
         verify(regleManuelleService, times(1)).deleteRegleManuelle(1);
     }
-    @Test
-    public void testCreateRegleManuelle_InvalidInput(){
-        RegleManuelle invalidRegleManuelle = new RegleManuelle();
-        when(regleManuelleService.createRegleManuelle(invalidRegleManuelle)).thenThrow(new IllegalArgumentException("Inavlid data"));
-        ResponseEntity<RegleManuelle> result = regleManuelleController.createRegleManuelle(invalidRegleManuelle);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-    }
+
 
 
     @Test
@@ -172,6 +166,27 @@ public class RegleManuelleControllerTest {
         when(regleManuelleService.createRegleManuelle(regleManuelle)).thenThrow(new ConflictException("Conflict occurred"));
         ResponseEntity<RegleManuelle> result = regleManuelleController.createRegleManuelle(regleManuelle);
         Assertions.assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+    }
+    @Test
+    public void testCreateRegleManuelle_InvalidInput() {
+        RegleManuelle invalidRegleManuelle = new RegleManuelle();
+        when(regleManuelleService.createRegleManuelle(invalidRegleManuelle))
+                .thenThrow(new IllegalArgumentException("Invalid data"));
+
+        ResponseEntity<RegleManuelle> result = regleManuelleController.createRegleManuelle(invalidRegleManuelle);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        verify(regleManuelleService, times(1)).createRegleManuelle(any(RegleManuelle.class));
+    }
+
+    @Test
+    public void testDeleteRegleManuelle_EntityNotFound() {
+        doThrow(new EntityNotFoundException("Manual rule not found"))
+                .when(regleManuelleService).deleteRegleManuelle(999);
+
+        ResponseEntity<Void> result = regleManuelleController.deleteRegleManuelle(999);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
 

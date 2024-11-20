@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -75,8 +76,8 @@ public class MouvementServiceIntegrationTest {
                     .dateHeureMouvement(dateHM1)
                     .dateRetourPrevue(dateRP1)
                     .dateSortiePrevue(dateSP1)
-                    .livreur(livreurA)
-                    .valise(val1)
+                    .livreurs((List<Livreur>) livreurA)
+                    .valises((List<Valise>) val1)
                     .build();
 
             mouvement = mouvementService.createMouvement(mouvement);
@@ -94,14 +95,14 @@ public class MouvementServiceIntegrationTest {
 
         // Assert
         assertNotNull(savedMvmt);
-        assertNotNull(savedMvmt.getLivreur());
-        assertNotNull(savedMvmt.getValise());
+        assertNotNull(savedMvmt.getLivreurs());
+        assertNotNull(savedMvmt.getValises());
         assertNotNull(savedMvmt.getDateHeureMouvement());
         assertNotNull(savedMvmt.getDateRetourPrevue());
         assertNotNull(savedMvmt.getDateSortiePrevue());
         assertEquals("en cours", savedMvmt.getStatutSortie());
-        assertEquals("12569", savedMvmt.getLivreur().getCodeLivreur());
-        assertEquals("Dutoit", savedMvmt.getValise().getClient().getName());
+        assertEquals("12569", savedMvmt.getLivreurs().get(0).getCodeLivreur());
+        assertEquals("Dutoit", savedMvmt.getValises().get(0).getClient().getName());
     }
 
     @Test
@@ -192,8 +193,8 @@ public class MouvementServiceIntegrationTest {
                     .dateHeureMouvement(dateHM1)
                     .dateRetourPrevue(dateRP1)
                     .dateSortiePrevue(dateSP1)
-                    .livreur(livreurB)
-                    .valise(val2)
+                    .livreurs((List<Livreur>) livreurB)
+                    .valises((List<Valise>) val2)
                     .build();
 
         } catch (Exception e) {

@@ -1,11 +1,14 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import example.controller.RetourSecuriteController;
 import example.entity.Client;
 import example.entity.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -13,16 +16,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,6 +47,10 @@ public class RetourSecuriteControllerIntegrationTest {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private RetourSecuriteController RScontroller;
+
 
     @SpyBean
     private IRetourSecuriteService retourSecuriteService;
@@ -66,7 +78,7 @@ public class RetourSecuriteControllerIntegrationTest {
         retourSecurite.setNumero(25L);
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setCloture(false);
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
 
         mvc.perform(post("/api/retourSecurite")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +107,7 @@ public class RetourSecuriteControllerIntegrationTest {
 
         Client client = new Client();
         client.setId(1);
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
 
         mvc.perform(put("/api/retourSecurite/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -140,7 +152,7 @@ public class RetourSecuriteControllerIntegrationTest {
 
         RetourSecurite retourSecurite = new RetourSecurite();
         retourSecurite.setNumero(25L);
-        retourSecurite.setClient(client);
+        retourSecurite.setClients(new ArrayList<>());
         retourSecuriteRepository.save(retourSecurite);
 
         mvc.perform(delete("/api/retourSecurite/{id}", retourSecurite.getId())
@@ -154,6 +166,39 @@ public class RetourSecuriteControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    public void testCreateRetourSecurite_MissingFields_ShouldReturnBadRequest() throws Exception {
+        RetourSecurite retourSecurite = new RetourSecurite();
+        mvc.perform(post("/api/retourSecurite")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(retourSecurite)))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    public void testCreateRetourSecurite_InvalidInput() {
+        RetourSecurite retourSecurite = new RetourSecurite();
+
+        when(retourSecuriteService.createRetourSecurite(any(RetourSecurite.class)))
+                .thenThrow(new DataIntegrityViolationException("Invalid input"));
+
+        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(retourSecurite);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        verify(retourSecuriteService, times(1)).createRetourSecurite(any(RetourSecurite.class));
+    }
+
+    @Test
+    public void testUpdateRetourSecurite_EntityNotFound() {
+        RetourSecurite retourSecurite = new RetourSecurite();
+        when(retourSecuriteService.updateRetourSecurite(eq(9999), any(RetourSecurite.class)))
+                .thenThrow(new EntityNotFoundException("Entity not found"));
+
+        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecurite(9999, retourSecurite);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(retourSecuriteService, times(1)).updateRetourSecurite(eq(9999), any(RetourSecurite.class));
+    }
+
 
 
 

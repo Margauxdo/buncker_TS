@@ -46,8 +46,6 @@ public class ValiseController {
         return new ResponseEntity<>(valise, HttpStatus.OK);
     }
 
-
-
     @PostMapping
     public ResponseEntity<Valise> createValise(@RequestBody Valise valise) {
         try {
@@ -64,12 +62,6 @@ public class ValiseController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-
-
-
 
 
     @PutMapping("{id}")

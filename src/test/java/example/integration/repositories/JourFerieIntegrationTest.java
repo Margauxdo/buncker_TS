@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,13 +42,13 @@ public class JourFerieIntegrationTest {
         regleA = regleRepository.save(regleA);
 
         JourFerie jourFerieA = new JourFerie();
-        jourFerieA.setRegle(regleA);
+        jourFerieA.setRegles(new ArrayList<>());
 
         JourFerie savedJourFerie = jourFerieRepository.save(jourFerieA);
 
         assertNotNull(savedJourFerie.getId());
 
-        assertEquals(regleA, savedJourFerie.getRegle());
+        assertEquals(regleA, savedJourFerie.getRegles());
     }
     @Test
     public void testFindByIdSuccess(){
@@ -55,11 +56,11 @@ public class JourFerieIntegrationTest {
         regleA.setCoderegle("CODE123");
         regleA = regleRepository.save(regleA);
         JourFerie jourFerieA = new JourFerie();
-        jourFerieA.setRegle(regleA);
+        jourFerieA.setRegles((List<Regle>) regleA);
         JourFerie savedJF = jourFerieRepository.save(jourFerieA);
         Optional<JourFerie> foundJF = jourFerieRepository.findById(savedJF.getId());
         assertTrue(foundJF.isPresent());
-        assertEquals(regleA, foundJF.get().getRegle());
+        assertEquals(regleA, foundJF.get().getRegles());
     }
     @Test
     public void testDeleteJourFerieSuccess(){
@@ -67,7 +68,7 @@ public class JourFerieIntegrationTest {
         regleA.setCoderegle("CODE123");
         regleA = regleRepository.save(regleA);
         JourFerie jourFerieA = new JourFerie();
-        jourFerieA.setRegle(regleA);
+        jourFerieA.setRegles((List<Regle>) regleA);
         JourFerie savedJF = jourFerieRepository.save(jourFerieA);
         jourFerieRepository.deleteById(jourFerieA.getId());
         Optional<JourFerie> deletedJF = jourFerieRepository.findById(jourFerieA.getId());
@@ -82,14 +83,14 @@ public class JourFerieIntegrationTest {
         regleB.setCoderegle("CODE456");
         regleB = regleRepository.save(regleB);
         JourFerie jourFerieA = new JourFerie();
-        jourFerieA.setRegle(regleA);
+        jourFerieA.setRegles((List<Regle>) regleA);
         JourFerie savedJF = jourFerieRepository.save(jourFerieA);
 
-        savedJF.setRegle(regleB);
+        savedJF.setRegles((List<Regle>) regleA);
         JourFerie updatedJF = jourFerieRepository.save(savedJF);
         Optional<JourFerie> foundJF = jourFerieRepository.findById(updatedJF.getId());
         assertTrue(foundJF.isPresent());
-        assertEquals(regleB, foundJF.get().getRegle());
+        assertEquals(regleB, foundJF.get().getRegles());
     }
     @Test
     public void testFindAllJourFerieSuccess() {
@@ -102,11 +103,11 @@ public class JourFerieIntegrationTest {
         regleB = regleRepository.save(regleB);
 
         JourFerie jourFerieA = new JourFerie();
-        jourFerieA.setRegle(regleA);
+        jourFerieA.setRegles((List<Regle>) regleA);
         jourFerieRepository.save(jourFerieA);
 
         JourFerie jourFerieB = new JourFerie();
-        jourFerieB.setRegle(regleB);
+        jourFerieB.setRegles((List<Regle>) regleB);
         jourFerieRepository.save(jourFerieB);
 
         List<JourFerie> listJF = jourFerieRepository.findAll();
@@ -127,7 +128,7 @@ public class JourFerieIntegrationTest {
         regleA = regleRepository.save(regleA);
 
         JourFerie jourFerieA = new JourFerie();
-        jourFerieA.setRegle(regleA);
+        jourFerieA.setRegles((List<Regle>) regleA);
         jourFerieRepository.save(jourFerieA);
 
         assertTrue(jourFerieRepository.findById(jourFerieA.getId()).isPresent());

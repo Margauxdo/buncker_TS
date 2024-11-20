@@ -42,7 +42,7 @@ public class TypeRegleTest {
         typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("regle1");
         typeRegle.setNomTypeRegle("regle2");
-        typeRegle.setListTypesRegles(listRegles);
+        typeRegle.setRegle(regles1);
         em.persist(typeRegle);
         em.flush();
 
@@ -59,12 +59,12 @@ public class TypeRegleTest {
     }
     @Test
     public void testTypeRegleListTypesREgle() {
-        Assertions.assertNotNull(typeRegle.getListTypesRegles(), "the list of rules should not be null");
-        Assertions.assertEquals(2, typeRegle.getListTypesRegles().size());
+        Assertions.assertNotNull(typeRegle.getNomTypeRegle(), "the list of rules should not be null");
+        Assertions.assertEquals(2, typeRegle.getRegle().getTypeRegles().get(0));
     }
     @Test
     public void testTypeRegleAssociationRegle() {
-        List<Regle> associatedRegles = typeRegle.getListTypesRegles();
+        List<Regle> associatedRegles = (List<Regle>) typeRegle.getRegle();
         Assertions.assertNotNull(associatedRegles, "The list of associated rules should not be null.");
         Assertions.assertEquals(2, associatedRegles.size(), "The rule type should be associated with two rules.");
     }

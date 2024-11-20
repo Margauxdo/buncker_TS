@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Formules</title>
+</head>
+<body>
+
+<h1>Liste des Formules</h1>
+
+<!-- Message d'erreur s'il y en a -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Table pour afficher les formules -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Libellé</th>
+        <th>Formule</th>
+        <th>Règle</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Boucle sur la liste des formules -->
+    <tr th:each="formule : ${formules}">
+        <td th:text="${formule.id}"></td>
+        <td th:text="${formule.libelle}"></td>
+        <td th:text="${formule.formule}"></td>
+        <td th:text="${formule.regle.coderegle}"></td>
+        <td>
+            <a th:href="@{/formules/view/{id}(id=${formule.id})}">Voir</a> |
+            <a th:href="@{/formules/edit/{id}(id=${formule.id})}">Modifier</a> |
+            <a th:href="@{/formules/delete/{id}(id=${formule.id})}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette formule ?');">Supprimer</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Lien vers la page de création d'une nouvelle formule -->
+<a href="/formules/create">Créer une nouvelle formule</a>
+
+</body>
+</html>
+

@@ -32,6 +32,7 @@ public class Formule {
 
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @Column(name = "regle_id")
     @JoinColumn(name = "regle_id", nullable = true)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Regle regle;

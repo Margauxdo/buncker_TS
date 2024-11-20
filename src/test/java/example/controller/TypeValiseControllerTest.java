@@ -1,7 +1,9 @@
 package example.controller;
 
 import example.entity.TypeValise;
+import example.entity.Valise;
 import example.interfaces.ITypeValiseService;
+import example.interfaces.IValiseService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,9 @@ public class TypeValiseControllerTest {
 
     @InjectMocks
     private TypeValiseController typeValiseController;
+
+    @Mock
+    private IValiseService valiseService;
 
     @Mock
     private ITypeValiseService typeValiseService;
@@ -63,12 +68,24 @@ public class TypeValiseControllerTest {
     }
     @Test
     public void testCreateTypeValise_Success() {
+        // Arrange
+        Valise valise = new Valise();
+        valise.setId(1); // Simulez une valise avec un ID valide
+
         TypeValise typeValise = new TypeValise();
-        when(typeValiseService.createTypeValise(typeValise)).thenReturn(typeValise);
+        typeValise.setValise(valise); // Associez la valise au type de valise
+
+        when(valiseService.getValiseById(1)).thenReturn(valise); // Simulez la récupération de la valise
+        when(typeValiseService.createTypeValise(any(TypeValise.class))).thenReturn(typeValise);
+
+        // Act
         ResponseEntity<TypeValise> response = typeValiseController.createTypeValise(typeValise);
+
+        // Assert
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Assertions.assertEquals(typeValise, response.getBody());
     }
+
     @Test
     public void testCreateTypeValise_Failure() {
         TypeValise typeValise = new TypeValise();
@@ -132,12 +149,19 @@ public class TypeValiseControllerTest {
         assertNotNull(typeValiseService);
 
     }
+
     @Test
-    public void testCreateTypeValise_Conflict() {
+    public void testCreateTypeValise_InternalServerError() {
         // Arrange
+        Valise valise = new Valise();
+        valise.setId(1);
+
         TypeValise typeValise = new TypeValise();
+        typeValise.setValise(valise);
+
+        when(valiseService.getValiseById(1)).thenReturn(valise);
         when(typeValiseService.createTypeValise(any(TypeValise.class)))
-                .thenThrow(new IllegalStateException("Conflict detected"));
+                .thenThrow(new RuntimeException("internal error"));
 
         // Act
         ResponseEntity<TypeValise> response = typeValiseController.createTypeValise(typeValise);
@@ -146,17 +170,6 @@ public class TypeValiseControllerTest {
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
-
-
-
-    @Test
-    public void testCreateTypeValise_InternalServerError() {
-        TypeValise typeValise = new TypeValise();
-        when(typeValiseService.createTypeValise(any(TypeValise.class)))
-                .thenThrow(new RuntimeException("internal error"));
-        ResponseEntity<TypeValise> response = typeValiseController.createTypeValise(typeValise);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
 
 
 

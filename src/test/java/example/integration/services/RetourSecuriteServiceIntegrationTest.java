@@ -6,18 +6,24 @@ import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
 import example.services.RetourSecuriteService;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
@@ -47,7 +53,7 @@ public class RetourSecuriteServiceIntegrationTest {
             Date dateClo = dateTimeFormat.parse("2024-10-30");
             Date dateSecu = dateTimeFormat.parse("2024-10-28");
             retourSecurite = RetourSecurite.builder()
-                    .client(clientA)
+                    .clients(new ArrayList<>())
                     .cloture(true)
                     .dateCloture(dateClo)
                     .datesecurite(dateSecu)
@@ -70,9 +76,9 @@ public class RetourSecuriteServiceIntegrationTest {
         assertNotNull(savedRetourSecu.getCloture());
         assertNotNull(savedRetourSecu.getDateCloture());
         assertNotNull(savedRetourSecu.getDatesecurite());
-        assertNotNull(savedRetourSecu.getClient());
-        assertEquals("Dutoit", savedRetourSecu.getClient().getName());
-        assertEquals("a.dutoit@gmail.com", savedRetourSecu.getClient().getEmail());
+        assertNotNull(savedRetourSecu.getClients());
+        assertEquals("Dutoit", savedRetourSecu.getClients().get(0).getName());
+        assertEquals("a.dutoit@gmail.com", savedRetourSecu.getClients().get(0).getEmail());
 
     }
 
@@ -88,8 +94,8 @@ public class RetourSecuriteServiceIntegrationTest {
         RetourSecurite updatedRS = retourSecuriteService.updateRetourSecurite(savedRS.getId(), savedRS);
         //Assert
         assertNotNull(updatedRS);
-        assertEquals("Dutoit", updatedRS.getClient().getName());
-        assertEquals("a.dutoit@gmail.com", updatedRS.getClient().getEmail());
+        assertEquals("Dutoit", updatedRS.getClients().get(0).getName());
+        assertEquals("a.dutoit@gmail.com", updatedRS.getClients().get(0).getEmail());
 
     }
 
@@ -112,8 +118,8 @@ public class RetourSecuriteServiceIntegrationTest {
         RetourSecurite rsById = retourSecuriteService.getRetourSecurite(savedRS.getId());
         //Assert
         assertNotNull(rsById);
-        assertEquals("Dutoit", rsById.getClient().getName());
-        assertEquals("a.dutoit@gmail.com", rsById.getClient().getEmail());
+        assertEquals("Dutoit", rsById.getClients().get(0).getName());
+        assertEquals("a.dutoit@gmail.com", rsById.getClients().get(0).getEmail());
 
     }
 
@@ -132,7 +138,7 @@ public class RetourSecuriteServiceIntegrationTest {
             Date dateClo = dateTimeFormat.parse("2024-10-30");
             Date dateSecu = dateTimeFormat.parse("2024-10-28");
             RetourSecurite rs1 = RetourSecurite.builder()
-                    .client(clientB)
+                    .clients(new ArrayList<>())
                     .cloture(true)
                     .dateCloture(dateClo)
                     .datesecurite(dateSecu)
@@ -152,7 +158,7 @@ public class RetourSecuriteServiceIntegrationTest {
             Date dateClo = dateTimeFormat.parse("2024-08-10");
             Date dateSecu = dateTimeFormat.parse("2023-12-28");
             RetourSecurite rs2 = RetourSecurite.builder()
-                    .client(clientC)
+                    .clients(new ArrayList<>())
                     .cloture(false)
                     .dateCloture(dateClo)
                     .datesecurite(dateSecu)
@@ -170,6 +176,36 @@ public class RetourSecuriteServiceIntegrationTest {
         assertNotNull(listRS);
         assertEquals(2, listRS.size());
     }
+    @Test
+    public void testCascadeDeleteClient() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("test@example.com");
+        client = clientRepository.save(client);
+
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setClients(new ArrayList<>());
+        retourSecurite.setNumero(12345L);
+        retourSecurite = retourSecuriteRepository.save(retourSecurite);
+
+        retourSecuriteRepository.delete(retourSecurite);
+
+        Optional<Client> foundClient = clientRepository.findById(client.getId());
+        Assertions.assertTrue(foundClient.isEmpty(), "Client should be deleted due to cascade.");
+    }
+
+
+    @Test
+    public void testCreateRetourSecurite_Failure_ConstraintViolation() {
+        RetourSecurite invalidRetourSecurite = new RetourSecurite(); // Entité sans numéro
+
+        Exception exception = Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+            retourSecuriteService.createRetourSecurite(invalidRetourSecurite);
+        });
+
+        Assertions.assertTrue(exception.getMessage().contains("could not execute statement"));
+    }
+
 
 
 }

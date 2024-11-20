@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LivreurServiceTest {
 
@@ -27,18 +27,42 @@ public class LivreurServiceTest {
     private LivreurService livreurService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-    @Test
-    public void testCreateLivreur_Success(){
-        Livreur livreur = new Livreur();
-        when(livreurRepository.save(livreur)).thenReturn(livreur);
-        Livreur result = livreurService.createLivreur(livreur);
-        Assertions.assertNotNull(result, "Livreur should not be null");
-        verify(livreurRepository, times(1)).save(livreur);
 
+    @Test
+    public void testCreateLivreur_Success() {
+        Livreur livreur = Livreur.builder().nomLivreur("John Doe").build();
+
+        when(livreurRepository.save(any(Livreur.class))).thenReturn(livreur);
+
+        Livreur result = livreurService.createLivreur(livreur);
+
+        assertNotNull(result);
+        assertEquals("John Doe", result.getNomLivreur());
+        verify(livreurRepository, times(1)).save(livreur);
     }
+
+    @Test
+    public void testGetLivreurById_Success() {
+        Livreur livreur = Livreur.builder().id(1).nomLivreur("John Doe").build();
+
+        when(livreurRepository.findById(1)).thenReturn(Optional.of(livreur));
+
+        Livreur result = livreurService.getLivreurById(1);
+
+        assertNotNull(result);
+        assertEquals("John Doe", result.getNomLivreur());
+    }
+
+    @Test
+    public void testDeleteLivreur_NotFound() {
+        when(livreurRepository.existsById(1)).thenReturn(false);
+
+        assertThrows(EntityNotFoundException.class, () -> livreurService.deleteLivreur(1));
+    }
+
 
     @Test
     public void testCreateLivreur_Failure_Exception() {
@@ -125,21 +149,6 @@ public class LivreurServiceTest {
     }
 
 
-
-
-
-    @Test
-    public void testGetLivreurById_Success(){
-        int id = 1;
-        Livreur livreur = new Livreur();
-        livreur.setId(id);
-        when(livreurRepository.findById(id)).thenReturn(Optional.of(livreur));
-        Livreur result = livreurService.getLivreurById(id);
-        Assertions.assertNotNull(result, "Livreur should not be null");
-        Assertions.assertEquals(livreur.getId(), result.getId(), "Livreur id should be the same");
-        verify(livreurRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(livreurRepository);
-    }
     @Test
     public void testGetLivreurById_Failure_Exception(){
         int id = 1;

@@ -23,33 +23,54 @@ public class LivreurTest {
     private EntityManager em;
 
     private Livreur livreur;
+
     @BeforeEach
     public void setUp() {
-        livreur = new Livreur();
-        livreur.setNomLivreur("Henry");
-        livreur.setPrenomLivreur("Martin");
-        livreur.setCodeLivreur("1234Henry");
-        livreur.setMotDePasse("root");
-        livreur.setNumeroCartePro("1234");
-        livreur.setTelephoneAlphapage("+3333333");
-        livreur.setTelephoneKobby("+0303030303");
-        livreur.setTelephonePortable("0625062506");
-
-        Mouvement mouvement1 = new Mouvement();
-        Mouvement mouvement2 = new Mouvement();
-        List<Mouvement> mouvements = new ArrayList<>();
-        mouvements.add(mouvement1);
-        mouvements.add(mouvement2);
-        livreur.setMouvements(mouvements);
+        livreur = Livreur.builder()
+                .nomLivreur("Henry")
+                .prenomLivreur("Martin")
+                .codeLivreur("1234Henry")
+                .motDePasse("root")
+                .numeroCartePro("1234")
+                .telephoneAlphapage("+3333333")
+                .telephoneKobby("+0303030303")
+                .telephonePortable("0625062506")
+                .build();
     }
+
     @Test
-    public void testLivreurPersistence(){
+    public void testLivreurPersistence() {
         em.persist(livreur);
         em.flush();
-        assertNotNull(livreur.getId(), "The id does not exist");
-
-
+        assertNotNull(livreur.getId(), "The id should not be null after persistence");
     }
+
+    @Test
+    public void testLivreurAttributes() {
+        em.persist(livreur);
+        em.flush();
+        Livreur retrievedLivreur = em.find(Livreur.class, livreur.getId());
+        assertNotNull(retrievedLivreur, "Livreur should be retrieved from the database");
+        assertEquals("Henry", retrievedLivreur.getNomLivreur());
+        assertEquals("Martin", retrievedLivreur.getPrenomLivreur());
+        assertEquals("1234Henry", retrievedLivreur.getCodeLivreur());
+    }
+
+    @Test
+    public void testLivreurMouvementRelation() {
+        Mouvement mouvement = new Mouvement();
+        mouvement.setLivreurs((List<Livreur>) livreur);
+
+        em.persist(mouvement);
+        em.persist(livreur);
+        em.flush();
+
+        Livreur retrievedLivreur = em.find(Livreur.class, livreur.getId());
+        assertNotNull(retrievedLivreur.getMouvement());
+        assertEquals(mouvement.getId(), retrievedLivreur.getMouvement().getId());
+    }
+
+
     @Test
     public void testLivreurAttribute(){
         em.persist(livreur);
@@ -66,22 +87,15 @@ public class LivreurTest {
         assertEquals("0625062506", retrievedLivreur.getTelephonePortable());
     }
 
-    @Test
-    public void testLivreurMouvementsRelation() {
-        em.persist(livreur);
-        em.flush();
-        Livreur retrievedLivreur = em.find(Livreur.class, livreur.getId());
-        assertNotNull(retrievedLivreur.getMouvements());
-        assertEquals(2, retrievedLivreur.getMouvements().size());
-    }
+
     @Test
     public void testCascadeDeleteMouvements() {
         em.persist(livreur);
         em.flush();
 
         int livreurId = livreur.getId();
-        int mouvement1Id = livreur.getMouvements().get(0).getId();
-        int mouvement2Id = livreur.getMouvements().get(1).getId();
+        int mouvement1Id = livreur.getMouvement().getLivreurs().size();
+        int mouvement2Id = livreur.getMouvement().getLivreurs().size();
 
         em.remove(livreur);
         em.flush();

@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
@@ -78,7 +79,7 @@ public class RegleTest {
         regle.setNBJSMEntree(25L);
         regle.setNombreJours(250);
         regle.setTypeEntree("typeEntree");
-        regle.setTypeRegle(typeRegle);
+        regle.setTypeRegles((List<TypeRegle>) typeRegle);
         regle.setValise(valise);
 
         List<SortieSemaine> sorties = new ArrayList<>();
@@ -92,6 +93,32 @@ public class RegleTest {
         em.persist(sortieSemaine);
         em.flush();
     }
+    @Test
+    public void testRegleValiseAssociation() {
+        Assertions.assertNotNull(regle.getValise(), "Valise association should not be null");
+        Assertions.assertEquals("ValiseTest", regle.getValise().getDescription(), "Valise description mismatch");
+    }
+
+    @Test
+    public void testRegleSortieSemaineOrphanRemoval() {
+        // Arrange
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        sortieSemaine.setDateSortieSemaine(new Date());
+        sortieSemaine.setRegle(regle);
+        regle.getSortieSemaine().add(sortieSemaine);
+        em.persist(sortieSemaine);
+        em.flush();
+
+        // Act
+        regle.getSortieSemaine().remove(sortieSemaine);
+        em.persist(regle);
+        em.flush();
+
+        // Assert
+        List<SortieSemaine> sorties = sortieSemaineRepository.findAll();
+        Assertions.assertTrue(sorties.isEmpty(), "Orphan removal did not work correctly for SortieSemaine");
+    }
+
 
     @Test
     public void testReglePersitence() {
@@ -150,12 +177,7 @@ public class RegleTest {
         Assertions.assertEquals(25L, regle.getNBJSMEntree());
     }
 
-    @Test
-    public void testRegleValiseAssociation() {
-        Assertions.assertNotNull(regle.getValise());
-        Valise expectedValise = valiseRepository.findAll().get(0);
-        Assertions.assertEquals(expectedValise.getId(), regle.getValise().getId());
-    }
+
 
     @Test
     public void testRegleSortieSemaineAssociation() {
@@ -167,9 +189,9 @@ public class RegleTest {
 
     @Test
     public void testRegleTypeRegleAssociation() {
-        Assertions.assertNotNull(regle.getTypeRegle());
+        Assertions.assertNotNull(regle.getTypeRegles());
         TypeRegle expectedTypeRegle = typeRegleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedTypeRegle.getId(), regle.getTypeRegle().getId());
+        Assertions.assertEquals(expectedTypeRegle.getId(), regle.getTypeRegles().get(0).getId());
     }
 
     @Test

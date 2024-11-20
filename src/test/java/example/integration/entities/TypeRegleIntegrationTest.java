@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -108,30 +109,61 @@ public class TypeRegleIntegrationTest {
             typeRegleRepository.saveAndFlush(typeRegle2);
         });
     }
+
+
     @Test
     public void testCascadeDeleteTypeRegleWithRegles() {
+        // Création d'un TypeRegle
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("Type A");
 
+        // Création des Regles associées
         Regle regle1 = new Regle();
         regle1.setCoderegle("R001");
-        regle1.setTypeRegle(typeRegle);
+        regle1.setTypeRegles(new ArrayList<>());
 
         Regle regle2 = new Regle();
         regle2.setCoderegle("R002");
-        regle2.setTypeRegle(typeRegle);
+        regle2.setTypeRegles(new ArrayList<>());
 
-        typeRegle.getListTypesRegles().add(regle1);
-        typeRegle.getListTypesRegles().add(regle2);
+        typeRegle.getNomTypeRegle().isEmpty();
+        typeRegle.getRegle();
 
+        // Sauvegarde
         typeRegleRepository.saveAndFlush(typeRegle);
 
+        // Suppression de TypeRegle
         typeRegleRepository.deleteById(typeRegle.getId());
         typeRegleRepository.flush();
 
+        // Vérifications
         assertFalse(regleRepository.findById(regle1.getId()).isPresent());
         assertFalse(regleRepository.findById(regle2.getId()).isPresent());
     }
+
+    @Test
+    public void testSaveTypeRegle_WithRegle() {
+        // Création d'une règle
+        Regle regle = new Regle();
+        regle.setCoderegle("RegleDatabase");
+
+        // Création d'un TypeRegle
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Type C");
+        typeRegle.getRegle();
+        regle.setTypeRegles(new ArrayList<>());
+
+        // Sauvegarde
+        TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
+
+        // Vérifications
+        assertNotNull(savedTypeRegle.getId());
+        assertEquals("Type C", savedTypeRegle.getNomTypeRegle());
+        assertEquals(1, savedTypeRegle.getNomTypeRegle());
+        assertEquals("RegleDatabase", savedTypeRegle.getNomTypeRegle());
+    }
+
+
 
 
 

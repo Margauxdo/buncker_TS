@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -137,6 +138,19 @@ public class RegleManuelleTest {
         Assertions.assertEquals("new admin", updatedRegle.getCreateurRegle(),
                 "Creator Rule should be updated to 'new admin'.");
     }
+
+    @Test
+    public void testCascadeDeleteRegles() {
+        RegleManuelle persistedRegleManuelle = em.find(RegleManuelle.class, regleManuelle.getId());
+        Assertions.assertNotNull(persistedRegleManuelle);
+
+        em.remove(persistedRegleManuelle);
+        em.flush();
+
+        List<Regle> regles = em.createQuery("SELECT r FROM Regle r", Regle.class).getResultList();
+        Assertions.assertTrue(regles.isEmpty(), "All associated Regle entities should be removed due to cascade delete");
+    }
+
 
 }
 

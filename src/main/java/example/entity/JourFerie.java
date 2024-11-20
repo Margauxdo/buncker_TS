@@ -23,13 +23,9 @@ public class JourFerie {
     private int id;
 
 
+    @OneToMany(mappedBy = "jourFerie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Regle> regles;
 
-    //relation manytoone avec Regle
-    @ManyToOne
-    @JoinColumn(name = "regle_id", nullable = false)
-    private Regle regle;
-
-    //liste des jours feries
     @ElementCollection
     @CollectionTable(name = "joursFeries", joinColumns = @JoinColumn(referencedColumnName = "id_jourFerie"))
     @Column(name = "jour")

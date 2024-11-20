@@ -1,6 +1,8 @@
 package example.integration.entities;
 
+import example.entity.Client;
 import example.entity.TypeValise;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
@@ -14,9 +16,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -69,14 +72,14 @@ public class TypeValiseIntegrationTest {
         TypeValise savedTV = typeValiseRepository.saveAndFlush(typeValise);
 
         Optional<TypeValise> foundTV = typeValiseRepository.findById(savedTV.getId());
-        Assertions.assertTrue(foundTV.isPresent());
+        assertTrue(foundTV.isPresent());
         Assertions.assertEquals("Jean Bernard", foundTV.get().getProprietaire());
     }
 
     @Test
     public void testFindTypeValiseByIdNotFound() {
         Optional<TypeValise> foundTV = typeValiseRepository.findById(-1);
-        Assertions.assertFalse(foundTV.isPresent());
+        assertFalse(foundTV.isPresent());
     }
 
     @Test
@@ -95,7 +98,7 @@ public class TypeValiseIntegrationTest {
     @Test
     public void testUpdateTypeValiseFailure() {
         Optional<TypeValise> foundTV = typeValiseRepository.findById(-1);
-        Assertions.assertFalse(foundTV.isPresent());
+        assertFalse(foundTV.isPresent());
     }
 
     @Test
@@ -109,13 +112,13 @@ public class TypeValiseIntegrationTest {
         typeValiseRepository.flush();
 
         Optional<TypeValise> foundTV = typeValiseRepository.findById(savedTV.getId());
-        Assertions.assertFalse(foundTV.isPresent());
+        assertFalse(foundTV.isPresent());
     }
 
     @Test
     public void testDeleteTypeValiseFailure() {
         Optional<TypeValise> foundTV = typeValiseRepository.findById(-1);
-        Assertions.assertFalse(foundTV.isPresent());
+        assertFalse(foundTV.isPresent());
     }
 
     @Test
@@ -166,7 +169,7 @@ public class TypeValiseIntegrationTest {
         typeValiseRepository.flush();
 
         Optional<TypeValise> foundTypeValise = typeValiseRepository.findById(typeValise.getId());
-        Assertions.assertFalse(foundTypeValise.isPresent());
+        assertFalse(foundTypeValise.isPresent());
     }
 
     @Test
@@ -182,4 +185,29 @@ public class TypeValiseIntegrationTest {
         typeValiseRepository.saveAndFlush(typeValise2);
 
     }
+    @Test
+    public void testCascadeDeleteWithValises() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("test@example.com");
+        client = clientRepository.save(client);
+
+        Valise valise = new Valise();
+        valise.setNumeroValise(12345L);
+        valise.setClient(client);
+
+        TypeValise typeValise = new TypeValise();
+        typeValise.setProprietaire("Test Proprietaire");
+        typeValise.setDescription("Test Description");
+        typeValise.setValise(valise);
+        typeValise = typeValiseRepository.saveAndFlush(typeValise);
+
+        typeValiseRepository.deleteById(typeValise.getId());
+        Optional<TypeValise> foundTypeValise = typeValiseRepository.findById(typeValise.getId());
+        assertFalse(foundTypeValise.isPresent());
+
+        List<Valise> remainingValises = valiseRepository.findAll();
+        assertTrue(remainingValises.isEmpty(), "Associated Valises should be deleted in cascade.");
+    }
+
 }

@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -57,8 +58,8 @@ public class MouvementTest {
                 .dateRetourPrevue(sdf.parse("2025-01-05"))
                 .dateSortiePrevue(sdf.parse("2025-01-01"))
                 .statutSortie("close")
-                .valise(valise)
-                .livreur(livreur)
+                .valises((List<Valise>) valise)
+                .livreurs((List<Livreur>) livreur)
                 .build();
 
         em.persist(mouvement);
@@ -72,13 +73,13 @@ public class MouvementTest {
 
     @Test
     public void testMouvementValiseAssociation() {
-        Assertions.assertNotNull(mouvement.getValise(), "Movement should be associated with a Valise");
-        Assertions.assertEquals(mouvement.getValise().getId(), valiseRepository.findAll().get(0).getId(), "Valise ID should match");
+        Assertions.assertNotNull(mouvement.getValises(), "Movement should be associated with a Valise");
+        Assertions.assertEquals(mouvement.getValises().get(0), valiseRepository.findAll().get(0).getId(), "Valise ID should match");
     }
 
     @Test
     public void testMouvementLivreurAssociation() {
-        Assertions.assertNotNull(mouvement.getLivreur(), "Movement should be associated with a Livreur");
+        Assertions.assertNotNull(mouvement.getLivreurs(), "Movement should be associated with a Livreur");
     }
 
     @Test

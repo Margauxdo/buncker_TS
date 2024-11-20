@@ -138,6 +138,16 @@ public class RegleManuelleIntegrationTest {
             regleManuelleRepository.save(regle2);
         }, "An exception should be thrown if a duplicate rulecode is saved.");
     }
+    @Test
+    public void testSaveRegleManuelle_MissingCreator_ShouldFail() {
+        RegleManuelle regleManuelle = new RegleManuelle();
+        regleManuelle.setDescriptionRegle("This rule is missing a creator");
+
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            regleManuelleRepository.saveAndFlush(regleManuelle);
+        });
+    }
+
 
 
 

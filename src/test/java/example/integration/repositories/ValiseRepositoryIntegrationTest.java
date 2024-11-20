@@ -62,17 +62,16 @@ public class ValiseRepositoryIntegrationTest {
         valise.setRefClient("Aw5689");
         valise.setNumeroDujeu("254689");
         valise.setClient(client);
-        valise.setRegleSortie(regle);
-        valise.setTypevalise(typeValise);
+        valise.setRegleSortie((List<Regle>) regle);
+        valise.setTypeValiseList((List<TypeValise>) typeValise);
 
         Valise savedVal = valiseRepository.save(valise);
         assertNotNull(savedVal.getId());
         assertEquals(2548L, savedVal.getNumeroValise());
         assertEquals("Aw5689", savedVal.getRefClient());
         assertEquals("254689", savedVal.getNumeroDujeu());
-        assertEquals(regle.getCoderegle(), savedVal.getRegleSortie().getCoderegle());
-    }
-
+        assertEquals(regle.getCoderegle(), savedVal.getRegleSortie().get(0).getCoderegle());
+}
 
     @Test
     public void testFindValiseByIdSuccess(){
@@ -83,7 +82,7 @@ public class ValiseRepositoryIntegrationTest {
 
         Valise val = new Valise();
         val.setNumeroValise(2548L);
-        val.setRefClient("Aw5689");
+        val.setRefClient("Aw5689");;
         val.setNumeroDujeu("254689");
         val.setClient(client);
         valiseRepository.save(val);
@@ -177,13 +176,13 @@ public class ValiseRepositoryIntegrationTest {
         val.setRefClient("Aw5689");
         val.setNumeroDujeu("254689");
         val.setClient(client);
-        val.setRegleSortie(regle);
+        val.setRegleSortie((List<Regle>) regle);
         valiseRepository.save(val);
 
         List<Valise> foundVals = valiseRepository.findByRegleSortie(regle);
         assertNotNull(foundVals);
         assertFalse(foundVals.isEmpty());
-        assertEquals("code regleA", foundVals.get(0).getRegleSortie().getCoderegle());
+        assertEquals("code regleA", foundVals.get(0).getRegleSortie().getClass());
     }
 
 

@@ -1,6 +1,7 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.repositories.MouvementRepository;
 import example.services.MouvementService;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -197,6 +199,23 @@ public class MouvementControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    public void testCreateMouvement_WithRelations() throws Exception {
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("En cours");
+        mouvement.setDateHeureMouvement(new Date());
+        mouvement.setLivreurs(Collections.singletonList(new Livreur()));
+
+        String mouvementJson = objectMapper.writeValueAsString(mouvement);
+
+        mockMvc.perform(post("/api/mouvements")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mouvementJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.statutSortie").value("En cours"))
+                .andExpect(jsonPath("$.livreurs").isArray());
+    }
+
 
 
 

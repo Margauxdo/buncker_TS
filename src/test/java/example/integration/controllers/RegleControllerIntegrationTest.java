@@ -2,8 +2,11 @@ package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.entity.Regle;
+import example.entity.SortieSemaine;
 import example.repositories.RegleRepository;
+import example.repositories.SortieSemaineRepository;
 import example.services.RegleService;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -34,6 +37,9 @@ public class RegleControllerIntegrationTest {
 
     @Autowired
     private RegleRepository regleRepository;
+
+    @Autowired
+    private SortieSemaineRepository sortieSemaineRepository;
 
     @SpyBean
     private RegleService regleService;
@@ -205,6 +211,27 @@ public class RegleControllerIntegrationTest {
         mockMvc.perform(delete("/api/regles/{id}", regle.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+    }
+    @Test
+    @Transactional
+    public void testDeleteRegleCascade() throws Exception {
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("DeleteCascade");
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        sortieSemaine.setDateSortieSemaine(new Date());
+        sortieSemaine.setRegle(regle);
+        regle.getSortieSemaine().add(sortieSemaine);
+        regleRepository.saveAndFlush(regle);
+
+        // Act
+        mockMvc.perform(delete("/api/regles/{id}", regle.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        // Assert
+        Assertions.assertFalse(regleRepository.findById(regle.getId()).isPresent(), "Regle was not deleted");
+        Assertions.assertTrue(sortieSemaineRepository.findAll().isEmpty(), "SortieSemaine was not cascade deleted");
     }
 
 

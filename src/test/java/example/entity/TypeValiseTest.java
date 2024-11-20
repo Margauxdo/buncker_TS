@@ -38,11 +38,11 @@ public class TypeValiseTest {
         Valise valise1 = new Valise();
         valise1.setDescription("Description de la valise");
         valise1.setClient(client);
-        valise1.setTypevalise(typeValise);
+        valise1.setTypeValiseList((List<TypeValise>) typeValise);
 
         List<Valise> valiseList = new ArrayList<>();
         valiseList.add(valise1);
-        typeValise.setValises(valiseList);
+        typeValise.setValise(valise1);
 
         em.persist(typeValise);
         em.persist(valise1);
@@ -61,8 +61,8 @@ public class TypeValiseTest {
         System.out.println("Testing Cascade Persist for Valises...");
         TypeValise foundTypeValise = em.find(TypeValise.class, typeValise.getId());
         Assertions.assertNotNull(foundTypeValise, "Suitcase type should be persisted.");
-        Assertions.assertEquals(1, foundTypeValise.getValises().size(), "A suitcase should be persisted in cascade.");
-        Assertions.assertNotNull(foundTypeValise.getValises().get(0).getId(), "The persisted suitcase should have an ID.");
+        Assertions.assertEquals(1, foundTypeValise.getValise().getNumeroValise(), "A suitcase should be persisted in cascade.");
+        Assertions.assertNotNull(foundTypeValise.getValise().getClient().getId(), "The persisted suitcase should have an ID.");
     }
 
     @Test

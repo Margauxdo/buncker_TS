@@ -21,18 +21,23 @@ public class TypeRegleService implements ITypeRegleService {
 
     @Override
     public TypeRegle createTypeRegle(TypeRegle typeRegle) {
+        if (typeRegle.getRegle() == null || typeRegle.getRegle().getId() == 0) {
+            throw new IllegalArgumentException("Associated Regle must not be null");
+        }
         return typeRegleRepository.save(typeRegle);
     }
+
 
     @Override
     public TypeRegle updateTypeRegle(int id, TypeRegle typeRegle) {
         if (typeRegle.getId() != id) {
-            throw new IllegalArgumentException("Rule type ID does not match");
+            throw new IllegalArgumentException("TypeRegle ID mismatch");
         }
 
         if (!typeRegleRepository.existsById(id)) {
-            throw new EntityNotFoundException("The rule type does not exist");
+            throw new EntityNotFoundException("TypeRegle not found");
         }
+
         return typeRegleRepository.save(typeRegle);
     }
 
@@ -40,7 +45,7 @@ public class TypeRegleService implements ITypeRegleService {
     @Override
     public void deleteTypeRegle(int id) {
         if (!typeRegleRepository.existsById(id)) {
-            throw new EntityNotFoundException("The rule type does not exist");
+            throw new EntityNotFoundException("TypeRegle not found");
         }
         typeRegleRepository.deleteById(id);
     }

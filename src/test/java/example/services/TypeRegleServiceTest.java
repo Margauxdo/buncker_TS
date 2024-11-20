@@ -1,5 +1,6 @@
 package example.services;
 
+import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.repositories.TypeRegleRepository;
 import org.junit.jupiter.api.Assertions;
@@ -172,7 +173,28 @@ public class TypeRegleServiceTest {
 
     @Test
     public void testNoInteractionWithTypeRegleRepository_Success() {
+
         verifyNoInteractions(typeRegleRepository);
     }
+    @Test
+    public void testCreateTypeRegle_WithRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Regle1");
+
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Type B");
+        typeRegle.setRegle(regle);
+
+        when(typeRegleRepository.save(typeRegle)).thenReturn(typeRegle);
+
+        TypeRegle result = typeRegleService.createTypeRegle(typeRegle);
+
+        Assertions.assertNotNull(result.getId());
+        Assertions.assertEquals("Type B", result.getNomTypeRegle());
+        Assertions.assertNotNull(result.getRegle());
+        Assertions.assertEquals("Regle1", result.getRegle().getCoderegle());
+    }
+
 }
+
 

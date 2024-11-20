@@ -1,5 +1,6 @@
 package example.exceptions;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +56,29 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("An unexpected error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
-        logger.error("Illegal State: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-    }
+
     @ExceptionHandler(ProblemeNotFoundException.class)
     public ResponseEntity<String> handleProblemeNotFound(ProblemeNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneralException(Exception e) {
+        e.printStackTrace();
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
+
+
+

@@ -94,7 +94,7 @@ public class TypeValiseControllerIntegrationTest {
         typeValise = typeValiseRepository.saveAndFlush(typeValise);
 
         typeValise = typeValiseRepository.findById(typeValise.getId()).orElseThrow();
-        Hibernate.initialize(typeValise.getValises());
+        Hibernate.initialize(typeValise.getValise());
 
         mvc.perform(get("/api/typeValise/{id}", typeValise.getId()))
                 .andExpect(status().isOk())

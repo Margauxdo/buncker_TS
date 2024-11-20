@@ -24,7 +24,7 @@ public class ClientController {
     @GetMapping("/api")
     public ResponseEntity<List<Client>> getAllClientsApi() {
         List<Client> clients = clientService.getAllClients();
-        return ResponseEntity.ok(clients); // Simplifié
+        return ResponseEntity.ok(clients);
     }
 
     // API REST: Récupérer un client par ID
@@ -46,9 +46,12 @@ public class ClientController {
     @PutMapping("/api/{id}")
     public ResponseEntity<Client> updateClientApi(@PathVariable int id, @RequestBody Client client) {
         Client updatedClient = clientService.updateClient(id, client);
-        return updatedClient != null ? ResponseEntity.ok(updatedClient)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (updatedClient == null) {
+            throw new EntityNotFoundException("Client not found with ID " + id);  // Cette ligne lèvera une exception capturée par l'@ExceptionHandler
+        }
+        return ResponseEntity.ok(updatedClient);
     }
+
 
     // API REST: Supprimer un client
     @DeleteMapping("/api/{id}")
@@ -64,7 +67,7 @@ public class ClientController {
     @GetMapping("/list")
     public String viewClients(Model model) {
         model.addAttribute("clients", clientService.getAllClients());
-        return "client_list";
+        return "clients/client_list";
     }
 
     // Vue Thymeleaf pour voir un client par ID
@@ -72,19 +75,23 @@ public class ClientController {
     public String viewClientById(@PathVariable int id, Model model) {
         Client client = clientService.getClientById(id);
         if (client == null) {
-            throw new EntityNotFoundException("Client avec l'ID " + id + " non trouvé.");
+            model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
+            return "error";
         }
         model.addAttribute("client", client);
-        return "client_detail";
+        return "clients/client_detail";
     }
+
 
 
     // Formulaire Thymeleaf pour créer un client
     @GetMapping("/create")
     public String createClientForm(Model model) {
         model.addAttribute("client", new Client());
-        return "client_create";
+        return "clients/client_create";
     }
+
+
 
     // Création d'un client via formulaire Thymeleaf
     @PostMapping("/create")
@@ -101,7 +108,7 @@ public class ClientController {
             return "error"; // Affiche une page d'erreur si le client n'existe pas
         }
         model.addAttribute("client", client);
-        return "client_edit";
+        return "clients/client_edit";
     }
 
     // Modifier un client via formulaire Thymeleaf

@@ -36,7 +36,7 @@ public class RetourSecuriteControllerTest {
         List<RetourSecurite> retourSecurites = new ArrayList<>();
         retourSecurites.add(new RetourSecurite());
         when(retourSecuriteService.getAllRetourSecurites()).thenReturn(retourSecurites);
-        List<RetourSecurite> result = RScontroller.getAllRetourSecurites();
+        List<RetourSecurite> result = (List<RetourSecurite>) RScontroller.getAllRetourSecurites();
         Assertions.assertNotNull(result);
         Assertions.assertEquals(retourSecurites.size(), result.size());
     }

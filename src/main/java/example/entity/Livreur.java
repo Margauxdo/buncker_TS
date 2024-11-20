@@ -33,8 +33,9 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    @OneToMany(mappedBy = "livreur", cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @Column(name = "mouvement_id")
     @JsonManagedReference
-    private List<Mouvement> mouvements;
+    private Mouvement mouvement;
 }
 

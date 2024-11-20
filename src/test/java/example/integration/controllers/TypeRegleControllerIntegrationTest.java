@@ -1,6 +1,7 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.repositories.TypeRegleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,5 +114,23 @@ public class TypeRegleControllerIntegrationTest {
         mvc.perform(delete("/api/typeRegle/999"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void testCreateTypeRegle_WithRegle() throws Exception {
+        Regle regle = new Regle();
+        regle.setCoderegle("RESTRegle");
+
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Type E");
+        typeRegle.setRegle(regle);
+
+        mvc.perform(post("/api/typeRegle")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(typeRegle)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nomTypeRegle").value("Type E"))
+                .andExpect(jsonPath("$.regle.coderegle").value("RESTRegle"));
+    }
+
 
 }

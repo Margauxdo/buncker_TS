@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -102,6 +103,35 @@ public class ClientTest {
             em.flush();
         }, "Le nom du client ne devrait pas être nul.");
     }
+    @Test
+    public void testUniqueEmailConstraint() {
+        Client client1 = new Client();
+        client1.setName("Client A");
+        client1.setEmail("unique@example.com");
+
+        Client client2 = new Client();
+        client2.setName("Client B");
+        client2.setEmail("unique@example.com");
+
+        em.persist(client1);
+
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+            em.persist(client2);
+            em.flush();
+        }, "L'email doit être unique.");
+    }
+
+    @Test
+    public void testNullEmailThrowsConstraintViolation() {
+        Client client = new Client();
+        client.setName("Client Test");
+
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            em.persist(client);
+            em.flush();
+        }, "Un email non nul est requis.");
+    }
+
 
 
 }

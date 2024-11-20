@@ -1,8 +1,10 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import example.entity.Formule;
 import example.entity.JourFerie;
 import example.entity.Regle;
+import example.repositories.FormuleRepository;
 import example.repositories.JourFerieRepository;
 import example.repositories.RegleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,12 +41,16 @@ public class JourFerieControllerIntegrationTest {
     private RegleRepository regleRepository;
 
     @Autowired
+    private FormuleRepository formuleRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         jourFerieRepository.deleteAll();
         regleRepository.deleteAll();
+        formuleRepository.deleteAll();
     }
 
     @Test
@@ -69,11 +77,10 @@ public class JourFerieControllerIntegrationTest {
         // Arrange
         Regle regle = new Regle();
         regle.setCoderegle("TestRuleCode");
-        regleRepository.save(regle);
+        regle = regleRepository.save(regle);
 
-        // Arrange
         JourFerie jourFerie = new JourFerie();
-        jourFerie.setRegle(regle);
+        jourFerie.setRegles(Collections.singletonList(regle)); // Correction ici
         jourFerie.setJoursFerieList(Collections.singletonList(new Date()));
 
         // Act & Assert
@@ -81,10 +88,9 @@ public class JourFerieControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(jourFerie)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.regle.coderegle", is("TestRuleCode")))
+                .andExpect(jsonPath("$.regles[0].coderegle", is("TestRuleCode")))
                 .andExpect(jsonPath("$.joursFerieList[0]").exists());
     }
-
 
     @Test
     public void testGetHolidayById_shouldReturnBadRequestForInvalidId() throws Exception {
@@ -95,16 +101,32 @@ public class JourFerieControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-
     @Test
     public void testGetHolidayById_shouldReturnNotFoundForNonExistentId() throws Exception {
+        // Act
         mockMvc.perform(get("/api/jourferies/{id}", 999999)
                         .contentType(MediaType.APPLICATION_JSON))
                 // Assert
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void testCreateHolidayWithFormule() throws Exception {
+        // Arrange
+        Formule formule = new Formule();
+        formule.setFormule("Formule Test");
+        formule = formuleRepository.save(formule);
 
+        JourFerie jourFerie = new JourFerie();
+        jourFerie.setJoursFerieList(Collections.singletonList(new Date()));
+        jourFerie.setRegles(new ArrayList<>());
+        jourFerieRepository.save(jourFerie);
 
-
+        // Act & Assert
+        mockMvc.perform(post("/api/jourferies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(jourFerie)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.formule.nom", is("Formule Test")));
+    }
 }

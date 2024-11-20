@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Créer une formule</title>
+</head>
+<body>
+<h1>Créer une nouvelle formule</h1>
+
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<form th:action="@{/formules/create}" th:object="${formule}" method="post">
+
+    <label for="libelle">Libellé:</label>
+    <input type="text" id="libelle" th:field="*{formule.libelle}" required />
+    <br>
+    <label for="description">Description:</label>
+    <input type="text" id="description" th:field="*{formule.description}" required />
+    <br>
+    <label for="regle">Règle:</label>
+    <input type="text" id="regle" th:field="*{formule.regle}" required />
+    <br>
+    <button type="submit">Créer</button>
+</form>
+
+<a th:href="@{/formules/list}">Retour à la liste</a>
+
+</body>
+</html>

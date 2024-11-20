@@ -157,5 +157,15 @@ public class RegleManuelleControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    public void testCreateRegleManuelle_MissingFields_ShouldReturnBadRequest() throws Exception {
+        RegleManuelle invalidRegleManuelle = new RegleManuelle();
+
+        mockMvc.perform(post("/api/regle-manuelle")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRegleManuelle)))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
