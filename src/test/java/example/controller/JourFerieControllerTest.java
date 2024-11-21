@@ -49,7 +49,7 @@ public class JourFerieControllerTest {
         when(jourFerieService.saveJourFerie(any(JourFerie.class))).thenReturn(jourFerie);
 
         // Act
-        ResponseEntity<JourFerie> response = jourFerieController.createJourFerie(jourFerie);
+        ResponseEntity<JourFerie> response = jourFerieController.createJourFerieApi(jourFerie);
 
         // Assert
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());

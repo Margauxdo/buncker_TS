@@ -76,7 +76,7 @@ public class ClientController {
         Client client = clientService.getClientById(id);
         if (client == null) {
             model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
-            return "error";
+            return "clients/error";
         }
         model.addAttribute("client", client);
         return "clients/client_detail";
@@ -105,7 +105,7 @@ public class ClientController {
     public String editClientForm(@PathVariable int id, Model model) {
         Client client = clientService.getClientById(id);
         if (client == null) {
-            return "error"; // Affiche une page d'erreur si le client n'existe pas
+            return "clients/error";
         }
         model.addAttribute("client", client);
         return "clients/client_edit";
