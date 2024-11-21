@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/jourferies")
+@RequestMapping("/jourferies")
 public class JourFerieController {
 
     @Autowired
@@ -48,14 +48,14 @@ public class JourFerieController {
 
     // API REST: Récupérer tous les JF
     @GetMapping("/api")
-    public ResponseEntity<List<JourFerie>> getJourFeries() {
+    public ResponseEntity<List<JourFerie>> getJourFeriesApi() {
         List<JourFerie> jourFeries = jourFerieService.getJourFeries();
         return new ResponseEntity<>(jourFeries, HttpStatus.OK);
     }
 
     // API REST: Récupérer un JF par ID
     @GetMapping("/api/{id}")
-    public ResponseEntity<JourFerie> getJourFerie(@PathVariable int id) {
+    public ResponseEntity<JourFerie> getJourFerieApi(@PathVariable int id) {
         if (id < 0) {
             throw new IllegalArgumentException("Invalid ID: " + id);
         }
@@ -102,6 +102,6 @@ public class JourFerieController {
     @PostMapping("/create")
     public String createJourFerieThymeleaf(@Valid @ModelAttribute("jourFerie") JourFerie jourFerie) {  // Renamed method
         jourFerieService.saveJourFerie(jourFerie);
-        return "redirect:/jourferies/list";
+        return "redirect:/jourferies/JF_list";
     }
 }

@@ -35,15 +35,15 @@ public class LivreurController {
     }
 
     // API REST: Récupérer tous les livreurs
-    @GetMapping("api")
-    public ResponseEntity<List<Livreur>> getAllLivreurs() {
+    @GetMapping("/api")
+    public ResponseEntity<List<Livreur>> getAllLivreursApi() {
         List<Livreur> livreurs = livreurService.getAllLivreurs();
         return ResponseEntity.ok(livreurs);
     }
 
     // API REST: Récupérer un livreur par ID
     @GetMapping("/api/{id}")
-    public ResponseEntity<Livreur> getLivreurById(@PathVariable int id) {
+    public ResponseEntity<Livreur> getLivreurByIdApi(@PathVariable int id) {
         Livreur livreur = livreurService.getLivreurById(id);
         return livreur != null ? ResponseEntity.ok(livreur) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -67,7 +67,7 @@ public class LivreurController {
 
     // API REST: Modifier un livreur
     @PutMapping("/api/{id}")
-    public ResponseEntity<Livreur> updateLivreur(@PathVariable int id, @RequestBody Livreur livreur) {
+    public ResponseEntity<Livreur> updateLivreurApi(@PathVariable int id, @RequestBody Livreur livreur) {
         if (livreur.getNomLivreur() == null || livreur.getNomLivreur().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -117,9 +117,9 @@ public class LivreurController {
 
     // Création d'un livreur via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createLivreurThymeleaf(@Valid @ModelAttribute("livreur") Livreur livreur) {
+    public String createLivreur(@Valid @ModelAttribute("livreur") Livreur livreur) {
         livreurService.createLivreur(livreur);
-        return "redirect:/livreurs/list";
+        return "redirect:/livreurs/livreur_list";
     }
 
     // Formulaire Thymeleaf pour modifier un livreur
@@ -135,15 +135,15 @@ public class LivreurController {
 
     // Modifier un livreur via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
-    public String updateLivreurThymeleaf(@PathVariable int id, @Valid @ModelAttribute("livreur") Livreur livreur) {
+    public String updateLivreur(@PathVariable int id, @Valid @ModelAttribute("livreur") Livreur livreur) {
         livreurService.updateLivreur(id, livreur);
-        return "redirect:/livreurs/list";
+        return "redirect:/livreurs/livreur_list";
     }
 
     // Supprimer un livreur via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
-    public String deleteLivreurThymeleaf(@PathVariable int id) {
+    public String deleteLivreur(@PathVariable int id) {
         livreurService.deleteLivreur(id);
-        return "redirect:/livreurs/list";
+        return "redirect:/livreurs/livreur_list";
     }
 }

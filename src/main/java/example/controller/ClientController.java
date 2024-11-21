@@ -97,7 +97,7 @@ public class ClientController {
     @PostMapping("/create")
     public String createClient(@Valid @ModelAttribute("client") Client client) {
         clientService.createClient(client);
-        return "redirect:/clients/list";
+        return "redirect:/clients/clients_list";
     }
 
     // Formulaire Thymeleaf pour modifier un client
@@ -115,13 +115,13 @@ public class ClientController {
     @PostMapping("/edit/{id}")
     public String updateClient(@PathVariable int id, @Valid @ModelAttribute("client") Client client) {
         clientService.updateClient(id, client);
-        return "redirect:/clients/list";
+        return "redirect:/clients/clients_list";
     }
 
     // Supprimer un client via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteClient(@PathVariable int id) {
         clientService.deleteClient(id);
-        return "redirect:/clients/list";
+        return "redirect:/clients/clients_list";
     }
 }

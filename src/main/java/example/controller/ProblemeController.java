@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/pb")
+@RequestMapping("/pb")
 public class ProblemeController {
 
     @Autowired

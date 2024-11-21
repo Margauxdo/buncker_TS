@@ -3,10 +3,12 @@ package example.controller;
 import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import org.slf4j.Logger;
@@ -15,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/mouvements")
+@RequestMapping("/mouvements")
 public class MouvementController {
 
     @Autowired
@@ -24,22 +26,23 @@ public class MouvementController {
     @Autowired
     private static final Logger logger = LoggerFactory.getLogger(MouvementController.class);
 
-
-    @GetMapping
-    public List<Mouvement> getAllMouvements() {
+    // API REST: Récupérer tous les mouvements
+    @GetMapping("/api")
+    public List<Mouvement> getAllMouvementsApi() {
         List<Mouvement> mouvements = mouvementService.getAllMouvements();
         return new ResponseEntity<>(mouvements, HttpStatus.OK).getBody();
     }
-
-    @GetMapping("{id}")
-    public ResponseEntity<Mouvement> getMouvementById(@PathVariable int id) {
+    // API REST: Récupérer un mouvement par ID
+    @GetMapping("/api/{id}")
+    public ResponseEntity<Mouvement> getMouvementByIdApi(@PathVariable int id) {
         Mouvement mouvement = mouvementService.getMouvementById(id);
         return mouvement != null ? new ResponseEntity<>(mouvement, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-        @PostMapping
-        public ResponseEntity<Mouvement> createMouvement(@RequestBody Mouvement mouvement) {
+    // API REST: Créer un mouvement
+        @PostMapping("/api")
+        public ResponseEntity<Mouvement> createMouvementApi(@RequestBody Mouvement mouvement) {
             try {
                 if (mouvement.getDateHeureMouvement() == null || mouvement.getStatutSortie() == null) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,8 +55,10 @@ public class MouvementController {
             }
         }
 
-        @PutMapping("/{id}")
-        public ResponseEntity<Mouvement> updateMouvement(@PathVariable int id, @RequestBody Mouvement mouvement) {
+    // API REST: Modifier un mouvement
+
+        @PutMapping("/api/{id}")
+        public ResponseEntity<Mouvement> updateMouvementApi(@PathVariable int id, @RequestBody Mouvement mouvement) {
             try {
                 if (!mouvementService.existsById(id)) {
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -69,8 +74,9 @@ public class MouvementController {
         }
 
 
+    // API REST: Supprimer un mouvement
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteMouvement(@PathVariable int id) {
+    public ResponseEntity<Void> deleteMouvementApi(@PathVariable int id) {
         try {
             if (!mouvementService.existsById(id)) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -80,7 +86,70 @@ public class MouvementController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }}
+    }
+
+    // Vue Thymeleaf pour lister les mouvements
+    @GetMapping("/list")
+    public String listAllMouvements(Model model) {
+        model.addAttribute("mouvements", mouvementService.getAllMouvements());
+        return "mouvements/mouv_list";
+    }
+
+    // Vue Thymeleaf pour voir un mouvement par ID
+    @GetMapping("/view/{id}")
+    public String viewMouvementById(@PathVariable int id, Model model) {
+        Mouvement mouvement = mouvementService.getMouvementById(id);
+        if (mouvement != null) {
+            model.addAttribute("errormessage", "Mouvement avec l'ID" + id + "non trouvé");
+            return "mouvements/error";
+        }
+        model.addAttribute("mouvement", mouvement);
+        return "mouvements/mouv_details";
+    }
+
+    // Formulaire Thymeleaf pour créer un mouvement
+    @GetMapping("/create")
+public String createMouvementForm(Model model) {
+        model.addAttribute("mouvement", new Mouvement());
+        return "mouvements/mouv_create";
+    }
+
+    // Création d'un mouvement via formulaire Thymeleaf
+    @PostMapping("/create")
+    public String createMouvementThymeleaf(@Valid @ModelAttribute("mouvement") Mouvement mouvement) {
+        mouvementService.createMouvement(mouvement);
+        return "redirect:/mouvements/mouv_list";
+    }
+
+    // Formulaire Thymeleaf pour modifier un mouvement
+    @GetMapping("/edit/{id}")
+    public String editMouvementForm(@PathVariable int id, Model model) {
+        Mouvement mouvement = mouvementService.getMouvementById(id);
+        if (mouvement != null) {
+            model.addAttribute("mouvement", mouvement);
+            return "mouvements/error";
+        }
+        model.addAttribute("mouvement", mouvement);
+        return "mouvements/mouv_edit";
+    }
+
+    // Modifier un mouvement via formulaire Thymeleaf
+    @PostMapping("/edit/{id}")
+    public String updateMouvement(@PathVariable int id, @Valid @ModelAttribute("mouvement") Mouvement mouvement){
+        mouvementService.updateMouvement(id, mouvement);
+        return "redirect:/mouvements/mouv_list";
+    }
+    // Supprimer un mouvement via un formulaire Thymeleaf sécurisé
+
+    @PostMapping("/delete/{id}")
+    public String deleteMouvement(@PathVariable int id) {
+        mouvementService.deleteMouvement(id);
+        return "redirect:/mouvements/mouv_list";
+    }
+
+
+}
+
 
 
 

@@ -37,7 +37,7 @@ public class MouvementControllerTest {
         List<Mouvement> mouvements = new ArrayList<>();
         mouvements.add(new Mouvement());
         when(mouvementService.getAllMouvements()).thenReturn(mouvements);
-        List<Mouvement> result = mouvementController.getAllMouvements();
+        List<Mouvement> result = mouvementController.getAllMouvementsApi();
         assertNotNull(result);
         assertEquals(mouvements.size(), result.size());
 
@@ -45,19 +45,19 @@ public class MouvementControllerTest {
     @Test
     public void testGetAllMouvements_Failure() {
         when(mouvementService.getAllMouvements()).thenThrow(new RuntimeException("Database error"));
-        Assertions.assertThrows(RuntimeException.class, () -> mouvementController.getAllMouvements());
+        Assertions.assertThrows(RuntimeException.class, () -> mouvementController.getAllMouvementsApi());
     }
     @Test
     public void testGetMouvementById_Success() {
         Mouvement mouvement = new Mouvement();
         when(mouvementService.getMouvementById(1)).thenReturn(mouvement);
-        ResponseEntity<Mouvement> result = mouvementController.getMouvementById(1);
+        ResponseEntity<Mouvement> result = mouvementController.getMouvementByIdApi(1);
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
     @Test
     public void testGetMouvementById_Failure() {
         when(mouvementService.getMouvementById(1)).thenReturn(null);
-        ResponseEntity<Mouvement> result = mouvementController.getMouvementById(1);
+        ResponseEntity<Mouvement> result = mouvementController.getMouvementByIdApi(1);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
@@ -67,7 +67,7 @@ public class MouvementControllerTest {
     public void testCreateMouvement_Failure() {
         Mouvement mouvement = new Mouvement();
         when(mouvementService.createMouvement(any(Mouvement.class))).thenThrow(new IllegalArgumentException("Movement invalid"));
-        ResponseEntity<Mouvement> response = mouvementController.createMouvement(mouvement);
+        ResponseEntity<Mouvement> response = mouvementController.createMouvementApi(mouvement);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
@@ -77,7 +77,7 @@ public class MouvementControllerTest {
     public void testUpdateMouvement_Failure() {
         Mouvement updatedMouvement = new Mouvement();
         when(mouvementService.updateMouvement(1, updatedMouvement)).thenReturn(null);
-        ResponseEntity<Mouvement> response = mouvementController.updateMouvement(1, updatedMouvement);
+        ResponseEntity<Mouvement> response = mouvementController.updateMouvementApi(1, updatedMouvement);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
     @Test
@@ -85,7 +85,7 @@ public class MouvementControllerTest {
         when(mouvementService.existsById(1)).thenReturn(true);
         doNothing().when(mouvementService).deleteMouvement(1);
 
-        ResponseEntity<Void> result = mouvementController.deleteMouvement(1);
+        ResponseEntity<Void> result = mouvementController.deleteMouvementApi(1);
 
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
 
@@ -99,7 +99,7 @@ public class MouvementControllerTest {
 
         doThrow(new RuntimeException("Internal server error")).when(mouvementService).deleteMouvement(1);
 
-        ResponseEntity<Void> response = mouvementController.deleteMouvement(1);
+        ResponseEntity<Void> response = mouvementController.deleteMouvementApi(1);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 
@@ -112,7 +112,7 @@ public class MouvementControllerTest {
     public void testCreateMouvement_InvalidInput() {
         Mouvement invalidMouvement = new Mouvement();
         when(mouvementService.createMouvement(any(Mouvement.class))).thenThrow(new IllegalArgumentException("Invalid data"));
-        ResponseEntity<Mouvement> result = mouvementController.createMouvement(invalidMouvement);
+        ResponseEntity<Mouvement> result = mouvementController.createMouvementApi(invalidMouvement);
         assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
     @Test
@@ -122,7 +122,7 @@ public class MouvementControllerTest {
         when(mouvementService.updateMouvement(anyInt(), any(Mouvement.class)))
                 .thenThrow(new IllegalArgumentException("Invalid data"));
 
-        ResponseEntity<Mouvement> result = mouvementController.updateMouvement(1, invalidMouvement);
+        ResponseEntity<Mouvement> result = mouvementController.updateMouvementApi(1, invalidMouvement);
 
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
@@ -131,7 +131,7 @@ public class MouvementControllerTest {
     @Test
     public void testDeleteMouvement_NotFound() {
         doThrow(new IllegalArgumentException("Mouvement not found")).when(mouvementService).deleteMouvement(1);
-        ResponseEntity<Void> result = mouvementController.deleteMouvement(1);
+        ResponseEntity<Void> result = mouvementController.deleteMouvementApi(1);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
     @Test
@@ -141,7 +141,7 @@ public class MouvementControllerTest {
         when(mouvementService.createMouvement(any(Mouvement.class)))
                 .thenThrow(new IllegalArgumentException("Conflict detected"));
 
-        ResponseEntity<Mouvement> result = mouvementController.createMouvement(mouvement);
+        ResponseEntity<Mouvement> result = mouvementController.createMouvementApi(mouvement);
 
         assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
@@ -161,7 +161,7 @@ public class MouvementControllerTest {
         when(mouvementService.createMouvement(any(Mouvement.class)))
                 .thenThrow(new IllegalArgumentException("Conflict detected"));
 
-        ResponseEntity<Mouvement> response = mouvementController.createMouvement(mouvement);
+        ResponseEntity<Mouvement> response = mouvementController.createMouvementApi(mouvement);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
@@ -176,7 +176,7 @@ public class MouvementControllerTest {
         when(mouvementService.createMouvement(any(Mouvement.class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
-        ResponseEntity<Mouvement> response = mouvementController.createMouvement(mouvement);
+        ResponseEntity<Mouvement> response = mouvementController.createMouvementApi(mouvement);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
@@ -189,7 +189,7 @@ public class MouvementControllerTest {
         when(mouvementService.updateMouvement(anyInt(), any(Mouvement.class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
-        ResponseEntity<Mouvement> response = mouvementController.updateMouvement(1, mouvement);
+        ResponseEntity<Mouvement> response = mouvementController.updateMouvementApi(1, mouvement);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -201,7 +201,7 @@ public class MouvementControllerTest {
         when(mouvementService.existsById(1)).thenReturn(true);
         doThrow(new RuntimeException("Unexpected error")).when(mouvementService).deleteMouvement(1);
 
-        ResponseEntity<Void> response = mouvementController.deleteMouvement(1);
+        ResponseEntity<Void> response = mouvementController.deleteMouvementApi(1);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 
@@ -217,7 +217,7 @@ public class MouvementControllerTest {
 
         when(mouvementService.createMouvement(any(Mouvement.class))).thenReturn(mouvement);
 
-        ResponseEntity<Mouvement> response = mouvementController.createMouvement(mouvement);
+        ResponseEntity<Mouvement> response = mouvementController.createMouvementApi(mouvement);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -235,7 +235,7 @@ public class MouvementControllerTest {
         when(mouvementService.updateMouvement(eq(1), any(Mouvement.class))).thenReturn(mouvement);
 
         // Act
-        ResponseEntity<Mouvement> response = mouvementController.updateMouvement(1, mouvement);
+        ResponseEntity<Mouvement> response = mouvementController.updateMouvementApi(1, mouvement);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Expected HTTP status 200 OK");

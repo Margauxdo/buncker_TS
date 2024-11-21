@@ -38,7 +38,7 @@ public class LivreurControllerTest {
 
         when(livreurService.getAllLivreurs()).thenReturn(livreurs);
 
-        ResponseEntity<List<Livreur>> response = livreurController.getAllLivreurs();
+        ResponseEntity<List<Livreur>> response = livreurController.getAllLivreursApi();
         List<Livreur> result = response.getBody();
 
         // Vérifier les assertions
@@ -50,20 +50,20 @@ public class LivreurControllerTest {
     @Test
     public void testGetAllLivreurs_Failure() {
         when(livreurService.getAllLivreurs()).thenThrow(new RuntimeException("Database error"));
-        Assertions.assertThrows(RuntimeException.class, () -> livreurController.getAllLivreurs());
+        Assertions.assertThrows(RuntimeException.class, () -> livreurController.getAllLivreursApi());
     }
     @Test
     public void testGetLivreurById_Success(){
         Livreur livreur = new Livreur();
         when(livreurService.getLivreurById(1)).thenReturn(livreur);
-        ResponseEntity<Livreur> result = livreurController.getLivreurById(1);
+        ResponseEntity<Livreur> result = livreurController.getLivreurByIdApi(1);
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
         Assertions.assertEquals(livreur, result.getBody());
     }
     @Test
     public void testGetLivreurById_Failure() {
         when(livreurService.getLivreurById(1)).thenReturn(null);
-        ResponseEntity<Livreur> result = livreurController.getLivreurById(1);
+        ResponseEntity<Livreur> result = livreurController.getLivreurByIdApi(1);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
     @Test
@@ -103,7 +103,7 @@ public class LivreurControllerTest {
         updatedLivreur.setNomLivreur("Valid Name");
         when(livreurService.updateLivreur(1, updatedLivreur)).thenReturn(updatedLivreur);
 
-        ResponseEntity<Livreur> result = livreurController.updateLivreur(1, updatedLivreur);
+        ResponseEntity<Livreur> result = livreurController.updateLivreurApi(1, updatedLivreur);
 
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
         Assertions.assertEquals(updatedLivreur, result.getBody());
@@ -116,7 +116,7 @@ public class LivreurControllerTest {
 
         when(livreurService.updateLivreur(1, updatedLivreur)).thenReturn(null);
 
-        ResponseEntity<Livreur> result = livreurController.updateLivreur(1, updatedLivreur);
+        ResponseEntity<Livreur> result = livreurController.updateLivreurApi(1, updatedLivreur);
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
@@ -178,7 +178,7 @@ public class LivreurControllerTest {
     public void testUpdateLivreur_InvalidInput() {
         Livreur updatedLivreur = new Livreur();
         when(livreurService.updateLivreur(eq(1), any(Livreur.class))).thenThrow(new IllegalArgumentException("Invalid data"));
-        ResponseEntity<Livreur> result = livreurController.updateLivreur(1, updatedLivreur);
+        ResponseEntity<Livreur> result = livreurController.updateLivreurApi(1, updatedLivreur);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
     @Test

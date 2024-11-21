@@ -149,14 +149,14 @@ public class FormuleController {
     @PostMapping("/edit/{id}")
     public String updateFormule(@PathVariable int id, @Valid @ModelAttribute("formule") Formule formule) {
         formuleService.updateFormule(id, formule);
-        return "redirect:/formules/list";
+        return "redirect:/formules/formules_list";
     }
 
     // Supprimer une formule via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteFormule(@PathVariable int id) {
         formuleService.deleteFormule(id);
-        return "redirect:/formules/list";
+        return "redirect:/formules/formules_list";
     }
 
 

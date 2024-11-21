@@ -67,7 +67,7 @@ public class JourFerieControllerTest {
         when(jourFerieService.getJourFerie(1)).thenReturn(jourFerie);
 
         // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerie(1);
+        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(1);
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -80,7 +80,7 @@ public class JourFerieControllerTest {
         when(jourFerieService.getJourFerie(1)).thenReturn(null);
 
         // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerie(1);
+        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(1);
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
@@ -89,7 +89,7 @@ public class JourFerieControllerTest {
     @Test
     public void testGetJourFerie_InvalidId() {
         // Act & Assert
-        Assertions.assertThrows(IllegalArgumentException.class, () -> jourFerieController.getJourFerie(-1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> jourFerieController.getJourFerieApi(-1));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class JourFerieControllerTest {
         when(jourFerieService.getJourFeries()).thenThrow(new RuntimeException("Erreur inattendue"));
 
         // Act & Assert
-        Assertions.assertThrows(RuntimeException.class, () -> jourFerieController.getJourFeries());
+        Assertions.assertThrows(RuntimeException.class, () -> jourFerieController.getJourFeriesApi());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class JourFerieControllerTest {
         when(jourFerieService.getJourFerie(1)).thenThrow(new RuntimeException("Erreur de service"));
 
         // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerie(1);
+        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(1);
 
         // Assert
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
@@ -119,7 +119,7 @@ public class JourFerieControllerTest {
         when(jourFerieService.getJourFerie(9999)).thenReturn(null);
 
         // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerie(9999);
+        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(9999);
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
