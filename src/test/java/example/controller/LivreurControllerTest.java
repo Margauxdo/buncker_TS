@@ -79,11 +79,21 @@ public class LivreurControllerTest {
 
     @Test
     public void testCreateLivreur_Failure() {
+        // Arrange
         Livreur livreur = new Livreur();
-        when(livreurService.createLivreur(any(Livreur.class))).thenThrow(new IllegalArgumentException("Disabled delivery person"));
+        when(livreurService.createLivreur(any(Livreur.class)))
+                .thenThrow(new IllegalArgumentException("Disabled delivery person"));
+
+        // Act
         ResponseEntity<Livreur> result = livreurController.createLivreur(livreur);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode(),
+                "Expected HTTP status 400 BAD_REQUEST for disabled delivery person");
+        verify(livreurService, times(1)).createLivreur(any(Livreur.class));
+        verifyNoMoreInteractions(livreurService);
     }
+
     @Test
     public void testUpdateLivreur_Success() {
         Livreur updatedLivreur = new Livreur();
@@ -116,12 +126,21 @@ public class LivreurControllerTest {
     }
 
     @Test
-    public void testCreateLivreur_InvalidInput(){
+    public void testCreateLivreur_InvalidInput() {
+        // Arrange
         Livreur invalidLivreur = new Livreur();
         when(livreurService.createLivreur(any(Livreur.class))).thenThrow(new IllegalArgumentException("Invalid data"));
+
+        // Act
         ResponseEntity<Livreur> result = livreurController.createLivreur(invalidLivreur);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode(),
+                "Expected HTTP status 400 BAD_REQUEST for invalid input");
+        verify(livreurService, times(1)).createLivreur(any(Livreur.class));
+        verifyNoMoreInteractions(livreurService);
     }
+
 
     @Test
     public void testDeleteLivreur_NotFound(){

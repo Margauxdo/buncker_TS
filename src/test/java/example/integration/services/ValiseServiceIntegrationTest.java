@@ -66,7 +66,7 @@ public class ValiseServiceIntegrationTest {
                 .numeroValise(12345L)
                 .client(client)
                 .regleSortie((List<Regle>) regle)
-                .typeValiseList((List<TypeValise>) typeValise)
+                .typeValise(typeValise)
                 .dateCreation(new Date())
                 .build();
     }
@@ -79,7 +79,7 @@ public class ValiseServiceIntegrationTest {
         assertNotNull(createdValise);
         assertEquals("Test Valise", createdValise.getDescription());
         assertEquals(client.getId(), createdValise.getClient().getId());
-        assertEquals(typeValise.getId(), createdValise.getTypeValiseList().get(1).getId());
+        assertEquals(typeValise.getId(), createdValise.getTypeValise().getId());
     }
 
     @Test

@@ -47,9 +47,12 @@ public class RegleServiceTest {
             regleService.createRegle(null);
         });
 
-        Assertions.assertEquals("Ruler cannot be null", exception.getMessage());
+        Assertions.assertEquals("La règle ne peut pas être nulle.", exception.getMessage(),
+                "Exception message should match the expected error message.");
+
         verifyNoInteractions(regleRepository);
     }
+
 
 
     @Test
@@ -110,12 +113,11 @@ public class RegleServiceTest {
             regleService.updateRegle(id, regle);
         });
 
-        Assertions.assertEquals("Ruler withID 1 not found", exception.getMessage());
+        Assertions.assertEquals("Règle non trouvée avec l'ID 1", exception.getMessage(),
+                "Exception message should match the expected error message.");
         verify(regleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(regleRepository);
     }
-
-
 
     @Test
     public void testUpdateRegle_NullInput_ShouldThrowNotFoundException() {
@@ -123,10 +125,11 @@ public class RegleServiceTest {
             regleService.updateRegle(1, null);
         });
 
-        Assertions.assertEquals("Ruler with id 1 not found for update", exception.getMessage());
+        Assertions.assertEquals("Règle non trouvée avec l'ID 1", exception.getMessage(),
+                "Exception message should match the expected error message.");
+
         verifyNoInteractions(regleRepository);
     }
-
 
 
     @Test

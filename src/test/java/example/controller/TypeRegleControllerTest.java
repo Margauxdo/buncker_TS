@@ -30,17 +30,26 @@ public class TypeRegleControllerTest {
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.openMocks(this);
     }
     @Test
     public void testGetTypeRegles_Success() {
+        // Arrange
         List<TypeRegle> typeRegles = new ArrayList<>();
         typeRegles.add(new TypeRegle());
         when(typeRegleService.getTypeRegles()).thenReturn(typeRegles);
-        List<TypeRegle> result = (List<TypeRegle>) typeRegleController.getTypeRegles();
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(typeRegles.size(), result.size());
+
+        // Act
+        ResponseEntity<List<TypeRegle>> response = typeRegleController.getTypeRegles();
+
+        // Assert
+        Assertions.assertNotNull(response, "ResponseEntity should not be null");
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "Expected HTTP status 200 OK");
+        Assertions.assertNotNull(response.getBody(), "Response body should not be null");
+        Assertions.assertEquals(typeRegles.size(), response.getBody().size(), "List size should match the mock data");
     }
+
     @Test
     public void testGetTypeRegles_Failure() {
         when(typeRegleService.getTypeRegles()).thenThrow(new RuntimeException("error database"));
@@ -101,11 +110,19 @@ public class TypeRegleControllerTest {
     }
     @Test
     public void testDeleteTypeRegle_Failure() {
+        // Arrange
         doThrow(new RuntimeException("Internal error")).when(typeRegleService).deleteTypeRegle(1);
+
+        // Act
         ResponseEntity<Void> response = typeRegleController.deleteTypeRegle(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+                "Expected HTTP status 500 INTERNAL_SERVER_ERROR");
         verify(typeRegleService, times(1)).deleteTypeRegle(1);
+        verifyNoMoreInteractions(typeRegleService);
     }
+
     @Test
     public void testCreateTypeRegle_InvalidInput() {
         TypeRegle invalidTypeRegle = new TypeRegle();
@@ -134,12 +151,21 @@ public class TypeRegleControllerTest {
     }
     @Test
     public void testCreateTypeRegle_Conflict() {
+        // Arrange
         TypeRegle typeRegle = new TypeRegle();
         when(typeRegleService.createTypeRegle(any(TypeRegle.class)))
                 .thenThrow(new IllegalStateException("Conflit lors de la création du type de règle"));
+
+        // Act
         ResponseEntity<TypeRegle> response = typeRegleController.createTypeRegle(typeRegle);
-        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode(),
+                "Expected HTTP status 409 CONFLICT");
+        verify(typeRegleService, times(1)).createTypeRegle(any(TypeRegle.class));
+        verifyNoMoreInteractions(typeRegleService);
     }
+
     @Test
     public void testCreateTypeRegle_WithRegle() {
         Regle regle = new Regle();

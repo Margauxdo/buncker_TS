@@ -28,17 +28,13 @@ public class ValiseService implements IValiseService {
     @Autowired
     private RegleRepository regleRepository;
     @Autowired
-    private TypeValiseRepository  typeValiseRepository;
+    private TypeValiseRepository typeValiseRepository;
     @Autowired
     private ClientRepository clientRepository;
 
-
     public ValiseService(ValiseRepository valiseRepository) {
-
         this.valiseRepository = valiseRepository;
     }
-
-
 
     @Override
     public Valise createValise(Valise valise) {
@@ -72,17 +68,11 @@ public class ValiseService implements IValiseService {
             }
 
             // Vérification du type de valise
-            if (!valise.getTypeValiseList().isEmpty()) {
-                List<TypeValise> validTypeValises = new ArrayList<>();
-                for (TypeValise typeValise : valise.getTypeValiseList()) {
-                    if (typeValise.getId() != 0) {
-                        TypeValise foundTypeValise = typeValiseRepository.findById(typeValise.getId())
-                                .orElseThrow(() -> new ResourceNotFoundException("TypeValise not found with ID: " + typeValise.getId()));
-                        validTypeValises.add(foundTypeValise);
-                        logger.debug("Type de valise associé : {}", foundTypeValise);
-                    }
-                }
-                valise.setTypeValiseList(validTypeValises);
+            if (valise.getTypeValise() != null && valise.getTypeValise().getId() != 0) {  // Vérifier si le type de valise existe
+                TypeValise validTypeValise = typeValiseRepository.findById(valise.getTypeValise().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("TypeValise not found with ID: " + valise.getTypeValise().getId()));
+                valise.setTypeValise(validTypeValise);
+                logger.debug("Type de valise associé : {}", validTypeValise);
             }
 
             // Sauvegarde de la valise dans la base de données
@@ -95,7 +85,6 @@ public class ValiseService implements IValiseService {
         }
     }
 
-
     @Override
     public Valise updateValise(int id, Valise valise) {
         if (valise.getId() != id) {
@@ -105,10 +94,9 @@ public class ValiseService implements IValiseService {
             valise.setId(id);
             return valiseRepository.save(valise);
         } else {
-            throw new RuntimeException("suitcase not found");
+            throw new RuntimeException("Suitcase not found");
         }
     }
-
 
     @Override
     public void deleteValise(int id) {
@@ -118,16 +106,11 @@ public class ValiseService implements IValiseService {
         valiseRepository.deleteById(id);
     }
 
-
-
-
     @Override
     public Valise getValiseById(int id) {
         return valiseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Valise not found with ID: " + id));
     }
-
-
 
     @Override
     public List<Valise> getAllValises() {

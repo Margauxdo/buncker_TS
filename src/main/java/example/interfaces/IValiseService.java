@@ -5,8 +5,8 @@ import example.entity.Valise;
 import java.util.List;
 
 public interface IValiseService {
-    Valise createValise(Valise valise);
-    Valise updateValise(int id,Valise valise);
+    Valise createValise(Valise valise);  // Laisse uniquement cette ligne
+    Valise updateValise(int id, Valise valise);
     void deleteValise(int id);
     Valise getValiseById(int id);
     List<Valise> getAllValises();

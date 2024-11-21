@@ -26,6 +26,7 @@ public class RegleManuelleTest {
     private EntityManager em;
 
     private RegleManuelle regleManuelle;
+
     @Autowired
     private RegleRepository regleRepository;
 
@@ -33,6 +34,7 @@ public class RegleManuelleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+        // Création de l'objet RegleManuelle
         regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("admin1");
         regleManuelle.setDescriptionRegle("description de la regle");
@@ -59,42 +61,44 @@ public class RegleManuelleTest {
                 "Rule ID must not be null after persistence");
     }
 
-
-@Test
+    @Test
     public void testRegleManuelleDescriptionRegle() {
-        Assertions.assertEquals(regleManuelle.getDescriptionRegle(),
-                "description de la regle");
-
+        Assertions.assertEquals("description de la regle", regleManuelle.getDescriptionRegle(),
+                "Description should match");
     }
-    @Test
-    public void testRegleManuelleCreateurRegle(){
-        Assertions.assertEquals(regleManuelle.getCreateurRegle(), "admin1");
 
-    }
     @Test
-    public void testRegleManuelleDateRegle(){
+    public void testRegleManuelleCreateurRegle() {
+        Assertions.assertEquals("admin1", regleManuelle.getCreateurRegle(),
+                "Creator should match");
+    }
+
+    @Test
+    public void testRegleManuelleDateRegle() {
         Assertions.assertNotNull(regleManuelle.getDateRegle());
-        Regle expectedRegle = regleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedRegle.getDateRegle(), regleManuelle.getDateRegle());
-
-
+        RegleManuelle expectedRegle = (RegleManuelle) regleRepository.findAll().get(0);
+        Assertions.assertEquals(expectedRegle.getDateRegle(), regleManuelle.getDateRegle(),
+                "Regle Date should match");
     }
+
     @Test
-    public void testRegleManuelleCodeRegle(){
+    public void testRegleManuelleCodeRegle() {
         Assertions.assertNotNull(regleManuelle.getCoderegle());
-        Regle expectedRegle = regleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedRegle.getCoderegle(), regleManuelle.getCoderegle());
+        RegleManuelle expectedRegle = (RegleManuelle) regleRepository.findAll().get(0);
+        Assertions.assertEquals(expectedRegle.getCoderegle(), regleManuelle.getCoderegle(),
+                "Code Rule should match");
+    }
 
-    }
     @Test
-    public void testRegleManuelleReglePourSortie(){
+    public void testRegleManuelleReglePourSortie() {
         Assertions.assertNotNull(regleManuelle.getReglePourSortie(), "regle pour la fermeture de la valise");
-        Regle expectedRegle = regleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId());
+        RegleManuelle expectedRegle = (RegleManuelle) regleRepository.findAll().get(0);
+        Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId(),
+                "The ID should match the ID in the repository");
     }
+
     @Test
     public void testRegleManuelleFermeJSFlags() {
-        // Verify each FermeJS flag is not null and check expected values if required
         Assertions.assertNotNull(regleManuelle.getFermeJS1(), "FermeJS1 must not be null");
         Assertions.assertNotNull(regleManuelle.getFermeJS2(), "FermeJS2 must not be null");
         Assertions.assertNotNull(regleManuelle.getFermeJS3(), "FermeJS3 must not be null");
@@ -103,8 +107,9 @@ public class RegleManuelleTest {
         Assertions.assertNotNull(regleManuelle.getFermeJS6(), "FermeJS6 must not be null");
         Assertions.assertNotNull(regleManuelle.getFermeJS7(), "FermeJS7 must not be null");
 
-        Regle expectedRegle = regleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId(), "The Manual Rule ID should match the ID in the repository");
+        RegleManuelle expectedRegle = (RegleManuelle) regleRepository.findAll().get(0);
+        Assertions.assertEquals(expectedRegle.getId(), regleManuelle.getId(),
+                "The Manual Rule ID should match the ID in the repository");
     }
 
     @Test
@@ -115,18 +120,16 @@ public class RegleManuelleTest {
                 "Code ruler should be 'code 1234'.");
     }
 
-
-
     @Test
-        public void testUpdateDescriptionRegle() {
-            regleManuelle.setDescriptionRegle("Nouvelle description");
-            em.merge(regleManuelle);
-            em.flush();
+    public void testUpdateDescriptionRegle() {
+        regleManuelle.setDescriptionRegle("Nouvelle description");
+        em.merge(regleManuelle);
+        em.flush();
 
-            RegleManuelle updatedRegle = em.find(RegleManuelle.class, regleManuelle.getId());
-            Assertions.assertEquals("Nouvelle description", updatedRegle.getDescriptionRegle(),
-                    "Description Rule should be updated to 'Nouvelle description'.");
-        }
+        RegleManuelle updatedRegle = em.find(RegleManuelle.class, regleManuelle.getId());
+        Assertions.assertEquals("Nouvelle description", updatedRegle.getDescriptionRegle(),
+                "Description Rule should be updated to 'Nouvelle description'.");
+    }
 
     @Test
     public void testUpdateCreateurRegle() {
@@ -148,12 +151,6 @@ public class RegleManuelleTest {
         em.flush();
 
         List<Regle> regles = em.createQuery("SELECT r FROM Regle r", Regle.class).getResultList();
-        Assertions.assertTrue(regles.isEmpty(), "All associated Regle entities should be removed due to cascade delete");
+        Assertions.assertTrue(((List<?>) regles).isEmpty(), "All associated Regle entities should be removed due to cascade delete");
     }
-
-
 }
-
-
-
-

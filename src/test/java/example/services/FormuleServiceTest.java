@@ -42,24 +42,30 @@ public class FormuleServiceTest {
 
     @Test
     public void testCreateFormule_Success() {
-            // Arrange
-            Formule formule = new Formule();
-            Regle regle = new Regle();
-            regle.setId(1);
-            formule.setRegle(regle);
+        // Arrange
+        Formule formule = new Formule();
+        Regle regle = new Regle();
+        regle.setId(1);  // On donne un ID à la règle
+        formule.setRegle(regle);
 
-            when(regleRepository.existsById(regle.getId())).thenReturn(true);
-            when(formuleRepository.save(formule)).thenReturn(formule);
+        // Simuler la présence de la règle en base de données
+        when(regleRepository.existsById(regle.getId())).thenReturn(true);  // Simule la règle existante en base
+        when(regleRepository.findById(regle.getId())).thenReturn(Optional.of(regle));  // Mock findById pour retourner la règle persistée
+        when(formuleRepository.save(formule)).thenReturn(formule);  // Simule la sauvegarde de la formule
 
-            // Act
-            Formule result = formuleService.createFormule(formule);
+        // Act
+        Formule result = formuleService.createFormule(formule);
 
-            // Assert
-            Assertions.assertNotNull(result, "Formule should not be null");
-            verify(formuleRepository, times(1)).save(formule);
-            verify(regleRepository, times(1)).existsById(regle.getId());
-            verifyNoMoreInteractions(formuleRepository, regleRepository);
-        }
+        // Assert
+        Assertions.assertNotNull(result, "Formule should not be null");
+        verify(formuleRepository, times(1)).save(formule);  // Vérifie que la méthode save a été appelée une fois
+        verify(regleRepository, times(1)).existsById(regle.getId());  // Vérifie que existsById a été appelé une fois
+        verify(regleRepository, times(1)).findById(regle.getId());  // Vérifie que findById a été appelé une fois
+        verifyNoMoreInteractions(formuleRepository, regleRepository);  // Vérifie qu'il n'y a pas d'autres interactions
+    }
+
+
+
 
     @Test
     public void testUpdateFormule_Success() {

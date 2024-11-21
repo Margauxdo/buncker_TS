@@ -1,11 +1,11 @@
 package example.entity;
 
+import example.entity.SortieSemaine;
 import example.repositories.FormuleRepository;
 import example.repositories.SortieSemaineRepository;
 import example.repositories.TypeRegleRepository;
 import example.repositories.ValiseRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,24 +45,29 @@ public class RegleTest {
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+        // Créer un Client et persister
         Client client = new Client();
         client.setName("CientA");
         client.setEmail("clientA@exemple.com");
         em.persist(client);
 
+        // Créer une Valise et persister
+        Valise valise = new Valise();
+        valise.setClient(client);
+        em.persist(valise);
+
+        // Créer une Formule et persister
         Formule formule = new Formule();
         formule.setLibelle("LibelleFormule");
         formule.setFormule("ContenuFormule");
         em.persist(formule);
 
+        // Créer un TypeRegle et persister
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("TypeRegleTest");
         em.persist(typeRegle);
 
-        Valise valise = new Valise();
-        valise.setClient(client);
-        em.persist(valise);
-
+        // Créer un Regle et associer les entités créées
         regle = new Regle();
         regle.setFermeJS1(false);
         regle.setFermeJS2(false);
@@ -76,32 +81,32 @@ public class RegleTest {
         regle.setCoderegle("Coderegle");
         regle.setCalculCalendaire(1234L);
         regle.setFormule(formule);
-        regle.setNBJSMEntree(25L);
+        regle.setNbjsmEntree(25L);
         regle.setNombreJours(250);
         regle.setTypeEntree("typeEntree");
-        regle.setTypeRegles((List<TypeRegle>) typeRegle);
+        regle.setTypeRegles(List.of(typeRegle));
         regle.setValise(valise);
 
-        List<SortieSemaine> sorties = new ArrayList<>();
-        regle.setSortieSemaine(sorties);
-        em.persist(regle);
-        em.flush();
-
+        // Créer une SortieSemaine et l'associer
         SortieSemaine sortieSemaine = new SortieSemaine();
         sortieSemaine.setRegle(regle);
-        sorties.add(sortieSemaine);
+        regle.getSortieSemaine().add(sortieSemaine);
+
+        // Persist Regle et SortieSemaine
+        em.persist(regle);
         em.persist(sortieSemaine);
         em.flush();
     }
+
     @Test
     public void testRegleValiseAssociation() {
         Assertions.assertNotNull(regle.getValise(), "Valise association should not be null");
-        Assertions.assertEquals("ValiseTest", regle.getValise().getDescription(), "Valise description mismatch");
+        Assertions.assertEquals("Valise de test", regle.getValise().getDescription(), "Valise description mismatch");
     }
 
     @Test
     public void testRegleSortieSemaineOrphanRemoval() {
-        // Arrange
+        // Ajouter et tester la suppression en cascade de SortieSemaine
         SortieSemaine sortieSemaine = new SortieSemaine();
         sortieSemaine.setDateSortieSemaine(new Date());
         sortieSemaine.setRegle(regle);
@@ -109,16 +114,14 @@ public class RegleTest {
         em.persist(sortieSemaine);
         em.flush();
 
-        // Act
+        // Supprimer la sortieSemaine
         regle.getSortieSemaine().remove(sortieSemaine);
         em.persist(regle);
         em.flush();
 
-        // Assert
         List<SortieSemaine> sorties = sortieSemaineRepository.findAll();
         Assertions.assertTrue(sorties.isEmpty(), "Orphan removal did not work correctly for SortieSemaine");
     }
-
 
     @Test
     public void testReglePersitence() {
@@ -128,14 +131,11 @@ public class RegleTest {
     @Test
     public void testRegleReglePourSortie() {
         Assertions.assertEquals("PourSortie", regle.getReglePourSortie());
-
     }
 
     @Test
     public void testRegleCodeRegle() {
         Assertions.assertEquals("Coderegle", regle.getCoderegle());
-
-
     }
 
     @Test
@@ -168,16 +168,12 @@ public class RegleTest {
     @Test
     public void testRegleTypeEntree() {
         Assertions.assertEquals("typeEntree", regle.getTypeEntree());
-
-
     }
 
     @Test
     public void testRegleNBJSMEntree() {
-        Assertions.assertEquals(25L, regle.getNBJSMEntree());
+        Assertions.assertEquals(25L, regle.getNbjsmEntree());
     }
-
-
 
     @Test
     public void testRegleSortieSemaineAssociation() {

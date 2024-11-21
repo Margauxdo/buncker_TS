@@ -27,7 +27,7 @@ public class RegleManuelle extends Regle {
     @NotEmpty(message = "Creator cannot be empty")
     private String createurRegle;
 
-    @OneToMany(mappedBy = "regleManuelle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Regle> regles;
 
 

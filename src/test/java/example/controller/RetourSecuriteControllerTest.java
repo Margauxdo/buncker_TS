@@ -29,17 +29,24 @@ public class RetourSecuriteControllerTest {
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.openMocks(this);
     }
     @Test
-    public void testGetAllRetourSecurites_Succes() {
+    public void testGetAllRetourSecurites_Success() {
         List<RetourSecurite> retourSecurites = new ArrayList<>();
         retourSecurites.add(new RetourSecurite());
+
         when(retourSecuriteService.getAllRetourSecurites()).thenReturn(retourSecurites);
-        List<RetourSecurite> result = (List<RetourSecurite>) RScontroller.getAllRetourSecurites();
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(retourSecurites.size(), result.size());
+
+        ResponseEntity<List<RetourSecurite>> response = RScontroller.getAllRetourSecurites();
+
+        Assertions.assertNotNull(response, "ResponseEntity should not be null");
+        Assertions.assertNotNull(response.getBody(), "Response body should not be null");
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "Status code should be 200 OK");
+        Assertions.assertEquals(retourSecurites.size(), response.getBody().size(), "Returned list size should match the mock data");
     }
+
     @Test
     public void testGetAllRetourSecurites_Failure() {
         when(retourSecuriteService.getAllRetourSecurites()).thenThrow(new RuntimeException("error database"));

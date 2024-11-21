@@ -226,20 +226,22 @@ public class MouvementControllerTest {
 
     @Test
     public void testUpdateMouvement_Success() {
+        // Arrange
         Mouvement mouvement = new Mouvement();
         mouvement.setId(1);
         mouvement.setStatutSortie("Finalisé");
 
+        when(mouvementService.existsById(1)).thenReturn(true); // Mock existence check
         when(mouvementService.updateMouvement(eq(1), any(Mouvement.class))).thenReturn(mouvement);
 
+        // Act
         ResponseEntity<Mouvement> response = mouvementController.updateMouvement(1, mouvement);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Finalisé", response.getBody().getStatutSortie());
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Expected HTTP status 200 OK");
+        assertNotNull(response.getBody(), "Response body must not be null");
+        assertEquals("Finalisé", response.getBody().getStatutSortie(), "StatutSortie should match the updated value");
     }
-
-
 
 
 }

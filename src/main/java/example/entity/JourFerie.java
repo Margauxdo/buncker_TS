@@ -19,16 +19,14 @@ public class JourFerie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_jourFerie")
     private int id;
 
-
-    @OneToMany(mappedBy = "jourFerie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "jourFerie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Regle> regles;
 
     @ElementCollection
-    @CollectionTable(name = "joursFeries", joinColumns = @JoinColumn(referencedColumnName = "id_jourFerie"))
-    @Column(name = "jour")
+    @CollectionTable(name = "jourFerie_id", joinColumns = @JoinColumn(name = "jour_ferie_id"))
+    @Column(name = "jourFerie_list")
     private List<Date> joursFerieList;
 
 

@@ -44,17 +44,18 @@ public class MouvementService implements IMouvementService {
         }
 
     @Override
-        public Mouvement updateMouvement(int id, Mouvement mouvement) {
-            Mouvement existingMouvement = mouvementRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + id));
+    public Mouvement updateMouvement(int id, Mouvement mouvement) {
+        Mouvement existingMouvement = mouvementRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found"));
 
-            existingMouvement.setDateHeureMouvement(mouvement.getDateHeureMouvement());
-            existingMouvement.setStatutSortie(mouvement.getStatutSortie());
-            existingMouvement.setDateSortiePrevue(mouvement.getDateSortiePrevue());
-            existingMouvement.setDateRetourPrevue(mouvement.getDateRetourPrevue());
+        existingMouvement.setDateHeureMouvement(mouvement.getDateHeureMouvement());
+        existingMouvement.setStatutSortie(mouvement.getStatutSortie());
+        existingMouvement.setDateSortiePrevue(mouvement.getDateSortiePrevue());
+        existingMouvement.setDateRetourPrevue(mouvement.getDateRetourPrevue());
 
-            return mouvementRepository.save(existingMouvement);
-        }
+        return mouvementRepository.save(existingMouvement);
+    }
+
 
     @Override
         public void deleteMouvement(int id) {

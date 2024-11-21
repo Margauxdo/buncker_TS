@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "probleme")
+@Table(name = "pb")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,11 +18,11 @@ public class Probleme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_probleme")
+    @Column(name = "pb_id")
     private int id;
 
     @NotBlank(message = "required problem description")
-   @Column(name = "description_probleme", unique = true, nullable = false)
+   @Column(name = "pb_id", unique = true, nullable = false)
     private String descriptionProbleme;
 
 

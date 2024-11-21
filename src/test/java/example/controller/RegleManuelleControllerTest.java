@@ -169,15 +169,20 @@ public class RegleManuelleControllerTest {
     }
     @Test
     public void testCreateRegleManuelle_InvalidInput() {
+        // Arrange
         RegleManuelle invalidRegleManuelle = new RegleManuelle();
         when(regleManuelleService.createRegleManuelle(invalidRegleManuelle))
                 .thenThrow(new IllegalArgumentException("Invalid data"));
 
+        // Act
         ResponseEntity<RegleManuelle> result = regleManuelleController.createRegleManuelle(invalidRegleManuelle);
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode(), "Expected HTTP status 400 BAD_REQUEST");
         verify(regleManuelleService, times(1)).createRegleManuelle(any(RegleManuelle.class));
+        verifyNoMoreInteractions(regleManuelleService);
     }
+
 
     @Test
     public void testDeleteRegleManuelle_EntityNotFound() {

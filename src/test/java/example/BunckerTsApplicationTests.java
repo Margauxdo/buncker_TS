@@ -9,5 +9,4 @@ class BunckerTsApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

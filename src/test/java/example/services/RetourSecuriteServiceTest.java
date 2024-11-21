@@ -79,9 +79,6 @@ public class RetourSecuriteServiceTest {
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
 
-
-
-
     @Test
     public void testUpdateRetourSecurite_Failure_Exception() {
         int id = 1;
@@ -96,7 +93,7 @@ public class RetourSecuriteServiceTest {
             retourSecuriteService.updateRetourSecurite(id, retourSecurite);
         });
 
-        Assertions.assertEquals("Back Security not found with id: 1", exception.getMessage(),
+        Assertions.assertEquals("RetourSecurite not found with id: 1", exception.getMessage(),
                 "Exception message should match the expected error message.");
 
         // Verify interactions
@@ -104,8 +101,6 @@ public class RetourSecuriteServiceTest {
         verify(retourSecuriteRepository, never()).save(any(RetourSecurite.class));
         verifyNoMoreInteractions(retourSecuriteRepository);
     }
-
-
 
 
 

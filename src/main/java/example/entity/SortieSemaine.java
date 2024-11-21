@@ -24,7 +24,7 @@ public class SortieSemaine {
     private int id;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "sortie_semaine")
+    @Column(name = "sortieSemaine_date")
     private Date dateSortieSemaine;
 
 

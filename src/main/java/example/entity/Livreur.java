@@ -18,7 +18,7 @@ import java.util.List;
 public class Livreur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_livreur")
+    @Column(name = "livreur_id")
     private int id;
 
     private String codeLivreur;
@@ -34,8 +34,10 @@ public class Livreur {
     private String telephoneAlphapage;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @Column(name = "mouvement_id")
+    @JoinColumn(name = "mouvement_id", nullable = false)
     @JsonManagedReference
     private Mouvement mouvement;
+
+
 }
 

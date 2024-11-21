@@ -2,6 +2,7 @@ package example.services;
 
 import example.entity.Client;
 import example.repositories.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,103 +51,151 @@ public class ClientServiceTest {
         verifyNoMoreInteractions(clientRepository);
 
     }
+
     @Test
     public void testPartialUpdateClient() {
+        int id = 1;
         Client existingClient = new Client();
+        existingClient.setId(id);
         existingClient.setName("Original Name");
         existingClient.setEmail("original@example.com");
-
-        when(clientRepository.findById(1)).thenReturn(Optional.of(existingClient));
 
         Client update = new Client();
         update.setName("Updated Name");
 
+        when(clientRepository.existsById(id)).thenReturn(true);
+        when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
         when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Client updatedClient = clientService.updateClient(id, update);
+        Assertions.assertNotNull(updatedClient, "Updated client should not be null");
+        Assertions.assertEquals("Updated Name", updatedClient.getName(), "Name should be updated");
+        Assertions.assertEquals("original@example.com", updatedClient.getEmail(), "Email should remain unchanged");
 
-        Client updatedClient = clientService.updateClient(1, update);
-
-        Assertions.assertEquals("Updated Name", updatedClient.getName());
-        Assertions.assertEquals("original@example.com", updatedClient.getEmail());
+        verify(clientRepository, times(1)).existsById(id);
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, times(1)).save(existingClient);
+        verifyNoMoreInteractions(clientRepository);
     }
 
     @Test
     public void testUpdateClient_Success() {
         int id = 1;
-        Client client = new Client();
-        client.setId(id);
+
+        Client existingClient = new Client();
+        existingClient.setId(id);
+        existingClient.setName("Old Name");
+        existingClient.setEmail("old@example.com");
+        Client updatedClient = new Client();
+        updatedClient.setId(id);
+        updatedClient.setName("Updated Name");
+        updatedClient.setEmail("updated@example.com");
 
         when(clientRepository.existsById(id)).thenReturn(true);
-        when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> {
-            Client savedClient = invocation.getArgument(0);
-            savedClient.setId(id);
-            return savedClient;
-        });
-
-        Client result = clientService.updateClient(id, client);
-
+        when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
+        when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Client result = clientService.updateClient(id, updatedClient);
         Assertions.assertNotNull(result, "Client should not be null");
-        Assertions.assertEquals(id, result.getId(), "Client ID should be updated");
-
+        Assertions.assertEquals(id, result.getId(), "Client ID should match");
+        Assertions.assertEquals("Updated Name", result.getName(), "Name should be updated");
+        Assertions.assertEquals("updated@example.com", result.getEmail(), "Email should be updated");
         verify(clientRepository, times(1)).existsById(id);
-        verify(clientRepository, times(1)).save(client);
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, times(1)).save(existingClient);
         verifyNoMoreInteractions(clientRepository);
     }
+
+    @Test
+    public void testUpdateClient_NotFound() {
+        int id = 1;
+        Client updatedClient = new Client();
+        updatedClient.setId(id);
+
+        when(clientRepository.existsById(id)).thenReturn(false);
+
+        EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> clientService.updateClient(id, updatedClient)
+        );
+
+        Assertions.assertEquals("Client not found with ID " + id, exception.getMessage());
+        verify(clientRepository, times(1)).existsById(id);
+        verifyNoMoreInteractions(clientRepository);
+    }
+
 
 
     @Test
     public void testUpdateClient_Failure_Exception() {
         int id = 1;
         Client client = new Client();
-        client.setId(2);
-
-        when(clientRepository.existsById(id)).thenReturn(true);
-
+        client.setId(2); // ID incohérent
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             clientService.updateClient(id, client);
         });
-
         Assertions.assertEquals("Client ID mismatch", exception.getMessage(), "Exception message should match expected error");
-
-        verify(clientRepository, times(1)).existsById(id);
+        verify(clientRepository, never()).existsById(anyInt());
+        verify(clientRepository, never()).findById(anyInt());
         verify(clientRepository, never()).save(any(Client.class));
         verifyNoMoreInteractions(clientRepository);
     }
 
+
+
     @Test
     public void testUpdateClient_Success_WhenIdMatches() {
         int id = 1;
-        Client client = new Client();
-        client.setId(id);  // Id correspondant à celui de la requête
-
+        Client existingClient = new Client();
+        existingClient.setId(id);
+        existingClient.setName("Old Name");
+        existingClient.setEmail("old@example.com");
+        Client clientToUpdate = new Client();
+        clientToUpdate.setId(id);
+        clientToUpdate.setName("Updated Name");
+        clientToUpdate.setEmail("updated@example.com");
         when(clientRepository.existsById(id)).thenReturn(true);
-        when(clientRepository.save(client)).thenReturn(client);
-
-        Client updatedClient = clientService.updateClient(id, client);
-
+        when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
+        when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Client updatedClient = clientService.updateClient(id, clientToUpdate);
         Assertions.assertNotNull(updatedClient, "Client should be updated successfully");
+        Assertions.assertEquals(id, updatedClient.getId(), "Client ID should match");
+        Assertions.assertEquals("Updated Name", updatedClient.getName(), "Name should be updated");
+        Assertions.assertEquals("updated@example.com", updatedClient.getEmail(), "Email should be updated");
         verify(clientRepository, times(1)).existsById(id);
-        verify(clientRepository, times(1)).save(client);
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, times(1)).save(existingClient);
+        verifyNoMoreInteractions(clientRepository);
     }
-
 
     @Test
     public void testDeleteClient_Success() {
         int id = 1;
+
+        Client existingClient = new Client();
+        existingClient.setId(id);
+        when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
         clientService.deleteClient(id);
-        verify(clientRepository, times(1)).deleteById(id);
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, times(1)).delete(existingClient);
         verifyNoMoreInteractions(clientRepository);
     }
+
     @Test
-    public void testDeleteClient_Failure_Exception(){
+    public void testDeleteClient_Failure_Exception() {
         int id = 1;
-        doThrow(new RuntimeException("database error")).when(clientRepository).deleteById(id);
-        Exception exception = assertThrows(RuntimeException.class,()-> {
+
+        Client client = new Client();
+        client.setId(id);
+        when(clientRepository.findById(id)).thenReturn(Optional.of(client));
+        doThrow(new RuntimeException("database error")).when(clientRepository).delete(client);
+        Exception exception = assertThrows(RuntimeException.class, () -> {
             clientService.deleteClient(id);
         });
         Assertions.assertEquals("database error", exception.getMessage(), "Exception message should match expected error");
-        verify(clientRepository, times(1)).deleteById(id);
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, times(1)).delete(client);
         verifyNoMoreInteractions(clientRepository);
     }
+
     @Test
     public void testGetClientById_Success() {
         int id = 1;
@@ -162,12 +211,17 @@ public class ClientServiceTest {
     @Test
     public void testGetClientById_Failure_Exception() {
         int id = 1;
+
         when(clientRepository.findById(id)).thenReturn(Optional.empty());
-        Client result = clientService.getClientById(id);
-        Assertions.assertNull(result,"Client should not be null");
+        EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> clientService.getClientById(id)
+        );
+        Assertions.assertEquals("Client not found with ID " + id, exception.getMessage());
         verify(clientRepository, times(1)).findById(id);
         verifyNoMoreInteractions(clientRepository);
     }
+
     @Test
     public void testGetAllClients_Success() {
         List<Client> clients = new ArrayList<>();

@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,12 +20,12 @@ import java.util.List;
 @Builder
 public class Valise {
 
-    @jakarta.persistence.Id
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_valise")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Utilisation de l'auto-incrémentation pour la clé primaire
+    @Column(name = "valise_id")
     private int id;
 
+    @Column(nullable = false)
     private String description;
     private Long numeroValise;
     private String refClient;
@@ -37,47 +36,19 @@ public class Valise {
     private Date dateCreation;
     private String numeroDujeu;
 
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
+    @JoinColumn(name = "type_valise_id", nullable = false)  // Relation ManyToOne vers TypeValise
     @JsonBackReference
+    private TypeValise typeValise;  // Chaque Valise a un TypeValise
+
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
+    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Regle> regleSortie = new ArrayList<>();
 
     @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Mouvement> mouvementList = new ArrayList<>();
-
-    @OneToMany
-    @Column(name = "typeValise_id")
-    private List<TypeValise> typeValiseList = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    @JsonIgnore
-    private Client client;
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-
-    public void addProbleme(Probleme probleme) {
-
-    }
-
-    public short getRegles() {
-        return 0;
-    }
-
-    public void add(Regle regle) {
-
-    }
-
-    public List<Object> getProblemes() {
-        return List.of();
-    }
-
-
 }

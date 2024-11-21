@@ -30,22 +30,26 @@ public class ProblemeTest {
 
     @BeforeEach
     public void setUp() {
+        // Créer un Client et persister
         Client client = new Client();
         client.setName("nomA");
         client.setEmail("nomA@gmail.com");
         client = clientRepository.save(client);
 
+        // Créer une Valise et persister
         Valise valise = new Valise();
         valise.setDescription("Valise de test");
         valise.setClient(client);
         valise = valiseRepository.save(valise);
 
+        // Créer un Probleme et associer à Client et Valise
         probleme = new Probleme();
         probleme.setDescriptionProbleme("description des problemes");
         probleme.setDetailsProbleme("detail des problemes");
         probleme.setClient(client);
         probleme.setValise(valise);
 
+        // Persist Probleme
         em.persist(probleme);
         em.flush();
     }
@@ -81,17 +85,18 @@ public class ProblemeTest {
 
     @Test
     public void testNonNullDescriptionProbleme() {
+        // Créer un Probleme sans description
         Probleme problemeWithoutDescription = new Probleme();
         problemeWithoutDescription.setClient(probleme.getClient());
         problemeWithoutDescription.setValise(probleme.getValise());
         problemeWithoutDescription.setDetailsProbleme("Details sans description");
 
+        // La persistance échouera car descriptionProbleme ne peut pas être vide
         Assertions.assertThrows(jakarta.validation.ConstraintViolationException.class, () -> {
             em.persist(problemeWithoutDescription);
             em.flush();
-        }, "La validation devrait échouer si descriptionProbleme est null");
+        }, "La validation devrait échouer si descriptionProbleme est null ou vide");
     }
-
 
     @Test
     public void testUpdateProblemeDetails() {
@@ -103,4 +108,3 @@ public class ProblemeTest {
         Assertions.assertEquals("updated problem details", updatedProbleme.getDetailsProbleme(), "Details should be updated");
     }
 }
-

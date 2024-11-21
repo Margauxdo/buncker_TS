@@ -63,7 +63,7 @@ public class ValiseRepositoryIntegrationTest {
         valise.setNumeroDujeu("254689");
         valise.setClient(client);
         valise.setRegleSortie((List<Regle>) regle);
-        valise.setTypeValiseList((List<TypeValise>) typeValise);
+        valise.setTypeValise(typeValise);
 
         Valise savedVal = valiseRepository.save(valise);
         assertNotNull(savedVal.getId());

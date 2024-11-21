@@ -19,7 +19,7 @@ import java.util.List;
 public class Mouvement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_mouvement")
+    @Column(name = "mouvement_id")
     private int id;
 
     private Date dateHeureMouvement;
@@ -28,12 +28,13 @@ public class Mouvement {
     private Date dateRetourPrevue;
 
     @OneToMany
-    @JoinColumn(name = "valise_id")
+    @JoinColumn(name = "valise_list")
     private List<Valise> valises;
 
     @OneToMany(mappedBy = "mouvement", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<Livreur> livreurs;
+
 
 
     @OneToMany

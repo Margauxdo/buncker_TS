@@ -44,13 +44,16 @@ public class RegleManuelleController {
             RegleManuelle createdRegleManuelle = regleManuelleService.createRegleManuelle(regleManuelle);
             return new ResponseEntity<>(createdRegleManuelle, HttpStatus.CREATED);
         } catch (ConstraintViolationException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Violation des contraintes
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Constraint violations
+        } catch (IllegalArgumentException e) { // Handle specific exception
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (ConflictException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 

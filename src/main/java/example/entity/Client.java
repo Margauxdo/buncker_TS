@@ -21,7 +21,7 @@ import java.util.List;
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_client")
+    @Column(name="client_id")
     private Integer id;
 
     @Column(nullable = false)
@@ -55,13 +55,13 @@ public class Client {
 
     private String codeClient;//TODO:? verifier//
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Valise> valises = new ArrayList<>();
 
 
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    @Column(name = "pb_id")
+    @Column(name = "pb_list")
     private List<Probleme> problemes;
 
     @ManyToOne(fetch = FetchType.LAZY)

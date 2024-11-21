@@ -18,10 +18,10 @@ import java.util.List;
 public class TypeRegle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_typeRegle")
+    @Column(name = "typeRegle_id")
     private int id;
 
-    @Column(name = "nom_type_regle", unique = true, nullable = false)
+    @Column(name = "typeRegle_name", unique = true, nullable = false)
     private String nomTypeRegle;
 
     @ManyToOne(cascade = CascadeType.PERSIST) // Cascade persist

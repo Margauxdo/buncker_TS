@@ -71,7 +71,7 @@ public class ValiseIntegrationTest {
                 .dateCreation(new Date())
                 .client(client)
                 .regleSortie((List<Regle>) regle)
-                .typeValiseList((List<TypeValise>) typeValise)
+                .typeValise(typeValise)
                 .build();
 
         valise = valiseRepository.save(valise);
@@ -83,7 +83,7 @@ public class ValiseIntegrationTest {
         assertEquals("Valise de test", valise.getDescription());
         assertEquals(client.getId(), valise.getClient().getId());
         assertEquals(regle.getId(), valise.getRegleSortie().get(0));
-        assertEquals(typeValise.getId(), valise.getTypeValiseList().get(0));
+        assertEquals(typeValise.getId(), valise.getTypeValise().getValise());
     }
 
     @Test

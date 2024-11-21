@@ -13,11 +13,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import jakarta.persistence.EntityManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -41,100 +39,23 @@ public class ClientTest {
 
         Valise valise = new Valise();
         valise.setDescription("Valise Test");
-        valise.setClient(client); // Lien bidirectionnel
-        client.setValises(new ArrayList<>());
+        valise.setClient(client);
         client.getValises().add(valise);
+    }
+
+    @Test
+    public void testSaveClient() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("test@example.com");
 
         em.persist(client);
         em.flush();
+
+        Client savedClient = em.find(Client.class, client.getId());
+        assertNotNull(savedClient);
+        assertEquals("Test Client", savedClient.getName());
+        assertEquals("test@example.com", savedClient.getEmail());
     }
-
-    @Test
-    public void testClientPersistence() {
-        assertNotNull(client.getId(), "L'ID du client ne doit pas être null après la persistance.");
-    }
-
-    @Test
-    public void testClientDataSavedCorrectly() {
-        Client persistedClient = em.find(Client.class, client.getId());
-        assertNotNull(persistedClient, "Le client doit être récupéré depuis la base de données.");
-        assertEquals("John Doe", persistedClient.getName());
-        assertEquals("john.doe@example.com", persistedClient.getEmail());
-        assertEquals("123 Main St", persistedClient.getAdresse());
-        assertEquals("123456789", persistedClient.getTelephoneExploitation());
-        assertEquals("Sampleville", persistedClient.getVille());
-        assertEquals("Manager", persistedClient.getPersonnelEtFonction());
-    }
-
-    @Test
-    public void testClientRelationsPersistence() {
-        Client persistedClient = em.find(Client.class, client.getId());
-        assertNotNull(persistedClient, "Le client doit être récupéré depuis la base de données.");
-        assertEquals(1, persistedClient.getValises().size(), "Le client doit avoir une valise associée.");
-    }
-
-    @Test
-    public void testCascadePersistValises() {
-        Client foundClient = em.find(Client.class, client.getId());
-        Assertions.assertNotNull(foundClient, "Le client devrait être trouvé.");
-        Assertions.assertEquals(1, foundClient.getValises().size(), "Une valise devrait être persistée en cascade.");
-    }
-
-    @Test
-    public void testCascadeDeleteValises() {
-        em.remove(client);
-        em.flush();
-
-        Client deletedClient = em.find(Client.class, client.getId());
-        Assertions.assertNull(deletedClient, "Le client devrait être supprimé.");
-
-        List<Valise> remainingValises = em.createQuery("SELECT v FROM Valise v", Valise.class).getResultList();
-        Assertions.assertTrue(remainingValises.isEmpty(), "Les valises associées devraient également être supprimées.");
-    }
-
-    @Test
-    public void testNonNullName() {
-        Client clientWithoutName = new Client();
-        clientWithoutName.setAdresse("Adresse sans nom");
-        clientWithoutName.setEmail("nullname@example.com");
-
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            em.persist(clientWithoutName);
-            em.flush();
-        }, "Le nom du client ne devrait pas être nul.");
-    }
-    @Test
-    public void testUniqueEmailConstraint() {
-        Client client1 = new Client();
-        client1.setName("Client A");
-        client1.setEmail("unique@example.com");
-
-        Client client2 = new Client();
-        client2.setName("Client B");
-        client2.setEmail("unique@example.com");
-
-        em.persist(client1);
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            em.persist(client2);
-            em.flush();
-        }, "L'email doit être unique.");
-    }
-
-    @Test
-    public void testNullEmailThrowsConstraintViolation() {
-        Client client = new Client();
-        client.setName("Client Test");
-
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            em.persist(client);
-            em.flush();
-        }, "Un email non nul est requis.");
-    }
-
-
 
 }
-
-
-

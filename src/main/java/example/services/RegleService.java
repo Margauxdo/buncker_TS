@@ -37,6 +37,10 @@ public class RegleService implements IRegleService {
 
     @Override
     public Regle updateRegle(int id, Regle regle) {
+        if (regle == null) {
+            throw new RegleNotFoundException("Règle non trouvée avec l'ID " + id);
+        }
+
         return regleRepository.findById(id)
                 .map(existingRegle -> {
                     existingRegle.setCoderegle(regle.getCoderegle());
@@ -51,6 +55,7 @@ public class RegleService implements IRegleService {
                 })
                 .orElseThrow(() -> new RegleNotFoundException("Règle non trouvée avec l'ID " + id));
     }
+
 
 
     @Override
@@ -73,7 +78,7 @@ public class RegleService implements IRegleService {
     }
     @Override
     public boolean regleExists(String coderegle) {
-        return regleRepository.existsByCoderegle(coderegle);
+        return regleRepository.existsByCoderegle("code regle");
     }
 
 

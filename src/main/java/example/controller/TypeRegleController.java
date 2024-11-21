@@ -34,10 +34,14 @@ public class TypeRegleController {
         try {
             TypeRegle createdTypeRegle = typeRegleService.createTypeRegle(typeRegle);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTypeRegle);
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) { // Handle specific exceptions
+            if (e instanceof IllegalStateException) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
 
     @PutMapping("{id}")
     public ResponseEntity<TypeRegle> updateTypeRegle(@PathVariable int id, @RequestBody TypeRegle typeRegle) {
@@ -58,6 +62,9 @@ public class TypeRegleController {
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 }

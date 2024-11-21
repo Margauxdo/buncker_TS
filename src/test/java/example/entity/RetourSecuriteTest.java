@@ -1,9 +1,9 @@
 package example.entity;
 
 import example.repositories.ClientRepository;
+import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,22 +32,35 @@ public class RetourSecuriteTest {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private MouvementRepository mouvementRepository;
+
     @BeforeEach
     public void setUp() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+        // Créer un Client et persister
         Client client = new Client();
         client.setName("Client Test");
         client.setEmail("client.test@example.com");
         em.persist(client);
         em.flush();
 
+        // Créer un Mouvement et persister
+        Mouvement mouvement = new Mouvement();
+        mouvement.setDateHeureMouvement(sdf.parse("2020-05-25"));
+        mouvement.setStatutSortie("closed");
+        em.persist(mouvement);
+        em.flush();
+
+        // Créer un RetourSecurite et associer les entités
         retourSecurite = new RetourSecurite();
-        retourSecurite.setClients((List<Client>) em.createQuery("select c from RetourSecurite c").getResultList());
+        retourSecurite.setClients(List.of(client));
         retourSecurite.setCloture(Boolean.FALSE);
         retourSecurite.setNumero(25689568965L);
         retourSecurite.setDatesecurite(sdf.parse("2020-02-25"));
         retourSecurite.setDateCloture(sdf.parse("2020-02-25"));
+        retourSecurite.setMouvement(mouvement);
 
         em.persist(retourSecurite);
         em.flush();
@@ -89,7 +103,7 @@ public class RetourSecuriteTest {
         Assertions.assertNotNull(retourSecurite.getClients(),
                 "The client associated with the Security return must not be null");
         Client expectedClient = clientRepository.findAll().get(0);
-        Assertions.assertEquals(expectedClient, retourSecurite.getClients(),
+        Assertions.assertEquals(expectedClient, retourSecurite.getClients().get(0),
                 "The associated client must match the persistent client");
     }
 
@@ -117,4 +131,3 @@ public class RetourSecuriteTest {
                 "The security date must be updated successfully.");
     }
 }
-

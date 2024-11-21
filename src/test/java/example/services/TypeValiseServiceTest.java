@@ -1,7 +1,9 @@
 package example.services;
 
 import example.entity.TypeValise;
+import example.entity.Valise;
 import example.repositories.TypeValiseRepository;
+import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,8 @@ public class TypeValiseServiceTest {
 
     @Mock
     private TypeValiseRepository typeValiseRepository;
+    @Mock
+    private ValiseRepository valiseRepository;
 
     @InjectMocks
     private TypeValiseService typeValiseService;
@@ -28,29 +32,43 @@ public class TypeValiseServiceTest {
     }
 
     @Test
-    public void testCreateTypeValise_Success(){
+    public void testCreateTypeValise_Success() {
+        // Arrange
+        Valise valise = new Valise();
+        valise.setId(1);
         TypeValise typeValise = new TypeValise();
+        typeValise.setValise(valise);
+
+        when(valiseRepository.findById(valise.getId())).thenReturn(Optional.of(valise));
         when(typeValiseRepository.save(typeValise)).thenReturn(typeValise);
 
+        // Act
         TypeValise result = typeValiseService.createTypeValise(typeValise);
 
+        // Assert
         Assertions.assertNotNull(result, "Suitcase type must not be null");
+        verify(valiseRepository, times(1)).findById(valise.getId());
         verify(typeValiseRepository, times(1)).save(typeValise);
-        verifyNoMoreInteractions(typeValiseRepository);
+        verifyNoMoreInteractions(valiseRepository, typeValiseRepository);
     }
+
     @Test
     public void testCreateTypeValise_Failure_Exception() {
         TypeValise typeValise = new TypeValise();
-        when(typeValiseRepository.save(typeValise)).thenThrow(new RuntimeException("Erreur lors de la création de TypeValise"));
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        // Act & Assert
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             typeValiseService.createTypeValise(typeValise);
         });
 
-        Assertions.assertEquals("Erreur lors de la création de TypeValise", exception.getMessage());
-        verify(typeValiseRepository, times(1)).save(typeValise);
-        verifyNoMoreInteractions(typeValiseRepository);
+        Assertions.assertEquals("TypeValise or its associated Valise cannot be null", exception.getMessage(),
+                "Exception message should match the expected error message.");
+
+        // Verify interactions
+        verify(typeValiseRepository, never()).save(any(TypeValise.class));
+        verifyNoInteractions(valiseRepository);
     }
+
 
     @Test
     public void testUpdateTypeValise_Success(){

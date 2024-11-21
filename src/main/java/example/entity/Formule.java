@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "formule")
 @Data
@@ -18,24 +17,17 @@ import lombok.NoArgsConstructor;
 public class Formule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_formule")
+    @Column(name = "formule_id")
     private int id;
 
     @NotNull
     @Column(nullable = false)
     private String libelle;
 
-
-
     private String formule;
 
-
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @Column(name = "regle_id")
+    @ManyToOne
     @JoinColumn(name = "regle_id", nullable = true)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Regle regle;
-
-
 }

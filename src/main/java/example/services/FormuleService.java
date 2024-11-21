@@ -15,14 +15,14 @@ import java.util.List;
 @Service
 public class FormuleService implements IFormuleService {
 
-    @Autowired
+
     private FormuleRepository formuleRepository;
-    @Autowired
-    private RegleRepository regleRepository;
+    private final RegleRepository regleRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
 
-    public FormuleService(FormuleRepository formuleRepository) {
+    @Autowired
+    public FormuleService(FormuleRepository formuleRepository, RegleRepository regleRepository) {
 
 
 

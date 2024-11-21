@@ -3,6 +3,7 @@ package example.services;
 import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.repositories.MouvementRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,10 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -61,25 +59,29 @@ public class MouvementServiceTest {
     @Test
     public void testUpdateMouvement_Success() {
         int id = 1;
-        Mouvement mouvement = new Mouvement();
-        mouvement.setId(2);
+        Mouvement existingMouvement = new Mouvement();
+        existingMouvement.setId(id);
+        existingMouvement.setDateHeureMouvement(new Date());
+        existingMouvement.setStatutSortie("Initial");
 
-        when(mouvementRepository.existsById(id)).thenReturn(true);
-        when(mouvementRepository.save(any(Mouvement.class))).thenAnswer(invocation -> {
-            Mouvement savedMouvement = invocation.getArgument(0);
-            savedMouvement.setId(id);
-            return savedMouvement;
-        });
+        Mouvement updatedMouvement = new Mouvement();
+        updatedMouvement.setDateHeureMouvement(new Date());
+        updatedMouvement.setStatutSortie("Updated");
 
-        Mouvement result = mouvementService.updateMouvement(id, mouvement);
+        when(mouvementRepository.findById(id)).thenReturn(Optional.of(existingMouvement));
+        when(mouvementRepository.save(any(Mouvement.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Mouvement result = mouvementService.updateMouvement(id, updatedMouvement);
 
         assertNotNull(result, "Mouvement should not be null");
-        assertEquals(id, result.getId(), "Mouvement ID should be updated");
+        assertEquals(id, result.getId(), "Mouvement ID should remain unchanged");
+        assertEquals("Updated", result.getStatutSortie(), "StatutSortie should be updated");
 
-        verify(mouvementRepository, times(1)).existsById(id);
-        verify(mouvementRepository, times(1)).save(mouvement);
+        verify(mouvementRepository, times(1)).findById(id);
+        verify(mouvementRepository, times(1)).save(existingMouvement);
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
     @Test
     public void testUpdateMouvement_Failure_Exception() {
@@ -87,43 +89,52 @@ public class MouvementServiceTest {
         Mouvement mouvement = new Mouvement();
         mouvement.setId(id);
 
-        when(mouvementRepository.existsById(id)).thenReturn(false);
+        when(mouvementRepository.findById(id)).thenReturn(Optional.empty());
 
-        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             mouvementService.updateMouvement(id, mouvement);
         });
+
         assertEquals("Mouvement not found", exception.getMessage());
 
-        verify(mouvementRepository, times(1)).existsById(id);
+        verify(mouvementRepository, times(1)).findById(id);
         verify(mouvementRepository, never()).save(any(Mouvement.class));
         verifyNoMoreInteractions(mouvementRepository);
     }
 
 
+
     @Test
     public void testDeleteMouvement_Success() {
         int id = 1;
+
+        when(mouvementRepository.existsById(id)).thenReturn(true);
         doNothing().when(mouvementRepository).deleteById(id);
 
         mouvementService.deleteMouvement(id);
 
+        verify(mouvementRepository, times(1)).existsById(id);
         verify(mouvementRepository, times(1)).deleteById(id);
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
     @Test
     public void testDeleteMouvement_Failure_Exception() {
         int id = 1;
-        doThrow(new RuntimeException("Database error")).when(mouvementRepository).deleteById(id);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        when(mouvementRepository.existsById(id)).thenReturn(false);
+
+        Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             mouvementService.deleteMouvement(id);
         });
 
-        assertEquals("Database error", exception.getMessage());
-        verify(mouvementRepository, times(1)).deleteById(id);
+        assertEquals("Mouvement not found with ID: " + id, exception.getMessage());
+        verify(mouvementRepository, times(1)).existsById(id);
+        verify(mouvementRepository, never()).deleteById(anyInt());
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
     @Test
     public void testGetMouvementById_Success() {
