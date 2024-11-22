@@ -84,12 +84,14 @@ public class JourFerieController {
     public String viewJFById(@PathVariable int id, Model model) {
         JourFerie jourFerie = jourFerieService.getJourFerie(id);
         if (jourFerie == null) {
-            model.addAttribute("jourFerie", jourFerie);
+            model.addAttribute("errorMessage", "Jour férié non trouvé pour l'ID " + id);
             return "jourFeries/error";
         }
         model.addAttribute("jourFerie", jourFerie);
         return "jourFeries/JF_details";
     }
+
+
 
     // Formulaire Thymeleaf pour créer un JF
     @GetMapping("/create")

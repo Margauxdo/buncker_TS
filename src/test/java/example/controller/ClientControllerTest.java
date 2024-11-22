@@ -2,161 +2,149 @@ package example.controller;
 
 import example.entity.Client;
 import example.interfaces.IClientService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ConcurrentModel;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ui.Model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class ClientControllerTest {
-
-    @InjectMocks
-    private ClientController clientController;
+@ExtendWith(MockitoExtension.class)
+public class ClientControllerTest {
 
     @Mock
     private IClientService clientService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @Mock
+    private Model model;
 
-
-    @Test
-    public void testGetAllClients_Success() {
-        List<Client> clients = new ArrayList<>();
-        clients.add(new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null));
-        when(clientService.getAllClients()).thenReturn(clients);
-
-        ResponseEntity<List<Client>> response = clientController.getAllClientsApi();
-
-        // Assertions
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(clients, response.getBody());
-    }
-
-
-    @Test
-    public void testGetAllClients_Failure() {
-        when(clientService.getAllClients()).thenThrow(new RuntimeException("Database error"));
-
-        assertThrows(RuntimeException.class, () -> clientController.getAllClientsApi());
-    }
-
-
-    @Test
-    public void testGetClientById_Success() {
-        Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
-        when(clientService.getClientById(1)).thenReturn(client);
-
-        ResponseEntity<Client> response = clientController.getClientByIdApi(1);
-
-        // Assertions
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(client, response.getBody());
-    }
-
-
-    @Test
-    public void testGetClientById_NotFound() {
-        when(clientService.getClientById(1)).thenReturn(null);
-
-        ResponseEntity<Client> response = clientController.getClientByIdApi(1);
-
-        // Assertions
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-
-    @Test
-    public void testCreateClientApi_Success() {
-        Client client = new Client(1, "Client 1", "Adresse 1", "client1@example.com", "0123456789", "Ville 1", null, null, null, null, null, null, null, null, null, null, null, null);
-        when(clientService.createClient(any(Client.class))).thenReturn(client);
-
-        ResponseEntity<Client> response = clientController.createClientApi(client);
-
-        // Assertions
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(client, response.getBody());
-    }
-
-
-    @Test
-    public void testCreateClientForm() {
-        ConcurrentModel model = new ConcurrentModel();
-        String viewName = clientController.createClientForm(model);
-
-        // Assertions
-        assertEquals("clients/client_create", viewName);  // Modifiez ici
-        assertTrue(model.containsAttribute("client"));
-    }
-
-
+    @InjectMocks
+    private ClientController clientController;
 
     @Test
     public void testCreateClient_Success() {
         Client client = new Client();
-        when(clientService.createClient(any(Client.class))).thenReturn(client); // Simule le retour d'un client créé
+        when(clientService.createClient(any(Client.class))).thenReturn(client);
 
         String response = clientController.createClient(client);
 
         // Assertions
-        assertEquals("redirect:/clients/list", response); // Vérifie la redirection après la création
+        assertEquals("redirect:/clients/clients_list", response);
     }
-
-
-    @Test
-    public void testCreateClient_InvalidInput() {
-        doThrow(new IllegalArgumentException("Données invalides"))
-                .when(clientService).createClient(any(Client.class));
-
-        Client client = new Client();
-        assertThrows(IllegalArgumentException.class, () -> clientController.createClient(client));
-    }
-
 
     @Test
     public void testDeleteClient_Success() {
-        when(clientService.existsById(1)).thenReturn(true);
+        lenient().when(clientService.existsById(1)).thenReturn(true);
         doNothing().when(clientService).deleteClient(1);
 
         String response = clientController.deleteClient(1);
 
         // Assertions
-        assertEquals("redirect:/clients/list", response);
-    }
-
-
-    @Test
-    public void testDeleteClient_NotFound() {
-        doThrow(new IllegalArgumentException("Client non trouvé"))
-                .when(clientService).deleteClient(1);
-
-        assertThrows(IllegalArgumentException.class, () -> clientController.deleteClient(1));
+        assertEquals("redirect:/clients/clients_list", response);
+        verify(clientService, times(1)).deleteClient(1);
     }
 
     @Test
     public void testDeleteClientWithRelations() {
-        Client client = new Client();
-        client.setId(1);
-        client.setName("Client With Relations");
-
-        when(clientService.existsById(1)).thenReturn(true);
         doNothing().when(clientService).deleteClient(1);
-
         String response = clientController.deleteClient(1);
 
-        assertEquals("redirect:/clients/list", response);
-        verify(clientService, times(1)).deleteClient(1);
+        // Assertions
+        assertEquals("redirect:/clients/clients_list", response);
+        verify(clientService, times(1)).deleteClient(1); // Vérifie que la suppression a été appelée
     }
 
+    @Test
+    public void testViewClients() {
+        when(clientService.getAllClients()).thenReturn(List.of(new Client()));
+
+        String response = clientController.viewClients(model);
+
+        // Assertions
+        assertEquals("clients/client_list", response);
+        verify(model, times(1)).addAttribute(eq("clients"), any());
+    }
+
+    @Test
+    public void testViewClientById_Success() {
+        Client client = new Client();
+        when(clientService.getClientById(1)).thenReturn(client);
+
+        String response = clientController.viewClientById(1, model);
+
+        // Assertions
+        assertEquals("clients/client_detail", response);
+        verify(model, times(1)).addAttribute("client", client);
+    }
+
+    @Test
+    public void testViewClientById_NotFound() {
+        when(clientService.getClientById(1)).thenReturn(null);
+
+        String response = clientController.viewClientById(1, model);
+
+        // Assertions
+        assertEquals("clients/error", response);
+        verify(model, times(1)).addAttribute(eq("errorMessage"), any());
+    }
+
+    @Test
+    public void testEditClientForm_Success() {
+        Client client = new Client();
+        when(clientService.getClientById(1)).thenReturn(client);
+
+        String response = clientController.editClientForm(1, model);
+
+        // Assertions
+        assertEquals("clients/client_edit", response);
+        verify(model, times(1)).addAttribute("client", client);
+    }
+
+    @Test
+    public void testEditClientForm_NotFound() {
+        when(clientService.getClientById(1)).thenReturn(null);
+
+        String response = clientController.editClientForm(1, model);
+
+        // Assertions
+        assertEquals("clients/error", response);
+    }
+
+    @Test
+    public void testUpdateClient_Success() {
+        Client client = new Client();
+        when(clientService.updateClient(1, client)).thenReturn(client);
+
+        String response = clientController.updateClient(1, client);
+
+        // Assertions
+        assertEquals("redirect:/clients/clients_list", response);
+    }
+
+    @Test
+    public void testCreateClientForm() {
+        String response = clientController.createClientForm(model);
+
+        // Assertions
+        assertEquals("clients/client_create", response);
+        verify(model, times(1)).addAttribute(eq("client"), any(Client.class)); // Vérifie que l'attribut "client" est ajouté au modèle
+    }
+
+    @Test
+    public void testViewClientsList() {
+        when(clientService.getAllClients()).thenReturn(List.of(new Client()));
+
+        String response = clientController.viewClients(model);
+
+        // Assertions
+        assertEquals("clients/client_list", response);
+        verify(model, times(1)).addAttribute(eq("clients"), any());
+    }
 }

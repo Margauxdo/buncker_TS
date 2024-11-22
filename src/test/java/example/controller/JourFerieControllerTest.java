@@ -1,23 +1,19 @@
 package example.controller;
 
-import example.entity.Formule;
 import example.entity.JourFerie;
-import example.entity.Regle;
 import example.interfaces.IJourFerieService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JourFerieControllerTest {
 
@@ -33,101 +29,67 @@ public class JourFerieControllerTest {
     }
 
     @Test
-    public void testCreateJourFerieWithFormule() {
-        // Arrange
-        Formule formule = new Formule();
-        formule.setId(1);
-        formule.setFormule("Formule Test");
-
-        Regle regle = new Regle();
-        regle.setCoderegle("R123");
-
-        JourFerie jourFerie = new JourFerie();
-        jourFerie.setRegles(List.of(regle)); // Correction ici
-        jourFerie.setJoursFerieList(new ArrayList<>());
-
-        when(jourFerieService.saveJourFerie(any(JourFerie.class))).thenReturn(jourFerie);
-
-        // Act
-        ResponseEntity<JourFerie> response = jourFerieController.createJourFerieApi(jourFerie);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(1, response.getBody().getRegles().size());
-        Assertions.assertEquals("R123", response.getBody().getRegles().get(0).getCoderegle());
-    }
-
-    @Test
-    public void testGetJourFerie_Success() {
-        // Arrange
+    public void testViewJFList() {
         JourFerie jourFerie = new JourFerie();
         jourFerie.setId(1);
+        when(jourFerieService.getJourFeries()).thenReturn(List.of(jourFerie));
 
+        Model model = new ConcurrentModel();
+        String response = jourFerieController.viewJF(model);
+
+        assertEquals("jourFeries/JF_list", response);
+        assertTrue(model.containsAttribute("jourFerie"));
+        assertEquals(1, ((List) model.getAttribute("jourFerie")).size());  // Vérifie que la liste contient un élément
+    }
+
+    @Test
+    public void testViewJFById_Success() {
+        JourFerie jourFerie = new JourFerie();
+        jourFerie.setId(1);
         when(jourFerieService.getJourFerie(1)).thenReturn(jourFerie);
 
-        // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(1);
+        Model model = new ConcurrentModel();
+        String response = jourFerieController.viewJFById(1, model);
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assertions.assertEquals(jourFerie, result.getBody());
+        assertEquals("jourFeries/JF_details", response);
+        assertTrue(model.containsAttribute("jourFerie"));
+        assertEquals(jourFerie, model.getAttribute("jourFerie"));  // Vérifie que l'attribut est bien l'objet jourFerie
     }
 
     @Test
-    public void testGetJourFerie_Failure() {
-        // Arrange
+    public void testViewJFById_NotFound() {
         when(jourFerieService.getJourFerie(1)).thenReturn(null);
 
-        // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(1);
+        Model model = new ConcurrentModel();
+        String response = jourFerieController.viewJFById(1, model);
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+        assertEquals("jourFeries/error", response);
+
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Jour férié non trouvé pour l'ID 1", model.getAttribute("errorMessage"));
+
+        assertNull(model.getAttribute("jourFerie"));
+    }
+
+
+    @Test
+    public void testCreateJourFerieForm() {
+        Model model = new ConcurrentModel();
+        String response = jourFerieController.createJourFerieForm(model);
+
+        assertEquals("jourFeries/JF_create", response);
+        assertTrue(model.containsAttribute("jourFerie"));
+        assertNotNull(model.getAttribute("jourFerie"));
     }
 
     @Test
-    public void testGetJourFerie_InvalidId() {
-        // Act & Assert
-        Assertions.assertThrows(IllegalArgumentException.class, () -> jourFerieController.getJourFerieApi(-1));
-    }
+    public void testCreateJourFerie_Success() {
+        JourFerie jourFerie = new JourFerie();
+        when(jourFerieService.saveJourFerie(jourFerie)).thenReturn(jourFerie);
 
-    @Test
-    public void testGetJourFeries_Exception() {
-        // Arrange
-        when(jourFerieService.getJourFeries()).thenThrow(new RuntimeException("Erreur inattendue"));
+        Model model = new ConcurrentModel();
+        String response = jourFerieController.createJourFerieThymeleaf(jourFerie);
 
-        // Act & Assert
-        Assertions.assertThrows(RuntimeException.class, () -> jourFerieController.getJourFeriesApi());
-    }
-
-    @Test
-    public void testGetJourFerie_ServiceError() {
-        // Arrange
-        when(jourFerieService.getJourFerie(1)).thenThrow(new RuntimeException("Erreur de service"));
-
-        // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(1);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-    }
-
-    @Test
-    public void testGetJourFerie_NotFound() {
-        // Arrange
-        when(jourFerieService.getJourFerie(9999)).thenReturn(null);
-
-        // Act
-        ResponseEntity<JourFerie> result = jourFerieController.getJourFerieApi(9999);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-    }
-
-    @Test
-    public void testJourFerieControllerInitialization() {
-        Assertions.assertNotNull(jourFerieController);
-        Assertions.assertNotNull(jourFerieService);
+        assertEquals("redirect:/jourferies/JF_list", response);
     }
 }

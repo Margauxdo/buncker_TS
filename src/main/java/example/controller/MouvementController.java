@@ -99,13 +99,15 @@ public class MouvementController {
     @GetMapping("/view/{id}")
     public String viewMouvementById(@PathVariable int id, Model model) {
         Mouvement mouvement = mouvementService.getMouvementById(id);
-        if (mouvement != null) {
-            model.addAttribute("errormessage", "Mouvement avec l'ID" + id + "non trouvé");
-            return "mouvements/error";
+        if (mouvement == null) {
+            model.addAttribute("errorMessage", "Mouvement avec l'ID " + id + " non trouvé.");
+            return "mouvements/error";  // Retourne la vue d'erreur si le mouvement n'est pas trouvé
         }
         model.addAttribute("mouvement", mouvement);
-        return "mouvements/mouv_details";
+        return "mouvements/mouv_details";  // Retourne la vue de détails si le mouvement est trouvé
     }
+
+
 
     // Formulaire Thymeleaf pour créer un mouvement
     @GetMapping("/create")
@@ -125,21 +127,20 @@ public String createMouvementForm(Model model) {
     @GetMapping("/edit/{id}")
     public String editMouvementForm(@PathVariable int id, Model model) {
         Mouvement mouvement = mouvementService.getMouvementById(id);
-        if (mouvement != null) {
-            model.addAttribute("mouvement", mouvement);
-            return "mouvements/error";
-        }
+        if (mouvement == null) {
+            model.addAttribute("errorMessage", "Mouvement avec l'ID " + id + " non trouvé.");
+            return "mouvements/error";   }
         model.addAttribute("mouvement", mouvement);
         return "mouvements/mouv_edit";
     }
 
-    // Modifier un mouvement via formulaire Thymeleaf
+
+
     @PostMapping("/edit/{id}")
     public String updateMouvement(@PathVariable int id, @Valid @ModelAttribute("mouvement") Mouvement mouvement){
         mouvementService.updateMouvement(id, mouvement);
         return "redirect:/mouvements/mouv_list";
     }
-    // Supprimer un mouvement via un formulaire Thymeleaf sécurisé
 
     @PostMapping("/delete/{id}")
     public String deleteMouvement(@PathVariable int id) {

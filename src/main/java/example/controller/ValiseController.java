@@ -7,9 +7,11 @@ import example.repositories.ClientRepository;
 import example.repositories.RegleRepository;
 import example.repositories.TypeValiseRepository;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.List;
 import static example.services.ValiseService.logger;
 
 @RestController
-@RequestMapping("/api/valise")
+@RequestMapping("/valise")
 public class ValiseController {
 
     @Autowired
@@ -29,16 +31,18 @@ public class ValiseController {
     @Autowired
     private TypeValiseRepository typeValiseRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Valise>> getAllValises() {
+    // API REST: Récupérer tous les valises
+    @GetMapping("/api")
+    public ResponseEntity<List<Valise>> getAllValisesApi() {
         List<Valise> valises = valiseService.getAllValises();
         return new ResponseEntity<>(valises, HttpStatus.OK);
     }
 
 
 
-    @GetMapping("{id}")
-    public ResponseEntity<Valise> getValiseById(@PathVariable int id) {
+    // API REST: Récupérer une valise par ID
+    @GetMapping("/api/{id}")
+    public ResponseEntity<Valise> getValiseByIdApi(@PathVariable int id) {
         Valise valise = valiseService.getValiseById(id);
         if (valise == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -46,8 +50,9 @@ public class ValiseController {
         return new ResponseEntity<>(valise, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<Valise> createValise(@RequestBody Valise valise) {
+    // API REST: Créer une valise
+    @PostMapping("/api")
+    public ResponseEntity<Valise> createValiseApi(@RequestBody Valise valise) {
         try {
             Valise createdValise = valiseService.createValise(valise);
             return new ResponseEntity<>(createdValise, HttpStatus.CREATED);
@@ -64,8 +69,9 @@ public class ValiseController {
     }
 
 
-    @PutMapping("{id}")
-    public ResponseEntity<Valise> updateValise(@RequestBody Valise valise, @PathVariable int id) {
+    // API REST: Modifier une valise
+    @PutMapping("/api/{id}")
+    public ResponseEntity<Valise> updateValiseApi(@RequestBody Valise valise, @PathVariable int id) {
         try {
             Valise updatedValise = valiseService.updateValise(id, valise);
             return updatedValise != null ? new ResponseEntity<>(updatedValise, HttpStatus.OK)
@@ -82,8 +88,9 @@ public class ValiseController {
     }
 
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteValise(@PathVariable int id) {
+    // API REST: Supprimer une valise
+    @DeleteMapping("/api/{id}")
+    public ResponseEntity<Void> deleteValiseApi(@PathVariable int id) {
         try {
             valiseService.deleteValise(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -93,6 +100,74 @@ public class ValiseController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Vue Thymeleaf pour lister les valises
+    @GetMapping("/list")
+    public String viewValises(Model model) {
+        model.addAttribute("valises", valiseService.getAllValises());
+        return "valises/valises_list";
+    }
+    // Vue Thymeleaf pour voir une valise par ID
+    @GetMapping("/view/{id}")
+    public String viewValise(@PathVariable int id, Model model) {
+        Valise valise = valiseService.getValiseById(id);
+        if (valise == null) {
+            model.addAttribute("errorMessage", "Valise avec l'Id" + id + "non trouve");
+            return "valises/error";
+        }
+        model.addAttribute("valise", valise);
+        return "valises/valise_details";
+    }
+    // Formulaire Thymeleaf pour créer une valise
+    @GetMapping("/create")
+    public String createValiseForm(Model model) {
+        model.addAttribute("valise", new Valise());
+        return "valises/valise_create";
+    }
+
+    // Création d'une valise via formulaire Thymeleaf
+    @PostMapping("/create")
+    public String createValise(@Valid  @ModelAttribute("valise") Valise valise) {
+        valiseService.createValise(valise);
+        return "redirect:/valises/valises_list";
+    }
+
+    // Formulaire Thymeleaf pour modifier une valise
+    @GetMapping("/edit/{id}")
+    public String editValiseForm(@PathVariable int id, Model model) {
+        Valise valise = valiseService.getValiseById(id);
+        if (valise == null) {
+            return "valises/error";
+        }
+        model.addAttribute("valise", valise);
+        return "valises/valise_edit";
+    }
+    // Modifier une valise via formulaire Thymeleaf
+    @PostMapping("/edit/{id}")
+    public String updateValise(@PathVariable int id, @Valid  @ModelAttribute("valise") Valise valise) {
+        valiseService.updateValise(id, valise);
+        return "redirect:/valises/valises_list";
+    }
+    // Supprimer une valise via un formulaire Thymeleaf sécurisé
+
+    @PostMapping("/delete/{id}")
+    public String deleteValise(@PathVariable int id, Model model) {
+        try {
+            valiseService.deleteValise(id);
+            return "redirect:/valises/valises_list";
+        } catch (ResourceNotFoundException e) {
+            model.addAttribute("errorMessage", "Valise with ID " + id + " not found!");
+            return "valises/error";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "An unexpected error occurred while deleting the Valise.");
+            return "valises/error";
+        }
+    }
+
+
+
+
+
 
 
 }

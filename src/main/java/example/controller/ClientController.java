@@ -54,14 +54,12 @@ public class ClientController {
 
 
     // API REST: Supprimer un client
-    @DeleteMapping("/api/{id}")
-    public ResponseEntity<Void> deleteClientApi(@PathVariable int id) {
-        if (!clientService.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        clientService.deleteClient(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/delete/{id}")
+    public String deleteClientApi(@PathVariable int id) {
+        clientService.deleteClient(id); // Ici, existsById n'est pas utilisé
+        return "redirect:/clients/clients_list";
     }
+
 
     // Vue Thymeleaf pour lister les clients
     @GetMapping("/list")

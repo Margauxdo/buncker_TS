@@ -8,6 +8,7 @@ import example.repositories.FormuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/regles")
+@RequestMapping("/regles")
 @Validated
 public class RegleController {
 
@@ -25,14 +26,16 @@ public class RegleController {
     @Autowired
     private FormuleRepository formuleRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Regle>> readRegles() {
+    // API REST: Récupérer tous les regles
+    @GetMapping("/api")
+    public ResponseEntity<List<Regle>> readReglesApi() {
         List<Regle> regleList = regleService.readAllRegles();
         return ResponseEntity.ok(regleList);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Regle> readRegleById(@PathVariable int id) {
+    // API REST: Récupérer une regle par ID
+    @GetMapping("/api/{id}")
+    public ResponseEntity<Regle> readRegleByIdApi(@PathVariable int id) {
         Regle regle = regleService.readRegle(id);
         if (regle == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -40,8 +43,9 @@ public class RegleController {
         return ResponseEntity.ok(regle);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createRegle(@RequestBody @Valid Regle regle) {
+    // API REST: Créer un client
+    @PostMapping("/api")
+    public ResponseEntity<?> createRegleApi(@RequestBody @Valid Regle regle) {
         try {
             if (regleService.regleExists(regle.getCoderegle())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -63,12 +67,9 @@ public class RegleController {
         }
     }
 
-
-
-
-
-    @PutMapping("{id}")
-    public ResponseEntity<Regle> updateRegle(@PathVariable int id, @RequestBody @Valid Regle regle) {
+    // API REST: Modifier une regle
+    @PutMapping("/api/{id}")
+    public ResponseEntity<Regle> updateRegleApi(@PathVariable int id, @RequestBody @Valid Regle regle) {
         try {
             Regle updatedRegle = regleService.updateRegle(id, regle);
             if (updatedRegle == null) {
@@ -85,8 +86,9 @@ public class RegleController {
     }
 
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteRegle(@PathVariable int id) {
+    // API REST: Supprimer une regle
+    @DeleteMapping("/api/{id}")
+    public ResponseEntity<Void> deleteRegleApi(@PathVariable int id) {
         try {
             regleService.deleteRegle(id);
             return ResponseEntity.noContent().build();
@@ -96,4 +98,62 @@ public class RegleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    // Vue Thymeleaf pour lister les regles
+    @GetMapping("/list")
+    public String viewAllRegles(Model model) {
+        model.addAttribute("regles", regleService.readAllRegles());
+        return "regles/regle_list";
+    }
+    // Vue Thymeleaf pour voir une regle par ID
+    @GetMapping("/view/{id}")
+    public String viewRegle(@PathVariable int id, Model model) {
+        Regle regle = regleService.readRegle(id);
+        if (regle == null) {
+            return "regles/error";
+        }
+        model.addAttribute("regle", regle);
+        return "regles/regle_details";
+    }
+
+    // Formulaire Thymeleaf pour créer une regle
+    @GetMapping("/create")
+    public String createRegleForm(Model model) {
+        model.addAttribute("formule", new Formule());
+        return "regles/regle_create";
+    }
+
+    // Création d'une regle via formulaire Thymeleaf
+    @PostMapping("/create")
+    public String createRegle(@Valid @ModelAttribute("regle") Regle regle) {
+        regleService.createRegle(regle);
+        return "redirect:/regles/regle_list";
+    }
+    // Formulaire Thymeleaf pour modifier une regle
+    @GetMapping("/edit/{id}")
+    public String editRegleForm(@PathVariable int id, Model model) {
+        Regle regle = regleService.readRegle(id);
+        if (regle == null) {
+            return "regles/error";
+        }
+        model.addAttribute("regle", regle);
+        return "regles/regle_edit";
+    }
+
+    // Modifier une regle via formulaire Thymeleaf
+    @PostMapping("/edit/{id}")
+    public String updateRegle(@PathVariable int id,@Valid @ModelAttribute("regle") Regle regle) {
+        regleService.updateRegle(id, regle);
+        return "redirect:/regles/regle_list";
+    }
+    // Supprimer une regle via un formulaire Thymeleaf sécurisé
+    @PostMapping("/delete/{id}")
+    public String deleteRegle(@PathVariable int id) {
+        regleService.deleteRegle(id);
+        return "redirect:/regles/regle_list";
+    }
+
+
+
+
 }

@@ -2,13 +2,14 @@ package example.controller;
 
 import example.entity.SortieSemaine;
 import example.interfaces.ISortieSemaineService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,127 +31,120 @@ public class SortieSemaineControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // Test Thymeleaf: Afficher toutes les semaines
     @Test
-    public void testGetAllSortieSemaine_Success() {
+    public void testViewSortieSemaine_Success() {
         List<SortieSemaine> sortieSemaines = new ArrayList<>();
         sortieSemaines.add(new SortieSemaine());
         when(sortieSemaineService.getAllSortieSemaine()).thenReturn(sortieSemaines);
-        ResponseEntity<List<SortieSemaine>> response = sortieSemaineController.getAllSortieSemaine();
-        assertNotNull(response.getBody());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(sortieSemaines.size(), response.getBody().size());
+
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.viewSortieSemaine(model);
+
+        assertEquals("sortieSemaines/SS_list", response, "Expected view name is 'sortieSemaines/SS_list'");
+        assertTrue(model.containsAttribute("sortieSemaine"), "Model should contain 'sortieSemaine' attribute");
+        assertEquals(sortieSemaines, model.getAttribute("sortieSemaine"), "Expected list of 'sortieSemaine' in model");
     }
 
-
     @Test
-    public void testGetAllSortieSemaine_Fail() {
-        when(sortieSemaineService.getAllSortieSemaine()).thenThrow(new RuntimeException("error database"));
+    public void testViewSortieSemaine_EmptyList() {
+        when(sortieSemaineService.getAllSortieSemaine()).thenReturn(Collections.emptyList());
 
-        ResponseEntity<List<SortieSemaine>> response = sortieSemaineController.getAllSortieSemaine();
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.viewSortieSemaine(model);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("sortieSemaines/SS_list", response, "Expected view name is 'sortieSemaines/SS_list'");
+        assertTrue(model.containsAttribute("sortieSemaine"), "Model should contain 'sortieSemaine' attribute");
+        assertTrue(((List<?>) model.getAttribute("sortieSemaine")).isEmpty(), "Expected empty list in model");
     }
 
-
-
-
+    // Test Thymeleaf: Voir une semaine spécifique par ID
     @Test
-    public void testGetSortieSemaine_Success() {
+    public void testViewSortieSemaineById_Success() {
         SortieSemaine sortieSemaine = new SortieSemaine();
         when(sortieSemaineService.getSortieSemaine(1)).thenReturn(sortieSemaine);
-        ResponseEntity<SortieSemaine> result = sortieSemaineController.getSortieSemaine(1);
-        assertEquals(HttpStatus.OK, result.getStatusCode());
+
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.viewSortieSemaineById(1, model);
+
+        assertEquals("sortieSemaines/SS_details", response, "Expected view name is 'sortieSemaines/SS_details'");
+        assertTrue(model.containsAttribute("sortieSemaine"), "Model should contain 'sortieSemaine' attribute");
+        assertEquals(sortieSemaine, model.getAttribute("sortieSemaine"), "Expected 'sortieSemaine' in model");
     }
 
     @Test
-    public void testGetSortieSemaine_Fail() {
+    public void testViewSortieSemaineById_NotFound() {
         when(sortieSemaineService.getSortieSemaine(1)).thenReturn(null);
-        ResponseEntity<SortieSemaine> result = sortieSemaineController.getSortieSemaine(1);
-        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.viewSortieSemaineById(1, model);
+
+        assertEquals("sortieSemaines/error", response, "Expected view name is 'sortieSemaines/error'");
+        assertTrue(model.containsAttribute("errormessage"), "Model should contain 'errormessage' attribute");
+        assertEquals("sortieSemaine avec l'Id1non trouvé", model.getAttribute("errormessage"));
+    }
+
+    // Test Thymeleaf: Créer une semaine
+    @Test
+    public void testCreateSortieSemaineForm() {
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.createSortieSemaineForm(model);
+
+        assertEquals("sortieSemaines/SS_create", response, "Expected view name is 'sortieSemaines/SS_create'");
+        assertTrue(model.containsAttribute("sortieSemaine"), "Model should contain 'sortieSemaine' attribute");
+        assertNotNull(model.getAttribute("sortieSemaine"), "Expected 'sortieSemaine' attribute in model");
     }
 
     @Test
     public void testCreateSortieSemaine_Success() {
         SortieSemaine sortieSemaine = new SortieSemaine();
-        when(sortieSemaineService.createSortieSemaine(sortieSemaine)).thenReturn(sortieSemaine);
-        ResponseEntity<SortieSemaine> result = sortieSemaineController.createSortieSemaine(sortieSemaine);
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertEquals(sortieSemaine, result.getBody());
+
+        String response = sortieSemaineController.createSortieSemaine(sortieSemaine);
+
+        assertEquals("redirect:/sortieSemaines/SS_list", response, "Expected redirection to 'SS_list'");
+        verify(sortieSemaineService, times(1)).createSortieSemaine(sortieSemaine);
+    }
+
+    // Test Thymeleaf: Modifier une semaine
+    @Test
+    public void testEditSortieSemaineForm_Success() {
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        when(sortieSemaineService.getSortieSemaine(1)).thenReturn(sortieSemaine);
+
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.editSortieSemaineForm(1, model);
+
+        assertEquals("sortieSemaines/SS_edit", response, "Expected view name is 'sortieSemaines/SS_edit'");
+        assertTrue(model.containsAttribute("sortieSemaine"), "Model should contain 'sortieSemaine' attribute");
+        assertEquals(sortieSemaine, model.getAttribute("sortieSemaine"), "Expected 'sortieSemaine' in model");
     }
 
     @Test
-    public void testCreateSortieSemaine_Fail() {
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        when(sortieSemaineService.createSortieSemaine(sortieSemaine)).thenThrow(new IllegalArgumentException("week invalid"));
-        ResponseEntity<SortieSemaine> response = sortieSemaineController.createSortieSemaine(sortieSemaine);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
+    public void testEditSortieSemaineForm_NotFound() {
+        when(sortieSemaineService.getSortieSemaine(1)).thenReturn(null);
 
+        Model model = new ConcurrentModel();
+        String response = sortieSemaineController.editSortieSemaineForm(1, model);
+
+        assertEquals("sortieSemaines/error", response, "Expected view name is 'sortieSemaines/error'");
+    }
 
     @Test
     public void testUpdateSortieSemaine_Success() {
-        SortieSemaine updateSortieSemaine = new SortieSemaine();
-        when(sortieSemaineService.updateSortieSemaine(1, updateSortieSemaine)).thenReturn(updateSortieSemaine);
-        ResponseEntity<SortieSemaine> response = sortieSemaineController.updateSortieSemaine(1, updateSortieSemaine);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updateSortieSemaine, response.getBody());
+        SortieSemaine sortieSemaine = new SortieSemaine();
+
+        String response = sortieSemaineController.updateSortieSemaine(1, sortieSemaine);
+
+        assertEquals("redirect:/sortieSemaines/SS_list", response, "Expected redirection to 'SS_list'");
+        verify(sortieSemaineService, times(1)).updateSortieSemaine(1, sortieSemaine);
     }
 
-    @Test
-    public void testUpdateSortieSemaine_Fail() {
-        SortieSemaine updateSortieSemaine = new SortieSemaine();
-
-        when(sortieSemaineService.updateSortieSemaine(1, updateSortieSemaine)).thenReturn(null);
-        ResponseEntity<SortieSemaine> response = sortieSemaineController.updateSortieSemaine(1, updateSortieSemaine);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-
+    // Test Thymeleaf: Supprimer une semaine
     @Test
     public void testDeleteSortieSemaine_Success() {
-        doNothing().when(sortieSemaineService).deleteSortieSemaine(1);
-        ResponseEntity<Void> response = sortieSemaineController.deleteSortieSemaine(1);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
+        String response = sortieSemaineController.deleteSortieSemaine(1);
 
-    @Test
-    public void testDeleteSortieSemaine_Fail() {
-        doThrow(new RuntimeException("Internal server error")).when(sortieSemaineService).deleteSortieSemaine(1);
-
-        ResponseEntity<Void> response = sortieSemaineController.deleteSortieSemaine(1);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("redirect:/sortieSemaines/SS_list", response, "Expected redirection to 'SS_list'");
         verify(sortieSemaineService, times(1)).deleteSortieSemaine(1);
     }
-
-
-    @Test
-    public void testUpdateSortieSemaine_InvalidInput() {
-        SortieSemaine invalidSortieSemaine = new SortieSemaine();
-        when(sortieSemaineService.updateSortieSemaine(anyInt(), any(SortieSemaine.class)))
-                .thenThrow(new IllegalArgumentException("invalid data"));
-
-        ResponseEntity<SortieSemaine> response = sortieSemaineController.updateSortieSemaine(1, invalidSortieSemaine);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-
-    @Test
-    public void testSortieSemaine_EmptyList() {
-        when(sortieSemaineService.getAllSortieSemaine()).thenReturn(Collections.emptyList());
-
-        ResponseEntity<List<SortieSemaine>> response = sortieSemaineController.getAllSortieSemaine();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
-    }
-
-    @Test
-    public void testSortieSemaineController() {
-        assertNotNull(sortieSemaineController);
-        assertNotNull(sortieSemaineService);
-    }
-
-
 }

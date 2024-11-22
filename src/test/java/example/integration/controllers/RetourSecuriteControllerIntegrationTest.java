@@ -181,7 +181,7 @@ public class RetourSecuriteControllerIntegrationTest {
         when(retourSecuriteService.createRetourSecurite(any(RetourSecurite.class)))
                 .thenThrow(new DataIntegrityViolationException("Invalid input"));
 
-        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(retourSecurite);
+        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecuriteApi(retourSecurite);
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
         verify(retourSecuriteService, times(1)).createRetourSecurite(any(RetourSecurite.class));
@@ -193,7 +193,7 @@ public class RetourSecuriteControllerIntegrationTest {
         when(retourSecuriteService.updateRetourSecurite(eq(9999), any(RetourSecurite.class)))
                 .thenThrow(new EntityNotFoundException("Entity not found"));
 
-        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecurite(9999, retourSecurite);
+        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecuriteApi(9999, retourSecurite);
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(retourSecuriteService, times(1)).updateRetourSecurite(eq(9999), any(RetourSecurite.class));

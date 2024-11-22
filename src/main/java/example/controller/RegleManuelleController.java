@@ -5,14 +5,16 @@ import example.exceptions.ConflictException;
 import example.interfaces.IRegleManuelleService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/regle-manuelle")
+@RequestMapping("/reglemanuelle")
 public class RegleManuelleController {
 
     private final IRegleManuelleService regleManuelleService;
@@ -21,13 +23,15 @@ public class RegleManuelleController {
         this.regleManuelleService = regleManuelleService;
     }
 
-    @GetMapping
-    public List<RegleManuelle> getRegleManuelles() {
+    // API REST: Récupérer tous les RM
+    @GetMapping("/api")
+    public List<RegleManuelle> getRegleManuellesApi() {
         return regleManuelleService.getRegleManuelles();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RegleManuelle> getRegleManuelleById(@PathVariable int id) {
+    // API REST: Récupérer une RM par ID
+    @GetMapping("/api/{id}")
+    public ResponseEntity<RegleManuelle> getRegleManuelleByIdApi(@PathVariable int id) {
         RegleManuelle regleManuelle = regleManuelleService.getRegleManuelle(id);
         if (regleManuelle == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -35,8 +39,9 @@ public class RegleManuelleController {
         return new ResponseEntity<>(regleManuelle, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<RegleManuelle> createRegleManuelle(@RequestBody RegleManuelle regleManuelle) {
+    // API REST: Créer une RM
+    @PostMapping("/api")
+    public ResponseEntity<RegleManuelle> createRegleManuelleApi(@RequestBody RegleManuelle regleManuelle) {
         if (regleManuelle == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -54,12 +59,9 @@ public class RegleManuelleController {
         }
     }
 
-
-
-
-
-    @PutMapping("/{id}")
-    public ResponseEntity<RegleManuelle> updateRegleManuelle(@PathVariable int id, @RequestBody RegleManuelle regleManuelle) {
+    // API REST: Modifier une RM
+    @PutMapping("/api/{id}")
+    public ResponseEntity<RegleManuelle> updateRegleManuelleApi(@PathVariable int id, @RequestBody RegleManuelle regleManuelle) {
         if (regleManuelle == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -77,8 +79,9 @@ public class RegleManuelleController {
     }
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRegleManuelle(@PathVariable int id) {
+    // API REST: Supprimer une RM
+    @DeleteMapping("/api/{id}")
+    public ResponseEntity<Void> deleteRegleManuelleApi(@PathVariable int id) {
         try {
             regleManuelleService.deleteRegleManuelle(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -88,5 +91,71 @@ public class RegleManuelleController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Vue Thymeleaf pour lister les RM
+    @GetMapping("/list")
+    public String listRegleManuelles(Model model) {
+        model.addAttribute("regleManuelles", regleManuelleService.getRegleManuelles());
+        return "reglesManuelles/RM_list";
+    }
+    // Vue Thymeleaf pour voir une RM par ID
+    @GetMapping("/view/{id}")
+    public String viewRegleManuelleById(@PathVariable int id, Model model) {
+        RegleManuelle regleManuelle = regleManuelleService.getRegleManuelle(id);
+        if (regleManuelle == null) {
+            model.addAttribute("regleManuelle", regleManuelle);
+            return "reglesManuelles/error";
+        }
+        model.addAttribute("regleManuelle", regleManuelle);
+        return "reglesManuelles/RM_details";
+    }
+    // Formulaire Thymeleaf pour créer une RM
+    @GetMapping("/create")
+    public String createRegleManuelleForm(Model model) {
+        model.addAttribute("regleManuelle", new RegleManuelle());
+        return "reglesManuelles/RM_create";
+    }
+
+    // Création d'une RM via formulaire Thymeleaf
+    @PostMapping("/create")
+    public String createRegleManuelle(@Valid @ModelAttribute("regleManuelle") RegleManuelle regleManuelle) {
+        regleManuelleService.createRegleManuelle(regleManuelle);
+        return "redirect:/reglesManuelles/RM_list";
+    }
+    // Formulaire Thymeleaf pour modifier une RM
+    @GetMapping("/edit/{id}")
+    public String editRegleManuelleForm(@PathVariable int id, Model model) {
+        RegleManuelle regleManuelle = regleManuelleService.getRegleManuelle(id);
+        if (regleManuelle == null) {
+            return "reglesManuelles/error";
+        }
+        model.addAttribute("regleManuelle", regleManuelle);
+        return "reglesManuelles/RM_edit";
+    }
+    // Modifier une RM via formulaire Thymeleaf
+    @PostMapping("/edit/{id}")
+    public String updatedRegleManuelle(@PathVariable int id, @Valid @ModelAttribute("regleManuelle") RegleManuelle regleManuelle) {
+        regleManuelleService.updateRegleManuelle(id, regleManuelle);
+        return "redirect:/reglesManuelles/RM_list";
+    }
+    // Supprimer une RM via un formulaire Thymeleaf sécurisé
+    @PostMapping("/delete/{id}")
+    public String deleteRegleManuelle(@PathVariable int id) {
+        try {
+            regleManuelleService.deleteRegleManuelle(id);
+        } catch (EntityNotFoundException e) {
+            System.err.println("Erreur : " + e.getMessage());
+            return "redirect:/reglesManuelles/error"; // Redirection vers une vue d'erreur spécifique
+        }
+        return "redirect:/reglesManuelles/RM_list";
+    }
+
+
+
+
+
+
+
+
 
 }

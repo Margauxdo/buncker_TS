@@ -107,12 +107,13 @@ public class FormuleController {
     @GetMapping("/view/{id}")
     public String viewFormuleById(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
-        if (formule != null) {
-            throw new EntityNotFoundException("Formule avec l'Id" + id + " n'existe pas !");
+        if (formule == null) {
+            throw new EntityNotFoundException("Formule avec l'Id " + id + " n'existe pas !");
         }
         model.addAttribute("formule", formule);
         return "formules/formule_detail";
     }
+
 
     // Formulaire Thymeleaf pour créer une formule
     @GetMapping("/create")
@@ -138,7 +139,7 @@ public class FormuleController {
     @GetMapping("/edit/{id}")
     public String editFormuleForm(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
-        if (formule != null) {
+        if (formule == null) {
             return "formules/error";
         }
         model.addAttribute("formule", formule);

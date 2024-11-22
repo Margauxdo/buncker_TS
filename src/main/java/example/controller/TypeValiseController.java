@@ -5,17 +5,19 @@ import example.entity.Valise;
 import example.interfaces.ITypeValiseService;
 import example.interfaces.IValiseService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/typeValise")
+@RequestMapping("/typeValise")
 public class TypeValiseController {
 
     @Autowired
@@ -23,15 +25,17 @@ public class TypeValiseController {
     @Autowired
     private IValiseService valiseService;
 
-    @GetMapping
-    public List<TypeValise> getTypeValises() {
+    // API REST: Récupérer tous les TV
+    @GetMapping("/api")
+    public List<TypeValise> getTypeValisesApi() {
         List<TypeValise> typeValises = typeValiseService.getTypeValises();
         return new ResponseEntity<>(typeValises, HttpStatus.OK).getBody();
     }
 
+    // API REST: Récupérer un TV par ID
     @Transactional
-    @GetMapping("{id}")
-    ResponseEntity<TypeValise> getTypeValise(@PathVariable int id) {
+    @GetMapping("/api/{id}")
+    ResponseEntity<TypeValise> getTypeValiseApi(@PathVariable int id) {
         TypeValise typeValise = typeValiseService.getTypeValise(id);
         return typeValise != null ? new ResponseEntity<>(typeValise, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -39,8 +43,9 @@ public class TypeValiseController {
 
 
 
-    @PostMapping
-    public ResponseEntity<TypeValise> createTypeValise(@RequestBody TypeValise typeValise) {
+    // API REST: Créer un TV
+    @PostMapping("/api")
+    public ResponseEntity<TypeValise> createTypeValiseApi(@RequestBody TypeValise typeValise) {
         try {
             if (typeValise == null || typeValise.getValise() == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -65,8 +70,9 @@ public class TypeValiseController {
     }
 
 
-    @PutMapping("{id}")
-    public ResponseEntity<TypeValise> updateTypeValise(@PathVariable int id, @RequestBody TypeValise typeValise) {
+    // API REST: Modifier un TV
+    @PutMapping("/api/{id}")
+    public ResponseEntity<TypeValise> updateTypeValiseApi(@PathVariable int id, @RequestBody TypeValise typeValise) {
         try {
             TypeValise updatedTypeValise = typeValiseService.updateTypeValise(id, typeValise);
             return new ResponseEntity<>(updatedTypeValise, HttpStatus.OK);
@@ -77,11 +83,9 @@ public class TypeValiseController {
         }
     }
 
-
-
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<TypeValise> deleteTypeValise(@PathVariable int id) {
+    // API REST: Supprimer un TV
+    @DeleteMapping("/api/{id}")
+    public ResponseEntity<TypeValise> deleteTypeValiseApi(@PathVariable int id) {
         try {
             typeValiseService.deleteTypeValise(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -91,5 +95,77 @@ public class TypeValiseController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Vue Thymeleaf pour lister les TV
+    @GetMapping("/list")
+    public String viewTypeValises(Model model) {
+        model.addAttribute("typeValises", typeValiseService.getTypeValises());
+        return "typeValises/TV_list";
+    }
+
+    // Vue Thymeleaf pour voir un TV par ID
+    @GetMapping("/view/{id}")
+    public String viewTypeValiseById(@PathVariable int id, Model model) {
+        TypeValise typeValise = typeValiseService.getTypeValise(id);
+        if (typeValise == null) {
+            model.addAttribute("errorMessage", "Type de valise avec l'Id" + id + " non trouvé");
+            return "typeValises/error";
+        }
+        model.addAttribute("typeValise", typeValise);
+        return "typeValises/TV_details";
+    }
+    // Formulaire Thymeleaf pour créer une TV
+    @GetMapping("/create")
+    public String createTypeValiseForm(Model model) {
+        model.addAttribute("typeValise", new TypeValise());
+        return "typeValises/TV_create";
+    }
+
+    // Création d'une TV via formulaire Thymeleaf
+    @PostMapping("/create")
+    public String createTypeValise(@Valid  @ModelAttribute("typeValise") TypeValise typeValise) {
+        typeValiseService.createTypeValise(typeValise);
+        return "redirect:/typeValises/TV_list";
+    }
+
+    // Formulaire Thymeleaf pour modifier un TV
+    @GetMapping("/edit/{id}")
+    public String editTypeValiseForm(@PathVariable int id, Model model) {
+        TypeValise typeValise = typeValiseService.getTypeValise(id);
+        if (typeValise == null) {
+            return "typeValises/error";
+        }
+        model.addAttribute("typeValise", typeValise);
+        return "typeValises/TV_edit";
+    }
+
+    // Modifier un TV via formulaire Thymeleaf
+    @PostMapping("/edit/{id}")
+    public String editTypeValise(@PathVariable int id, @Valid TypeValise typeValise) {
+        typeValiseService.updateTypeValise(id, typeValise);
+        return "redirect:/typeValises/TV_list";
+    }
+
+    // Supprimer un TV via un formulaire Thymeleaf sécurisé
+    @PostMapping("/delete/{id}")
+    public String deleteTypeValise(@PathVariable int id, Model model) {
+        try {
+            typeValiseService.deleteTypeValise(id);
+            return "redirect:/typeValises/TV_list";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "TypeValise avec l'ID " + id + " non trouvé !");
+            return "typeValises/error";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
+            return "typeValises/error";
+        }
+    }
+
+
+
+
+
+
+
 
 }

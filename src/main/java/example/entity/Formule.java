@@ -20,7 +20,6 @@ public class Formule {
     @Column(name = "formule_id")
     private int id;
 
-    @NotNull
     @Column(nullable = false)
     private String libelle;
 
@@ -28,6 +27,5 @@ public class Formule {
 
     @ManyToOne
     @JoinColumn(name = "regle_id", nullable = true)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Regle regle;
 }

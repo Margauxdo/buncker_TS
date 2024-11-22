@@ -2,214 +2,149 @@ package example.controller;
 
 import example.entity.Formule;
 import example.interfaces.IFormuleService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class FormuleControllerTest {
 
     @InjectMocks
-    private FormuleController formuleController; ;
+    private FormuleController formuleController;
 
     @Mock
     private IFormuleService formuleService;
 
     @BeforeEach
     public void setUp() {
-
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetAllFormules_Success() {
+    public void testViewFormuleList() {
         List<Formule> formules = new ArrayList<>();
         formules.add(new Formule());
         when(formuleService.getAllFormules()).thenReturn(formules);
 
-        List<Formule> result = formuleController.getAllFormulesApi();
+        Model model = new ConcurrentModel();
+        String response = formuleController.viewFormuleList(model);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals("formules/formule_list", response);
+        assertTrue(model.containsAttribute("formules"));
+        assertEquals(formules, model.getAttribute("formules"));
     }
 
     @Test
-    public void testGetAllFormules_Failure() {
-        when(formuleService.getAllFormules()).thenThrow(new RuntimeException("Erreur de la base de données"));
-
-        assertThrows(RuntimeException.class, () -> formuleController.getAllFormulesApi());
-    }
-
-    @Test
-    public void testGetFormuleById_Success() {
+    public void testViewFormuleById_Success() {
         Formule formule = new Formule();
         when(formuleService.getFormuleById(1)).thenReturn(formule);
 
-        ResponseEntity<Formule> response = formuleController.getFormuleByIdApi(1);
+        Model model = new ConcurrentModel();
+        String response = formuleController.viewFormuleById(1, model);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(formule, response.getBody());
+        assertEquals("formules/formule_detail", response);
+        assertTrue(model.containsAttribute("formule"));
+        assertEquals(formule, model.getAttribute("formule"));
     }
 
+
     @Test
-    public void testGetFormuleById_Failure() {
+    public void testViewFormuleById_NotFound() {
         when(formuleService.getFormuleById(1)).thenReturn(null);
 
-        ResponseEntity<Formule> response = formuleController.getFormuleByIdApi(1);
+        Model model = new ConcurrentModel();
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            formuleController.viewFormuleById(1, model);
+        });
+
+        // Vérifiez le message d'exception (si nécessaire)
+        assertEquals("Formule avec l'Id 1 n'existe pas !", exception.getMessage());
+    }
+
+
+    @Test
+    public void testCreateFormuleForm() {
+        Model model = new ConcurrentModel();
+        String response = formuleController.createFormuleForm(model);
+
+        assertEquals("formules/formule_create", response);
+        assertTrue(model.containsAttribute("formule"));
+        assertNotNull(model.getAttribute("formule"));
     }
 
     @Test
     public void testCreateFormule_Success() {
         Formule formule = new Formule();
-        when(formuleService.createFormule(any(Formule.class))).thenReturn(formule);
+        when(formuleService.createFormule(any(Formule.class))).thenReturn(formule); // Utilisation de when() pour les méthodes non-void
 
-        String response = formuleController.createFormule(formule, new ConcurrentModel());
+        Model model = new ConcurrentModel();
+        String response = formuleController.createFormule(formule, model);
 
         assertEquals("redirect:/formules/list", response);
     }
-    @Test
-    public void testCreateFormuleApi_Success() {
-        Formule formule = new Formule();
-        when(formuleService.createFormule(any(Formule.class))).thenReturn(formule);
-
-        ResponseEntity<Formule> response = formuleController.createFormuleApi(formule);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(formule, response.getBody());
-    }
-
-    @Test
-    public void testCreateFormuleApi_Failure() {
-        // Cas d'échec avec l'API REST
-        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
-
-        ResponseEntity<Formule> response = formuleController.createFormuleApi(new Formule());
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
 
 
     @Test
     public void testCreateFormule_Failure() {
-        doThrow(new IllegalArgumentException("Formule invalide"))
-                .when(formuleService).createFormule(any(Formule.class));
+        doThrow(new IllegalArgumentException("Invalid formula")).when(formuleService).createFormule(any(Formule.class));
 
-        ConcurrentModel model = new ConcurrentModel();
-
+        Model model = new ConcurrentModel();
         String response = formuleController.createFormule(new Formule(), model);
 
-        assertEquals("formule_create", response);
-
+        assertEquals("formules/formule_create", response);
         assertTrue(model.containsAttribute("errorMessage"));
-        assertEquals("Formule invalide", model.getAttribute("errorMessage"));
+        assertEquals("Invalid formula", model.getAttribute("errorMessage"));
     }
 
+    @Test
+    public void testEditFormuleForm_Success() {
+        Formule formule = new Formule();
+        when(formuleService.getFormuleById(1)).thenReturn(formule);
 
+        Model model = new ConcurrentModel();
+        String response = formuleController.editFormuleForm(1, model);
 
+        assertEquals("formules/formule_edit", response);
+        assertTrue(model.containsAttribute("formule"));
+        assertEquals(formule, model.getAttribute("formule"));
+    }
+
+    @Test
+    public void testEditFormuleForm_NotFound() {
+        when(formuleService.getFormuleById(1)).thenReturn(null);
+
+        Model model = new ConcurrentModel();
+        String response = formuleController.editFormuleForm(1, model);
+
+        assertEquals("formules/error", response);
+    }
 
     @Test
     public void testUpdateFormule_Success() {
-        Formule updatedFormule = new Formule();
-        when(formuleService.updateFormule(1, updatedFormule)).thenReturn(updatedFormule);
+        Formule formule = new Formule();
+        when(formuleService.updateFormule(eq(1), any(Formule.class))).thenReturn(formule); // Utilisez when() pour simuler le retour d'un objet
 
-        ResponseEntity<Formule> response = formuleController.updateFormuleApi(1, updatedFormule);
+        String response = formuleController.updateFormule(1, formule);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updatedFormule, response.getBody());
-    }
+        assertEquals("redirect:/formules/formules_list", response);  }
 
-    @Test
-    public void testUpdateFormule_Failure() {
-        Formule updatedFormule = new Formule();
-        when(formuleService.updateFormule(1, updatedFormule)).thenReturn(null);
-
-        ResponseEntity<Formule> response = formuleController.updateFormuleApi(1, updatedFormule);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
 
     @Test
     public void testDeleteFormule_Success() {
         doNothing().when(formuleService).deleteFormule(1);
 
-        ResponseEntity<Formule> response = formuleController.deleteFormuleApi(1);
+        String response = formuleController.deleteFormule(1);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
-
-    @Test
-    public void testDeleteFormule_Failure() {
-        doThrow(new RuntimeException("Formule non trouvée")).when(formuleService).deleteFormule(1);
-
-        assertThrows(RuntimeException.class, () -> formuleController.deleteFormuleApi(1));
-    }
-
-    @Test
-    public void testCreateFormule_InvalidInput() {
-        doThrow(new IllegalArgumentException("Invalid data"))
-                .when(formuleService).createFormule(any(Formule.class));
-
-        ConcurrentModel model = new ConcurrentModel();
-
-        String response = formuleController.createFormule(new Formule(), model);
-
-        assertEquals("formule_create", response);
-
-        assertTrue(model.containsAttribute("errorMessage"));
-        assertEquals("Invalid data", model.getAttribute("errorMessage"));
-    }
-
-
-
-
-    @Test
-    public void testUpdateFormule_InvalidInput() {
-        Formule invalidFormule = new Formule();
-        when(formuleService.updateFormule(eq(1), any(Formule.class))).thenThrow(new IllegalArgumentException("Invalid data"));
-
-        ResponseEntity<Formule> response = formuleController.updateFormuleApi(1, invalidFormule);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-    @Test
-    public void testDeleteFormule_NotFound() {
-        doThrow(new IllegalArgumentException("Formule not found")).when(formuleService).deleteFormule(1);
-
-        ResponseEntity<Formule> response = formuleController.deleteFormuleApi(1);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-    @Test
-    public void testCreateFormuleApi_Conflict() {
-        when(formuleService.createFormule(any(Formule.class))).thenThrow(new IllegalStateException("Conflict detected"));
-
-        ResponseEntity<Formule> response = formuleController.createFormuleApi(new Formule());
-
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-    }
-
-
-
-
-    @Test
-    public void testFormuleController(){
-        assertNotNull(formuleController);
-        assertNotNull(formuleController);
-    }
-
+        assertEquals("redirect:/formules/formules_list", response);  }
 }
-

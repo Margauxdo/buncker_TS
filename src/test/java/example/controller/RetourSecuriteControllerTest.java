@@ -3,17 +3,14 @@ package example.controller;
 import example.entity.RetourSecurite;
 import example.interfaces.IRetourSecuriteService;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,127 +26,121 @@ public class RetourSecuriteControllerTest {
 
     @BeforeEach
     public void setUp() {
-
         MockitoAnnotations.openMocks(this);
     }
+
     @Test
-    public void testGetAllRetourSecurites_Success() {
-        List<RetourSecurite> retourSecurites = new ArrayList<>();
-        retourSecurites.add(new RetourSecurite());
+    public void testViewAllRetourSecurites_Success() {
+        // Arrange
+        Model model = new ConcurrentModel();
+        when(retourSecuriteService.getAllRetourSecurites()).thenReturn(List.of(new RetourSecurite()));
 
-        when(retourSecuriteService.getAllRetourSecurites()).thenReturn(retourSecurites);
+        // Act
+        String response = RScontroller.viewAllRetourSecurites(model);
 
-        ResponseEntity<List<RetourSecurite>> response = RScontroller.getAllRetourSecurites();
-
-        Assertions.assertNotNull(response, "ResponseEntity should not be null");
-        Assertions.assertNotNull(response.getBody(), "Response body should not be null");
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "Status code should be 200 OK");
-        Assertions.assertEquals(retourSecurites.size(), response.getBody().size(), "Returned list size should match the mock data");
+        // Assert
+        assertEquals("retourSecurites/RS_list", response);
+        assertTrue(model.containsAttribute("retourSecurites"));
+        assertNotNull(model.getAttribute("retourSecurites"));
     }
 
     @Test
-    public void testGetAllRetourSecurites_Failure() {
-        when(retourSecuriteService.getAllRetourSecurites()).thenThrow(new RuntimeException("error database"));
-        assertThrows(RuntimeException.class, () -> RScontroller.getAllRetourSecurites());
-    }
-    @Test
-    public void testGetRetourSecuriteById_Succes() {
+    public void testViewRetourSecuriteById_Success() {
+        // Arrange
         RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setId(1);
+        Model model = new ConcurrentModel();
         when(retourSecuriteService.getRetourSecurite(1)).thenReturn(retourSecurite);
-        ResponseEntity<RetourSecurite> result = RScontroller.getRetourSecuriteById(1);
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
 
+        // Act
+        String response = RScontroller.viewRetourSecuriteById(1, model);
+
+        // Assert
+        assertEquals("retourSecurites/RS_details", response);
+        assertTrue(model.containsAttribute("retourSecurite"));
+        assertEquals(retourSecurite, model.getAttribute("retourSecurite"));
     }
+
     @Test
-    public void testGetRetourSecuriteById_Failure() {
+    public void testViewRetourSecuriteById_NotFound() {
+        // Arrange
+        Model model = new ConcurrentModel();
         when(retourSecuriteService.getRetourSecurite(1)).thenReturn(null);
-        ResponseEntity<RetourSecurite> result = RScontroller.getRetourSecuriteById(1);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+
+        // Act
+        String response = RScontroller.viewRetourSecuriteById(1, model);
+
+        // Assert
+        assertEquals("retourSecurites/error", response);
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Retour securité avec l'ID1non trouve", model.getAttribute("errorMessage"));
     }
+
     @Test
-    public void testCreateRetourSecurite_Succes() {
+    public void testCreateRetourSecuriteForm() {
+        // Arrange
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = RScontroller.createRetourSecuriteForm(model);
+
+        // Assert
+        assertEquals("retourSecurites/RS_create", response);
+        assertTrue(model.containsAttribute("retourSecurite"));
+        assertNotNull(model.getAttribute("retourSecurite"));
+    }
+
+    @Test
+    public void testEditRetourSecuriteForm_Success() {
+        // Arrange
         RetourSecurite retourSecurite = new RetourSecurite();
-        when(retourSecuriteService.createRetourSecurite(retourSecurite)).thenReturn(retourSecurite);
-        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(retourSecurite);
-        Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertEquals(retourSecurite, result.getBody());
+        retourSecurite.setId(1);
+        Model model = new ConcurrentModel();
+        when(retourSecuriteService.getRetourSecurite(1)).thenReturn(retourSecurite);
+
+        // Act
+        String response = RScontroller.editRetourSecuriteForm(1, model);
+
+        // Assert
+        assertEquals("retourSecurites/RS_edit", response);
+        assertTrue(model.containsAttribute("retourSecurite"));
+        assertEquals(retourSecurite, model.getAttribute("retourSecurite"));
     }
 
     @Test
-    public void testUpdateRetourSecurite_Succes() {
-        RetourSecurite updateRetourSecurite = new RetourSecurite();
-        when(retourSecuriteService.updateRetourSecurite(1,updateRetourSecurite)).thenReturn(updateRetourSecurite);
-        ResponseEntity<RetourSecurite> result = RScontroller.updateRetourSecurite(1,updateRetourSecurite);
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(updateRetourSecurite, result.getBody());
-    }
-    @Test
-    public void testUpdateRetourSecurite_Failure() {
-        int id = 1;
-        RetourSecurite updateRetourSecurite = new RetourSecurite();
-        when(retourSecuriteService.updateRetourSecurite(id, updateRetourSecurite))
-                .thenThrow(new EntityNotFoundException("Safety return does not exist"));
+    public void testEditRetourSecuriteForm_NotFound() {
+        // Arrange
+        Model model = new ConcurrentModel();
+        when(retourSecuriteService.getRetourSecurite(1)).thenReturn(null);
 
-        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecurite(id, updateRetourSecurite);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Status code should be 404 NOT_FOUND");
+        // Act
+        String response = RScontroller.editRetourSecuriteForm(1, model);
+
+        // Assert
+        assertEquals("retourSecurites/error", response);
     }
 
     @Test
-    public void testDeleteRetourSecurite_Succes() {
-        doNothing().when(retourSecuriteService).deleteRetourSecurite(1);
-        ResponseEntity<Void> result = RScontroller.deleteRetourSecurite(1);
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
-    }
-    @Test
-    public void testDeleteRetourSecurite_Failure() {
-        doThrow(new RuntimeException("Internal server error")).when(retourSecuriteService).deleteRetourSecurite(1);
-        ResponseEntity<Void> result = RScontroller.deleteRetourSecurite(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-        verify(retourSecuriteService).deleteRetourSecurite(1);
-    }
-    @Test
-    public void testRetourSecuriteController() {
-        assertNotNull(RScontroller);
-        assertNotNull(retourSecuriteService);
-    }
-    @Test
-    public void testCreateRetourSecurite_Failure() {
-        RetourSecurite retourSecurite = new RetourSecurite();
+    public void testDeleteRetourSecurite_Success() {
+        // Act
+        String response = RScontroller.deleteRetourSecurite(1);
 
-        when(retourSecuriteService.createRetourSecurite(any(RetourSecurite.class)))
-                .thenThrow(new DataIntegrityViolationException("security invalid"));
-
-        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(retourSecurite);
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-    }
-
-
-
-    @Test
-    public void testUpdateRetourSecurite_InternalServerError() {
-        RetourSecurite retourSecurite = new RetourSecurite();
-        when(retourSecuriteService.updateRetourSecurite(1, retourSecurite))
-                .thenThrow(new RuntimeException("Internal server error"));
-        ResponseEntity<RetourSecurite> result = RScontroller.updateRetourSecurite(1, retourSecurite);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+        // Assert
+        assertEquals("redirect:/retourSecurites/RS_list", response);
+        verify(retourSecuriteService, times(1)).deleteRetourSecurite(1);
     }
 
     @Test
-    public void testDeleteRetourSecurite_InternalServerError() {
-        doThrow(new RuntimeException("Internal server error")).when(retourSecuriteService).deleteRetourSecurite(1);
-        ResponseEntity<Void> result = RScontroller.deleteRetourSecurite(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    public void testDeleteRetourSecurite_NotFound() {
+        // Arrange
+        doThrow(new EntityNotFoundException("Safety return not found")).when(retourSecuriteService).deleteRetourSecurite(1);
+
+        // Act
+        String response = RScontroller.deleteRetourSecurite(1);
+
+        // Assert
+        assertEquals("redirect:/retourSecurites/RS_list", response, "Expected redirection to RS_list view");
+        verify(retourSecuriteService, times(1)).deleteRetourSecurite(1);
     }
-
-    @Test
-    public void testCreateRetourSecurite_NullInput() {
-        when(retourSecuriteService.createRetourSecurite(null)).thenThrow(new DataIntegrityViolationException("Null input not allowed"));
-
-        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecurite(null);
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-    }
-
 
 }

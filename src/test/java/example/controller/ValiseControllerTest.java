@@ -1,25 +1,17 @@
 package example.controller;
 
-import example.entity.Client;
 import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
-import example.repositories.ClientRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ValiseControllerTest {
@@ -27,12 +19,8 @@ public class ValiseControllerTest {
     @InjectMocks
     private ValiseController valiseController;
 
-
     @Mock
     private IValiseService valiseService;
-
-    @Mock
-    private ClientRepository clientRepository;
 
     @BeforeEach
     public void setUp() {
@@ -40,195 +28,126 @@ public class ValiseControllerTest {
     }
 
     @Test
-    public void testGetAllValises_Success() {
-        List<Valise> valises = new ArrayList<>();
-        valises.add(new Valise());
+    public void testViewValises_Success() {
+        // Arrange
+        when(valiseService.getAllValises()).thenReturn(java.util.List.of(new Valise()));
 
-        when(valiseService.getAllValises()).thenReturn(valises);
+        Model model = new ConcurrentModel();
 
-        ResponseEntity<List<Valise>> responseEntity = valiseController.getAllValises();
-        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        // Act
+        String response = valiseController.viewValises(model);
 
-        List<Valise> response = responseEntity.getBody();
-
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(valises.size(), response.size());
+        // Assert
+        assertEquals("valises/valises_list", response, "Expected view name is 'valises/valises_list'");
+        assertTrue(model.containsAttribute("valises"), "Model should contain 'valises' attribute");
     }
 
     @Test
-    public void testGetAllValises_Failure() {
-        when(valiseService.getAllValises()).thenThrow(new RuntimeException("error database"));
-        assertThrows(RuntimeException.class, () -> valiseController.getAllValises());
-    }
-    @Test
-    public void testGetValiseById_Success() {
+    public void testViewValiseById_Success() {
+        // Arrange
         Valise valise = new Valise();
         when(valiseService.getValiseById(1)).thenReturn(valise);
-        ResponseEntity<Valise> response = valiseController.getValiseById(1);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = valiseController.viewValise(1, model);
+
+        // Assert
+        assertEquals("valises/valise_details", response, "Expected view name is 'valises/valise_details'");
+        assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
+        assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
     }
+
     @Test
-    public void testGetValiseById_Failure() {
+    public void testViewValiseById_NotFound() {
+        // Arrange
         when(valiseService.getValiseById(1)).thenReturn(null);
-        ResponseEntity<Valise> response = valiseController.getValiseById(1);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = valiseController.viewValise(1, model);
+
+        // Assert
+        assertEquals("valises/error", response, "Expected view name is 'valises/error'");
+        assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
     }
 
     @Test
-    public void testCreateValise_Success() {
-        Client client = new Client();
-        client.setId(1);
-        client.setName("Client Test");
-        client.setEmail("client@test.com");
+    public void testCreateValiseForm_Success() {
+        // Arrange
+        Model model = new ConcurrentModel();
 
+        // Act
+        String response = valiseController.createValiseForm(model);
+
+        // Assert
+        assertEquals("valises/valise_create", response, "Expected view name is 'valises/valise_create'");
+        assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
+    }
+
+    @Test
+    public void testEditValiseForm_Success() {
+        // Arrange
         Valise valise = new Valise();
-        valise.setDescription("Nouvelle Valise");
-        valise.setNumeroValise(67890L);
-        valise.setClient(client);
+        when(valiseService.getValiseById(1)).thenReturn(valise);
 
-        when(clientRepository.findById(anyInt())).thenReturn(Optional.of(client));
-        when(valiseService.createValise(any(Valise.class))).thenReturn(valise);
+        Model model = new ConcurrentModel();
 
-        ResponseEntity<Valise> response = valiseController.createValise(valise);
+        // Act
+        String response = valiseController.editValiseForm(1, model);
 
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assertions.assertEquals(valise, response.getBody());
+        // Assert
+        assertEquals("valises/valise_edit", response, "Expected view name is 'valises/valise_edit'");
+        assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
+        assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
     }
 
+    @Test
+    public void testEditValiseForm_NotFound() {
+        // Arrange
+        when(valiseService.getValiseById(1)).thenReturn(null);
+
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = valiseController.editValiseForm(1, model);
+
+        // Assert
+        assertEquals("valises/error", response, "Expected view name is 'valises/error'");
+    }
 
     @Test
-    public void testCreateValise_Failure() {
-        Valise valise = new Valise();
-        when(valiseService.createValise(valise)).thenThrow(new IllegalArgumentException("suitcase invalid"));
-        ResponseEntity<Valise> response = valiseController.createValise(valise);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-    @Test
-    public void testUpdateValise_Success() {
-        Valise updatedValise = new Valise();
-        when(valiseService.updateValise(1, updatedValise)).thenReturn(updatedValise);
-        ResponseEntity<Valise> response = valiseController.updateValise(updatedValise, 1);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(updatedValise, response.getBody());
-    }
-    @Test
-    public void testUpdateValise_Failure() {
-        Valise updatedValise = new Valise();
-        when(valiseService.updateValise(1, updatedValise)).thenReturn(null);
-        ResponseEntity<Valise> response = valiseController.updateValise(updatedValise, 1);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-    @Test
-    public void testDeleteValise_Success() {
+    public void testDeleteValise_Success_Thymeleaf() {
+        // Arrange
         doNothing().when(valiseService).deleteValise(1);
-        ResponseEntity<Void> response = valiseController.deleteValise(1);
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
-    @Test
-    public void testDeleteValise_Failure() {
-        doThrow(new RuntimeException("Internal error")).when(valiseService).deleteValise(1);
-        ResponseEntity<Void> response = valiseController.deleteValise(1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        verify(valiseService).deleteValise(1);
 
-    }
-    @Test
-    public void testCreateValise_InvalidInput() {
-        Valise invalidValise = new Valise();
-        when(valiseService.createValise(invalidValise)).thenThrow(new IllegalArgumentException("suitcase invalid"));
-        ResponseEntity<Valise> response = valiseController.createValise(invalidValise);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-    @Test
-    public void testUpdateValise_InvalidInput() {
-        Valise invalidValise = new Valise();
-        when(valiseService.updateValise(anyInt(), any(Valise.class)))
-                .thenThrow(new IllegalArgumentException("suitcase invalid"));
-        ResponseEntity<Valise> response = valiseController.updateValise(invalidValise, 1);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Model model = new ConcurrentModel(); // Create a mock model
+
+        // Act
+        String response = valiseController.deleteValise(1, model);
+
+        // Assert
+        assertEquals("redirect:/valises/valises_list", response, "Expected redirect to 'valises/valises_list'");
+        verify(valiseService, times(1)).deleteValise(1);
     }
 
     @Test
-    public void testDeleteValise_NotFound() {
-        doThrow(new ResourceNotFoundException("The suitcase does not exists")).when(valiseService).deleteValise(1);
+    public void testDeleteValise_NotFound_Thymeleaf() {
+        // Arrange
+        doThrow(new ResourceNotFoundException("Valise not found")).when(valiseService).deleteValise(1);
 
-        ResponseEntity<Void> response = valiseController.deleteValise(1);
+        Model model = new ConcurrentModel();
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        // Act
+        String response = valiseController.deleteValise(1, model);
+
+        // Assert
+        assertEquals("valises/error", response, "Expected view name is 'valises/error'");
+        assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
+        assertEquals("Valise with ID 1 not found!", model.getAttribute("errorMessage"));
+        verify(valiseService, times(1)).deleteValise(1);
     }
-
-    @Test
-    public void testCreateValise_NotFound() {
-        Valise valise = new Valise();
-        valise.setDescription("Valise introuvable");
-        valise.setNumeroValise(123456L);
-
-        Client client = new Client();
-        client.setId(1);
-        valise.setClient(client);
-
-        when(clientRepository.findById(1)).thenReturn(Optional.empty());
-
-        when(valiseService.createValise(any(Valise.class)))
-                .thenThrow(new ResourceNotFoundException("resource not found"));
-
-        ResponseEntity<Valise> response = valiseController.createValise(valise);
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-
-    @Test
-    public void testValiseController() {
-        assertNotNull(valiseController);
-        assertNotNull(valiseService);
-
-    }
-
-
-
-
-    @Test
-    public void testCreateValise_InternalServerError() {
-        Valise valise = new Valise();
-        valise.setDescription("Test Valise");
-        valise.setNumeroValise(123456L);
-
-        Client client = new Client();
-        client.setId(1);
-        client.setName("Client Test");
-        valise.setClient(client);
-
-        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
-
-        when(valiseService.createValise(any(Valise.class)))
-                .thenThrow(new RuntimeException("internal error"));
-
-        ResponseEntity<Valise> response = valiseController.createValise(valise);
-
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
-
-
-
-    @Test
-    public void testUpdateValise_Conflict() {
-        Valise valise = new Valise();
-        when(valiseService.updateValise(anyInt(), any(Valise.class)))
-                .thenThrow(new IllegalStateException("conflict detected"));
-        ResponseEntity<Valise> response = valiseController.updateValise(valise, 1);
-        Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-    }
-
-    @Test
-    public void testUpdateValise_InternalServerError() {
-        Valise valise = new Valise();
-        when(valiseService.updateValise(anyInt(), any(Valise.class)))
-                .thenThrow(new RuntimeException("internal error"));
-        ResponseEntity<Valise> response = valiseController.updateValise(valise, 1);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
-
-
 
 }
