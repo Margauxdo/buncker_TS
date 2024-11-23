@@ -48,7 +48,7 @@ public class Valise {
     @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Regle> regleSortie = new ArrayList<>();
 
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mouvement> mouvementList = new ArrayList<>();
+
 }

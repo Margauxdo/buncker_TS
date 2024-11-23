@@ -23,7 +23,7 @@ public class ProblemeController {
     @Autowired
     private ProblemeRepository problemeRepository;
 
-    // API REST: Récupérer tous les pb
+    /*// API REST: Récupérer tous les pb
     @GetMapping("/api")
     public List<Probleme> getAllProblemesApi() {
         List<Probleme> problemes = problemeService.getAllProblemes();
@@ -87,7 +87,7 @@ public class ProblemeController {
             // Si une RuntimeException est levée, on retourne INTERNAL_SERVER_ERROR
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les pb
     @GetMapping("/list")

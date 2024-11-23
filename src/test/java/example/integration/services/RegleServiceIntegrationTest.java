@@ -76,7 +76,7 @@ public class RegleServiceIntegrationTest {
                     .nombreJours(25)
                     .reglePourSortie("regle A1")
                     .typeEntree("entree test")
-                    .typeRegles(typeRegles) // Définition de la liste des TypeRegles
+                    .typeRegle(tRegle)
                     .formule(form)
                     .valise(val1)
                     .build();
@@ -93,8 +93,8 @@ public class RegleServiceIntegrationTest {
 
         // Assert
         assertNotNull(savedR);
-        assertFalse(savedR.getTypeRegles().isEmpty(), "La liste des TypeRegles ne doit pas être vide");
-        assertEquals("Type AB", savedR.getTypeRegles().get(0).getNomTypeRegle(), "Le nom du TypeRegle doit correspondre");
+        assertFalse(savedR.getTypeRegle().getNomTypeRegle().isEmpty(), "La liste des TypeRegles ne doit pas être vide");
+        assertEquals("Type AB", savedR.getTypeRegle().getRegle(), "Le nom du TypeRegle doit correspondre");
         assertNotNull(savedR.getFormule(), "La Formule ne doit pas être null");
         assertNotNull(savedR.getValise(), "La Valise ne doit pas être null");
         assertEquals("regle A1", savedR.getReglePourSortie(), "Le contenu de la règle doit correspondre");

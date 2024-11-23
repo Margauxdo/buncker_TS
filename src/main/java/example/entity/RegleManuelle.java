@@ -6,10 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,19 +13,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@DiscriminatorValue("MANUELLE")
+@Table(name = "regle_manuelle")
 public class RegleManuelle extends Regle {
 
-
+    @Column(name = "description_regle")
     private String descriptionRegle;
 
-    @NotNull(message = "Rule creator is required")
-    @NotEmpty(message = "Creator cannot be empty")
+    @Column(name = "createur_regle", nullable = false)
     private String createurRegle;
-
-    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Regle> regles;
-
-
-
 }
+

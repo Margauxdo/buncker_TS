@@ -44,7 +44,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         regleManuelle.setCreateurRegle("jean Paul Martin");
         regleManuelle.setCoderegle("12345");
         regleManuelle.setValise(val);
-        regleManuelle.setTypeRegles((List<TypeRegle>) tp);
+        regleManuelle.setTypeRegle(tp);
 
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);
         assertNotNull(savedRM.getId());
@@ -63,7 +63,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         regleManuelle.setCreateurRegle("jean Paul Martin");
         regleManuelle.setCoderegle("12345");
         regleManuelle.setValise(val);
-        regleManuelle.setTypeRegles((List<TypeRegle>) tp);
+        regleManuelle.setTypeRegle(tp);
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);
         Optional<RegleManuelle> foundRM = regleManuelleRepository.findById(savedRM.getId());
         assertTrue(foundRM.isPresent());
@@ -82,7 +82,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         regleManuelle.setCreateurRegle("jean Paul Martin");
         regleManuelle.setCoderegle("12345");
         regleManuelle.setValise(val);
-        regleManuelle.setTypeRegles((List<TypeRegle>) tp);
+        regleManuelle.setTypeRegle(tp);
         regleManuelleRepository.deleteById(regleManuelle.getId());
         Optional<RegleManuelle> deletedRM = regleManuelleRepository.findById(regleManuelle.getId());
         assertFalse(deletedRM.isPresent());
@@ -162,7 +162,7 @@ public class RegleManuelleRepositoryIntegrationTest {
         regleManuelle.setCreateurRegle("Jean Paul Martin");
         regleManuelle.setCoderegle("12345");
         regleManuelle.setValise(val);
-        regleManuelle.setTypeRegles((List<TypeRegle>) tp);
+        regleManuelle.setTypeRegle(tp);
 
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);
 
@@ -206,13 +206,13 @@ public class RegleManuelleRepositoryIntegrationTest {
         regleManuelle.setCreateurRegle("Jean Paul Martin");
         regleManuelle.setCoderegle("12345");
         regleManuelle.setDescriptionRegle("Description de test");
-        regleManuelle.setTypeRegles((List<TypeRegle>) tp);
+        regleManuelle.setTypeRegle(tp);
 
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);
 
         Optional<RegleManuelle> foundRM = regleManuelleRepository.findById(savedRM.getId());
         assertTrue(foundRM.isPresent());
-        assertEquals("Type Regle Test", foundRM.get().getTypeRegles().get(0).getNomTypeRegle());
+        assertEquals("Type Regle Test", foundRM.get().getTypeRegle().getRegle());
     }
 
 

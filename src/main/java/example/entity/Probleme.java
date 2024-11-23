@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pb")
+@Table(name = "probleme")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,19 +18,20 @@ public class Probleme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pb_id")
+    @Column(name = "probleme_id")
     private int id;
 
-    @NotBlank(message = "required problem description")
-   @Column(name = "pb_id", unique = true, nullable = false)
+    @NotBlank(message = "description is required")
+   @Column(name = "probleme_description",  nullable = false)
     private String descriptionProbleme;
 
 
-    @NotBlank(message = "required problem details")
+    @NotBlank(message = "details is required")
+    @Column(name = "probleme_detail", nullable = false)
     private String detailsProbleme;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "valise_id")
+    @ManyToOne
+    @JoinColumn(name = "numero_de_valise", nullable = false)
     private Valise valise;
 
 

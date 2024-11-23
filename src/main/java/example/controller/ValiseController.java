@@ -31,7 +31,7 @@ public class ValiseController {
     @Autowired
     private TypeValiseRepository typeValiseRepository;
 
-    // API REST: Récupérer tous les valises
+   /* // API REST: Récupérer tous les valises
     @GetMapping("/api")
     public ResponseEntity<List<Valise>> getAllValisesApi() {
         List<Valise> valises = valiseService.getAllValises();
@@ -99,7 +99,7 @@ public class ValiseController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les valises
     @GetMapping("/list")

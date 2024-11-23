@@ -24,10 +24,10 @@ public class JourFerie {
     @OneToMany(mappedBy = "jourFerie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Regle> regles;
 
-    @ElementCollection
+    /*@ElementCollection
     @CollectionTable(name = "jourFerie_id", joinColumns = @JoinColumn(name = "jour_ferie_id"))
     @Column(name = "jourFerie_list")
-    private List<Date> joursFerieList;
+    private List<Date> joursFerieList;*/
 
 
 }

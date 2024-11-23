@@ -15,76 +15,65 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.JOINED) // Héritage JOINED
 @Table(name = "regle")
 public class Regle {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "regle_id")
+    @Column(name = "cle_regle")
     private int id;
 
+    @Column(name = "regle_pour_sortie")
     private String reglePourSortie;
 
-    @Column(name = "regle_code", unique = true, nullable = false)
+    @Column(name = "code_regle", unique = true, nullable = false)
     private String coderegle;
 
+    @Column(name = "date_regle")
     private Date dateRegle;
 
+    @Column(name = "nombre_jours")
     private int nombreJours;
 
+    @Column(name = "calcul_calendaire")
     private Long calculCalendaire;
 
     private Boolean fermeJS1;
-
     private Boolean fermeJS2;
-
     private Boolean fermeJS3;
-
     private Boolean fermeJS4;
-
     private Boolean fermeJS5;
-
     private Boolean fermeJS6;
-
     private Boolean fermeJS7;
 
+    @Column(name = "type_entree")
     private String typeEntree;
 
+    @Column(name = "nb_jsm_entree")
     private Long nbjsmEntree;
 
     // Relation ManyToOne avec Valise
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "valise_id")
+    @JoinColumn(name = "cle_valise")
     private Valise valise;
 
     // Relation OneToMany avec SortieSemaine
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "regle")
+    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SortieSemaine> sortieSemaine = new ArrayList<>();
 
-    // Relation OneToMany avec TypeRegle
-    @OneToMany
-    @JoinColumn(name = "typeRegle_id")
-    private List<TypeRegle> typeRegles = new ArrayList<>();
-
-    // Relation ManyToOne avec RegleManuelle
+    // Relation ManyToOne avec TypeRegle
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "regleManuelle_id")
-    private RegleManuelle regleManuelle;
+    @JoinColumn(name = "cle_type_regle")
+    private TypeRegle typeRegle;
 
     // Relation ManyToOne avec Formule
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "formule_id", nullable = true)
+    @JoinColumn(name = "cle_formule", nullable = true)
     private Formule formule;
 
     // Relation ManyToOne avec JourFerie
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "jourFerie_id")
+    @JoinColumn(name = "cle_jour_ferie")
     private JourFerie jourFerie;
-
-    // Constructeur personnalisé
-    public Regle(String r001, Date date) {
-        this.coderegle = r001;
-        this.dateRegle = date;
-    }
 }

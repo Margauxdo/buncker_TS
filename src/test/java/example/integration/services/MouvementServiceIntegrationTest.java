@@ -77,7 +77,7 @@ public class MouvementServiceIntegrationTest {
                     .dateRetourPrevue(dateRP1)
                     .dateSortiePrevue(dateSP1)
                     .livreurs((List<Livreur>) livreurA)
-                    .valises((List<Valise>) val1)
+                    .valise(val1)
                     .build();
 
             mouvement = mouvementService.createMouvement(mouvement);
@@ -96,13 +96,13 @@ public class MouvementServiceIntegrationTest {
         // Assert
         assertNotNull(savedMvmt);
         assertNotNull(savedMvmt.getLivreurs());
-        assertNotNull(savedMvmt.getValises());
+        assertNotNull(savedMvmt.getValise());
         assertNotNull(savedMvmt.getDateHeureMouvement());
         assertNotNull(savedMvmt.getDateRetourPrevue());
         assertNotNull(savedMvmt.getDateSortiePrevue());
         assertEquals("en cours", savedMvmt.getStatutSortie());
         assertEquals("12569", savedMvmt.getLivreurs().get(0).getCodeLivreur());
-        assertEquals("Dutoit", savedMvmt.getValises().get(0).getClient().getName());
+        assertEquals("Dutoit", savedMvmt.getValise().getClient().getName());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class MouvementServiceIntegrationTest {
                     .dateRetourPrevue(dateRP1)
                     .dateSortiePrevue(dateSP1)
                     .livreurs((List<Livreur>) livreurB)
-                    .valises((List<Valise>) val2)
+                    .valise(val2)
                     .build();
 
         } catch (Exception e) {

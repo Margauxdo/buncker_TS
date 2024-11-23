@@ -45,7 +45,7 @@ public class RegleRepositoryIntegrationTest {
         Regle regle = new Regle();
         regle.setCoderegle("AW5698");
         regle.setFormule(form);
-        regle.getTypeRegles().add(tp);
+        regle.getTypeRegle();
         regle.setValise(val);
         Regle savedregle = regleRepository.save(regle);
         assertNotNull(savedregle.getId());
@@ -130,7 +130,7 @@ public class RegleRepositoryIntegrationTest {
 
         Regle regle = new Regle();
         regle.setCoderegle("AW5698");
-        regle.getTypeRegles().add(typeRegle);
+        regle.getTypeRegle().getRegle();
 
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
@@ -139,8 +139,8 @@ public class RegleRepositoryIntegrationTest {
 
         // Assert
         assertTrue(foundRegle.isPresent());
-        assertFalse(foundRegle.get().getTypeRegles().isEmpty(), "TypeRegles list should not be empty");
-        assertEquals("Type ABC", foundRegle.get().getTypeRegles().get(0).getNomTypeRegle());
+        assertFalse((foundRegle.get().getTypeRegle().getNomTypeRegle().isEmpty()), "");
+        assertEquals("Type ABC", foundRegle.get().getTypeRegle().getRegle());
     }
 
     @Test

@@ -19,7 +19,7 @@ public class TypeRegleController {
     @Autowired
     private ITypeRegleService typeRegleService;
 
-    // API REST: Récupérer tous les TR
+    /*// API REST: Récupérer tous les TR
     @GetMapping("/api")
     public ResponseEntity<List<TypeRegle>> getTypeReglesApi() {
         List<TypeRegle> typeRegleList = typeRegleService.getTypeRegles();
@@ -72,7 +72,7 @@ public class TypeRegleController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les TR
     @GetMapping("/list")

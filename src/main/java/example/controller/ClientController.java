@@ -20,7 +20,7 @@ public class ClientController {
     @Autowired
     private IClientService clientService;
 
-    // API REST: Récupérer tous les clients
+     /*// API REST: Récupérer tous les clients
     @GetMapping("/api")
     public ResponseEntity<List<Client>> getAllClientsApi() {
         List<Client> clients = clientService.getAllClients();
@@ -58,8 +58,7 @@ public class ClientController {
     public String deleteClientApi(@PathVariable int id) {
         clientService.deleteClient(id); // Ici, existsById n'est pas utilisé
         return "redirect:/clients/clients_list";
-    }
-
+    }*/
 
     // Vue Thymeleaf pour lister les clients
     @GetMapping("/list")

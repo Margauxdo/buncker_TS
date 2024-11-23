@@ -85,7 +85,7 @@ public class JourFerieControllerTest {
     @Test
     public void testCreateJourFerie_Success() {
         JourFerie jourFerie = new JourFerie();
-        when(jourFerieService.saveJourFerie(jourFerie)).thenReturn(jourFerie);
+        /*when(jourFerieService.saveJourFerie(jourFerie)).thenReturn(jourFerie);*/
 
         Model model = new ConcurrentModel();
         String response = jourFerieController.createJourFerieThymeleaf(jourFerie);

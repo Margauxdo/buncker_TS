@@ -29,7 +29,7 @@ public class RegleManuelleController {
         return regleManuelleService.getRegleManuelles();
     }
 
-    // API REST: Récupérer une RM par ID
+    /*// API REST: Récupérer une RM par ID
     @GetMapping("/api/{id}")
     public ResponseEntity<RegleManuelle> getRegleManuelleByIdApi(@PathVariable int id) {
         RegleManuelle regleManuelle = regleManuelleService.getRegleManuelle(id);
@@ -90,7 +90,7 @@ public class RegleManuelleController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les RM
     @GetMapping("/list")

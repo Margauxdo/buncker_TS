@@ -34,7 +34,7 @@ public class LivreurController {
         }
     }
 
-    // API REST: Récupérer tous les livreurs
+   /* // API REST: Récupérer tous les livreurs
     @GetMapping("/api")
     public ResponseEntity<List<Livreur>> getAllLivreursApi() {
         List<Livreur> livreurs = livreurService.getAllLivreurs();
@@ -87,7 +87,7 @@ public class LivreurController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les livreurs
     @GetMapping("/list")

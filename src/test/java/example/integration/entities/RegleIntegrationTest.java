@@ -169,10 +169,10 @@ public class RegleIntegrationTest {
 
         Regle regle = new Regle();
         regle.setCoderegle("R008");
-        regle.setTypeRegles((List<TypeRegle>) typeRegle);
+        regle.setTypeRegle(typeRegle);
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
-        assertEquals("Type A", savedRegle.getTypeRegles().get(0).getNomTypeRegle());
+        assertEquals("Type A", savedRegle.getTypeRegle().getRegle());
     }
 
     @Test

@@ -84,7 +84,7 @@ public class RegleTest {
         regle.setNbjsmEntree(25L);
         regle.setNombreJours(250);
         regle.setTypeEntree("typeEntree");
-        regle.setTypeRegles(List.of(typeRegle));
+        regle.setTypeRegle(typeRegle);
         regle.setValise(valise);
 
         // Créer une SortieSemaine et l'associer
@@ -185,9 +185,9 @@ public class RegleTest {
 
     @Test
     public void testRegleTypeRegleAssociation() {
-        Assertions.assertNotNull(regle.getTypeRegles());
+        Assertions.assertNotNull(regle.getTypeRegle());
         TypeRegle expectedTypeRegle = typeRegleRepository.findAll().get(0);
-        Assertions.assertEquals(expectedTypeRegle.getId(), regle.getTypeRegles().get(0).getId());
+        Assertions.assertEquals(expectedTypeRegle.getId(), regle.getTypeRegle().getRegle());
     }
 
     @Test

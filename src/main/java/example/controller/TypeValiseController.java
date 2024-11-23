@@ -25,7 +25,7 @@ public class TypeValiseController {
     @Autowired
     private IValiseService valiseService;
 
-    // API REST: Récupérer tous les TV
+    /*// API REST: Récupérer tous les TV
     @GetMapping("/api")
     public List<TypeValise> getTypeValisesApi() {
         List<TypeValise> typeValises = typeValiseService.getTypeValises();
@@ -94,7 +94,7 @@ public class TypeValiseController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les TV
     @GetMapping("/list")

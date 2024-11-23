@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,66 +21,35 @@ public class JourFerieController {
     @Autowired
     private IJourFerieService jourFerieService;
 
-    @Autowired
-    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+    private static final Logger logger = LoggerFactory.getLogger(JourFerieController.class);
 
-    @ControllerAdvice
-    public class GlobalExceptionHandler {
-
-        @ExceptionHandler(IllegalArgumentException.class)
-        public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
-        @ExceptionHandler(IllegalArgumentException.class)
-        public ResponseEntity<String> handleInvalidArgument(IllegalArgumentException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // API REST: Créer un JF (Renamed method)
+    // API REST: Créer un jour férié
     @PostMapping("/api")
-    public ResponseEntity<JourFerie> createJourFerieApi(@RequestBody JourFerie jourFerie) {  // Renamed method
+    public ResponseEntity<JourFerie> createJourFerieApi(@RequestBody JourFerie jourFerie) {
         logger.info("Requête reçue pour créer un JOUR FERIE : {}", jourFerie);
-
-        JourFerie createdJourFerie = jourFerieService.saveJourFerie(jourFerie);
-        return new ResponseEntity<>(createdJourFerie, HttpStatus.CREATED);
+        //JourFerie createdJourFerie = jourFerieService.saveJourFerie(jourFerie);
+        //return new ResponseEntity<>(createdJourFerie, HttpStatus.CREATED);
+        //TODO temporaire a changer
+        return  new ResponseEntity<>(jourFerie, HttpStatus.CREATED);
     }
 
-    // API REST: Récupérer tous les JF
+
+
+    // API REST: Récupérer tous les jours fériés
     @GetMapping("/api")
     public ResponseEntity<List<JourFerie>> getJourFeriesApi() {
         List<JourFerie> jourFeries = jourFerieService.getJourFeries();
         return new ResponseEntity<>(jourFeries, HttpStatus.OK);
     }
 
-    // API REST: Récupérer un JF par ID
-    @GetMapping("/api/{id}")
-    public ResponseEntity<JourFerie> getJourFerieApi(@PathVariable int id) {
-        if (id < 0) {
-            throw new IllegalArgumentException("Invalid ID: " + id);
-        }
-        try {
-            if (id == 99999) {
-                throw new RuntimeException("Simulated server error for testing");
-            }
-
-            JourFerie jourFerie = jourFerieService.getJourFerie(id);
-            return jourFerie != null ? new ResponseEntity<>(jourFerie, HttpStatus.OK) :
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // Vue Thymeleaf pour lister JF
+    // Vue Thymeleaf pour lister les jours fériés
     @GetMapping("/list")
     public String viewJF(Model model) {
         model.addAttribute("jourFerie", jourFerieService.getJourFeries());
         return "jourFeries/JF_list";
     }
 
-    // Vue Thymeleaf pour voir un JF par ID
+    // Vue Thymeleaf pour voir un jour férié par ID
     @GetMapping("/view/{id}")
     public String viewJFById(@PathVariable int id, Model model) {
         JourFerie jourFerie = jourFerieService.getJourFerie(id);
@@ -91,19 +61,18 @@ public class JourFerieController {
         return "jourFeries/JF_details";
     }
 
-
-
-    // Formulaire Thymeleaf pour créer un JF
+    // Formulaire Thymeleaf pour créer un jour férié
     @GetMapping("/create")
     public String createJourFerieForm(Model model) {
         model.addAttribute("jourFerie", new JourFerie());
         return "jourFeries/JF_create";
     }
 
-    // Création d'un JF via formulaire Thymeleaf (Renamed method)
+    // Création d'un jour férié via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createJourFerieThymeleaf(@Valid @ModelAttribute("jourFerie") JourFerie jourFerie) {  // Renamed method
-        jourFerieService.saveJourFerie(jourFerie);
-        return "redirect:/jourferies/JF_list";
+    public String createJourFerieThymeleaf(@Valid @ModelAttribute("jourFerie") JourFerie jourFerie) {
+        /*jourFerieService.saveJourFerie(jourFerie);*/
+        //TODO a corriger la methode
+        return "redirect:/jourferies/list";
     }
 }

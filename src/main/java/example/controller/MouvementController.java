@@ -26,7 +26,7 @@ public class MouvementController {
     @Autowired
     private static final Logger logger = LoggerFactory.getLogger(MouvementController.class);
 
-    // API REST: Récupérer tous les mouvements
+    /*// API REST: Récupérer tous les mouvements
     @GetMapping("/api")
     public List<Mouvement> getAllMouvementsApi() {
         List<Mouvement> mouvements = mouvementService.getAllMouvements();
@@ -86,7 +86,7 @@ public class MouvementController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les mouvements
     @GetMapping("/list")

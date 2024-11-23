@@ -21,7 +21,7 @@ public class RetourSecuriteController {
     @Autowired
     private IRetourSecuriteService retourSecuriteService;
 
-    // API REST: Récupérer tous les RS
+    /*// API REST: Récupérer tous les RS
     @GetMapping("/api")
     public ResponseEntity<List<RetourSecurite>> getAllRetourSecuritesApi() {
         List<RetourSecurite> retourSecurites = retourSecuriteService.getAllRetourSecurites();
@@ -74,7 +74,7 @@ public class RetourSecuriteController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
+    }*/
     // Vue Thymeleaf pour lister les RS
     @GetMapping("/list")
     public String viewAllRetourSecurites(Model model) {

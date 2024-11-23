@@ -26,7 +26,7 @@ public class RegleController {
     @Autowired
     private FormuleRepository formuleRepository;
 
-    // API REST: Récupérer tous les regles
+    /*// API REST: Récupérer tous les regles
     @GetMapping("/api")
     public ResponseEntity<List<Regle>> readReglesApi() {
         List<Regle> regleList = regleService.readAllRegles();
@@ -97,7 +97,7 @@ public class RegleController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les regles
     @GetMapping("/list")

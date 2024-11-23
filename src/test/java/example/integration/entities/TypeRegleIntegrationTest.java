@@ -120,11 +120,11 @@ public class TypeRegleIntegrationTest {
         // Création des Regles associées
         Regle regle1 = new Regle();
         regle1.setCoderegle("R001");
-        regle1.setTypeRegles(new ArrayList<>());
+        regle1.setTypeRegle(typeRegle);
 
         Regle regle2 = new Regle();
         regle2.setCoderegle("R002");
-        regle2.setTypeRegles(new ArrayList<>());
+        regle2.setTypeRegle(typeRegle);
 
         typeRegle.getNomTypeRegle().isEmpty();
         typeRegle.getRegle();
@@ -151,7 +151,7 @@ public class TypeRegleIntegrationTest {
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("Type C");
         typeRegle.getRegle();
-        regle.setTypeRegles(new ArrayList<>());
+        regle.setTypeRegle(typeRegle);
 
         // Sauvegarde
         TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);

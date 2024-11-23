@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JourFerieRepository extends JpaRepository<JourFerie, Integer> {
-    int deleteByRegleId(Integer regleId);
 
 
 }

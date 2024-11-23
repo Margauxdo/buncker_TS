@@ -27,9 +27,10 @@ public class Mouvement {
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
 
-    @OneToMany
-    @JoinColumn(name = "valise_list")
-    private List<Valise> valises;
+    @ManyToOne
+    @JoinColumn(name = "valise_id", nullable = false)
+    private Valise valise;
+
 
     @OneToMany(mappedBy = "mouvement", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference

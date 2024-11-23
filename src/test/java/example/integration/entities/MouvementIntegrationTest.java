@@ -68,7 +68,7 @@ public class MouvementIntegrationTest {
         mouvement.setStatutSortie("En cours");
         mouvement.setDateSortiePrevue(new Date());
         mouvement.setDateRetourPrevue(new Date());
-        mouvement.setValises((List<Valise>) valise);
+        mouvement.setValise(valise);
         mouvement.setLivreurs((List<Livreur>) livreur);
 
         Mouvement savedMouvement = mouvementRepository.save(mouvement);
@@ -134,7 +134,7 @@ public class MouvementIntegrationTest {
         Mouvement mouvement = new Mouvement();
         mouvement.setDateHeureMouvement(new Date());
         mouvement.setStatutSortie("En cours");
-        mouvement.setValises((List<Valise>) valise);
+        mouvement.setValise(valise);
         mouvement.setLivreurs((List<Livreur>) livreur);
 
         mouvementRepository.save(mouvement);

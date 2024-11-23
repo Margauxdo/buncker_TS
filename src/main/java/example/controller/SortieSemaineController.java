@@ -18,7 +18,7 @@ public class SortieSemaineController {
     @Autowired
     private ISortieSemaineService sortieSemaineService;
 
-    // API REST: Récupérer tous les SS
+    /*// API REST: Récupérer tous les SS
     @GetMapping("/api")
     public ResponseEntity<List<SortieSemaine>> getAllSortieSemaineApi() {
         try {
@@ -75,7 +75,7 @@ public class SortieSemaineController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
     // Vue Thymeleaf pour lister les clients
     @GetMapping("/list")
     public String viewSortieSemaine(Model model) {

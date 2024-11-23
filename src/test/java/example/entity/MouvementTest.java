@@ -43,29 +43,25 @@ public class MouvementTest {
     public void setUp() throws ParseException {
         sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // Création d'un Client et persistance
         Client client = new Client();
         client.setName("Test Client");
         client.setEmail("test@example.com");
         clientRepository.save(client);
 
-        // Création d'une Valise et persistance
         valise = new Valise();
         valise.setClient(client);
         valiseRepository.save(valise);
 
-        // Création d'un Livreur et persistance
         livreur = new Livreur();
         livreur.setNomLivreur("Test Livreur");
         livreurRepository.save(livreur);
 
-        // Création d'un Mouvement et association avec Valise et Livreur
         mouvement = Mouvement.builder()
                 .dateHeureMouvement(sdf.parse("2024-10-25"))
                 .dateRetourPrevue(sdf.parse("2025-01-05"))
                 .dateSortiePrevue(sdf.parse("2025-01-01"))
                 .statutSortie("close")
-                .valises(Collections.singletonList(valise)) // Association avec la Valise
+                .valise(valise)
                 .livreurs(Collections.singletonList(livreur)) // Association avec le Livreur
                 .build();
 
@@ -81,14 +77,12 @@ public class MouvementTest {
 
     @Test
     public void testMouvementValiseAssociation() {
-        // Vérification que le mouvement est bien associé à la Valise
-        Assertions.assertNotNull(mouvement.getValises(), "Movement should be associated with a Valise");
-        Assertions.assertEquals(valise.getId(), mouvement.getValises().get(0).getId(), "Valise ID should match");
+        Assertions.assertNotNull(mouvement.getValise(), "Movement should be associated with a Valise");
+        Assertions.assertEquals(valise.getId(), mouvement.getValise().getId(), "Valise ID should match");
     }
 
     @Test
     public void testMouvementLivreurAssociation() {
-        // Vérification que le mouvement est bien associé à un Livreur
         Assertions.assertNotNull(mouvement.getLivreurs(), "Movement should be associated with a Livreur");
         Assertions.assertEquals(livreur.getId(), mouvement.getLivreurs().get(0).getId(), "Livreur ID should match");
     }

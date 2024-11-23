@@ -63,7 +63,7 @@ public class MouvementRepositoryIntegrationTest {
 
         Mouvement mouvement = new Mouvement();
         mouvement.setLivreurs(Collections.singletonList(livreur));
-        mouvement.setValises(Collections.singletonList(valise));
+        mouvement.setValise(valise);
         mouvement.setStatutSortie("En cours");
         mouvement.setDateHeureMouvement(new Date());
 
@@ -71,9 +71,9 @@ public class MouvementRepositoryIntegrationTest {
 
         assertNotNull(savedMouvement.getId());
         assertEquals(1, savedMouvement.getLivreurs().size());
-        assertEquals(1, savedMouvement.getValises().size());
+        assertEquals(1, savedMouvement.getValise().getTypeValise());
         assertEquals("Jean", savedMouvement.getLivreurs().get(0).getNomLivreur());
-        assertEquals(123L, savedMouvement.getValises().get(0).getNumeroValise());
+        assertEquals(123L, savedMouvement.getValise().getNumeroValise());
     }
 
     @Test
@@ -139,7 +139,7 @@ public class MouvementRepositoryIntegrationTest {
 
         Mouvement mouvement = new Mouvement();
         mouvement.setLivreurs(Collections.singletonList(livreur));
-        mouvement.setValises(Collections.singletonList(valise));
+        mouvement.setValise(valise);
         mouvement.setStatutSortie("A supprimer");
         mouvement.setDateHeureMouvement(new Date());
         mouvement = mouvementRepository.save(mouvement);
