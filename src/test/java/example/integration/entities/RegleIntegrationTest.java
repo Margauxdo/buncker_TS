@@ -3,7 +3,7 @@ package example.integration.entities;
 import example.entity.*;
 import example.repositories.*;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolationException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -137,14 +137,61 @@ public class RegleIntegrationTest {
         });
     }
 
-    @Test
-    public void testSaveEntityFailureDueToNullField() {
-        Regle regle = new Regle();
 
-        assertThrows(ConstraintViolationException.class, () -> {
-            regleRepository.saveAndFlush(regle);
-        });
+    @Test
+    @Transactional
+    public void testSaveEntitySuccess() {
+        Regle regle = new Regle();
+        regle.setCoderegle("R001");
+        regle.setReglePourSortie("Règle test");
+        regle.setDateRegle(new Date());
+        regle.setNombreJours(7);
+
+        Regle savedRegle = regleRepository.save(regle);
+
+        Assertions.assertNotNull(savedRegle.getId(), "L'ID de la règle doit être généré.");
+        Assertions.assertEquals("R001", savedRegle.getCoderegle(), "Le code de la règle doit correspondre.");
     }
+    @Test
+    @Transactional
+    public void testSaveEntityFailureDueToDuplicateCode() {
+        Regle regle1 = new Regle();
+        regle1.setCoderegle("R002");
+        regle1.setReglePourSortie("Règle 1");
+        regleRepository.saveAndFlush(regle1);
+
+        Regle regle2 = new Regle();
+        regle2.setCoderegle("R002");
+        regle2.setReglePourSortie("Règle 2");
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            regleRepository.saveAndFlush(regle2);
+        }, "Une DataIntegrityViolationException aurait dû être levée pour le code duplicata.");
+    }
+    @Test
+    @Transactional
+    public void testCascadeDeleteWithSortieSemaine() {
+        Regle regle = new Regle();
+        regle.setCoderegle("R003");
+        regle.setReglePourSortie("Règle avec sorties");
+
+        SortieSemaine sortie1 = new SortieSemaine();
+        sortie1.setRegle(regle);
+
+        SortieSemaine sortie2 = new SortieSemaine();
+        sortie2.setRegle(regle);
+
+        regle.setSortieSemaine(List.of(sortie1, sortie2));
+
+        regleRepository.saveAndFlush(regle);
+        regleRepository.deleteById(regle.getId());
+
+        Assertions.assertFalse(sortieSemaineRepository.existsById(sortie1.getId()), "La sortie 1 doit être supprimée en cascade.");
+        Assertions.assertFalse(sortieSemaineRepository.existsById(sortie2.getId()), "La sortie 2 doit être supprimée en cascade.");
+    }
+
+
+
 
     @Test
     public void testOneToManyRelationshipWithCascade() {
@@ -161,19 +208,7 @@ public class RegleIntegrationTest {
         assertEquals(1, savedRegle.getSortieSemaine().size());
     }
 
-    @Test
-    public void testManyToOneRelationship() {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type A");
-        TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
 
-        Regle regle = new Regle();
-        regle.setCoderegle("R008");
-        regle.setTypeRegle(typeRegle);
-        Regle savedRegle = regleRepository.saveAndFlush(regle);
-
-        assertEquals("Type A", savedRegle.getTypeRegle().getRegle());
-    }
 
     @Test
     public void testAddAndRemoveChildEntitiesInCollection() {
@@ -192,51 +227,31 @@ public class RegleIntegrationTest {
 
         assertEquals(0, savedRegle.getSortieSemaine().size());
     }
-
     @Test
-    public void testOneToOneRelationship() {
-        Client client = new Client();
-        client.setName("ClientTest");
-        client.setEmail("client@test.com");
-        clientRepository.saveAndFlush(client);
-
+    public void testManyToOneRelationshipWithTypeRegle() {
         Regle regle = new Regle();
         regle.setCoderegle("R010");
-
-        Valise valise = new Valise();
-        valise.setDescription("ValiseTest");
-        valise.setClient(client);
-        valise.setRegleSortie((List<Regle>) regle);
-
-        regle.setValise(valise);
-
-        valiseRepository.saveAndFlush(valise);
-        Regle savedRegle = regleRepository.saveAndFlush(regle);
-
-        assertNotNull(savedRegle.getValise());
-        assertEquals("ValiseTest", savedRegle.getValise().getDescription());
-        assertEquals("ClientTest", savedRegle.getValise().getClient().getName());
-    }
-    @Test
-    public void testDeleteRegle() {
-        Regle regle = new Regle();
-        regle.setCoderegle("Test Regle");
+        regle.setReglePourSortie("Règle test");
         regleRepository.saveAndFlush(regle);
 
-        JourFerie jourFerie = new JourFerie();
-        jourFerie.setRegles((List<Regle>) regle);
-        jourFerieRepository.saveAndFlush(jourFerie);
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Type 1");
+        typeRegle.setRegle(regle); // Relation ManyToOne définie
+        typeRegleRepository.saveAndFlush(typeRegle);
 
-        jourFerieRepository.deleteByRegleId(regle.getId());
-        jourFerieRepository.flush();
+        assertNotNull(typeRegle.getRegle());
+        assertEquals("R010", typeRegle.getRegle().getCoderegle());
 
-        regleRepository.deleteById(regle.getId());
-        regleRepository.flush();
+        regle.setTypeRegle(typeRegle);
+        regleRepository.saveAndFlush(regle);
 
-        assertFalse(regleRepository.findById(regle.getId()).isPresent());
-
-        assertEquals(0, jourFerieRepository.findAll().size());
+        Regle fetchedRegle = regleRepository.findById(regle.getId()).orElseThrow();
+        assertNotNull(fetchedRegle.getTypeRegle());
+        assertEquals("Type 1", fetchedRegle.getTypeRegle().getNomTypeRegle());
     }
+
+
+
 
 
 

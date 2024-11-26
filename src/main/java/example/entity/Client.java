@@ -46,14 +46,14 @@ public class Client {
     private String envoiparDefaut;
     private String memoRetourSecurite1;
     private String memoRetourSecurite2;
-    private String typeSuivie; //TODO:? verifier//
+    private String typeSuivie;
 
     public Client(
             int i, String s, String s1, String mail, String number, String s2, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8, Object o9, Object o10, Object o11) {
     }
 
 
-    private String codeClient;//TODO:? verifier//
+    private String codeClient;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Valise> valises = new ArrayList<>();
@@ -64,7 +64,7 @@ public class Client {
     @Column(name = "pb_list")
     private List<Probleme> problemes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "retourSecurite_id")
     private RetourSecurite retourSecurite;
 

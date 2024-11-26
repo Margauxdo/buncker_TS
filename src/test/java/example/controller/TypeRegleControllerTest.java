@@ -11,6 +11,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -27,12 +29,11 @@ public class TypeRegleControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // Test pour afficher la liste des TypeRegles via Thymeleaf
+    // **Test: Lister tous les TypeRegles (Thymeleaf)**
     @Test
     public void testViewAllTypeRegles_Success() {
         // Arrange
-        when(typeRegleService.getTypeRegles()).thenReturn(java.util.List.of(new TypeRegle()));
-
+        when(typeRegleService.getTypeRegles()).thenReturn(List.of(new TypeRegle()));
         Model model = new ConcurrentModel();
 
         // Act
@@ -41,15 +42,15 @@ public class TypeRegleControllerTest {
         // Assert
         assertEquals("typeRegles/TR_list", response, "Expected view name is 'typeRegles/TR_list'");
         assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
+        assertNotNull(model.getAttribute("typeRegle"), "Expected non-null 'typeRegle' in model");
     }
 
-    // Test pour voir un TypeRegle par ID via Thymeleaf (Succès)
+    // **Test: Voir un TypeRegle par ID (Succès)**
     @Test
     public void testViewTypeRegleById_Success() {
         // Arrange
         TypeRegle typeRegle = new TypeRegle();
         when(typeRegleService.getTypeRegle(1)).thenReturn(typeRegle);
-
         Model model = new ConcurrentModel();
 
         // Act
@@ -61,12 +62,11 @@ public class TypeRegleControllerTest {
         assertEquals(typeRegle, model.getAttribute("typeRegle"), "Expected 'typeRegle' in model");
     }
 
-    // Test pour voir un TypeRegle par ID via Thymeleaf (Erreur)
+    // **Test: Voir un TypeRegle par ID (Non trouvé)**
     @Test
     public void testViewTypeRegleById_NotFound() {
         // Arrange
         when(typeRegleService.getTypeRegle(1)).thenReturn(null);
-
         Model model = new ConcurrentModel();
 
         // Act
@@ -75,9 +75,10 @@ public class TypeRegleControllerTest {
         // Assert
         assertEquals("typeRegles/error", response, "Expected view name is 'typeRegles/error'");
         assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
+        assertEquals("typeRegle avec l'Id1 non trouve !", model.getAttribute("errorMessage"));
     }
 
-    // Test pour afficher le formulaire de création via Thymeleaf
+    // **Test: Afficher le formulaire de création (Thymeleaf)**
     @Test
     public void testCreateTypeRegleForm_Success() {
         // Arrange
@@ -89,15 +90,15 @@ public class TypeRegleControllerTest {
         // Assert
         assertEquals("typeRegles/TP_create", response, "Expected view name is 'typeRegles/TP_create'");
         assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
+        assertNotNull(model.getAttribute("typeRegle"), "Expected 'typeRegle' in model");
     }
 
-    // Test pour afficher le formulaire de modification via Thymeleaf (Succès)
+    // **Test: Afficher le formulaire de modification (Succès)**
     @Test
     public void testEditTypeRegleForm_Success() {
         // Arrange
         TypeRegle typeRegle = new TypeRegle();
         when(typeRegleService.getTypeRegle(1)).thenReturn(typeRegle);
-
         Model model = new ConcurrentModel();
 
         // Act
@@ -109,12 +110,11 @@ public class TypeRegleControllerTest {
         assertEquals(typeRegle, model.getAttribute("typeRegle"), "Expected 'typeRegle' in model");
     }
 
-    // Test pour afficher le formulaire de modification via Thymeleaf (Erreur)
+    // **Test: Afficher le formulaire de modification (Non trouvé)**
     @Test
     public void testEditTypeRegleForm_NotFound() {
         // Arrange
         when(typeRegleService.getTypeRegle(1)).thenReturn(null);
-
         Model model = new ConcurrentModel();
 
         // Act
@@ -124,14 +124,11 @@ public class TypeRegleControllerTest {
         assertEquals("typeRegles/error", response, "Expected view name is 'typeRegles/error'");
     }
 
-
-
-
+    // **Test: Supprimer un TypeRegle (Succès)**
     @Test
     public void testDeleteTypeRegle_Success() {
         // Arrange
         doNothing().when(typeRegleService).deleteTypeRegle(1);
-
         Model model = new ConcurrentModel();
 
         // Act
@@ -142,11 +139,11 @@ public class TypeRegleControllerTest {
         verify(typeRegleService, times(1)).deleteTypeRegle(1);
     }
 
+    // **Test: Supprimer un TypeRegle (Non trouvé)**
     @Test
     public void testDeleteTypeRegle_NotFound() {
         // Arrange
         doThrow(new EntityNotFoundException("TypeRegle not found")).when(typeRegleService).deleteTypeRegle(1);
-
         Model model = new ConcurrentModel();
 
         // Act
@@ -158,6 +155,4 @@ public class TypeRegleControllerTest {
         assertEquals("TypeRegle avec l'ID 1 non trouvé !", model.getAttribute("errorMessage"));
         verify(typeRegleService, times(1)).deleteTypeRegle(1);
     }
-
-
 }

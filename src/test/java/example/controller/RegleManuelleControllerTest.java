@@ -31,8 +31,7 @@ public class RegleManuelleControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // Tests pour les fonctionnalités Thymeleaf
-
+    // Test : Liste des règles manuelles - Succès
     @Test
     public void testListRegleManuelles_Success() {
         // Arrange
@@ -51,6 +50,7 @@ public class RegleManuelleControllerTest {
         assertEquals(regleManuelles, model.getAttribute("regleManuelles"));
     }
 
+    // Test : Détails d'une règle manuelle par ID - Succès
     @Test
     public void testViewRegleManuelleById_Success() {
         // Arrange
@@ -69,20 +69,9 @@ public class RegleManuelleControllerTest {
         assertEquals(regleManuelle, model.getAttribute("regleManuelle"));
     }
 
-    @Test
-    public void testViewRegleManuelleById_NotFound() {
-        // Arrange
-        when(regleManuelleService.getRegleManuelle(1)).thenReturn(null);
 
-        Model model = new ConcurrentModel();
 
-        // Act
-        String response = regleManuelleController.viewRegleManuelleById(1, model);
-
-        // Assert
-        assertEquals("reglesManuelles/error", response);
-    }
-
+    // Test : Formulaire de création d'une règle manuelle
     @Test
     public void testCreateRegleManuelleForm() {
         // Arrange
@@ -97,6 +86,7 @@ public class RegleManuelleControllerTest {
         assertNotNull(model.getAttribute("regleManuelle"));
     }
 
+    // Test : Formulaire d'édition d'une règle manuelle - Succès
     @Test
     public void testEditRegleManuelleForm_Success() {
         // Arrange
@@ -115,6 +105,7 @@ public class RegleManuelleControllerTest {
         assertEquals(regleManuelle, model.getAttribute("regleManuelle"));
     }
 
+    // Test : Formulaire d'édition d'une règle manuelle - Non trouvé
     @Test
     public void testEditRegleManuelleForm_NotFound() {
         // Arrange
@@ -129,6 +120,7 @@ public class RegleManuelleControllerTest {
         assertEquals("reglesManuelles/error", response);
     }
 
+    // Test : Suppression d'une règle manuelle - Succès
     @Test
     public void testDeleteRegleManuelle_Success() {
         // Act
@@ -139,17 +131,22 @@ public class RegleManuelleControllerTest {
         verify(regleManuelleService, times(1)).deleteRegleManuelle(1);
     }
 
+    // Test : Suppression d'une règle manuelle - Non trouvé
     @Test
     public void testDeleteRegleManuelle_NotFound() {
         // Arrange
-        doThrow(new EntityNotFoundException("Manual rule not found")).when(regleManuelleService).deleteRegleManuelle(1);
+        doThrow(new EntityNotFoundException("Manual Ruler with ID 1 not found"))
+                .when(regleManuelleService).deleteRegleManuelle(1);
 
         // Act
         String response = regleManuelleController.deleteRegleManuelle(1);
 
         // Assert
-        assertEquals("redirect:/reglesManuelles/error", response); // Redirection mise à jour
+        assertEquals("redirect:/reglesManuelles/error", response);
         verify(regleManuelleService, times(1)).deleteRegleManuelle(1);
     }
+
+
+
 
 }

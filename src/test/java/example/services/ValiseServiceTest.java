@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -82,7 +83,7 @@ public class ValiseServiceTest {
             valiseService.createValise(valise);
         });
 
-        Assertions.assertEquals("Erreur interne lors de la création de la valise", exception.getMessage());
+        assertEquals("Erreur interne lors de la création de la valise", exception.getMessage());
 
         verify(valiseRepository, times(1)).save(valise);
         verifyNoMoreInteractions(valiseRepository);
@@ -104,7 +105,7 @@ public class ValiseServiceTest {
         Valise result = valiseService.updateValise( id, valise);
 
         assertNotNull(result, "The suitcase must not be null");
-        Assertions.assertEquals(id, result.getId(), "Suitcase ID must match");
+        assertEquals(id, result.getId(), "Suitcase ID must match");
 
         verify(valiseRepository, times(1)).existsById(id);
         verify(valiseRepository, times(1)).save(valise);
@@ -120,7 +121,7 @@ public class ValiseServiceTest {
             valiseService.updateValise( id, valise);
         });
 
-        Assertions.assertEquals("Suitcase ID does not match", exception.getMessage());
+        assertEquals("Suitcase ID does not match", exception.getMessage());
 
         verify(valiseRepository, never()).existsById(id);
         verify(valiseRepository, never()).save(any(Valise.class));
@@ -146,7 +147,7 @@ public class ValiseServiceTest {
             valiseService.deleteValise(id);
         });
 
-        Assertions.assertEquals("The suitcase does not exist", exception.getMessage());
+        assertEquals("The suitcase does not exist", exception.getMessage());
         verify(valiseRepository, times(1)).existsById(id);
         verifyNoMoreInteractions(valiseRepository);
     }
@@ -161,7 +162,7 @@ public class ValiseServiceTest {
         Valise result = valiseService.getValiseById(id);
 
         assertNotNull(result, "The suitcase must not be null");
-        Assertions.assertEquals(id, result.getId(), "ID must match");
+        assertEquals(id, result.getId(), "ID must match");
 
         verify(valiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(valiseRepository);
@@ -192,7 +193,7 @@ public class ValiseServiceTest {
 
         List<Valise> result = valiseService.getAllValises();
 
-        Assertions.assertEquals(2, result.size(), "The suitcase list must contain 2 items");
+        assertEquals(2, result.size(), "The suitcase list must contain 2 items");
         verify(valiseRepository, times(1)).findAll();
         verifyNoMoreInteractions(valiseRepository);
     }
@@ -204,7 +205,7 @@ public class ValiseServiceTest {
             valiseService.getAllValises();
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage());
+        assertEquals("Database error", exception.getMessage());
         verify(valiseRepository, times(1)).findAll();
         verifyNoMoreInteractions(valiseRepository);
     }

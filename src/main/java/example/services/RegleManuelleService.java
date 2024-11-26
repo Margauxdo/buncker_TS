@@ -62,7 +62,8 @@ public class RegleManuelleService implements IRegleManuelleService {
 
     public void deleteRegleManuelle(int id) {
         if (!regleManuelleRepository.existsById(id)) {
-            throw new EntityNotFoundException("Manual Ruler with ID " + id + " not found");
+            throw new EntityNotFoundException("Manual rule not found");
+
         }
         regleManuelleRepository.deleteById(id);
     }

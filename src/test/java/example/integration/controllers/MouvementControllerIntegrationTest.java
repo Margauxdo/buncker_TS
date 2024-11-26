@@ -1,235 +1,134 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entity.Livreur;
 import example.entity.Mouvement;
+import example.interfaces.IMouvementService;
 import example.repositories.MouvementRepository;
-import example.services.MouvementService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.text.SimpleDateFormat;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Date;
-import java.util.TimeZone;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationtest")
 public class MouvementControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private MouvementRepository mouvementRepository;
 
-    @Autowired
-    private MouvementService mouvementService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         mouvementRepository.deleteAll();
     }
+
     @Test
-    public void testGetAllMouvements_ShouldReturnAllMouvements() throws Exception {
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setStatutSortie("close");
-        mouvement1.setDateHeureMouvement(new Date());
-        mouvementRepository.save(mouvement1);
+    public void testListAllMouvements() throws Exception {
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("Active")
+                .build();
+        mouvementRepository.save(mouvement);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String expectedDate = dateFormat.format(mouvement1.getDateHeureMouvement());
-
-        // Le pattern accepte les dates avec ou sans millisecondes et timezone
-        String valuePattern = expectedDate + "(\\.\\d{3})?(Z|\\+00:00)?";
-
-        mockMvc.perform(get("/api/mouvements")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/mouvements/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].statutSortie").value("close"))
-                .andExpect(jsonPath("$[0].dateHeureMouvement").value(org.hamcrest.Matchers.matchesPattern(valuePattern)));
+                .andExpect(view().name("mouvements/mouv_list"))
+                .andExpect(model().attributeExists("mouvements"))
+                .andExpect(model().attribute("mouvements", hasSize(1)));
     }
 
-
-
     @Test
-    public void testGetMouvementById_ShouldReturnMouvement_WhenMouvementExists() throws Exception {
-        // Arrange
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setStatutSortie("close");
-        mouvement1.setDateHeureMouvement(new Date());
-        mouvementRepository.save(mouvement1);
+    public void testViewMouvementById() throws Exception {
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("Active")
+                .build();
+        mouvement = mouvementRepository.save(mouvement);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String expectedDateRegex = dateFormat.format(mouvement1.getDateHeureMouvement()) + "(\\.\\d{3})?(Z|\\+00:00)?";
-
-        // Act & Assert
-        mockMvc.perform(get("/api/mouvements/{id}", mouvement1.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/mouvements/view/{id}", mouvement.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statutSortie").value("close"))
-                .andExpect(jsonPath("$.dateHeureMouvement").value(org.hamcrest.Matchers.matchesPattern(expectedDateRegex)));
-    }
-
-
-
-
-
-
-
-    @Test
-    public void testGetMouvementById_ShouldReturnNotFound_WhenMouvementDoesNotExist () throws Exception {
-        mockMvc.perform(get("/api/mouvements/{id}", 999999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(view().name("mouvements/mouv_details"))
+                .andExpect(model().attributeExists("mouvement"))
+                .andExpect(model().attribute("mouvement", hasProperty("statutSortie", is("Active"))));
     }
 
     @Test
-    public void testCreateMouvement_ShouldReturnCreated_WhenMouvementIsValid() throws Exception {
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setStatutSortie("close");
-        mouvement1.setDateHeureMouvement(new Date());
-        String mouvementJson = objectMapper.writeValueAsString(mouvement1);
-
-        mockMvc.perform(post("/api/mouvements")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mouvementJson))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.statutSortie").value("close"));
-    }
-    @Test
-    public void testCreateMouvement_ShouldReturnBadRequest_WhenDataIsInvalid() throws Exception {
-        String invalidMouvementJson = "{\"statutSortie\":\"invalid\"}";
-        mockMvc.perform(post("/api/mouvements")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidMouvementJson))
-                .andExpect(status().isBadRequest());
-    }
-
-
-
-    @Test
-    public void testUpdateMouvement_ShouldReturnUpdatedMouvement_WhenMouvementExists() throws Exception {
-        // Arrange
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setStatutSortie("close");
-        mouvement1.setDateHeureMouvement(new Date());
-        mouvementRepository.save(mouvement1);
-
-        ZonedDateTime updatedDate = ZonedDateTime.now(ZoneOffset.UTC);
-        Mouvement updatedMouvement1 = new Mouvement();
-        updatedMouvement1.setId(mouvement1.getId());
-        updatedMouvement1.setStatutSortie("close");
-        updatedMouvement1.setDateHeureMouvement(Date.from(updatedDate.toInstant()));
-        String updatedMouvementJson = objectMapper.writeValueAsString(updatedMouvement1);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        String expectedDateString = updatedDate.format(formatter);
-
-        // Act & Assert
-        mockMvc.perform(put("/api/mouvements/{id}", mouvement1.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedMouvementJson))
+    public void testCreateMouvementForm() throws Exception {
+        mockMvc.perform(get("/mouvements/create"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statutSortie").value("close"))
-                .andExpect(jsonPath("$.dateHeureMouvement").value(org.hamcrest.Matchers.startsWith(expectedDateString)));
+                .andExpect(view().name("mouvements/mouv_create"))
+                .andExpect(model().attributeExists("mouvement"));
     }
-
 
     @Test
-    public void testUpdateMouvement_ShouldReturnNotFound_WhenMouvementDoesNotExist() throws Exception {
-        Mouvement updatedMouvement1 = new Mouvement();
-        updatedMouvement1.setStatutSortie("invalid");
-        updatedMouvement1.setDateHeureMouvement(new Date());
-        String updatedMouvementJson = objectMapper.writeValueAsString(updatedMouvement1);
+    public void testCreateMouvement() throws Exception {
+        mockMvc.perform(post("/mouvements/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("dateHeureMouvement", "2024-11-26T10:00:00")
+                        .param("statutSortie", "Active"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mouvements/mouv_list"));
 
-        mockMvc.perform(put("/api/mouvements/{id}", 999999)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedMouvementJson))
-                .andExpect(status().isNotFound());
+        Mouvement savedMouvement = mouvementRepository.findAll().get(0);
+        assert savedMouvement.getStatutSortie().equals("Active");
     }
-
 
     @Test
-    public void testUpdateMouvement_ShouldReturnBadRequest_WhenDataIsInvalid() throws Exception {
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setStatutSortie("close");
-        mouvement1.setDateHeureMouvement(new Date());
-        mouvementRepository.save(mouvement1);
+    public void testEditMouvementForm() throws Exception {
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("Active")
+                .build();
+        mouvement = mouvementRepository.save(mouvement);
 
-        String invalidMouvementJson = "{\"statutSortie\":\"in\"}";
-        mockMvc.perform(put("/api/mouvements/{id}", mouvement1.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidMouvementJson))
-                .andExpect(status().isBadRequest());
-
-
+        mockMvc.perform(get("/mouvements/edit/{id}", mouvement.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mouvements/mouv_edit"))
+                .andExpect(model().attributeExists("mouvement"))
+                .andExpect(model().attribute("mouvement", hasProperty("statutSortie", is("Active"))));
     }
+
     @Test
-    public void testDeleteMouvement_ShouldReturnNoContent_WhenMouvementExists() throws Exception {
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setStatutSortie("close");
-        mouvement1.setDateHeureMouvement(new Date());
-        mouvementRepository.save(mouvement1);
-        mockMvc.perform(delete("/api/mouvements/{id}", mouvement1.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+    public void testUpdateMouvement() throws Exception {
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("Active")
+                .build();
+        mouvement = mouvementRepository.save(mouvement);
+
+        mockMvc.perform(post("/mouvements/edit/{id}", mouvement.getId())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("statutSortie", "Inactive"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mouvements/mouv_list"));
+
+        Mouvement updatedMouvement = mouvementRepository.findById(mouvement.getId()).orElse(null);
+        assert updatedMouvement != null;
+        assert updatedMouvement.getStatutSortie().equals("Inactive");
     }
+
     @Test
-    public void testDeleteMouvement_ShouldReturnNotFound_WhenMouvementDoesNotExist() throws Exception {
-        mockMvc.perform(delete("/api/mouvements/{id}", 999999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-    @Test
-    public void testCreateMouvement_WithRelations() throws Exception {
-        Mouvement mouvement = new Mouvement();
-        mouvement.setStatutSortie("En cours");
-        mouvement.setDateHeureMouvement(new Date());
-        mouvement.setLivreurs(Collections.singletonList(new Livreur()));
+    public void testDeleteMouvement() throws Exception {
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("Active")
+                .build();
+        mouvement = mouvementRepository.save(mouvement);
 
-        String mouvementJson = objectMapper.writeValueAsString(mouvement);
+        mockMvc.perform(post("/mouvements/delete/{id}", mouvement.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mouvements/mouv_list"));
 
-        mockMvc.perform(post("/api/mouvements")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mouvementJson))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.statutSortie").value("En cours"))
-                .andExpect(jsonPath("$.livreurs").isArray());
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
+        assert mouvementRepository.findById(mouvement.getId()).isEmpty();
+    }}

@@ -34,7 +34,7 @@ public class RetourSecurite {
     private List<Client> clients;
 
     @ManyToOne
-    @JoinColumn(name = "mouvement_id", nullable = false)
+    @JoinColumn(name = "mouvement_id", nullable = true)
     private Mouvement mouvement;
 
 }

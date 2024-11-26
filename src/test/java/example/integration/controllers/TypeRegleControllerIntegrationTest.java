@@ -1,7 +1,5 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.repositories.TypeRegleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,127 +8,116 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationtest")
+@Transactional
 public class TypeRegleControllerIntegrationTest {
 
     @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
 
     @Autowired
     private TypeRegleRepository typeRegleRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private TypeRegle testTypeRegle;
 
     @BeforeEach
-    void setUp() {
-        typeRegleRepository.deleteAll();
+    public void setUp() {
+        testTypeRegle = TypeRegle.builder()
+                .nomTypeRegle("TypeRegle Test")
+                .build();
+        typeRegleRepository.save(testTypeRegle);
     }
 
     @Test
-    public void testCreateTypeRegle_Success() throws Exception {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type A");
-
-        mvc.perform(post("/api/typeRegle")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(typeRegle)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nomTypeRegle").value("Type A"));
-    }
-
-
-    @Test
-    @Transactional
-    public void testGetTypeRegle_Success() throws Exception {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type C");
-        typeRegle = typeRegleRepository.save(typeRegle);
-
-        mvc.perform(get("/api/typeRegle/" + typeRegle.getId()))
+    public void testViewAllTypeRegles() throws Exception {
+        mockMvc.perform(get("/typeRegle/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nomTypeRegle").value("Type C"));
-    }
-
-
-    @Test
-    public void testGetTypeRegle_NotFound() throws Exception {
-        mvc.perform(get("/api/typeRegle/999"))
-                .andExpect(status().isNotFound());
+                .andExpect(view().name("typeRegles/TR_list"))
+                .andExpect(model().attributeExists("typeRegle"))
+                .andExpect(model().attribute("typeRegle", hasItem(hasProperty("libelle", is("TypeRegle Test")))));
     }
 
     @Test
-    public void testUpdateTypeRegle_Success() throws Exception {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type D");
-        typeRegle = typeRegleRepository.save(typeRegle);
-
-        typeRegle.setNomTypeRegle("Type D Updated");
-
-        mvc.perform(put("/api/typeRegle/" + typeRegle.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(typeRegle)))
+    public void testViewTypeRegleById_Success() throws Exception {
+        mockMvc.perform(get("/typeRegle/view/{id}", testTypeRegle.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nomTypeRegle").value("Type D Updated"));
+                .andExpect(view().name("typeRegles/TP_details"))
+                .andExpect(model().attributeExists("typeRegle"))
+                .andExpect(model().attribute("typeRegle", hasProperty("libelle", is("TypeRegle Test"))));
     }
 
     @Test
-    public void testUpdateTypeRegle_NotFound() throws Exception {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setId(999999);
-        typeRegle.setNomTypeRegle("Type E");
-
-        mvc.perform(put("/api/typeRegle/999999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(typeRegle)))
-                .andExpect(status().isNotFound());
-    }
-
-
-
-    @Test
-    public void testDeleteTypeRegle_Success() throws Exception {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type F");
-        typeRegle = typeRegleRepository.save(typeRegle);
-
-        mvc.perform(delete("/api/typeRegle/" + typeRegle.getId()))
-                .andExpect(status().isNoContent());
-
-        mvc.perform(get("/api/typeRegle/" + typeRegle.getId()))
-                .andExpect(status().isNotFound());
-    }
-    @Test
-    public void testDeleteTypeRegle_NotFound() throws Exception {
-        mvc.perform(delete("/api/typeRegle/999"))
-                .andExpect(status().isNotFound());
+    public void testViewTypeRegleById_NotFound() throws Exception {
+        mockMvc.perform(get("/typeRegle/view/{id}", 999))
+                .andExpect(status().isOk())
+                .andExpect(view().name("typeRegles/error"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", containsString("non trouve")));
     }
 
     @Test
-    public void testCreateTypeRegle_WithRegle() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("RESTRegle");
-
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type E");
-        typeRegle.setRegle(regle);
-
-        mvc.perform(post("/api/typeRegle")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(typeRegle)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nomTypeRegle").value("Type E"))
-                .andExpect(jsonPath("$.regle.coderegle").value("RESTRegle"));
+    public void testCreateTypeRegleForm() throws Exception {
+        mockMvc.perform(get("/typeRegle/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("typeRegles/TP_create"))
+                .andExpect(model().attributeExists("typeRegle"));
     }
 
+    @Test
+    public void testCreateTypeRegle() throws Exception {
+        mockMvc.perform(post("/typeRegle/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("libelle", "New TypeRegle"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/typeRegles/TR_list"));
 
+        TypeRegle createdTypeRegle = typeRegleRepository.findAll().stream()
+                .filter(tr -> tr.getNomTypeRegle().equals("New TypeRegle"))
+                .findFirst()
+                .orElse(null);
+
+        assert createdTypeRegle != null;
+    }
+
+    @Test
+    public void testEditTypeRegleForm() throws Exception {
+        mockMvc.perform(get("/typeRegle/edit/{id}", testTypeRegle.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("typeRegles/TR_edit"))
+                .andExpect(model().attributeExists("typeRegle"))
+                .andExpect(model().attribute("typeRegle", hasProperty("libelle", is("TypeRegle Test"))));
+    }
+
+    @Test
+    public void testUpdateTypeRegle() throws Exception {
+        mockMvc.perform(post("/typeRegle/edit/{id}", testTypeRegle.getId())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("libelle", "Updated TypeRegle"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/typeRegles/TR_list"));
+
+        TypeRegle updatedTypeRegle = typeRegleRepository.findById(testTypeRegle.getId()).orElse(null);
+
+        assert updatedTypeRegle != null;
+        assert updatedTypeRegle.getNomTypeRegle().equals("Updated TypeRegle");
+    }
+
+    @Test
+    public void testDeleteTypeRegle() throws Exception {
+        mockMvc.perform(post("/typeRegle/delete/{id}", testTypeRegle.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/typeRegles/TR_list"));
+
+        boolean exists = typeRegleRepository.existsById(testTypeRegle.getId());
+        assert !exists;
+    }
 }
+

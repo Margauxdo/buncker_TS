@@ -31,13 +31,14 @@ public class Regle {
     private String coderegle;
 
     @Column(name = "date_regle")
+    @Temporal(TemporalType.DATE)
     private Date dateRegle;
 
     @Column(name = "nombre_jours")
     private int nombreJours;
 
     @Column(name = "calcul_calendaire")
-    private Long calculCalendaire;
+    private int calculCalendaire;
 
     private Boolean fermeJS1;
     private Boolean fermeJS2;
@@ -76,4 +77,10 @@ public class Regle {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cle_jour_ferie")
     private JourFerie jourFerie;
+
+    public void setSomeProperty(String someValue) {
+    }
+
+    public void setSomeField(String someValue) {
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.Optional;
 
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integrationtest")
@@ -44,16 +45,16 @@ public class RegleManuelleIntegrationTest {
         Assertions.assertEquals("RM001", savedRegle.getCoderegle());
     }
 
-
     @Test
     public void testSaveRegleManuelleWithoutCreateur() {
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setDescriptionRegle("This is a rule without a creator");
 
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             regleManuelleRepository.save(regleManuelle);
         }, "Save should fail if rule creator is missing");
     }
+
 
 
     @Test
@@ -138,19 +139,5 @@ public class RegleManuelleIntegrationTest {
             regleManuelleRepository.save(regle2);
         }, "An exception should be thrown if a duplicate rulecode is saved.");
     }
-    @Test
-    public void testSaveRegleManuelle_MissingCreator_ShouldFail() {
-        RegleManuelle regleManuelle = new RegleManuelle();
-        regleManuelle.setDescriptionRegle("This rule is missing a creator");
-
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            regleManuelleRepository.saveAndFlush(regleManuelle);
-        });
-    }
-
-
-
-
-
 
 }

@@ -6,12 +6,15 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -23,42 +26,36 @@ public class JourFerieController {
 
     private static final Logger logger = LoggerFactory.getLogger(JourFerieController.class);
 
-    // API REST: Créer un jour férié
-    @PostMapping("/api")
-    public ResponseEntity<JourFerie> createJourFerieApi(@RequestBody JourFerie jourFerie) {
-        logger.info("Requête reçue pour créer un JOUR FERIE : {}", jourFerie);
-        //JourFerie createdJourFerie = jourFerieService.saveJourFerie(jourFerie);
-        //return new ResponseEntity<>(createdJourFerie, HttpStatus.CREATED);
-        //TODO temporaire a changer
-        return  new ResponseEntity<>(jourFerie, HttpStatus.CREATED);
-    }
-
-
-
-    // API REST: Récupérer tous les jours fériés
-    @GetMapping("/api")
-    public ResponseEntity<List<JourFerie>> getJourFeriesApi() {
-        List<JourFerie> jourFeries = jourFerieService.getJourFeries();
-        return new ResponseEntity<>(jourFeries, HttpStatus.OK);
-    }
-
     // Vue Thymeleaf pour lister les jours fériés
     @GetMapping("/list")
-    public String viewJF(Model model) {
-        model.addAttribute("jourFerie", jourFerieService.getJourFeries());
-        return "jourFeries/JF_list";
+    public String viewJFDateList(Model model) {
+        try {
+            List<Date> datesFerie = jourFerieService.getAllDateFerie();
+            model.addAttribute("datesFerie", datesFerie);
+            return "jourFeries/JF_dates"; // View to display the dates
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération des jours fériés", e);
+            model.addAttribute("errorMessage", "Une erreur s'est produite lors de la récupération des jours fériés.");
+            return "jourFeries/error";
+        }
     }
 
     // Vue Thymeleaf pour voir un jour férié par ID
     @GetMapping("/view/{id}")
     public String viewJFById(@PathVariable int id, Model model) {
-        JourFerie jourFerie = jourFerieService.getJourFerie(id);
-        if (jourFerie == null) {
-            model.addAttribute("errorMessage", "Jour férié non trouvé pour l'ID " + id);
+        try {
+            JourFerie jourFerie = jourFerieService.getJourFerie(id);
+            if (jourFerie == null) {
+                model.addAttribute("errorMessage", "Jour férié non trouvé pour l'ID " + id);
+                return "jourFeries/error";
+            }
+            model.addAttribute("jourFerie", jourFerie);
+            return "jourFeries/JF_details"; // View for holiday details
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération du jour férié par ID", e);
+            model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
             return "jourFeries/error";
         }
-        model.addAttribute("jourFerie", jourFerie);
-        return "jourFeries/JF_details";
     }
 
     // Formulaire Thymeleaf pour créer un jour férié
@@ -68,11 +65,28 @@ public class JourFerieController {
         return "jourFeries/JF_create";
     }
 
-    // Création d'un jour férié via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createJourFerieThymeleaf(@Valid @ModelAttribute("jourFerie") JourFerie jourFerie) {
-        /*jourFerieService.saveJourFerie(jourFerie);*/
-        //TODO a corriger la methode
-        return "redirect:/jourferies/list";
+    public String createJourFerieThymeleaf(@Valid @ModelAttribute("jourFerie") JourFerie jourFerie, Model model) {
+        try {
+            // Vérifier si une date identique existe déjà
+            List<Date> existingDates = jourFerieService.getAllDateFerie();
+            if (existingDates.contains(jourFerie.getDate())) {
+                model.addAttribute("errorMessage", "Un jour férié avec cette date existe déjà.");
+                return "jourFeries/JF_create";
+            }
+
+            // Ajouter le jour férié
+            jourFerieService.persistJourFerie(jourFerie);
+            return "redirect:/jourferies/list";
+        } catch (Exception e) {
+            logger.error("Erreur lors de la création du jour férié", e);
+            model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
+            return "jourFeries/JF_create";
+        }
     }
 }
+
+
+
+
+

@@ -133,6 +133,7 @@ public class TypeValiseController {
     public String editTypeValiseForm(@PathVariable int id, Model model) {
         TypeValise typeValise = typeValiseService.getTypeValise(id);
         if (typeValise == null) {
+            model.addAttribute("errorMessage", "Le type de valise avec l'ID " + id + " n'a pas été trouvé.");
             return "typeValises/error";
         }
         model.addAttribute("typeValise", typeValise);

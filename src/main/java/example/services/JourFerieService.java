@@ -6,6 +6,7 @@ import example.repositories.JourFerieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,14 +29,28 @@ public class JourFerieService implements IJourFerieService {
         return jourFerieRepository.findAll();
     }
 
-
-    /*@Override
+    @Override
     public JourFerie saveJourFerie(JourFerie jourFerie) {
-        if (jourFerie.getJoursFerieList() == null || jourFerie.getJoursFerieList().isEmpty()) {
-            throw new IllegalArgumentException("La liste des jours fériés ne peut pas être vide.");
+        if (jourFerie.getRegles().isEmpty()) {
+            throw new IllegalStateException("A JourFerie must have at least one associated Regle");
         }
         return jourFerieRepository.save(jourFerie);
-    }*/
+    }
+
+
+
+    @Override
+    public List<Date> getAllDateFerie() {
+        return jourFerieRepository.findAll().stream()
+                .map(JourFerie::getDate)
+                .toList();
+    }
+    @Override
+    public void persistJourFerie(JourFerie jourFerie) {
+        jourFerieRepository.save(jourFerie);
+    }
+
+
 
 
 }

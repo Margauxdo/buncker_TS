@@ -1,29 +1,27 @@
 package example.integration.entities;
 
-import example.entity.Valise;
 import example.entity.Client;
+import example.entity.Mouvement;
 import example.entity.Regle;
-import example.entity.TypeValise;
-import example.repositories.ValiseRepository;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
+import example.repositories.MouvementRepository;
 import example.repositories.RegleRepository;
-import example.repositories.TypeValiseRepository;
+import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Date;
-import java.util.List;
+import jakarta.transaction.Transactional;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(org.springframework.test.context.junit.jupiter.SpringExtension.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ActiveProfiles("testintegration")
 @Transactional
 public class ValiseIntegrationTest {
 
@@ -34,102 +32,185 @@ public class ValiseIntegrationTest {
     private ClientRepository clientRepository;
 
     @Autowired
-    private RegleRepository regleRepository;
+    private MouvementRepository mouvementRepository;
 
     @Autowired
-    private TypeValiseRepository typeValiseRepository;
-
-    private Client client;
-    private Regle regle;
-    private TypeValise typeValise;
-    private Valise valise;
+    private RegleRepository regleRepository;
 
     @BeforeEach
-    void setUp() {
-        // Création d'un client
-        client = new Client();
-        client.setName("Jean Dupont");
-        client.setEmail("jean.dupont@example.com");
-        client = clientRepository.save(client);
-
-        // Création d'une règle
-        regle = new Regle();
-        regle.setCoderegle("R1234");
-        regle = regleRepository.save(regle);
-
-        // Création d'un type de valise
-        typeValise = new TypeValise();
-        typeValise.setProprietaire("Entreprise XYZ");
-        typeValise.setDescription("Type de valise standard");
-        typeValise = typeValiseRepository.save(typeValise);
-
-        // Création d'une valise
-        valise = Valise.builder()
-                .description("Valise de test")
-                .numeroValise(123456L)
-                .refClient("REF123")
-                .dateCreation(new Date())
-                .client(client)
-                .regleSortie((List<Regle>) regle)
-                .typeValise(typeValise)
-                .build();
-
-        valise = valiseRepository.save(valise);
+    public void setUp() {
+        valiseRepository.deleteAll();
+        mouvementRepository.deleteAll();
+        regleRepository.deleteAll();
     }
 
     @Test
-    void testCreateValise() {
-        assertNotNull(valise.getId(), "L'ID de la valise doit être généré après la sauvegarde.");
-        assertEquals("Valise de test", valise.getDescription());
+    public void testSaveValise() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setNumeroValise(123456L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        // Assertions
+        assertTrue(valise.getId() > 0);
+        assertEquals("Test Valise", valise.getDescription());
+        assertEquals(123456L, valise.getNumeroValise());
         assertEquals(client.getId(), valise.getClient().getId());
-        assertEquals(regle.getId(), valise.getRegleSortie().get(0));
-        assertEquals(typeValise.getId(), valise.getTypeValise().getValise());
     }
 
     @Test
-    void testFindValiseById() {
-        Valise foundValise = valiseRepository.findById(valise.getId()).orElse(null);
-        assertNotNull(foundValise, "La valise doit être trouvée.");
-        assertEquals(valise.getNumeroValise(), foundValise.getNumeroValise());
+    public void testFindValiseById() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setNumeroValise(123456L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        Optional<Valise> foundValise = valiseRepository.findById(valise.getId());
+
+        // Assertions
+        assertTrue(foundValise.isPresent());
+        assertEquals("Test Valise", foundValise.get().getDescription());
     }
 
     @Test
-    void testUpdateValise() {
-        valise.setDescription("Valise mise à jour");
-        valise.setNumeroValise(654321L);
-        Valise updatedValise = valiseRepository.save(valise);
-        assertEquals("Valise mise à jour", updatedValise.getDescription());
-        assertEquals(654321L, updatedValise.getNumeroValise());
+    public void testUpdateValise() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Old Valise");
+        valise.setNumeroValise(123456L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        // Update the valise
+        valise.setDescription("Updated Valise");
+        valise = valiseRepository.saveAndFlush(valise);
+
+        // Assertions
+        assertEquals("Updated Valise", valise.getDescription());
     }
 
     @Test
-    void testDeleteValise() {
+    public void testDeleteValise() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setNumeroValise(123456L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
         valiseRepository.deleteById(valise.getId());
-        assertFalse(valiseRepository.existsById(valise.getId()), "La valise doit être supprimée.");
+
+        Optional<Valise> deletedValise = valiseRepository.findById(valise.getId());
+        assertTrue(deletedValise.isEmpty());
     }
 
     @Test
-    void testDeleteNonExistentValise() {
-        // Vérifier que l'ID n'existe pas
-        assertFalse(valiseRepository.existsById(9999), "L'ID 9999 ne doit pas exister dans la base de données.");
+    public void testValiseWithMouvementAndRegle() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
 
-        // Lever une exception manuellement si l'ID n'existe pas
-        Exception exception = assertThrows(org.springframework.dao.EmptyResultDataAccessException.class, () -> {
-            if (!valiseRepository.existsById(9999)) {
-                throw new org.springframework.dao.EmptyResultDataAccessException("No Valise entity with id 9999 exists", 1);
-            }
-            valiseRepository.deleteById(9999);
-        });
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise with Mouvement and Regle");
+        valise.setNumeroValise(123456L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
 
-        // Vérifier le message de l'exception
-        assertTrue(exception.getMessage().contains("No Valise entity with id 9999 exists"));
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("Test Statut");
+        mouvement.setValise(valise);
+        valise.getMouvementList().add(mouvement);
+        mouvement = mouvementRepository.saveAndFlush(mouvement);
+
+        Regle regle = new Regle();
+        regle.setReglePourSortie("Test Regle");
+        regle.setValise(valise);
+        regle.setCoderegle("CODE123");
+        valise.getRegleSortie().add(regle);
+        regle = regleRepository.saveAndFlush(regle);
+
+        valise = valiseRepository.findById(valise.getId()).orElseThrow();
+
+        assertEquals(1, valise.getMouvementList().size());
+        assertEquals(1, valise.getRegleSortie().size());
+        assertEquals(mouvement.getId(), valise.getMouvementList().get(0).getId());
+        assertEquals(regle.getId(), valise.getRegleSortie().get(0).getId());
     }
-
 
     @Test
-    void testFindAllValises() {
-        List<Valise> valises = valiseRepository.findAll();
-        assertFalse(valises.isEmpty(), "La liste des valises ne doit pas être vide.");
-        assertEquals(1, valises.size());
+    public void testValiseWithEmptyLists() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise with Empty Lists");
+        valise.setNumeroValise(987654L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        assertTrue(valise.getMouvementList().isEmpty());
+        assertTrue(valise.getRegleSortie().isEmpty());
     }
+
+    @Test
+    public void testValiseDeleteCascading() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Valise for Cascade Test");
+        valise.setNumeroValise(111111L);
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("Test Statut");
+        mouvement.setValise(valise);
+        valise.getMouvementList().add(mouvement);
+        mouvementRepository.saveAndFlush(mouvement);
+
+        Regle regle = new Regle();
+        regle.setReglePourSortie("Test Regle");
+        regle.setValise(valise);
+        regle.setCoderegle("CODE123");
+        valise.getRegleSortie().add(regle);
+        regleRepository.saveAndFlush(regle);
+
+        valiseRepository.deleteById(valise.getId());
+        Optional<Valise> deletedValise = valiseRepository.findById(valise.getId());
+        assertTrue(deletedValise.isEmpty());
+
+        Optional<Mouvement> deletedMouvement = mouvementRepository.findById(mouvement.getId());
+        assertTrue(deletedMouvement.isEmpty());
+
+        Optional<Regle> deletedRegle = regleRepository.findById(regle.getId());
+        assertTrue(deletedRegle.isEmpty());
+    }
+
+
 }

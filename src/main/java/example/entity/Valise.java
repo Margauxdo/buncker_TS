@@ -3,6 +3,7 @@ package example.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,12 +22,14 @@ import java.util.List;
 public class Valise {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Utilisation de l'auto-incrémentation pour la clé primaire
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "valise_id")
     private int id;
 
     @Column(nullable = false)
+    @NotNull
     private String description;
+    @NotNull
     private Long numeroValise;
     private String refClient;
     private Date sortie;
@@ -36,19 +39,19 @@ public class Valise {
     private Date dateCreation;
     private String numeroDujeu;
 
-    @ManyToOne
-    @JoinColumn(name = "type_valise_id", nullable = false)  // Relation ManyToOne vers TypeValise
-    @JsonBackReference
-    private TypeValise typeValise;  // Chaque Valise a un TypeValise
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_valise_id", nullable = true)
+    private TypeValise typeValise;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Regle> regleSortie = new ArrayList<>();
-
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
     private List<Mouvement> mouvementList = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
+    private List<Regle> regleSortie = new ArrayList<>();
 
 }

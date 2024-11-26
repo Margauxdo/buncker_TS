@@ -1,32 +1,29 @@
+
 package example.integration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import example.entity.Client;
+import example.entity.TypeValise;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
+import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationtest")
 @Transactional
 public class ValiseControllerIntegrationTest {
 
@@ -40,95 +37,106 @@ public class ValiseControllerIntegrationTest {
     private ClientRepository clientRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private TypeValiseRepository typeValiseRepository;
 
     private Client client;
-    private Valise valise;
+    private TypeValise typeValise;
 
     @BeforeEach
-    void setUp() {
-        valiseRepository.deleteAll();
-        clientRepository.deleteAll();
-
-        client = new Client();
-        client.setName("Client Test");
-        client.setEmail("getvalisetest@example.com");
-        clientRepository.save(client);
-
-        valise = new Valise();
-        valise.setDescription("Valise de test");
-        valise.setNumeroValise(123456L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
-
-        System.out.println("Client ID : " + client.getId());
-        System.out.println("Valise ID : " + valise.getId());
-
-            objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-
-
+    public void setUp() {
+        // Initialisation des dépendances nécessaires
+        client = clientRepository.save(Client.builder().name("Client Test").build());
+        typeValise = typeValiseRepository.save(TypeValise.builder().description("Type Test").build());
     }
 
     @Test
-    public void testGetValiseById_Success() throws Exception {
-        assertTrue(valiseRepository.findById(valise.getId()).isPresent(), "La valise n'existe pas dans la base de données.");
+    public void testViewValises() throws Exception {
+        Valise valise = valiseRepository.save(Valise.builder()
+                .description("Test Valise")
+                .client(client)
+                .typeValise(typeValise)
+                .build());
 
-        mockMvc.perform(get("/api/valise/" + valise.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
+        mockMvc.perform(get("/valise/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description").value("Valise de test"))
-                .andExpect(jsonPath("$.numeroValise").value(123456));
+                .andExpect(view().name("valises/valises_list"))
+                .andExpect(model().attributeExists("valises"))
+                .andExpect(model().attribute("valises", hasSize(1)))
+                .andExpect(model().attribute("valises", hasItem(
+                        hasProperty("description", is("Test Valise"))
+                )));
     }
 
-
-
-
     @Test
-    public void testGetAllValises() throws Exception {
-        mockMvc.perform(get("/api/valise")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
+    public void testCreateValiseForm() throws Exception {
+        mockMvc.perform(get("/valise/create"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].description").value("Valise de test"))
-                .andExpect(jsonPath("$[0].numeroValise").value(123456));
-    }
-
-
-    @Test
-    void testCreateValise_Success() throws Exception {
-        Client client = new Client();
-        client.setName("Client Test");
-        client.setEmail("uniqueemail_" + UUID.randomUUID() + "@example.com");
-        clientRepository.save(client);
-
-        Valise valise = new Valise();
-        valise.setDescription("Nouvelle valise");
-        valise.setNumeroValise(789101L);
-        valise.setClient(client);
-
-        String valiseJson = objectMapper.writeValueAsString(valise);
-
-        mockMvc.perform(post("/api/valise")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(valiseJson))
-                .andExpect(status().isCreated());
-    }
-
-
-    @Test
-    public void testDeleteValise_Success() throws Exception {
-        mockMvc.perform(delete("/api/valise/" + valise.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(view().name("valises/valise_create"))
+                .andExpect(model().attributeExists("valise"));
     }
 
     @Test
-    public void testDeleteValise_NotFound() throws Exception {
-        mockMvc.perform(delete("/api/valise/999")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
+    public void testCreateValise() throws Exception {
+        mockMvc.perform(post("/valise/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("description", "New Valise")
+                        .param("client.id", String.valueOf(client.getId()))
+                        .param("typeValise.id", String.valueOf(typeValise.getId())))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/valises/valises_list"));
+
+        Valise savedValise = valiseRepository.findAll().get(0);
+        assert savedValise.getDescription().equals("New Valise");
+    }
+
+    @Test
+    public void testEditValiseForm() throws Exception {
+        Valise valise = valiseRepository.save(Valise.builder()
+                .description("Edit Test")
+                .client(client)
+                .typeValise(typeValise)
+                .build());
+
+        mockMvc.perform(get("/valise/edit/{id}", valise.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("valises/valise_edit"))
+                .andExpect(model().attributeExists("valise"))
+                .andExpect(model().attribute("valise", hasProperty("description", is("Edit Test"))));
+    }
+
+    @Test
+    public void testUpdateValise() throws Exception {
+        Valise valise = valiseRepository.save(Valise.builder()
+                .description("Update Test")
+                .client(client)
+                .typeValise(typeValise)
+                .build());
+
+        mockMvc.perform(post("/valise/edit/{id}", valise.getId())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("description", "Updated Description")
+                        .param("client.id", String.valueOf(client.getId()))
+                        .param("typeValise.id", String.valueOf(typeValise.getId())))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/valises/valises_list"));
+
+        Valise updatedValise = valiseRepository.findById(valise.getId()).orElse(null);
+        assert updatedValise != null;
+        assert updatedValise.getDescription().equals("Updated Description");
+    }
+
+    @Test
+    public void testDeleteValise() throws Exception {
+        Valise valise = valiseRepository.save(Valise.builder()
+                .description("Delete Test")
+                .client(client)
+                .typeValise(typeValise)
+                .build());
+
+        mockMvc.perform(post("/valise/delete/{id}", valise.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/valises/valises_list"));
+
+        assert valiseRepository.findById(valise.getId()).isEmpty();
     }
 }

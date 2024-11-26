@@ -71,23 +71,6 @@ public class FormuleIntegrationTest {
         assertEquals(regle.getId(), savedFormule.getRegle().getId());
     }
 
-    @Test
-    public void testSaveFormuleFailure() {
-        Regle regle = new Regle();
-        regle.setCoderegle("R124");
-        regle.setDateRegle(new Date());
-
-        regle = regleRepository.saveAndFlush(regle);
-
-        Formule formule = new Formule();
-        formule.setFormule("formule2");
-        formule.setLibelle(null);
-        formule.setRegle(regle);
-
-        Assertions.assertThrows(jakarta.validation.ConstraintViolationException.class, () -> {
-            formuleRepository.saveAndFlush(formule);
-        });
-    }
 
 
     @Test

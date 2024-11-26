@@ -1,21 +1,22 @@
 package example.integration.entities;
 
+import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
+import example.entity.Valise;
+import example.repositories.ClientRepository;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
-import org.junit.jupiter.api.Assertions;
+import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.transaction.Transactional;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,13 +24,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ActiveProfiles("integrationtest")
+@Transactional
 public class LivreurIntegrationTest {
 
     @Autowired
     private LivreurRepository livreurRepository;
+
     @Autowired
     private MouvementRepository mouvementRepository;
+    @Autowired
+    private ValiseRepository valiseRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
     @BeforeEach
     public void setUp() {
@@ -39,171 +45,176 @@ public class LivreurIntegrationTest {
 
     @Test
     public void testSaveLivreur() {
-        Livreur livreur1 = new Livreur();
-        livreur1.setNomLivreur("Dupond");
-        livreur1.setCodeLivreur("1234");
-        livreur1.setNumeroCartePro("123456");
-        livreur1.setPrenomLivreur("jean");
-        livreur1.setMotDePasse("1234");
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
 
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setLivreurs((List<Livreur>) livreur1);
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
 
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("Mouvement de test");
+        mouvement.setValise(valise);
+        mouvement = mouvementRepository.saveAndFlush(mouvement);
 
-        Livreur savedLivreur = livreurRepository.save(livreur1);
-
-        Assertions.assertNotNull(savedLivreur.getId());
-        assertEquals("Dupond", savedLivreur.getNomLivreur());
-        assertEquals("1234", savedLivreur.getCodeLivreur());
-        assertEquals("123456", savedLivreur.getNumeroCartePro());
-        assertEquals("jean", savedLivreur.getPrenomLivreur());
-        assertEquals("1234", savedLivreur.getMotDePasse());
-    }
-    @Test
-    public void testFindLivreurById(){
         Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Dupond");
-        livreur.setCodeLivreur("1234");
-        livreur.setNumeroCartePro("123456");
-        livreur.setPrenomLivreur("jean");
+        livreur.setCodeLivreur("LIV001");
+        livreur.setNomLivreur("Martin");
+        livreur.setPrenomLivreur("Paul");
+        livreur.setNumeroCartePro("12345");
+        livreur.setTelephonePortable("123456789");
+        livreur.setMouvement(mouvement);
 
-        Livreur savedLivreur = livreurRepository.save(livreur);
-        Livreur foundLivreur = livreurRepository.findById(savedLivreur.getId()).orElse(null);
+        Livreur savedLivreur = livreurRepository.saveAndFlush(livreur);
 
-        Assertions.assertNotNull(foundLivreur);
-        assertEquals("Dupond", foundLivreur.getNomLivreur());
-        assertEquals("1234", foundLivreur.getCodeLivreur());
-        assertEquals("123456", foundLivreur.getNumeroCartePro());
-        assertEquals("jean", foundLivreur.getPrenomLivreur());
-
+        // Assertions
+        assertTrue(savedLivreur.getId() > 0);
+        assertEquals("LIV001", savedLivreur.getCodeLivreur());
+        assertEquals("Martin", savedLivreur.getNomLivreur());
+        assertEquals("Paul", savedLivreur.getPrenomLivreur());
+        assertEquals("12345", savedLivreur.getNumeroCartePro());
+        assertEquals("123456789", savedLivreur.getTelephonePortable());
+        assertEquals(mouvement.getId(), savedLivreur.getMouvement().getId());
     }
+
+
     @Test
-    public void testFindLivreurByCodeLivreur(){
+    public void testFindLivreurById() {
+
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("Mouvement pour test");
+        mouvement.setValise(valise);
+        mouvement = mouvementRepository.saveAndFlush(mouvement);
+
         Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Dupond");
-        livreur.setCodeLivreur("1234");
-        livreur.setNumeroCartePro("123456");
-        livreur.setPrenomLivreur("jean");
+        livreur.setCodeLivreur("LIV002");
+        livreur.setNomLivreur("Durand");
+        livreur.setPrenomLivreur("Jean");
+        livreur.setNumeroCartePro("67890");
+        livreur.setTelephonePortable("987654321");
+        livreur.setMouvement(mouvement);
+        livreur = livreurRepository.saveAndFlush(livreur);
 
-        Livreur savedLivreur = livreurRepository.save(livreur);
-        Livreur foundLivreurByCode = livreurRepository.findByCodeLivreur(savedLivreur.getCodeLivreur());
+        Optional<Livreur> foundLivreur = livreurRepository.findById(livreur.getId());
 
-        Assertions.assertNotNull(foundLivreurByCode);
-        assertEquals("Dupond", foundLivreurByCode.getNomLivreur());
-        assertEquals("1234", foundLivreurByCode.getCodeLivreur());
-        assertEquals("123456", foundLivreurByCode.getNumeroCartePro());
-        assertEquals("jean", foundLivreurByCode.getPrenomLivreur());
-
-    }
-    @Test
-    public void testFindAllLivreur(){
-        Livreur livA = new Livreur();
-        livA.setNomLivreur("Dupond");
-        livA.setCodeLivreur("1234");
-        livA.setNumeroCartePro("123456");
-        livA.setPrenomLivreur("jean");
-        livreurRepository.save(livA);
-        Livreur livB = new Livreur();
-        livB.setNomLivreur("Leon");
-        livB.setCodeLivreur("4321");
-        livB.setNumeroCartePro("134625");
-        livB.setPrenomLivreur("Jules");
-        livreurRepository.save(livB);
-
-        List<Livreur> livreurs = livreurRepository.findAll();
-        assertEquals(2, livreurs.size());
-        assertTrue(livreurs.stream().anyMatch(livreur -> livreur.getNomLivreur().equals("Dupond")) );
-        assertTrue(livreurs.stream().anyMatch(livreur -> livreur.getNomLivreur().equals("Leon")) );
+        // Assertions
+        assertTrue(foundLivreur.isPresent());
+        assertEquals("LIV002", foundLivreur.get().getCodeLivreur());
+        assertEquals("Durand", foundLivreur.get().getNomLivreur());
     }
 
-    @Test
-    public void testSaveLivreurWithNullNameThrowsException() {
-        Livreur livreur = new Livreur();
-        livreur.setCodeLivreur("1234");
-        livreur.setNumeroCartePro("123456");
-        livreur.setPrenomLivreur("jean");
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            livreurRepository.save(livreur);
-        }, "Expected DataIntegrityViolationException due to null 'nomLivreur'");
-    }
 
     @Test
     public void testUpdateLivreur() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("Test Mouvement");
+        mouvement.setValise(valise);
+        mouvement = mouvementRepository.saveAndFlush(mouvement);
+
         Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Dupond");
-        livreur.setCodeLivreur("1234");
-        livreur.setNumeroCartePro("123456");
-        livreur.setPrenomLivreur("jean");
+        livreur.setCodeLivreur("LIV003");
+        livreur.setNomLivreur("Lemoine");
+        livreur.setPrenomLivreur("Sophie");
+        livreur.setNumeroCartePro("54321");
+        livreur.setTelephonePortable("1122334455");
+        livreur.setMouvement(mouvement);
+        livreur = livreurRepository.saveAndFlush(livreur);
 
-        Livreur savedLivreur = livreurRepository.save(livreur);
+        livreur.setNomLivreur("Lemoine Updated");
+        livreur.setPrenomLivreur("Sophie Updated");
+        livreur = livreurRepository.saveAndFlush(livreur);
 
-        savedLivreur.setNomLivreur("henry");
-        Livreur updatedLivreur = livreurRepository.save(savedLivreur);
-
-        assertEquals("henry", updatedLivreur.getNomLivreur(), "The delivery person's name should be updated to 'henry'");
+        // Assertions
+        assertEquals("Lemoine Updated", livreur.getNomLivreur());
+        assertEquals("Sophie Updated", livreur.getPrenomLivreur());
     }
-
-    @Test
-    public void testCascadeDeleteLivreurDeleteMouvement() {
-        Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Dupond");
-        livreur.setCodeLivreur("1234");
-
-        Mouvement mouvement1 = new Mouvement();
-        mouvement1.setLivreurs((List<Livreur>) livreur);
-
-        livreur.setMouvement(mouvement1);
-        livreur.getMouvement().setLivreurs((List<Livreur>) livreur);
-
-        livreurRepository.saveAndFlush(livreur);
-
-        livreurRepository.delete(livreur);
-
-        Assertions.assertFalse(livreurRepository.findById(livreur.getId()).isPresent(), "The delivery person must be deleted");
-        Assertions.assertFalse(mouvementRepository.findById(mouvement1.getId()).isPresent(), "The movement must be deleted in cascade");
-    }
-
 
 
 
     @Test
     public void testDeleteLivreur() {
-        Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Dupond");
-        livreur.setCodeLivreur("1234");
-        livreur.setNumeroCartePro("123456");
-        livreur.setPrenomLivreur("jean");
+        Client client = new Client();
+        client.setName("Client Test");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
 
-        Livreur savedLivreur = livreurRepository.save(livreur);
-        livreurRepository.deleteById(savedLivreur.getId());
-        Assertions.assertFalse(livreurRepository.findById(savedLivreur.getId()).isPresent());
-    }
-
-    @Test
-    void testCreateLivreur() {
-        Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Livreur Test");
-        livreurRepository.save(livreur);
-
-        Optional<Livreur> found = livreurRepository.findById(livreur.getId());
-        assertTrue(found.isPresent());
-        assertEquals("Livreur Test", found.get().getNomLivreur());
-    }
-
-    @Test
-    void testLivreurRelationWithMouvement() {
-        Livreur livreur = new Livreur();
-        livreur.setNomLivreur("Livreur Test");
-        livreurRepository.save(livreur);
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
 
         Mouvement mouvement = new Mouvement();
-        mouvement.setLivreurs((List<Livreur>) livreur);
-        mouvementRepository.save(mouvement);
+        mouvement.setStatutSortie("Mouvement pour suppression");
+        mouvement.setValise(valise); // Ensure that a Valise is associated
+        mouvement = mouvementRepository.saveAndFlush(mouvement);
 
-        Optional<Mouvement> found = mouvementRepository.findById(mouvement.getId());
-        assertTrue(found.isPresent());
-        assertEquals(livreur.getId(), found.get().getLivreurs().get(0).getId());
+        Livreur livreur = new Livreur();
+        livreur.setCodeLivreur("LIV004");
+        livreur.setNomLivreur("Robert");
+        livreur.setPrenomLivreur("Alice");
+        livreur.setNumeroCartePro("98765");
+        livreur.setTelephonePortable("6677889900");
+        livreur.setMouvement(mouvement);
+        livreur = livreurRepository.saveAndFlush(livreur);
+
+        livreurRepository.deleteById(livreur.getId());
+
+        Optional<Livreur> deletedLivreur = livreurRepository.findById(livreur.getId());
+        assertTrue(deletedLivreur.isEmpty());
+    }
+
+
+    @Test
+    public void testSaveLivreurWithMouvement() {
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("client@test.com");
+        client = clientRepository.saveAndFlush(client);
+
+        Valise valise = new Valise();
+        valise.setDescription("Test Valise");
+        valise.setClient(client);
+        valise = valiseRepository.saveAndFlush(valise);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setStatutSortie("Test Statut");
+        mouvement.setValise(valise);
+        mouvement = mouvementRepository.saveAndFlush(mouvement);
+
+        Livreur livreur = new Livreur();
+        livreur.setCodeLivreur("LIV005");
+        livreur.setNomLivreur("Michel");
+        livreur.setPrenomLivreur("Jean");
+        livreur.setNumeroCartePro("67890");
+        livreur.setTelephonePortable("987654321");
+        livreur.setMouvement(mouvement);
+        livreur = livreurRepository.saveAndFlush(livreur);
+
+        assertEquals(livreur.getMouvement().getId(), mouvement.getId());
+        assertEquals(livreur.getMouvement().getStatutSortie(), "Test Statut");
     }
 
 

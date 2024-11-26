@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,10 +29,10 @@ public class FormuleControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // Test: Affichage de la liste des formules - Succès
     @Test
     public void testViewFormuleList() {
-        List<Formule> formules = new ArrayList<>();
-        formules.add(new Formule());
+        List<Formule> formules = List.of(new Formule());
         when(formuleService.getAllFormules()).thenReturn(formules);
 
         Model model = new ConcurrentModel();
@@ -42,8 +41,10 @@ public class FormuleControllerTest {
         assertEquals("formules/formule_list", response);
         assertTrue(model.containsAttribute("formules"));
         assertEquals(formules, model.getAttribute("formules"));
+        verify(formuleService, times(1)).getAllFormules();
     }
 
+    // Test: Affichage d'une formule par ID - Succès
     @Test
     public void testViewFormuleById_Success() {
         Formule formule = new Formule();
@@ -55,24 +56,24 @@ public class FormuleControllerTest {
         assertEquals("formules/formule_detail", response);
         assertTrue(model.containsAttribute("formule"));
         assertEquals(formule, model.getAttribute("formule"));
+        verify(formuleService, times(1)).getFormuleById(1);
     }
 
-
+    // Test: Affichage d'une formule par ID - Non trouvée
     @Test
     public void testViewFormuleById_NotFound() {
         when(formuleService.getFormuleById(1)).thenReturn(null);
 
         Model model = new ConcurrentModel();
-
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             formuleController.viewFormuleById(1, model);
         });
 
-        // Vérifiez le message d'exception (si nécessaire)
         assertEquals("Formule avec l'Id 1 n'existe pas !", exception.getMessage());
+        verify(formuleService, times(1)).getFormuleById(1);
     }
 
-
+    // Test: Formulaire de création d'une formule
     @Test
     public void testCreateFormuleForm() {
         Model model = new ConcurrentModel();
@@ -83,18 +84,20 @@ public class FormuleControllerTest {
         assertNotNull(model.getAttribute("formule"));
     }
 
+    // Test: Création d'une formule - Succès
     @Test
     public void testCreateFormule_Success() {
         Formule formule = new Formule();
-        when(formuleService.createFormule(any(Formule.class))).thenReturn(formule); // Utilisation de when() pour les méthodes non-void
+        when(formuleService.createFormule(any(Formule.class))).thenReturn(formule);
 
         Model model = new ConcurrentModel();
         String response = formuleController.createFormule(formule, model);
 
         assertEquals("redirect:/formules/list", response);
+        verify(formuleService, times(1)).createFormule(formule);
     }
 
-
+    // Test: Création d'une formule - Échec
     @Test
     public void testCreateFormule_Failure() {
         doThrow(new IllegalArgumentException("Invalid formula")).when(formuleService).createFormule(any(Formule.class));
@@ -107,6 +110,7 @@ public class FormuleControllerTest {
         assertEquals("Invalid formula", model.getAttribute("errorMessage"));
     }
 
+    // Test: Formulaire de modification d'une formule - Succès
     @Test
     public void testEditFormuleForm_Success() {
         Formule formule = new Formule();
@@ -118,8 +122,10 @@ public class FormuleControllerTest {
         assertEquals("formules/formule_edit", response);
         assertTrue(model.containsAttribute("formule"));
         assertEquals(formule, model.getAttribute("formule"));
+        verify(formuleService, times(1)).getFormuleById(1);
     }
 
+    // Test: Formulaire de modification d'une formule - Non trouvée
     @Test
     public void testEditFormuleForm_NotFound() {
         when(formuleService.getFormuleById(1)).thenReturn(null);
@@ -128,23 +134,29 @@ public class FormuleControllerTest {
         String response = formuleController.editFormuleForm(1, model);
 
         assertEquals("formules/error", response);
+        verify(formuleService, times(1)).getFormuleById(1);
     }
 
+    // Test: Mise à jour d'une formule - Succès
     @Test
     public void testUpdateFormule_Success() {
         Formule formule = new Formule();
-        when(formuleService.updateFormule(eq(1), any(Formule.class))).thenReturn(formule); // Utilisez when() pour simuler le retour d'un objet
+        when(formuleService.updateFormule(eq(1), any(Formule.class))).thenReturn(formule);
 
         String response = formuleController.updateFormule(1, formule);
 
-        assertEquals("redirect:/formules/formules_list", response);  }
+        assertEquals("redirect:/formules/formules_list", response);
+        verify(formuleService, times(1)).updateFormule(1, formule);
+    }
 
-
+    // Test: Suppression d'une formule - Succès
     @Test
     public void testDeleteFormule_Success() {
         doNothing().when(formuleService).deleteFormule(1);
 
         String response = formuleController.deleteFormule(1);
 
-        assertEquals("redirect:/formules/formules_list", response);  }
+        assertEquals("redirect:/formules/formules_list", response);
+        verify(formuleService, times(1)).deleteFormule(1);
+    }
 }

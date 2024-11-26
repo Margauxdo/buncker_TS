@@ -2,10 +2,7 @@ package example.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -33,6 +30,7 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
+    @Setter
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "mouvement_id", nullable = false)
     @JsonManagedReference

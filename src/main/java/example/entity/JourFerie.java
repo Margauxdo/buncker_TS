@@ -1,11 +1,13 @@
 package example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,13 +23,15 @@ public class JourFerie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotEmpty(message = "A JourFerie must have at least one associated Regle")
     @OneToMany(mappedBy = "jourFerie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Regle> regles;
+    private List<Regle> regles = new ArrayList<>();
 
-    /*@ElementCollection
-    @CollectionTable(name = "jourFerie_id", joinColumns = @JoinColumn(name = "jour_ferie_id"))
-    @Column(name = "jourFerie_list")
-    private List<Date> joursFerieList;*/
+
+
+    @Column(name = "Date", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
 
 }

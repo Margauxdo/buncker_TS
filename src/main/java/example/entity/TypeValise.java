@@ -1,6 +1,7 @@
 package example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,14 +26,17 @@ public class TypeValise {
     private int id;
 
     @Column(nullable = false)
+    @NotNull
     private String proprietaire;
 
 
     @Column(nullable = false)
+    @NotNull
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "valise_id", nullable = false) // Correction ici
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "valise_id", nullable = true)
     private Valise valise;
+
 
 }

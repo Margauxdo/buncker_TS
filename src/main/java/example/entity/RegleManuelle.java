@@ -1,6 +1,7 @@
 package example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class RegleManuelle extends Regle {
     private String descriptionRegle;
 
     @Column(name = "createur_regle", nullable = false)
+    @NotNull
     private String createurRegle;
 }
 

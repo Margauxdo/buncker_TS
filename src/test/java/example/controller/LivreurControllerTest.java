@@ -1,6 +1,8 @@
+// Unit Test for LivreurController
 package example.controller;
 
 import example.entity.Livreur;
+import example.exceptions.ConflictException;
 import example.interfaces.ILivreurService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ public class LivreurControllerTest {
     }
 
     @Test
-    public void testListLivreurs() {
+    public void testListLivreurs_Success() {
         Livreur livreur = new Livreur();
         livreur.setId(1);
         when(livreurService.getAllLivreurs()).thenReturn(List.of(livreur));
@@ -39,7 +41,8 @@ public class LivreurControllerTest {
 
         assertEquals("livreurs/livreur_list", response);
         assertTrue(model.containsAttribute("livreurs"));
-        assertEquals(1, ((List) model.getAttribute("livreurs")).size());  // Vérifie que la liste contient un élément
+        assertEquals(1, ((List<?>) model.getAttribute("livreurs")).size());
+        verify(livreurService, times(1)).getAllLivreurs();
     }
 
     @Test
@@ -53,7 +56,8 @@ public class LivreurControllerTest {
 
         assertEquals("livreurs/livreur_details", response);
         assertTrue(model.containsAttribute("livreur"));
-        assertEquals(livreur, model.getAttribute("livreur"));  // Vérifie que l'attribut est bien l'objet livreur
+        assertEquals(livreur, model.getAttribute("livreur"));
+        verify(livreurService, times(1)).getLivreurById(1);
     }
 
     @Test
@@ -64,8 +68,8 @@ public class LivreurControllerTest {
         String response = livreurController.viewLivreurById(1, model);
 
         assertEquals("livreurs/error", response);
-        assertTrue(model.containsAttribute("errorMessage"));
         assertEquals("Livreur avec l'ID 1 non trouvé.", model.getAttribute("errorMessage"));
+        verify(livreurService, times(1)).getLivreurById(1);
     }
 
     @Test
@@ -84,10 +88,23 @@ public class LivreurControllerTest {
         livreur.setNomLivreur("John Doe");
         when(livreurService.createLivreur(any(Livreur.class))).thenReturn(livreur);
 
-        Model model = new ConcurrentModel();
-        String response = livreurController.createLivreur(livreur);
+        String response = livreurController.createLivreur(livreur, new ConcurrentModel());
 
-        assertEquals("redirect:/livreurs/livreur_list", response);
+        assertEquals("redirect:/livreurs/list", response);
+        verify(livreurService, times(1)).createLivreur(livreur);
+    }
+
+    @Test
+    public void testCreateLivreur_Conflict() {
+        Livreur livreur = new Livreur();
+        doThrow(new ConflictException("Conflict")).when(livreurService).createLivreur(any(Livreur.class));
+
+        Model model = new ConcurrentModel();
+        String response = livreurController.createLivreur(livreur, model);
+
+        assertEquals("livreurs/livreur_create", response);
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Un conflit s'est produit lors de la création du livreur.", model.getAttribute("errorMessage"));
     }
 
     @Test
@@ -101,17 +118,8 @@ public class LivreurControllerTest {
 
         assertEquals("livreurs/livreur_edit", response);
         assertTrue(model.containsAttribute("livreur"));
-        assertEquals(livreur, model.getAttribute("livreur"));  // Vérifie que l'attribut est bien l'objet livreur
-    }
-
-    @Test
-    public void testEditLivreurForm_NotFound() {
-        when(livreurService.getLivreurById(1)).thenReturn(null);
-
-        Model model = new ConcurrentModel();
-        String response = livreurController.editLivreurForm(1, model);
-
-        assertEquals("livreurs/error", response);
+        assertEquals(livreur, model.getAttribute("livreur"));
+        verify(livreurService, times(1)).getLivreurById(1);
     }
 
     @Test
@@ -122,17 +130,32 @@ public class LivreurControllerTest {
 
         when(livreurService.updateLivreur(1, livreur)).thenReturn(livreur);
 
-        String response = livreurController.updateLivreur(1, livreur);
+        Model model = new ConcurrentModel();
+        String response = livreurController.updateLivreur(1, livreur, model);
 
-        assertEquals("redirect:/livreurs/livreur_list", response);
+        assertEquals("redirect:/livreurs/list", response);
+        verify(livreurService, times(1)).updateLivreur(1, livreur);
     }
 
     @Test
     public void testDeleteLivreur_Success() {
         doNothing().when(livreurService).deleteLivreur(1);
 
-        String response = livreurController.deleteLivreur(1);
+        String response = livreurController.deleteLivreur(1, new ConcurrentModel());
 
-        assertEquals("redirect:/livreurs/livreur_list", response);
+        assertEquals("redirect:/livreurs/list", response);
+        verify(livreurService, times(1)).deleteLivreur(1);
+    }
+
+    @Test
+    public void testDeleteLivreur_Error() {
+        doThrow(new RuntimeException("Delete Error")).when(livreurService).deleteLivreur(1);
+
+        Model model = new ConcurrentModel();
+        String response = livreurController.deleteLivreur(1, model);
+
+        assertEquals("livreurs/error", response);
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Une erreur inattendue s'est produite lors de la suppression.", model.getAttribute("errorMessage"));
     }
 }

@@ -1,16 +1,13 @@
 package example.integration.controllers;
 
 import example.entity.Client;
-import example.entity.Valise;
 import example.repositories.ClientRepository;
-import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WebAppConfiguration
 @ActiveProfiles("integrationtest")
+@Transactional
 public class ClientControllerIntegrationTest {
 
     @Autowired
@@ -32,212 +30,122 @@ public class ClientControllerIntegrationTest {
     @Autowired
     private ClientRepository clientRepository;
 
-    @Autowired
-    private ValiseRepository valiseRepository;
-
     @BeforeEach
     public void setUp() {
         clientRepository.deleteAll();
     }
 
-    // API Tests
-    @Test
-    @Transactional
-    public void getAllClients_shouldReturnClients_whenClientsExist() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
-        clientRepository.save(client);
-
-        mockMvc.perform(get("/clients/api")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Nom Test"));
-    }
-
-    @Test
-    @Transactional
-    public void getClientById_shouldReturnClient_whenClientExists() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
-        client = clientRepository.save(client);
-
-        mockMvc.perform(get("/clients/api/{id}", client.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Nom Test"))
-                .andExpect(jsonPath("$.email").value("email@example.com"));
-    }
-
-    @Test
-    public void getClientById_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {
-        mockMvc.perform(get("/clients/api/{id}", 999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void createClient_shouldCreateClient_whenValidRequest() throws Exception {
-        String clientJson = "{\"name\":\"Nom Test\",\"adresse\":\"Adresse Test\",\"email\":\"email@example.com\"}";
-
-        mockMvc.perform(post("/clients/api")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(clientJson))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name", is("Nom Test")));
-    }
-
-    @Test
-    public void createClient_shouldReturnBadRequest_whenInvalidRequest() throws Exception {
-        String clientJson = "{\"name\":\"\",\"email\":\"invalid_email\"}";
-
-        mockMvc.perform(post("/clients/api")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(clientJson))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void updateClient_shouldUpdateClient_whenClientExists() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
-        client = clientRepository.save(client);
-
-        String updatedClientJson = String.format(
-                "{\"id\": %d, \"name\":\"Nom Mis à Jour\", \"adresse\":\"Adresse Mis à Jour\", \"email\":\"new_email@example.com\"}",
-                client.getId()
-        );
-
-        mockMvc.perform(put("/clients/api/{id}", client.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedClientJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Nom Mis à Jour")));
-    }
-
-    @Test
-    public void updateClient_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {
-        String updatedClientJson = "{\"name\":\"Nom Test\",\"adresse\":\"Adresse Test\",\"email\":\"email@example.com\"}";
-
-        mockMvc.perform(put("/clients/api/{id}", 999)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedClientJson))
-                .andExpect(status().isNotFound());
-    }
-
-
-    @Test
-    public void deleteClient_shouldReturnNoContent_whenClientExists() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
-        client = clientRepository.save(client);
-
-        mockMvc.perform(delete("/clients/api/{id}", client.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void deleteClient_shouldReturnNotFound_whenClientDoesNotExist() throws Exception {
-        mockMvc.perform(delete("/clients/api/{id}", 999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    // Thymeleaf Tests
+    // Test: View all clients
     @Test
     public void testViewClients() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@example.com")
+                .adresse("123 Test St")
+                .build();
         clientRepository.save(client);
 
         mockMvc.perform(get("/clients/list"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("clients/client_list"))  // Correct view name
+                .andExpect(view().name("clients/client_list"))
                 .andExpect(model().attribute("clients", hasSize(1)))
                 .andExpect(model().attribute("clients", hasItem(
-                        hasProperty("name", is("Nom Test"))  // Ensure client.name is correct
+                        hasProperty("name", is("John Doe"))
                 )));
     }
 
-
+    // Test: View a single client by ID
     @Test
     public void testViewClientById() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
+        Client client = Client.builder()
+                .name("Jane Doe")
+                .email("jane@example.com")
+                .adresse("456 Sample St")
+                .build();
         client = clientRepository.save(client);
 
         mockMvc.perform(get("/clients/view/{id}", client.getId()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("clients/client_detail"))  // Updated view name
-                .andExpect(model().attribute("client", hasProperty("name", is("Nom Test"))));
+                .andExpect(view().name("clients/client_detail"))
+                .andExpect(model().attribute("client", hasProperty("name", is("Jane Doe"))));
     }
 
-
+    // Test: Show create client form
     @Test
     public void testCreateClientForm() throws Exception {
         mockMvc.perform(get("/clients/create"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("clients/client_create"))  // Modifiez ici
+                .andExpect(view().name("clients/client_create"))
                 .andExpect(model().attributeExists("client"));
     }
+
+    // Test: Create a new client
     @Test
-    public void testDeleteClientCascadeRelations() throws Exception {
-        Client client = new Client();
-        client.setName("Client with Relations");
-        client.setEmail("relations@example.com");
+    public void testCreateClient() throws Exception {
+        mockMvc.perform(post("/clients/create")
+                        .param("name", "Alice Doe")
+                        .param("email", "alice@example.com")
+                        .param("adresse", "789 Example St"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/clients/clients_list"));
 
-        Valise valise = new Valise();
-        valise.setClient(client);
-        client.getValises().add(valise);
-
-        clientRepository.save(client);
-
-        mockMvc.perform(delete("/clients/api/{id}", client.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        Assertions.assertTrue(clientRepository.findById(client.getId()).isEmpty());
-        Assertions.assertTrue(valiseRepository.findAll().isEmpty());
+        Client savedClient = clientRepository.findAll().get(0);
+        Assertions.assertEquals("Alice Doe", savedClient.getName());
+        Assertions.assertEquals("alice@example.com", savedClient.getEmail());
     }
 
-
+    // Test: Show edit client form
     @Test
     public void testEditClientForm() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
+        Client client = Client.builder()
+                .name("Edit Test")
+                .email("edit@example.com")
+                .adresse("123 Edit St")
+                .build();
         client = clientRepository.save(client);
 
         mockMvc.perform(get("/clients/edit/{id}", client.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("clients/client_edit"))
-
-                .andExpect(model().attribute("client", hasProperty("name", is("Nom Test"))));
+                .andExpect(model().attribute("client", hasProperty("name", is("Edit Test"))));
     }
 
+    // Test: Edit an existing client
+    @Test
+    public void testEditClient() throws Exception {
+        Client client = Client.builder()
+                .name("Original Name")
+                .email("original@example.com")
+                .adresse("123 Original St")
+                .build();
+        client = clientRepository.save(client);
+
+        mockMvc.perform(post("/clients/edit/{id}", client.getId())
+                        .param("name", "Updated Name")
+                        .param("email", "updated@example.com")
+                        .param("adresse", "123 Updated St"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/clients/clients_list"));
+
+        Client updatedClient = clientRepository.findById(client.getId()).orElseThrow();
+        Assertions.assertEquals("Updated Name", updatedClient.getName());
+        Assertions.assertEquals("updated@example.com", updatedClient.getEmail());
+    }
+
+    // Test: Delete a client
     @Test
     public void testDeleteClient() throws Exception {
-        Client client = new Client();
-        client.setName("Nom Test");
-        client.setAdresse("Adresse Test");
-        client.setEmail("email@example.com");
+        Client client = Client.builder()
+                .name("Delete Test")
+                .email("delete@example.com")
+                .adresse("123 Delete St")
+                .build();
         client = clientRepository.save(client);
 
         mockMvc.perform(post("/clients/delete/{id}", client.getId()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/clients/list"));
+                .andExpect(redirectedUrl("/clients/clients_list"));
+
+        Assertions.assertTrue(clientRepository.findById(client.getId()).isEmpty());
     }
 }

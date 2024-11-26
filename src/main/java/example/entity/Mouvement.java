@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,11 +35,23 @@ public class Mouvement {
 
     @OneToMany(mappedBy = "mouvement", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
-    private List<Livreur> livreurs;
-
-
+    private List<Livreur> livreurs = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "retourSecurite_id")
-    private List<RetourSecurite> retourSecurites;
+    private List<RetourSecurite> retourSecurites = new ArrayList<>();
+
+
+
+    public void addLivreur(Livreur livreur) {
+        this.livreurs.add(livreur);
+        livreur.setMouvement(this); // Maintenir la cohérence de la relation bidirectionnelle
+    }
+
+    public void removeLivreur(Livreur livreur) {
+        this.livreurs.remove(livreur);
+        livreur.setMouvement(null); // Maintenir la cohérence de la relation bidirectionnelle
+    }
+
+
 }

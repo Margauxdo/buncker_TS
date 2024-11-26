@@ -24,7 +24,7 @@ public class TypeRegle {
     @Column(name = "typeRegle_name", unique = true, nullable = false)
     private String nomTypeRegle;
 
-    @ManyToOne(cascade = CascadeType.PERSIST) // Cascade persist
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "regle_id", nullable = false)
     private Regle regle;
 }

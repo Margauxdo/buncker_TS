@@ -1,206 +1,136 @@
+
 package example.integration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import example.controller.RetourSecuriteController;
-import example.entity.Client;
 import example.entity.RetourSecurite;
-import example.interfaces.IRetourSecuriteService;
-import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 
-import static org.hamcrest.Matchers.is;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationtest")
+@Transactional
 public class RetourSecuriteControllerIntegrationTest {
 
     @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
+
     @Autowired
     private RetourSecuriteRepository retourSecuriteRepository;
 
-    @Autowired
-    private ClientRepository clientRepository;
-
-    @Autowired
-    private RetourSecuriteController RScontroller;
-
-
-    @SpyBean
-    private IRetourSecuriteService retourSecuriteService;
-    @Autowired
-    private ObjectMapper objectMapper;
-
-
+    private RetourSecurite savedRetourSecurite;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        retourSecuriteRepository.deleteAll();
-        clientRepository.deleteAll();
+    public void setUp() {
+        RetourSecurite retourSecurite = RetourSecurite.builder()
+                .numero(123456L)
+                .datesecurite(new Date())
+                .cloture(false)
+                .build();
+        savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
     }
 
-
-
+    // Test: View all RetourSecurites
     @Test
-    public void testCreateRS_ShouldCreateRetourSecuriteWhenDataIsValid() throws Exception {
-        Client client = new Client();
-        client.setName("Bonningue");
-        client.setEmail("bonningue@gmail.com");
-        client = clientRepository.save(client);
-
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setNumero(25L);
-        retourSecurite.setDatesecurite(new Date());
-        retourSecurite.setCloture(false);
-        retourSecurite.setClients(new ArrayList<>());
-
-        mvc.perform(post("/api/retourSecurite")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(retourSecurite)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.numero", is(25)))
-                .andExpect(jsonPath("$.cloture", is(false)));
+    public void testViewAllRetourSecurites() throws Exception {
+        mockMvc.perform(get("/retourSecurite/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("retourSecurites/RS_list"))
+                .andExpect(model().attributeExists("retourSecurites"))
+                .andExpect(model().attribute("retourSecurites", hasSize(greaterThan(0))));
     }
 
-
-
-
+    // Test: View a RetourSecurite by ID - Success
     @Test
-    public void testCreateRS_ShouldReturnBadRequestWhenRetourSecuriteIsNullOrInvalid() throws Exception {
-        mvc.perform(post("/api/retourSecurite")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isBadRequest());
+    public void testViewRetourSecuriteById_Success() throws Exception {
+        mockMvc.perform(get("/retourSecurite/view/{id}", savedRetourSecurite.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("retourSecurites/RS_details"))
+                .andExpect(model().attributeExists("retourSecurite"))
+                .andExpect(model().attribute("retourSecurite", hasProperty("numero", is(savedRetourSecurite.getNumero()))));
     }
 
-
+    // Test: View a RetourSecurite by ID - Not Found
     @Test
-    public void testUpdateRS_ShouldReturnBadRequestWhenUpdateDataIsInvalid() throws Exception {
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setNumero(null);
-
-        Client client = new Client();
-        client.setId(1);
-        retourSecurite.setClients(new ArrayList<>());
-
-        mvc.perform(put("/api/retourSecurite/{id}", 999999)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(retourSecurite)))
-                .andExpect(status().isBadRequest());
+    public void testViewRetourSecuriteById_NotFound() throws Exception {
+        mockMvc.perform(get("/retourSecurite/view/{id}", 9999))
+                .andExpect(status().isOk())
+                .andExpect(view().name("retourSecurites/error"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", containsString("non trouve")));
     }
 
-
-
-
+    // Test: Create RetourSecurite Form
     @Test
-    public void testUpdateRS_ShouldReturnNotFoundWhenUpdatingNonExistentRetourSecurite() throws Exception {
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setNumero(25L);
-
-        mvc.perform(put("/api/retourSecurite/{id}", 9999)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(retourSecurite)))
-                .andExpect(status().isNotFound());
+    public void testCreateRetourSecuriteForm() throws Exception {
+        mockMvc.perform(get("/retourSecurite/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("retourSecurites/RS_create"))
+                .andExpect(model().attributeExists("retourSecurite"));
     }
 
+    // Test: Create RetourSecurite - Success
     @Test
-    public void testUpdateRS_ShouldReturnInternalServerErrorWhenDatabaseErrorOccursOnUpdate() throws Exception {
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setNumero(25L);
+    public void testCreateRetourSecurite_Success() throws Exception {
+        mockMvc.perform(post("/retourSecurite/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("numero", "987654")
+                        .param("cloture", "false"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/retourSecurites/RS_list"));
 
-        Mockito.doThrow(new RuntimeException("Simulated database error"))
-                .when(retourSecuriteService).updateRetourSecurite(eq(-1), any(RetourSecurite.class));
+        RetourSecurite createdRetourSecurite = retourSecuriteRepository.findAll().stream()
+                .filter(rs -> rs.getNumero().equals(987654L))
+                .findFirst()
+                .orElse(null);
 
-        mvc.perform(put("/api/retourSecurite/{id}", -1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(retourSecurite)))
-                .andExpect(status().isInternalServerError());
+        assert createdRetourSecurite != null;
     }
 
+    // Test: Edit RetourSecurite Form
     @Test
-    public void testDeleteRS_ShouldDeleteRetourSecuriteWhenIdExists() throws Exception {
-        Client client = new Client();
-        client.setName("Test Client");
-        client.setEmail("testclient@example.com");
-        clientRepository.save(client);
-
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setNumero(25L);
-        retourSecurite.setClients(new ArrayList<>());
-        retourSecuriteRepository.save(retourSecurite);
-
-        mvc.perform(delete("/api/retourSecurite/{id}", retourSecurite.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+    public void testEditRetourSecuriteForm() throws Exception {
+        mockMvc.perform(get("/retourSecurite/edit/{id}", savedRetourSecurite.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("retourSecurites/RS_edit"))
+                .andExpect(model().attributeExists("retourSecurite"))
+                .andExpect(model().attribute("retourSecurite", hasProperty("numero", is(savedRetourSecurite.getNumero()))));
     }
 
+    // Test: Edit RetourSecurite - Success
     @Test
-    public void testDeleteRS_ShouldReturnNotFoundWhenDeletingNonExistentRetourSecurite() throws Exception {
-        mvc.perform(delete("/api/retourSecurite/{id}", 9999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+    public void testEditRetourSecurite_Success() throws Exception {
+        mockMvc.perform(post("/retourSecurite/edit/{id}", savedRetourSecurite.getId())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("numero", "111111")
+                        .param("cloture", "true"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/retourSecurites/RS_list"));
+
+        RetourSecurite updatedRetourSecurite = retourSecuriteRepository.findById(savedRetourSecurite.getId()).orElse(null);
+        assert updatedRetourSecurite != null;
+        assert updatedRetourSecurite.getNumero().equals(111111L);
+        assert updatedRetourSecurite.getCloture();
     }
+
+    // Test: Delete RetourSecurite
     @Test
-    public void testCreateRetourSecurite_MissingFields_ShouldReturnBadRequest() throws Exception {
-        RetourSecurite retourSecurite = new RetourSecurite();
-        mvc.perform(post("/api/retourSecurite")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(retourSecurite)))
-                .andExpect(status().isBadRequest());
+    public void testDeleteRetourSecurite() throws Exception {
+        mockMvc.perform(post("/retourSecurite/delete/{id}", savedRetourSecurite.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/retourSecurites/RS_list"));
+
+        assert retourSecuriteRepository.findById(savedRetourSecurite.getId()).isEmpty();
     }
-    @Test
-    public void testCreateRetourSecurite_InvalidInput() {
-        RetourSecurite retourSecurite = new RetourSecurite();
-
-        when(retourSecuriteService.createRetourSecurite(any(RetourSecurite.class)))
-                .thenThrow(new DataIntegrityViolationException("Invalid input"));
-
-        ResponseEntity<RetourSecurite> result = RScontroller.createRetourSecuriteApi(retourSecurite);
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-        verify(retourSecuriteService, times(1)).createRetourSecurite(any(RetourSecurite.class));
-    }
-
-    @Test
-    public void testUpdateRetourSecurite_EntityNotFound() {
-        RetourSecurite retourSecurite = new RetourSecurite();
-        when(retourSecuriteService.updateRetourSecurite(eq(9999), any(RetourSecurite.class)))
-                .thenThrow(new EntityNotFoundException("Entity not found"));
-
-        ResponseEntity<RetourSecurite> response = RScontroller.updateRetourSecuriteApi(9999, retourSecurite);
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        verify(retourSecuriteService, times(1)).updateRetourSecurite(eq(9999), any(RetourSecurite.class));
-    }
-
-
-
-
-
 }

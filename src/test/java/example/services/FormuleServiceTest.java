@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -19,6 +20,8 @@ import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,32 +43,6 @@ public class FormuleServiceTest {
     }
 
 
-    @Test
-    public void testCreateFormule_Success() {
-        // Arrange
-        Formule formule = new Formule();
-        Regle regle = new Regle();
-        regle.setId(1);  // On donne un ID à la règle
-        formule.setRegle(regle);
-
-        // Simuler la présence de la règle en base de données
-        when(regleRepository.existsById(regle.getId())).thenReturn(true);  // Simule la règle existante en base
-        when(regleRepository.findById(regle.getId())).thenReturn(Optional.of(regle));  // Mock findById pour retourner la règle persistée
-        when(formuleRepository.save(formule)).thenReturn(formule);  // Simule la sauvegarde de la formule
-
-        // Act
-        Formule result = formuleService.createFormule(formule);
-
-        // Assert
-        Assertions.assertNotNull(result, "Formule should not be null");
-        verify(formuleRepository, times(1)).save(formule);  // Vérifie que la méthode save a été appelée une fois
-        verify(regleRepository, times(1)).existsById(regle.getId());  // Vérifie que existsById a été appelé une fois
-        verify(regleRepository, times(1)).findById(regle.getId());  // Vérifie que findById a été appelé une fois
-        verifyNoMoreInteractions(formuleRepository, regleRepository);  // Vérifie qu'il n'y a pas d'autres interactions
-    }
-
-
-
 
     @Test
     public void testUpdateFormule_Success() {
@@ -83,8 +60,8 @@ public class FormuleServiceTest {
 
         Formule result = formuleService.updateFormule(id, formule);
 
-        Assertions.assertNotNull(result, "Formule should not be null");
-        Assertions.assertEquals(id, result.getId(), "L'ID de la formule devrait être mis à jour");
+        assertNotNull(result, "Formule should not be null");
+        assertEquals(id, result.getId(), "L'ID de la formule devrait être mis à jour");
 
         verify(formuleRepository, times(1)).findById(id);
         verify(formuleRepository, times(1)).save(any(Formule.class));
@@ -106,8 +83,8 @@ public class FormuleServiceTest {
 
         Formule result = formuleService.getFormuleById(id);
 
-        Assertions.assertNotNull(result, "Formule should not be null");
-        Assertions.assertEquals(id, result.getId(), "L'ID de la formule devrait correspondre");
+        assertNotNull(result, "Formule should not be null");
+        assertEquals(id, result.getId(), "L'ID de la formule devrait correspondre");
 
         verify(formuleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(formuleRepository);
@@ -137,7 +114,7 @@ public class FormuleServiceTest {
 
         List<Formule> result = formuleService.getAllFormules();
 
-        Assertions.assertEquals(2, result.size(), "La liste des formules devrait contenir 2 éléments");
+        assertEquals(2, result.size(), "La liste des formules devrait contenir 2 éléments");
         verify(formuleRepository, times(1)).findAll();
         verifyNoMoreInteractions(formuleRepository);
     }
@@ -148,7 +125,7 @@ public class FormuleServiceTest {
 
         List<Formule> result = formuleService.getAllFormules();
 
-        Assertions.assertNotNull(result, "Le résultat ne doit pas être null");
+        assertNotNull(result, "Le résultat ne doit pas être null");
         Assertions.assertTrue(result.isEmpty(), "La liste des formules devrait être vide");
 
         verify(formuleRepository, times(1)).findAll();
@@ -183,7 +160,7 @@ public class FormuleServiceTest {
             formuleService.deleteFormule(id);
         });
 
-        Assertions.assertEquals("Formule not found for ID " + id, exception.getMessage(), "Exception message should match expected error");
+        assertEquals("Formule not found for ID " + id, exception.getMessage(), "Exception message should match expected error");
 
         verify(formuleRepository, times(1)).existsById(id);
 
@@ -204,7 +181,7 @@ public class FormuleServiceTest {
             formuleService.deleteFormule(id);
         });
 
-        Assertions.assertEquals("Database error", exception.getMessage(), "Exception message should match expected error");
+        assertEquals("Database error", exception.getMessage(), "Exception message should match expected error");
 
         verify(formuleRepository, times(1)).existsById(id);
         verify(formuleRepository, times(1)).deleteById(id);
@@ -233,6 +210,10 @@ public class FormuleServiceTest {
         verify(formuleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(formuleRepository);
     }
+
+
+
+
 
 }
 

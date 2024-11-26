@@ -1,6 +1,7 @@
 package example.services;
 
 import example.entity.Formule;
+import example.entity.Regle;
 import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
@@ -32,17 +33,26 @@ public class FormuleService implements IFormuleService {
 
     @Override
     public Formule createFormule(Formule formule) {
-        logger.info("Création de la formule avec les détails: {}", formule);
-
-        if (formule.getRegle() == null || !regleRepository.existsById(formule.getRegle().getId())) {
-            logger.error("Regle not found with ID: {}", formule.getRegle().getId());
+        logger.info("Creating formule with Regle ID: {}", formule.getRegle().getId());
+        logger.info("Checking existence of Regle...");
+        if (!regleRepository.existsById(formule.getRegle().getId())) {
+            logger.error("Regle not found during existence check");
             throw new IllegalArgumentException("Regle not found with ID: " + formule.getRegle().getId());
         }
 
-        Formule createdFormule = formuleRepository.save(formule);
-        logger.info("Formule créée avec succès : {}", createdFormule);
-        return createdFormule;
+        logger.info("Fetching Regle from repository...");
+        Regle regle = regleRepository.findById(formule.getRegle().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Regle not found with ID: " + formule.getRegle().getId()));
+        formule.setRegle(regle);
+        logger.info("Saving formule...");
+        return formuleRepository.save(formule);
     }
+
+
+
+
+
+
 
 
 

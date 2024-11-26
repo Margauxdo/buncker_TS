@@ -28,6 +28,7 @@ public class ClientControllerTest {
     @InjectMocks
     private ClientController clientController;
 
+    // Test: Création d'un client - Succès
     @Test
     public void testCreateClient_Success() {
         Client client = new Client();
@@ -35,43 +36,33 @@ public class ClientControllerTest {
 
         String response = clientController.createClient(client);
 
-        // Assertions
         assertEquals("redirect:/clients/clients_list", response);
+        verify(clientService, times(1)).createClient(client); // Vérifie l'appel du service
     }
 
+    // Test: Suppression d'un client - Succès
     @Test
     public void testDeleteClient_Success() {
-        lenient().when(clientService.existsById(1)).thenReturn(true);
         doNothing().when(clientService).deleteClient(1);
 
         String response = clientController.deleteClient(1);
 
-        // Assertions
         assertEquals("redirect:/clients/clients_list", response);
-        verify(clientService, times(1)).deleteClient(1);
+        verify(clientService, times(1)).deleteClient(1); // Vérifie l'appel du service
     }
 
-    @Test
-    public void testDeleteClientWithRelations() {
-        doNothing().when(clientService).deleteClient(1);
-        String response = clientController.deleteClient(1);
-
-        // Assertions
-        assertEquals("redirect:/clients/clients_list", response);
-        verify(clientService, times(1)).deleteClient(1); // Vérifie que la suppression a été appelée
-    }
-
+    // Test: Liste des clients - Succès
     @Test
     public void testViewClients() {
         when(clientService.getAllClients()).thenReturn(List.of(new Client()));
 
         String response = clientController.viewClients(model);
 
-        // Assertions
         assertEquals("clients/client_list", response);
         verify(model, times(1)).addAttribute(eq("clients"), any());
     }
 
+    // Test: Voir un client par ID - Succès
     @Test
     public void testViewClientById_Success() {
         Client client = new Client();
@@ -79,22 +70,22 @@ public class ClientControllerTest {
 
         String response = clientController.viewClientById(1, model);
 
-        // Assertions
         assertEquals("clients/client_detail", response);
         verify(model, times(1)).addAttribute("client", client);
     }
 
+    // Test: Voir un client par ID - Non trouvé
     @Test
     public void testViewClientById_NotFound() {
         when(clientService.getClientById(1)).thenReturn(null);
 
         String response = clientController.viewClientById(1, model);
 
-        // Assertions
         assertEquals("clients/error", response);
         verify(model, times(1)).addAttribute(eq("errorMessage"), any());
     }
 
+    // Test: Modifier un client - Succès
     @Test
     public void testEditClientForm_Success() {
         Client client = new Client();
@@ -102,21 +93,22 @@ public class ClientControllerTest {
 
         String response = clientController.editClientForm(1, model);
 
-        // Assertions
         assertEquals("clients/client_edit", response);
         verify(model, times(1)).addAttribute("client", client);
     }
 
+    // Test: Modifier un client - Non trouvé
     @Test
     public void testEditClientForm_NotFound() {
         when(clientService.getClientById(1)).thenReturn(null);
 
         String response = clientController.editClientForm(1, model);
 
-        // Assertions
         assertEquals("clients/error", response);
+        verify(clientService, times(1)).getClientById(1);
     }
 
+    // Test: Mise à jour d'un client - Succès
     @Test
     public void testUpdateClient_Success() {
         Client client = new Client();
@@ -124,27 +116,16 @@ public class ClientControllerTest {
 
         String response = clientController.updateClient(1, client);
 
-        // Assertions
         assertEquals("redirect:/clients/clients_list", response);
+        verify(clientService, times(1)).updateClient(1, client);
     }
 
+    // Test: Formulaire de création d'un client
     @Test
     public void testCreateClientForm() {
         String response = clientController.createClientForm(model);
 
-        // Assertions
         assertEquals("clients/client_create", response);
-        verify(model, times(1)).addAttribute(eq("client"), any(Client.class)); // Vérifie que l'attribut "client" est ajouté au modèle
-    }
-
-    @Test
-    public void testViewClientsList() {
-        when(clientService.getAllClients()).thenReturn(List.of(new Client()));
-
-        String response = clientController.viewClients(model);
-
-        // Assertions
-        assertEquals("clients/client_list", response);
-        verify(model, times(1)).addAttribute(eq("clients"), any());
+        verify(model, times(1)).addAttribute(eq("client"), any(Client.class));
     }
 }

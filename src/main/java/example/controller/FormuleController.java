@@ -37,8 +37,14 @@ public class FormuleController {
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
         return new ResponseEntity<>("Invalid data for Formula creation", HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(EntityNotFoundException.class)
+    public String handleEntityNotFoundException(EntityNotFoundException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "formules/error";
+    }
 
 
+/*
     // API REST: Récupérer tous les formules
     @GetMapping("/api")
     public List<Formule> getAllFormulesApi() {
@@ -95,16 +101,16 @@ public class FormuleController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
 
     // Vue Thymeleaf pour lister les formules
-    @GetMapping("/list")
+    @GetMapping("/formules/list")
     public String viewFormuleList(Model model) {
         model.addAttribute("formules", formuleService.getAllFormules());
         return "formules/formule_list";
     }
     // Vue Thymeleaf pour voir une formule par ID
-    @GetMapping("/view/{id}")
+    @GetMapping("/formules/view/{id}")
     public String viewFormuleById(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
         if (formule == null) {
@@ -116,14 +122,14 @@ public class FormuleController {
 
 
     // Formulaire Thymeleaf pour créer une formule
-    @GetMapping("/create")
+    @GetMapping("/formules/create")
     public String createFormuleForm(Model model) {
         model.addAttribute("formule", new Formule());
         return "formules/formule_create";
     }
 
     // Création d'une formule via formulaire Thymeleaf
-    @PostMapping("/create")
+    @PostMapping("/formules/create")
     public String createFormule(@Valid @ModelAttribute("formule") Formule formule,Model model){
         try {
             formuleService.createFormule(formule);
@@ -136,7 +142,7 @@ public class FormuleController {
     }
 
     // Formulaire Thymeleaf pour modifier une formule
-    @GetMapping("/edit/{id}")
+    @GetMapping("/formules/edit/{id}")
     public String editFormuleForm(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
         if (formule == null) {
@@ -147,18 +153,22 @@ public class FormuleController {
     }
 
     // Modifier une formule via formulaire Thymeleaf
-    @PostMapping("/edit/{id}")
+    @PostMapping("/formules/edit/{id}")
     public String updateFormule(@PathVariable int id, @Valid @ModelAttribute("formule") Formule formule) {
         formuleService.updateFormule(id, formule);
         return "redirect:/formules/formules_list";
     }
 
     // Supprimer une formule via un formulaire Thymeleaf sécurisé
-    @PostMapping("/delete/{id}")
+    @PostMapping("/formules/delete/{id}")
     public String deleteFormule(@PathVariable int id) {
+        System.out.println("Deleting Formule with ID: " + id);
         formuleService.deleteFormule(id);
         return "redirect:/formules/formules_list";
     }
+
+
+
 
 
 }

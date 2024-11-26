@@ -4,6 +4,7 @@ import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.repositories.RegleRepository;
 import example.repositories.TypeRegleRepository;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -34,16 +36,7 @@ public class TypeRegleIntegrationTest {
         typeRegleRepository.deleteAll();
     }
 
-    @Test
-    public void testSaveTypeRegleSuccess() {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Valid TypeRegle");
 
-        TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
-
-        assertNotNull(savedTypeRegle.getId());
-        assertEquals("Valid TypeRegle", savedTypeRegle.getNomTypeRegle());
-    }
 
     @Test
     public void testSaveTypeRegleFailure() {
@@ -54,40 +47,124 @@ public class TypeRegleIntegrationTest {
     }
 
     @Test
-    public void testFindTypeRegleByIdSuccess() {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Test Find");
-        TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
-
-        Optional<TypeRegle> foundTypeRegle = typeRegleRepository.findById(savedTypeRegle.getId());
-        assertTrue(foundTypeRegle.isPresent());
-        assertEquals("Test Find", foundTypeRegle.get().getNomTypeRegle());
-    }
-
-    @Test
-    public void testFindTypeRegleByIdNotFound() {
-        Optional<TypeRegle> foundTypeRegle = typeRegleRepository.findById(-1);
-        assertFalse(foundTypeRegle.isPresent());
-    }
-
-    @Test
+    @Transactional
     public void testUpdateTypeRegleSuccess() {
+        Regle regle = new Regle();
+        regle.setCoderegle("InitialCode");
+        regle.setSomeProperty("Some Value");
+        regle = regleRepository.saveAndFlush(regle);
+
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setNomTypeRegle("Old Name");
+        typeRegle.setRegle(regle);
         TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
 
         savedTypeRegle.setNomTypeRegle("New Name");
         TypeRegle updatedTypeRegle = typeRegleRepository.saveAndFlush(savedTypeRegle);
 
+        assertNotNull(updatedTypeRegle.getId());
         assertEquals("New Name", updatedTypeRegle.getNomTypeRegle());
+        assertEquals("InitialCode", updatedTypeRegle.getRegle().getCoderegle()); // Verify the associated Regle
     }
 
 
 
+
     @Test
-    public void testDeleteTypeRegleSuccess() {
+    @Transactional
+    public void testUniqueConstraintOnTypeRegleName() {
+        Regle regle = new Regle();
+        regle.setCoderegle("CODE123");
+        regle.setSomeField("Some Value");
+        regle = regleRepository.saveAndFlush(regle);
+
+        TypeRegle typeRegle1 = new TypeRegle();
+        typeRegle1.setNomTypeRegle("SingleName");
+        typeRegle1.setRegle(regle);
+        typeRegleRepository.saveAndFlush(typeRegle1);
+
+        TypeRegle typeRegle2 = new TypeRegle();
+        typeRegle2.setNomTypeRegle("SingleName");
+        typeRegle2.setRegle(regle);
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            typeRegleRepository.saveAndFlush(typeRegle2);
+        });
+    }
+
+    @Test
+    @Transactional
+    public void testSaveTypeRegleSuccess() {
+        Regle regle = new Regle();
+        regle.setCoderegle("TestCode");
+        regle = regleRepository.saveAndFlush(regle);
         TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Delete Test");
+        typeRegle.setNomTypeRegle("Test Type");
+        typeRegle.setRegle(regle);
+        TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
+
+        // Assertions
+        assertNotNull(savedTypeRegle.getId());
+        assertEquals("Test Type", savedTypeRegle.getNomTypeRegle());
+        assertNotNull(savedTypeRegle.getRegle());
+        assertEquals("TestCode", savedTypeRegle.getRegle().getCoderegle());
+    }
+
+    @Test
+    @Transactional
+    public void testUniqueConstraintOnNomTypeRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("R001");
+        regleRepository.saveAndFlush(regle);
+
+        TypeRegle typeRegle1 = new TypeRegle();
+        typeRegle1.setNomTypeRegle("Unique Type");
+        typeRegle1.setRegle(regle);
+        typeRegleRepository.saveAndFlush(typeRegle1);
+
+        TypeRegle typeRegle2 = new TypeRegle();
+        typeRegle2.setNomTypeRegle("Unique Type");
+        typeRegle2.setRegle(regle);
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            typeRegleRepository.saveAndFlush(typeRegle2);
+        });
+    }
+
+    @Test
+    @Transactional
+    public void testFindTypeRegleByIdSuccess() {
+        Regle regle = new Regle();
+        regle.setCoderegle("R001");
+        regleRepository.saveAndFlush(regle);
+
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Find Type");
+        typeRegle.setRegle(regle);
+        TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
+
+        Optional<TypeRegle> foundTypeRegle = typeRegleRepository.findById(savedTypeRegle.getId());
+        assertTrue(foundTypeRegle.isPresent());
+        assertEquals("Find Type", foundTypeRegle.get().getNomTypeRegle());
+        assertEquals("R001", foundTypeRegle.get().getRegle().getCoderegle());
+    }
+
+    @Test
+    @Transactional
+    public void testFindTypeRegleByIdNotFound() {
+        Optional<TypeRegle> foundTypeRegle = typeRegleRepository.findById(-1);
+        assertFalse(foundTypeRegle.isPresent());
+    }
+    @Test
+    @Transactional
+    public void testDeleteTypeRegleSuccess() {
+        Regle regle = new Regle();
+        regle.setCoderegle("ValidCode");
+        regle.setSomeProperty("Some Value");
+        regle = regleRepository.saveAndFlush(regle);
+
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Delete Type");
+        typeRegle.setRegle(regle);
         TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
 
         typeRegleRepository.deleteById(savedTypeRegle.getId());
@@ -96,72 +173,20 @@ public class TypeRegleIntegrationTest {
         Optional<TypeRegle> foundTypeRegle = typeRegleRepository.findById(savedTypeRegle.getId());
         assertFalse(foundTypeRegle.isPresent());
     }
-    @Test
-    public void testUniqueConstraintOnTypeRegleName() {
-        TypeRegle typeRegle1 = new TypeRegle();
-        typeRegle1.setNomTypeRegle("SingleName");
-        typeRegleRepository.saveAndFlush(typeRegle1);
 
-        TypeRegle typeRegle2 = new TypeRegle();
-        typeRegle2.setNomTypeRegle("SingleName");
+    @Test
+    @Transactional
+    public void testSaveTypeRegleInvalidData() {
+        TypeRegle typeRegle = new TypeRegle();
 
         assertThrows(DataIntegrityViolationException.class, () -> {
-            typeRegleRepository.saveAndFlush(typeRegle2);
+            typeRegleRepository.saveAndFlush(typeRegle);
         });
     }
 
 
-    @Test
-    public void testCascadeDeleteTypeRegleWithRegles() {
-        // Création d'un TypeRegle
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type A");
 
-        // Création des Regles associées
-        Regle regle1 = new Regle();
-        regle1.setCoderegle("R001");
-        regle1.setTypeRegle(typeRegle);
 
-        Regle regle2 = new Regle();
-        regle2.setCoderegle("R002");
-        regle2.setTypeRegle(typeRegle);
-
-        typeRegle.getNomTypeRegle().isEmpty();
-        typeRegle.getRegle();
-
-        // Sauvegarde
-        typeRegleRepository.saveAndFlush(typeRegle);
-
-        // Suppression de TypeRegle
-        typeRegleRepository.deleteById(typeRegle.getId());
-        typeRegleRepository.flush();
-
-        // Vérifications
-        assertFalse(regleRepository.findById(regle1.getId()).isPresent());
-        assertFalse(regleRepository.findById(regle2.getId()).isPresent());
-    }
-
-    @Test
-    public void testSaveTypeRegle_WithRegle() {
-        // Création d'une règle
-        Regle regle = new Regle();
-        regle.setCoderegle("RegleDatabase");
-
-        // Création d'un TypeRegle
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type C");
-        typeRegle.getRegle();
-        regle.setTypeRegle(typeRegle);
-
-        // Sauvegarde
-        TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
-
-        // Vérifications
-        assertNotNull(savedTypeRegle.getId());
-        assertEquals("Type C", savedTypeRegle.getNomTypeRegle());
-        assertEquals(1, savedTypeRegle.getNomTypeRegle());
-        assertEquals("RegleDatabase", savedTypeRegle.getNomTypeRegle());
-    }
 
 
 

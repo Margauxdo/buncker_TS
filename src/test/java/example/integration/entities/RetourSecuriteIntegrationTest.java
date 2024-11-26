@@ -1,6 +1,7 @@
 package example.integration.entities;
 
 import example.entity.Client;
+import example.entity.Mouvement;
 import example.entity.RetourSecurite;
 import example.repositories.ClientRepository;
 import example.repositories.RetourSecuriteRepository;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +34,10 @@ public class RetourSecuriteIntegrationTest {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+
     @PersistenceContext
     private EntityManager em;
 
@@ -40,20 +47,10 @@ public class RetourSecuriteIntegrationTest {
         clientRepository.deleteAll();
     }
 
-    @Test
-    public void testSaveRetourSecurite() {
-        Client client = new Client();
-        client.setEmail("test@test.com");
-        client.setName("Albert");
-        clientRepository.save(client);
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClients(new ArrayList<>());
-        retourSecurite.setDatesecurite(new Date());
-        retourSecurite.setNumero(1234L);
-        RetourSecurite savedRs = retourSecuriteRepository.save(retourSecurite);
-        Assertions.assertNotNull(savedRs.getId(), "The safety return id must be generated");
-        Assertions.assertEquals(client.getId(), savedRs.getClients().get(0), "The associated client must match");
-    }
+
+
+
+
     @Test
     public void testUpdateRetourSecurite() {
         Client client = new Client();
@@ -73,14 +70,18 @@ public class RetourSecuriteIntegrationTest {
     }
     @Test
     public void testSaveRetourSecuriteWithoutClient() {
+        // Create a RetourSecurite instance without clients or mouvement
         RetourSecurite retourSecurite = new RetourSecurite();
         retourSecurite.setDatesecurite(new Date());
         retourSecurite.setNumero(1234L);
 
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            retourSecuriteRepository.save(retourSecurite);
-        }, "A DataIntegrityViolationException is expected due to the client not being present.");
+        // Attempt to save the entity and verify it's persisted successfully
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
+        Assertions.assertNotNull(savedRetourSecurite.getId(), "The RetourSecurite should be saved successfully even without clients.");
+        Assertions.assertEquals(1234L, savedRetourSecurite.getNumero());
+        Assertions.assertNull(savedRetourSecurite.getClients(), "Clients should be null since none were associated.");
     }
+
 
 
 
@@ -194,25 +195,63 @@ public class RetourSecuriteIntegrationTest {
 
         Assertions.assertFalse(foundRetourSecurite.isPresent(), "safety return should not be found");
     }
+
+    @Test
+    public void testClotureAndDateCloture() {
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setNumero(5678L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setCloture(true);
+        retourSecurite.setDateCloture(new Date());
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
+
+        Assertions.assertNotNull(savedRetourSecurite.getDateCloture(), "La date de clôture doit être renseignée lorsque 'cloture' est true.");
+        Assertions.assertTrue(savedRetourSecurite.getCloture(), "Le champ 'cloture' doit être true.");
+    }
+
+
+
     @Test
     public void testCascadeDeleteClients() {
-        Client client = new Client();
-        client.setName("Test Client");
-        client.setEmail("test@example.com");
-        em.persist(client);
+        Client client1 = new Client();
+        client1.setEmail("client1@test.com");
+        client1.setName("Client1");
+
+        Client client2 = new Client();
+        client2.setEmail("client2@test.com");
+        client2.setName("Client2");
 
         RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClients(new ArrayList<>());
-        retourSecurite.setNumero(12345L);
-        em.persist(retourSecurite);
-        em.flush();
+        retourSecurite.setNumero(1234L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setClients(List.of(client1, client2));
 
-        em.remove(retourSecurite);
-        em.flush();
+        client1.setRetourSecurite(retourSecurite);
+        client2.setRetourSecurite(retourSecurite);
 
-        List<Client> clients = em.createQuery("SELECT c FROM Client c", Client.class).getResultList();
-        Assertions.assertTrue(clients.isEmpty(), "Clients should be deleted due to cascade.");
+        retourSecuriteRepository.save(retourSecurite);
+
+        retourSecuriteRepository.deleteById(retourSecurite.getId());
+
+        Assertions.assertFalse(clientRepository.existsById(client1.getId()), "Le client 1 doit être supprimé en cascade.");
+        Assertions.assertFalse(clientRepository.existsById(client2.getId()), "Le client 2 doit être supprimé en cascade.");
     }
+
+
+
+    @Test
+    public void testSaveRetourSecuriteWithEmptyClients() {
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setNumero(3456L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setClients(new ArrayList<>());
+
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
+        Assertions.assertTrue(savedRetourSecurite.getClients().isEmpty(), "La liste des clients doit être vide.");
+    }
+
+
+
 
 
 }

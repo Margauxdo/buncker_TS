@@ -199,21 +199,30 @@ public class RegleManuelleRepositoryIntegrationTest {
     }
     @Test
     public void testRegleManuelleWithTypeRegle() {
+        // Créer et sauvegarder un TypeRegle
         TypeRegle tp = new TypeRegle();
         tp.setNomTypeRegle("Type Regle Test");
 
+        // Créer et associer RegleManuelle avec TypeRegle
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setCreateurRegle("Jean Paul Martin");
         regleManuelle.setCoderegle("12345");
         regleManuelle.setDescriptionRegle("Description de test");
         regleManuelle.setTypeRegle(tp);
 
+        // Sauvegarder RegleManuelle
         RegleManuelle savedRM = regleManuelleRepository.save(regleManuelle);
 
+        // Récupérer RegleManuelle sauvegardée
         Optional<RegleManuelle> foundRM = regleManuelleRepository.findById(savedRM.getId());
-        assertTrue(foundRM.isPresent());
-        assertEquals("Type Regle Test", foundRM.get().getTypeRegle().getRegle());
+
+        // Vérifications
+        assertTrue(foundRM.isPresent(), "RegleManuelle devrait être présente dans la base de données.");
+        assertNotNull(foundRM.get().getTypeRegle(), "TypeRegle ne devrait pas être null.");
+        assertEquals("Type Regle Test", foundRM.get().getTypeRegle().getNomTypeRegle(),
+                "Le nom du TypeRegle ne correspond pas.");
     }
+
 
 
 

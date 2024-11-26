@@ -1,12 +1,7 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import example.entity.Formule;
 import example.entity.JourFerie;
-import example.entity.Regle;
-import example.repositories.FormuleRepository;
 import example.repositories.JourFerieRepository;
-import example.repositories.RegleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,96 +31,90 @@ public class JourFerieControllerIntegrationTest {
     @Autowired
     private JourFerieRepository jourFerieRepository;
 
-    @Autowired
-    private RegleRepository regleRepository;
-
-    @Autowired
-    private FormuleRepository formuleRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @BeforeEach
     void setUp() {
         jourFerieRepository.deleteAll();
-        regleRepository.deleteAll();
-        formuleRepository.deleteAll();
     }
 
+    // Test: View list of public holidays
     @Test
-    public void testGetAllHolidays_shouldReturnEmptyList() throws Exception {
-        // Act
-        mockMvc.perform(get("/api/jourferies")
-                        .contentType(MediaType.APPLICATION_JSON))
-                // Assert
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
-    }
-
-    @Test
-    public void testGetHolidayById_shouldReturnNotFound() throws Exception {
-        // Act
-        mockMvc.perform(get("/api/jourferies/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // Assert
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void testCreateHoliday_shouldReturnCreated() throws Exception {
+    public void testViewJFDateList() throws Exception {
         // Arrange
-        Regle regle = new Regle();
-        regle.setCoderegle("TestRuleCode");
-        regle = regleRepository.save(regle);
-
-        JourFerie jourFerie = new JourFerie();
-        jourFerie.setRegles(Collections.singletonList(regle)); // Correction ici
-        jourFerie.setJoursFerieList(Collections.singletonList(new Date()));
-
-        // Act & Assert
-        mockMvc.perform(post("/api/jourferies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(jourFerie)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.regles[0].coderegle", is("TestRuleCode")))
-                .andExpect(jsonPath("$.joursFerieList[0]").exists());
-    }
-
-    @Test
-    public void testGetHolidayById_shouldReturnBadRequestForInvalidId() throws Exception {
-        // Act
-        mockMvc.perform(get("/api/jourferies/{id}", -1)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // Assert
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testGetHolidayById_shouldReturnNotFoundForNonExistentId() throws Exception {
-        // Act
-        mockMvc.perform(get("/api/jourferies/{id}", 999999)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // Assert
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void testCreateHolidayWithFormule() throws Exception {
-        // Arrange
-        Formule formule = new Formule();
-        formule.setFormule("Formule Test");
-        formule = formuleRepository.save(formule);
-
-        JourFerie jourFerie = new JourFerie();
-        jourFerie.setJoursFerieList(Collections.singletonList(new Date()));
-        jourFerie.setRegles(new ArrayList<>());
+        JourFerie jourFerie = JourFerie.builder()
+                .date(new Date())
+                .build();
         jourFerieRepository.save(jourFerie);
 
         // Act & Assert
-        mockMvc.perform(post("/api/jourferies")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(jourFerie)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.formule.nom", is("Formule Test")));
+        mockMvc.perform(get("/jourferies/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("jourFeries/JF_dates"))
+                .andExpect(model().attributeExists("datesFerie"))
+                .andExpect(model().attribute("datesFerie", hasSize(1)))
+                .andExpect(model().attribute("datesFerie", hasItem(jourFerie.getDate())));
+    }
+
+    // Test: View a public holiday by ID
+    @Test
+    public void testViewJFById() throws Exception {
+        // Arrange
+        JourFerie jourFerie = JourFerie.builder()
+                .date(new Date())
+                .build();
+        jourFerie = jourFerieRepository.save(jourFerie);
+
+        // Act & Assert
+        mockMvc.perform(get("/jourferies/view/{id}", jourFerie.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("jourFeries/JF_details"))
+                .andExpect(model().attributeExists("jourFerie"))
+                .andExpect(model().attribute("jourFerie", hasProperty("id", is(jourFerie.getId()))))
+                .andExpect(model().attribute("jourFerie", hasProperty("date", is(jourFerie.getDate()))));
+    }
+
+    // Test: Create public holiday form
+    @Test
+    public void testCreateJourFerieForm() throws Exception {
+        mockMvc.perform(get("/jourferies/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("jourFeries/JF_create"))
+                .andExpect(model().attributeExists("jourFerie"));
+    }
+
+    // Test: Create a public holiday via form
+    @Test
+    public void testCreateJourFerieThymeleaf() throws Exception {
+        // Act & Assert
+        mockMvc.perform(post("/jourferies/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("date", "2024-01-01")) // Match the format in @DateTimeFormat
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/jourferies/list"));
+
+        // Validate the saved holiday
+        JourFerie savedJourFerie = jourFerieRepository.findAll().get(0);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        assertEquals("2024-01-01", sdf.format(savedJourFerie.getDate()));
+    }
+
+
+    // Test: Create a public holiday with duplicate date
+    @Test
+    public void testCreateJourFerieDuplicateDate() throws Exception {
+        // Arrange
+        JourFerie jourFerie = JourFerie.builder()
+                .date(new SimpleDateFormat("yyyy-MM-dd").parse("2024-01-01"))
+                .build();
+        jourFerieRepository.save(jourFerie);
+
+        // Act & Assert
+        mockMvc.perform(post("/jourferies/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("date", "2024-01-01"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("jourFeries/JF_create"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", is("Un jour férié avec cette date existe déjà.")));
     }
 }
+

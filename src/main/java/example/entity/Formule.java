@@ -21,6 +21,7 @@ public class Formule {
     private int id;
 
     @Column(nullable = false)
+    @NotNull(message = "Libelle cannot be null")
     private String libelle;
 
     private String formule;

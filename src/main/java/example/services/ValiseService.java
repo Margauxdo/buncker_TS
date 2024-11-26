@@ -39,51 +39,48 @@ public class ValiseService implements IValiseService {
     @Override
     public Valise createValise(Valise valise) {
         try {
-            // Vérification que le client existe via clientId
-            if (valise.getClient().getId() == 0) {
+            // Vérification du client
+            if (valise.getClient() == null || valise.getClient().getId() == 0) {
                 throw new IllegalArgumentException("Client ID is required");
             }
-
-            // Log d'entrée pour vérifier les données
-            logger.debug("Tentative de création de la valise avec les informations : {}", valise);
-
-            // Vérification que le client existe en utilisant clientId
             Client client = clientRepository.findById(valise.getClient().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Client not found with ID: " + valise.getClient().getId()));
-            valise.setClient(client); // Assurez-vous que vous avez une méthode setClient dans Valise
-            logger.debug("Client trouvé : {}", client);
+            valise.setClient(client);
 
-            // Vérification de la règle
+            // Vérification des règles associées
             if (valise.getRegleSortie() != null && !valise.getRegleSortie().isEmpty()) {
-                List<Regle> validRegles = new ArrayList<>();
-                for (Regle regle : valise.getRegleSortie()) {
-                    if (regle.getId() != 0) {
-                        Regle foundRegle = regleRepository.findById(regle.getId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Regle not found with ID: " + regle.getId()));
-                        validRegles.add(foundRegle);
-                        logger.debug("Règle associée : {}", foundRegle);
-                    }
-                }
-                valise.setRegleSortie(validRegles);
+                valise.setRegleSortie(validateRegles(valise.getRegleSortie()));
             }
 
             // Vérification du type de valise
-            if (valise.getTypeValise() != null && valise.getTypeValise().getId() != 0) {  // Vérifier si le type de valise existe
-                TypeValise validTypeValise = typeValiseRepository.findById(valise.getTypeValise().getId())
+            if (valise.getTypeValise() != null && valise.getTypeValise().getId() != 0) {
+                TypeValise typeValise = typeValiseRepository.findById(valise.getTypeValise().getId())
                         .orElseThrow(() -> new ResourceNotFoundException("TypeValise not found with ID: " + valise.getTypeValise().getId()));
-                valise.setTypeValise(validTypeValise);
-                logger.debug("Type de valise associé : {}", validTypeValise);
+                valise.setTypeValise(typeValise);
             }
 
-            // Sauvegarde de la valise dans la base de données
+            // Sauvegarde de la valise
             Valise savedValise = valiseRepository.save(valise);
-            logger.debug("Valise créée avec succès : {}", savedValise);
+            logger.info("Valise créée avec succès : {}", savedValise);
             return savedValise;
         } catch (Exception e) {
             logger.error("Erreur lors de la création de la valise : {}", e.getMessage(), e);
             throw new RuntimeException("Erreur interne lors de la création de la valise", e);
         }
     }
+
+    private List<Regle> validateRegles(List<Regle> regles) {
+        List<Regle> validRegles = new ArrayList<>();
+        for (Regle regle : regles) {
+            if (regle.getId() != 0) {
+                Regle foundRegle = regleRepository.findById(regle.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Regle not found with ID: " + regle.getId()));
+                validRegles.add(foundRegle);
+            }
+        }
+        return validRegles;
+    }
+
 
     @Override
     public Valise updateValise(int id, Valise valise) {

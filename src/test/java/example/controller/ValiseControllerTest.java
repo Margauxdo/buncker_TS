@@ -27,6 +27,9 @@ public class ValiseControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // **Tests Thymeleaf**
+
+    // Test pour afficher toutes les valises
     @Test
     public void testViewValises_Success() {
         // Arrange
@@ -42,6 +45,7 @@ public class ValiseControllerTest {
         assertTrue(model.containsAttribute("valises"), "Model should contain 'valises' attribute");
     }
 
+    // Test pour afficher une valise par ID (succès)
     @Test
     public void testViewValiseById_Success() {
         // Arrange
@@ -59,6 +63,7 @@ public class ValiseControllerTest {
         assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
     }
 
+    // Test pour afficher une valise par ID (erreur)
     @Test
     public void testViewValiseById_NotFound() {
         // Arrange
@@ -74,6 +79,7 @@ public class ValiseControllerTest {
         assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
     }
 
+    // Test pour afficher le formulaire de création
     @Test
     public void testCreateValiseForm_Success() {
         // Arrange
@@ -87,6 +93,7 @@ public class ValiseControllerTest {
         assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
     }
 
+    // Test pour afficher le formulaire de modification (succès)
     @Test
     public void testEditValiseForm_Success() {
         // Arrange
@@ -104,6 +111,7 @@ public class ValiseControllerTest {
         assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
     }
 
+    // Test pour afficher le formulaire de modification (erreur)
     @Test
     public void testEditValiseForm_NotFound() {
         // Arrange
@@ -118,12 +126,13 @@ public class ValiseControllerTest {
         assertEquals("valises/error", response, "Expected view name is 'valises/error'");
     }
 
+    // Test pour supprimer une valise (succès)
     @Test
-    public void testDeleteValise_Success_Thymeleaf() {
+    public void testDeleteValise_Success() {
         // Arrange
         doNothing().when(valiseService).deleteValise(1);
 
-        Model model = new ConcurrentModel(); // Create a mock model
+        Model model = new ConcurrentModel();
 
         // Act
         String response = valiseController.deleteValise(1, model);
@@ -133,8 +142,9 @@ public class ValiseControllerTest {
         verify(valiseService, times(1)).deleteValise(1);
     }
 
+    // Test pour supprimer une valise (erreur)
     @Test
-    public void testDeleteValise_NotFound_Thymeleaf() {
+    public void testDeleteValise_NotFound() {
         // Arrange
         doThrow(new ResourceNotFoundException("Valise not found")).when(valiseService).deleteValise(1);
 
@@ -149,5 +159,4 @@ public class ValiseControllerTest {
         assertEquals("Valise with ID 1 not found!", model.getAttribute("errorMessage"));
         verify(valiseService, times(1)).deleteValise(1);
     }
-
 }

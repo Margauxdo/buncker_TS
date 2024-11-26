@@ -141,14 +141,17 @@ public class RegleManuelleController {
     // Supprimer une RM via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteRegleManuelle(@PathVariable int id) {
+        System.out.println("Controller: Calling deleteRegleManuelle service method");
         try {
             regleManuelleService.deleteRegleManuelle(id);
         } catch (EntityNotFoundException e) {
             System.err.println("Erreur : " + e.getMessage());
-            return "redirect:/reglesManuelles/error"; // Redirection vers une vue d'erreur spécifique
+            return "redirect:/reglesManuelles/error";
         }
         return "redirect:/reglesManuelles/RM_list";
     }
+
+
 
 
 

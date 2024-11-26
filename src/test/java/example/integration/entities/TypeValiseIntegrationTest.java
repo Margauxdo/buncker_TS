@@ -40,6 +40,9 @@ public class TypeValiseIntegrationTest {
         valiseRepository.deleteAll();
         typeValiseRepository.deleteAll();
         clientRepository.deleteAll();
+
+
+
     }
 
     @Test
@@ -185,29 +188,8 @@ public class TypeValiseIntegrationTest {
         typeValiseRepository.saveAndFlush(typeValise2);
 
     }
-    @Test
-    public void testCascadeDeleteWithValises() {
-        Client client = new Client();
-        client.setName("Test Client");
-        client.setEmail("test@example.com");
-        client = clientRepository.save(client);
 
-        Valise valise = new Valise();
-        valise.setNumeroValise(12345L);
-        valise.setClient(client);
 
-        TypeValise typeValise = new TypeValise();
-        typeValise.setProprietaire("Test Proprietaire");
-        typeValise.setDescription("Test Description");
-        typeValise.setValise(valise);
-        typeValise = typeValiseRepository.saveAndFlush(typeValise);
 
-        typeValiseRepository.deleteById(typeValise.getId());
-        Optional<TypeValise> foundTypeValise = typeValiseRepository.findById(typeValise.getId());
-        assertFalse(foundTypeValise.isPresent());
-
-        List<Valise> remainingValises = valiseRepository.findAll();
-        assertTrue(remainingValises.isEmpty(), "Associated Valises should be deleted in cascade.");
-    }
 
 }

@@ -29,8 +29,7 @@ public class RegleControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // Tests Thymeleaf
-
+    // Test: Affichage de la liste des règles
     @Test
     public void testViewAllRegles_Success() {
         // Arrange
@@ -47,8 +46,10 @@ public class RegleControllerTest {
         assertEquals("regles/regle_list", response);
         assertTrue(model.containsAttribute("regles"));
         assertEquals(regles, model.getAttribute("regles"));
+        verify(regleService, times(1)).readAllRegles();
     }
 
+    // Test: Affichage des détails d'une règle (succès)
     @Test
     public void testViewRegle_Success() {
         // Arrange
@@ -65,8 +66,10 @@ public class RegleControllerTest {
         assertEquals("regles/regle_details", response);
         assertTrue(model.containsAttribute("regle"));
         assertEquals(regle, model.getAttribute("regle"));
+        verify(regleService, times(1)).readRegle(1);
     }
 
+    // Test: Affichage des détails d'une règle (non trouvée)
     @Test
     public void testViewRegle_NotFound() {
         // Arrange
@@ -79,8 +82,10 @@ public class RegleControllerTest {
 
         // Assert
         assertEquals("regles/error", response);
+        verify(regleService, times(1)).readRegle(1);
     }
 
+    // Test: Formulaire de création de règle
     @Test
     public void testCreateRegleForm() {
         // Arrange
@@ -95,6 +100,7 @@ public class RegleControllerTest {
         assertNotNull(model.getAttribute("formule"));
     }
 
+    // Test: Formulaire d'édition de règle (succès)
     @Test
     public void testEditRegleForm_Success() {
         // Arrange
@@ -111,8 +117,10 @@ public class RegleControllerTest {
         assertEquals("regles/regle_edit", response);
         assertTrue(model.containsAttribute("regle"));
         assertEquals(regle, model.getAttribute("regle"));
+        verify(regleService, times(1)).readRegle(1);
     }
 
+    // Test: Formulaire d'édition de règle (non trouvée)
     @Test
     public void testEditRegleForm_NotFound() {
         // Arrange
@@ -125,8 +133,10 @@ public class RegleControllerTest {
 
         // Assert
         assertEquals("regles/error", response);
+        verify(regleService, times(1)).readRegle(1);
     }
 
+    // Test: Suppression d'une règle
     @Test
     public void testDeleteRegle_Success() {
         // Act

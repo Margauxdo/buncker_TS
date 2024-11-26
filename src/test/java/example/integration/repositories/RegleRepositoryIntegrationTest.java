@@ -3,6 +3,7 @@ package example.integration.repositories;
 import example.entity.*;
 import example.repositories.RegleRepository;
 import example.repositories.SortieSemaineRepository;
+import example.repositories.TypeRegleRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,8 @@ public class RegleRepositoryIntegrationTest {
     private RegleRepository regleRepository;
     @Autowired
     private SortieSemaineRepository sortieSemaineRepository;
+    @Autowired
+    private TypeRegleRepository typeRegleRepository;
 
     @BeforeEach
     public void setUp() {
@@ -130,18 +133,24 @@ public class RegleRepositoryIntegrationTest {
 
         Regle regle = new Regle();
         regle.setCoderegle("AW5698");
-        regle.getTypeRegle().getRegle();
+        regle.setTypeRegle(typeRegle);
+        regle = regleRepository.saveAndFlush(regle);
 
-        Regle savedRegle = regleRepository.saveAndFlush(regle);
+        typeRegle.setRegle(regle);
+
+        typeRegle = typeRegleRepository.saveAndFlush(typeRegle);
 
         // Act
-        Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
+        Optional<Regle> foundRegle = regleRepository.findById(regle.getId());
 
         // Assert
-        assertTrue(foundRegle.isPresent());
-        assertFalse((foundRegle.get().getTypeRegle().getNomTypeRegle().isEmpty()), "");
-        assertEquals("Type ABC", foundRegle.get().getTypeRegle().getRegle());
+        assertTrue(foundRegle.isPresent(), "La règle devrait être présente.");
+        assertNotNull(foundRegle.get().getTypeRegle(), "Le TypeRegle ne devrait pas être null.");
+        assertEquals("Type ABC", foundRegle.get().getTypeRegle().getNomTypeRegle(),
+                "Le nom du TypeRegle ne correspond pas.");
     }
+
+
 
     @Test
     public void testFindRegleByValise(){

@@ -1,35 +1,24 @@
 package example.integration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import example.entity.Regle;
-import example.entity.SortieSemaine;
 import example.repositories.RegleRepository;
-import example.repositories.SortieSemaineRepository;
-import example.services.RegleService;
-import org.junit.jupiter.api.Assertions;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationtest")
+@Transactional
 public class RegleControllerIntegrationTest {
 
     @Autowired
@@ -38,203 +27,96 @@ public class RegleControllerIntegrationTest {
     @Autowired
     private RegleRepository regleRepository;
 
-    @Autowired
-    private SortieSemaineRepository sortieSemaineRepository;
-
-    @SpyBean
-    private RegleService regleService;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private Regle testRegle;
 
     @BeforeEach
-    void setUp() {
-        regleRepository.deleteAll();
+    public void setUp() {
+        // Initialisation d'une règle de test
+        testRegle = Regle.builder()
+                .coderegle("CODE123")
+                .reglePourSortie("Règle de test")
+                .dateRegle(new Date())
+                .nombreJours(5)
+                .calculCalendaire(2)
+                .fermeJS1(false)
+                .build();
+        testRegle = regleRepository.save(testRegle);
     }
-    @Test
-    @Transactional
-    public void testReadAllRegles_ShouldReturnListOfRegles() throws Exception {
-        // Création et sauvegarde de la règle
-        Regle regle1 = new Regle();
-        regle1.setCoderegle("2568L");
-        regle1.setDateRegle(new Date());
-        regle1.setNombreJours(25);
-        regleRepository.save(regle1);
 
-        // Exécuter la requête
-        mockMvc.perform(get("/api/regles")
-                        .contentType(MediaType.APPLICATION_JSON))
+    @Test
+    public void testViewAllRegles() throws Exception {
+        mockMvc.perform(get("/regles/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].coderegle").value("2568L"));
+                .andExpect(view().name("regles/regle_list"))
+                .andExpect(model().attributeExists("regles"))
+                .andExpect(model().attribute("regles", hasItem(hasProperty("coderegle", is("CODE123")))));
     }
 
-
-
     @Test
-    @Transactional
-    public void testReadRegleById_ShouldReturnRegleWhenExists() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("2568L");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(25);
-        regleRepository.save(regle);
-
-        mockMvc.perform(get("/api/regles/{id}", regle.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
+    public void testViewRegleById() throws Exception {
+        mockMvc.perform(get("/regles/view/{id}", testRegle.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.coderegle").value("2568L"))
-                .andExpect(jsonPath("$.nombreJours").value(25));
+                .andExpect(view().name("regles/regle_details"))
+                .andExpect(model().attributeExists("regle"))
+                .andExpect(model().attribute("regle", hasProperty("coderegle", is("CODE123"))));
     }
 
     @Test
-    public void testReadRegleById_ShouldReturnNotFoundWhenRegleDoesNotExist() throws Exception {
-        mockMvc.perform(get("/api/regles/{id}", -1)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound()); // 404
-    }
-
-    @Test
-    public void testCreateRegle_ShouldCreateAndReturnNewRegle() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("2568L");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(25);
-        String regleJson = objectMapper.writeValueAsString(regle);
-
-        mockMvc.perform(post("/api/regles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(regleJson))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.coderegle").value("2568L"))
-                .andExpect(jsonPath("$.nombreJours").value(25));
-    }
-
-    @Test
-    public void testCreateRegle_ShouldReturnConflictWhenDuplicateRegle() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("2568L");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(25);
-        regleRepository.save(regle);
-        String regleJson = objectMapper.writeValueAsString(regle);
-        mockMvc.perform(post("/api/regles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(regleJson))
-                .andExpect(status().isConflict());
-    }
-    @Test
-    public void testCreateRegle_ShouldReturnBadRequestForInvalidData() throws Exception {
-        String invalidRegleJson = "{\"coderegle\":\"\"}";
-
-        mockMvc.perform(post("/api/regles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRegleJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                .andExpect(jsonPath("$.coderegle").value("Le code de la règle est obligatoire"));
-
-    }
-
-
-
-
-
-
-
-
-
-    @Test
-    public void testUpdateRegle_ShouldUpdateAndReturnUpdatedRegle() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("2568L");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(25);
-        regleRepository.save(regle);
-
-        Regle updatedRegle = new Regle();
-        updatedRegle.setCoderegle("5688L");
-        updatedRegle.setDateRegle(new Date());
-        updatedRegle.setNombreJours(32);
-
-        String updatedRegleJson = objectMapper.writeValueAsString(updatedRegle);
-
-        mockMvc.perform(put("/api/regles/{id}", regle.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedRegleJson))
+    public void testCreateRegleForm() throws Exception {
+        mockMvc.perform(get("/regles/create"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.coderegle").value("5688L"))
-                .andExpect(jsonPath("$.nombreJours").value(32));
+                .andExpect(view().name("regles/regle_create"))
+                .andExpect(model().attributeExists("formule"));
     }
 
     @Test
-    public void testUpdateRegle_ShouldReturnNotFoundWhenRegleDoesNotExist() throws Exception {
-        Regle updatedRegle = new Regle();
-        updatedRegle.setCoderegle("invalid");
-        updatedRegle.setDateRegle(new Date());
-        updatedRegle.setNombreJours(258);
-        String updatedRegleJson = objectMapper.writeValueAsString(updatedRegle);
+    public void testCreateRegle() throws Exception {
+        mockMvc.perform(post("/regles/create")
+                        .param("coderegle", "NEWCODE")
+                        .param("reglePourSortie", "Nouvelle règle")
+                        .param("nombreJours", "10")
+                        .param("calculCalendaire", "3")
+                        .param("fermeJS1", "true"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/regles/regle_list"));
 
-        mockMvc.perform(put("/api/regles/{id}", 99999)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updatedRegleJson))
-                .andExpect(status().isNotFound());
+        Regle newRegle = regleRepository.findByCoderegle("NEWCODE");
+        assert newRegle != null;
+        assert newRegle.getReglePourSortie().equals("Nouvelle règle");
     }
-
-
 
     @Test
-    public void testUpdateRegle_ShouldReturnBadRequestForInvalidData() throws Exception {
-        // Set up a valid entity in the database
-        Regle regle = new Regle();
-        regle.setCoderegle("2568L");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(25);
-        regleRepository.save(regle);
-
-        String invalidRegleJson = "{\"coderegle\":\"\"}";
-
-        mockMvc.perform(put("/api/regles/{id}", regle.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRegleJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                .andExpect(jsonPath("$.coderegle").value("Le code de la règle est obligatoire"));
+    public void testEditRegleForm() throws Exception {
+        mockMvc.perform(get("/regles/edit/{id}", testRegle.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("regles/regle_edit"))
+                .andExpect(model().attributeExists("regle"))
+                .andExpect(model().attribute("regle", hasProperty("coderegle", is("CODE123"))));
     }
-
 
     @Test
-    public void testDeleteRegle_ShouldSuccessfullyDeleteSpecifiedRegle() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("2568L");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(25);
-        regleRepository.save(regle);
-        mockMvc.perform(delete("/api/regles/{id}", regle.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+    public void testUpdateRegle() throws Exception {
+        mockMvc.perform(post("/regles/edit/{id}", testRegle.getId())
+                        .param("coderegle", "UPDATEDCODE")
+                        .param("reglePourSortie", "Règle mise à jour")
+                        .param("nombreJours", "15"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/regles/regle_list"));
+
+        Regle updatedRegle = regleRepository.findById(testRegle.getId()).orElse(null);
+        assert updatedRegle != null;
+        assert updatedRegle.getCoderegle().equals("UPDATEDCODE");
+        assert updatedRegle.getNombreJours() == 15;
     }
+
     @Test
-    @Transactional
-    public void testDeleteRegleCascade() throws Exception {
-        // Arrange
-        Regle regle = new Regle();
-        regle.setCoderegle("DeleteCascade");
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        sortieSemaine.setDateSortieSemaine(new Date());
-        sortieSemaine.setRegle(regle);
-        regle.getSortieSemaine().add(sortieSemaine);
-        regleRepository.saveAndFlush(regle);
+    public void testDeleteRegle() throws Exception {
+        mockMvc.perform(post("/regles/delete/{id}", testRegle.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/regles/regle_list"));
 
-        // Act
-        mockMvc.perform(delete("/api/regles/{id}", regle.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        // Assert
-        Assertions.assertFalse(regleRepository.findById(regle.getId()).isPresent(), "Regle was not deleted");
-        Assertions.assertTrue(sortieSemaineRepository.findAll().isEmpty(), "SortieSemaine was not cascade deleted");
+        assert regleRepository.findById(testRegle.getId()).isEmpty();
     }
-
-
-
 }
+
 
