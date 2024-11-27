@@ -5,206 +5,180 @@ import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
-import example.repositories.LivreurRepository;
-import example.repositories.MouvementRepository;
 import example.repositories.ValiseRepository;
 import example.services.MouvementService;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("integrationtest")
 public class MouvementServiceIntegrationTest {
 
     @Autowired
     private MouvementService mouvementService;
-    @Autowired
-    private MouvementRepository mouvementRepository;
-    private Mouvement mouvement;
-    @Autowired
-    private LivreurRepository livreurRepository;
-    @Autowired
-    private ClientRepository clientRepository;
+
     @Autowired
     private ValiseRepository valiseRepository;
 
+    @Autowired
+    private ClientRepository clientRepository;
+
+    private Valise valise;
+    private Mouvement mouvement;
 
     @BeforeEach
     public void setUp() {
-        mouvementRepository.deleteAll();
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .build();
+        client = clientRepository.save(client);
 
-        Livreur livreurA = new Livreur();
-        livreurA.setCodeLivreur("12569");
-        livreurA.setNomLivreur("Dubois");
-        livreurA.setNumeroCartePro("AW568951");
-        livreurA = livreurRepository.save(livreurA);
+        valise = Valise.builder()
+                .description("Valise de test")
+                .numeroValise(123456L)
+                .refClient("RefClientTest")
+                .client(client)
+                .build();
+        valise = valiseRepository.save(valise);
 
-        Client clientA = new Client();
-        clientA.setName("Dutoit");
-        clientA.setEmail("a.dutoit@gmail.com");
-        clientA = clientRepository.save(clientA);
-
-        Valise val1 = new Valise();
-        val1.setClient(clientA);
-        val1.setNumeroValise(1234L);
-        val1 = valiseRepository.save(val1);
-
-        try {
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date dateHM1 = dateTimeFormat.parse("2024-10-30 12:30:00");
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date dateRP1 = dateFormat.parse("2024-10-01");
-            Date dateSP1 = dateFormat.parse("2024-10-31");
-
-            mouvement = Mouvement.builder()
-                    .statutSortie("en cours")
-                    .dateHeureMouvement(dateHM1)
-                    .dateRetourPrevue(dateRP1)
-                    .dateSortiePrevue(dateSP1)
-                    .livreurs((List<Livreur>) livreurA)
-                    .valise(val1)
-                    .build();
-
-            mouvement = mouvementService.createMouvement(mouvement);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("EN_TRANSIT")
+                .dateSortiePrevue(new Date())
+                .dateRetourPrevue(new Date(System.currentTimeMillis() + 86400000L)) // +1 jour
+                .valise(valise)
+                .build();
     }
 
-
     @Test
-    public void testCreateMouvement() {
+    void testCreateMouvement_Success() {
         // Act
-        Mouvement savedMvmt = mouvementService.createMouvement(mouvement);
+        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
 
         // Assert
-        assertNotNull(savedMvmt);
-        assertNotNull(savedMvmt.getLivreurs());
-        assertNotNull(savedMvmt.getValise());
-        assertNotNull(savedMvmt.getDateHeureMouvement());
-        assertNotNull(savedMvmt.getDateRetourPrevue());
-        assertNotNull(savedMvmt.getDateSortiePrevue());
-        assertEquals("en cours", savedMvmt.getStatutSortie());
-        assertEquals("12569", savedMvmt.getLivreurs().get(0).getCodeLivreur());
-        assertEquals("Dutoit", savedMvmt.getValise().getClient().getName());
+        assertNotNull(createdMouvement.getId());
+        assertEquals(mouvement.getDateHeureMouvement(), createdMouvement.getDateHeureMouvement());
+        assertEquals(mouvement.getStatutSortie(), createdMouvement.getStatutSortie());
+        assertEquals(mouvement.getValise().getId(), createdMouvement.getValise().getId());
     }
 
     @Test
-    public void testUpdateMouvement() {
+    void testUpdateMouvement_Success() {
         // Arrange
-        Mouvement savedMvmt = mouvementService.createMouvement(mouvement);
-        Date specificDate = new Date();
+        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
+        createdMouvement.setStatutSortie("LIVRE");
 
         // Act
-        savedMvmt.setStatutSortie("finalisé");
-        savedMvmt.setDateHeureMouvement(specificDate);
-        savedMvmt.setDateRetourPrevue(specificDate);
-        savedMvmt.setDateSortiePrevue(specificDate);
-        Mouvement updatedMvmt = mouvementService.updateMouvement(savedMvmt.getId(), savedMvmt);
+        Mouvement updatedMouvement = mouvementService.updateMouvement(createdMouvement.getId(), createdMouvement);
 
         // Assert
-        assertNotNull(updatedMvmt);
-        assertEquals(savedMvmt.getId(), updatedMvmt.getId());
-        assertEquals("finalisé", updatedMvmt.getStatutSortie());
-        assertEquals(specificDate, updatedMvmt.getDateHeureMouvement());
-        assertEquals(specificDate, updatedMvmt.getDateRetourPrevue());
-        assertEquals(specificDate, updatedMvmt.getDateSortiePrevue());
-    }
-
-
-    @Test
-    public void testDeleteMouvement() {
-        // Arrange
-        Mouvement savedMvmt = mouvementService.createMouvement(mouvement);
-        // Act
-        mouvementService.deleteMouvement(savedMvmt.getId());
-        // Assert
-        Mouvement deletedMvmt = mouvementService.getMouvementById(savedMvmt.getId());
-        Assertions.assertNull(deletedMvmt);
+        assertNotNull(updatedMouvement);
+        assertEquals("LIVRE", updatedMouvement.getStatutSortie());
     }
 
     @Test
-    public void testGetMouvementById() {
+    void testUpdateMouvement_Failure_NotFound() {
         // Arrange
-        Mouvement savedMvmt = mouvementService.createMouvement(mouvement);
+        mouvement.setId(999);
+
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            mouvementService.updateMouvement(999, mouvement);
+        });
+
+        assertEquals("Mouvement not found", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteMouvement_Success() {
+        // Arrange
+        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
 
         // Act
-        Mouvement mvmtId = mouvementService.getMouvementById(savedMvmt.getId());
+        mouvementService.deleteMouvement(createdMouvement.getId());
 
         // Assert
-        assertNotNull(mvmtId);
-        assertEquals(savedMvmt.getId(), mvmtId.getId());
-
-        // Compare les autres champs
-        assertEquals("en cours", mvmtId.getStatutSortie());
-        assertEquals(mouvement.getDateHeureMouvement(), mvmtId.getDateHeureMouvement());
-        assertEquals(mouvement.getDateRetourPrevue(), mvmtId.getDateRetourPrevue());
-        assertEquals(mouvement.getDateSortiePrevue(), mvmtId.getDateSortiePrevue());
+        assertFalse(mouvementService.existsById(createdMouvement.getId()));
     }
 
+    @Test
+    void testDeleteMouvement_Failure_NotFound() {
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            mouvementService.deleteMouvement(999);
+        });
+
+        assertEquals("Mouvement not found with ID: 999", exception.getMessage());
+    }
 
     @Test
-    public void testGetAllMouvements() throws ParseException {
+    void testGetAllMouvements() {
         // Arrange
-        Livreur livreurB = new Livreur();
-        livreurB.setCodeLivreur("12570");
-        livreurB.setNomLivreur("Simon");
-        livreurB.setNumeroCartePro("AW589632");
-        livreurB = livreurRepository.save(livreurB);
-
-        Client clientB = new Client();
-        clientB.setName("Leurant");
-        clientB.setEmail("t.leurant@gmail.com");
-        clientB = clientRepository.save(clientB);
-
-        Valise val2 = new Valise();
-        val2.setClient(clientB);
-        val2.setNumeroValise(1245L);
-        val2 = valiseRepository.save(val2);
-
-        Mouvement mouvement1 = null;
-
-        try {
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date dateHM1 = dateTimeFormat.parse("2024-12-28 12:34:00");
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date dateRP1 = dateFormat.parse("2024-08-21");
-            Date dateSP1 = dateFormat.parse("2024-11-30");
-
-            mouvement1 = Mouvement.builder()
-                    .statutSortie("finalisé")
-                    .dateHeureMouvement(dateHM1)
-                    .dateRetourPrevue(dateRP1)
-                    .dateSortiePrevue(dateSP1)
-                    .livreurs((List<Livreur>) livreurB)
-                    .valise(val2)
-                    .build();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         mouvementService.createMouvement(mouvement);
-        mouvementService.createMouvement(mouvement1);
 
-        assertNotNull(mouvementService.getAllMouvements());
-        assertEquals(2, mouvementService.getAllMouvements().size());
+        // Act
+        List<Mouvement> mouvements = mouvementService.getAllMouvements();
+
+        // Assert
+        assertFalse(mouvements.isEmpty());
+        assertEquals(1, mouvements.size());
     }
+
+    @Test
+    void testGetMouvementById_Success() {
+        // Arrange
+        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
+
+        // Act
+        Mouvement fetchedMouvement = mouvementService.getMouvementById(createdMouvement.getId());
+
+        // Assert
+        assertNotNull(fetchedMouvement);
+        assertEquals(createdMouvement.getStatutSortie(), fetchedMouvement.getStatutSortie());
+    }
+
+    @Test
+    void testGetMouvementById_Failure_NotFound() {
+        // Act
+        Mouvement fetchedMouvement = mouvementService.getMouvementById(999);
+
+        // Assert
+        assertNull(fetchedMouvement);
+    }
+
+
+    @Test
+    void testGetAllMouvements_LargeDataset() {
+        // Arrange
+        for (int i = 0; i < 100; i++) {
+            mouvementService.createMouvement(
+                    Mouvement.builder()
+                            .dateHeureMouvement(new Date())
+                            .statutSortie("EN_TRANSIT_" + i)
+                            .dateSortiePrevue(new Date())
+                            .dateRetourPrevue(new Date(System.currentTimeMillis() + 86400000L))
+                            .valise(valise)
+                            .build()
+            );
+        }
+
+        // Act
+        List<Mouvement> mouvements = mouvementService.getAllMouvements();
+
+        // Assert
+        assertEquals(100, mouvements.size());
+    }
+
+
+
 }

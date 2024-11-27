@@ -1,132 +1,338 @@
 package example.integration.services;
 
+import example.entity.Client;
 import example.entity.Livreur;
-import example.repositories.LivreurRepository;
+import example.entity.Mouvement;
+import example.entity.Valise;
+import example.exceptions.RegleNotFoundException;
+import example.repositories.ClientRepository;
+import example.repositories.MouvementRepository;
+import example.repositories.ValiseRepository;
 import example.services.LivreurService;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("integrationtest")
 public class LivreurServiceIntegrationTest {
+
     @Autowired
     private LivreurService livreurService;
-    @Autowired
-    private LivreurRepository livreurRepository;
+
+    private Mouvement mouvement;
     private Livreur livreur;
+    @Autowired
+    private MouvementRepository mouvementRepository;
+    @Autowired
+    private ValiseRepository valiseRepository;
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
     @BeforeEach
     public void setUp() {
-        livreurRepository.deleteAll();
+        mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("EN_TRANSIT")
+                .dateSortiePrevue(new Date(System.currentTimeMillis() + 86400000L)) // +1 day
+                .dateRetourPrevue(new Date(System.currentTimeMillis() + 172800000L)) // +2 days
+                .build();
+
         livreur = Livreur.builder()
-                .codeLivreur("12345A")
-                .prenomLivreur("Jean")
-                .nomLivreur("Bernard")
-                .telephoneKobby("0789603526")
-                .telephonePortable("0652458785")
-                .telephoneAlphapage("0963562154")
-                .numeroCartePro("1456932")
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV123")
+                .motDePasse("password")
+                .mouvement(mouvement)
                 .build();
     }
+
     @Test
-    public void testCreateLivreur() {
-        //Act
-        Livreur savedLivreur = livreurService.createLivreur(livreur);
+    void testCreateLivreur_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@doe.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Valise de Test")
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("En cours")
+                .dateSortiePrevue(new Date())
+                .dateRetourPrevue(new Date())
+                .valise(valise)
+                .build();
+        mouvementRepository.save(mouvement);
+
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV001")
+                .mouvement(mouvement)
+                .build();
+
+        // Act
+        Livreur createdLivreur = livreurService.createLivreur(livreur);
 
         // Assert
-        assertNotNull(savedLivreur);
-        assertNotNull(savedLivreur.getId());
-        assertEquals("12345A", savedLivreur.getCodeLivreur());
-        assertEquals("Jean", savedLivreur.getPrenomLivreur());
-        assertEquals("Bernard", savedLivreur.getNomLivreur());
-        assertEquals("0789603526", savedLivreur.getTelephoneKobby());
-        assertEquals("0652458785", savedLivreur.getTelephonePortable());
-        assertEquals("0963562154", savedLivreur.getTelephoneAlphapage());
-        assertEquals("1456932", savedLivreur.getNumeroCartePro());
+        assertNotNull(createdLivreur.getId());
+        assertEquals(livreur.getNomLivreur(), createdLivreur.getNomLivreur());
+        assertEquals(livreur.getCodeLivreur(), createdLivreur.getCodeLivreur());
+        assertNotNull(createdLivreur.getMouvement());
+        assertEquals(mouvement.getId(), createdLivreur.getMouvement().getId());
+        assertEquals(valise.getId(), createdLivreur.getMouvement().getValise().getId());
     }
-    @Test
-    public void testUpdateLivreur() {
-        // Arrange
-        Livreur savedLivreur = livreurService.createLivreur(livreur);
 
-        //Act
-        savedLivreur.setCodeLivreur("12346A1");
-        savedLivreur.setPrenomLivreur("Quentin");
-        savedLivreur.setNomLivreur("Dutois");
-        savedLivreur.setTelephoneKobby("0789603527");
-        savedLivreur.setTelephonePortable("0652458788");
-        savedLivreur.setTelephoneAlphapage("0963562254");
-        savedLivreur.setNumeroCartePro("1456933");
-        Livreur updatedLivreur = livreurService.updateLivreur(savedLivreur.getId(), savedLivreur);
+
+
+    @Test
+    void testCreateLivreur_Failure_DuplicateCode() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@doe.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Valise Test")
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("EN_TRANSIT")
+                .dateSortiePrevue(new Date(System.currentTimeMillis() + 86400000L))
+                .dateRetourPrevue(new Date(System.currentTimeMillis() + 172800000L))
+                .valise(valise)
+                .build();
+        mouvementRepository.save(mouvement);
+
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV123")
+                .mouvement(mouvement)
+                .build();
+        livreurService.createLivreur(livreur);
+
+        // Act & Assert
+        Exception exception = assertThrows(RuntimeException.class, () -> livreurService.createLivreur(livreur)); // Deuxième ajout avec le même code
+        assertTrue(exception.getMessage().contains("Livreur avec ce code existe déjà."));
+    }
+
+
+    @Test
+    void testUpdateLivreur_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@doe.com")
+                .build();
+        clientRepository.save(client);
+        Valise valise = Valise.builder()
+                .description("Valise Test")
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("En cours")
+                .dateSortiePrevue(new Date())
+                .dateRetourPrevue(new Date())
+                .valise(valise)
+                .build();
+        mouvementRepository.save(mouvement);
+
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV001")
+                .mouvement(mouvement) // Associer le mouvement
+                .build();
+        Livreur createdLivreur = livreurService.createLivreur(livreur);
+
+        // Modifier le nom du livreur
+        createdLivreur.setNomLivreur("Updated Name");
+
+        // Act
+        Livreur updatedLivreur = livreurService.updateLivreur(createdLivreur.getId(), createdLivreur);
 
         // Assert
         assertNotNull(updatedLivreur);
-        assertEquals("12346A1", updatedLivreur.getCodeLivreur());
-        assertEquals("Quentin", updatedLivreur.getPrenomLivreur());
-        assertEquals("Dutois", updatedLivreur.getNomLivreur());
-        assertEquals("0789603527", updatedLivreur.getTelephoneKobby());
-        assertEquals("0652458788", updatedLivreur.getTelephonePortable());
-        assertEquals("0963562254", updatedLivreur.getTelephoneAlphapage());
-        assertEquals("1456933", updatedLivreur.getNumeroCartePro());
-
+        assertEquals("Updated Name", updatedLivreur.getNomLivreur());
+        assertNotNull(updatedLivreur.getMouvement());
+        assertEquals(mouvement.getId(), updatedLivreur.getMouvement().getId());
     }
+
+
+
     @Test
-    public void testDeleteLivreur() {
-        // Arrange
-        Livreur savedLivreur = livreurService.createLivreur(livreur);
+    void testUpdateLivreur_Failure_NotFound() {
+        // Act & Assert
+        RegleNotFoundException exception = assertThrows(RegleNotFoundException.class, () -> {
+            livreur.setId(999);
+            livreurService.updateLivreur(999, livreur);
+        });
 
-        //Act
-        livreurService.deleteLivreur(savedLivreur.getId());
-
-        // Assert
-        Livreur deletedLivreur = livreurService.getLivreurById(savedLivreur.getId());
-        assertNull(deletedLivreur);
+        assertTrue(exception.getMessage().contains("Delivery person not found with ID"));
     }
+
     @Test
-    public void testGetLivreurById() {
+    void testDeleteLivreur_Success() {
         // Arrange
-        Livreur savedLivreur = livreurService.createLivreur(livreur);
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@doe.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Valise Test")
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("EN_TRANSIT")
+                .dateSortiePrevue(new Date(System.currentTimeMillis() + 86400000L))
+                .dateRetourPrevue(new Date(System.currentTimeMillis() + 172800000L))
+                .valise(valise)
+                .build();
+        mouvementRepository.save(mouvement);
+
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV123")
+                .mouvement(mouvement)
+                .build();
+        Livreur createdLivreur = livreurService.createLivreur(livreur);
+
+        assertNotNull(livreurService.getLivreurById(createdLivreur.getId()));
 
         // Act
-        Livreur foundLivreur = livreurService.getLivreurById(savedLivreur.getId());
+        livreurService.deleteLivreur((long) createdLivreur.getId());
 
-        //Assert
-        assertNotNull(foundLivreur);
-        assertEquals(savedLivreur.getId(), foundLivreur.getId());
-        assertEquals("12345A", foundLivreur.getCodeLivreur());
-        assertEquals("Jean", foundLivreur.getPrenomLivreur());
-        assertEquals("Bernard", foundLivreur.getNomLivreur());
+        entityManager.flush();
+        entityManager.clear();
 
+        // Assert:
+        Livreur deletedLivreur = entityManager.find(Livreur.class, createdLivreur.getId());
+        assertNull(deletedLivreur, "Livreur should be null after deletion");
     }
+
+
     @Test
-    public void testGetAllLivreurs() {
-        //Arrange
-        Livreur livreur2 = Livreur.builder()
-                .codeLivreur("125689")
-                .prenomLivreur("Louis")
-                .nomLivreur("Decroix")
-                .telephoneKobby("0785693654")
-                .telephonePortable("0654256985")
-                .telephoneAlphapage("0911254587")
-                .numeroCartePro("1451658")
+    void testDeleteLivreur_Failure_NotFound() {
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> livreurService.deleteLivreur(999));
+        assertTrue(exception.getMessage().contains("delivery person not found with ID"));
+    }
+
+    @Test
+    void testGetAllLivreurs() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@doe.com")
                 .build();
+        clientRepository.save(client);
 
+        Valise valise = Valise.builder()
+                .description("Valise de test")
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("En cours")
+                .dateSortiePrevue(new Date())
+                .dateRetourPrevue(new Date())
+                .valise(valise)
+                .build();
+        mouvementRepository.save(mouvement);
+
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV123")
+                .mouvement(mouvement)
+                .build();
         livreurService.createLivreur(livreur);
-        livreurService.createLivreur(livreur2);
 
-        //Act
+        // Act
         List<Livreur> livreurs = livreurService.getAllLivreurs();
 
-        //Assert
-        assertNotNull(livreurs);
-        assertEquals(2, livreurs.size());
+        // Assert
+        assertFalse(livreurs.isEmpty());
+        assertEquals(1, livreurs.size());
+    }
+
+
+    @Test
+    void testGetLivreurById_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john@doe.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Valise Test")
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(new Date())
+                .statutSortie("EN_TRANSIT")
+                .dateSortiePrevue(new Date(System.currentTimeMillis() + 86400000L))
+                .dateRetourPrevue(new Date(System.currentTimeMillis() + 172800000L))
+                .valise(valise)
+                .build();
+        mouvementRepository.save(mouvement);
+
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("John Doe")
+                .codeLivreur("LIV123")
+                .mouvement(mouvement) // Associer un mouvement valide
+                .build();
+        Livreur createdLivreur = livreurService.createLivreur(livreur);
+
+        // Act
+        Livreur fetchedLivreur = livreurService.getLivreurById(createdLivreur.getId());
+
+        // Assert
+        assertNotNull(fetchedLivreur);
+        assertEquals(createdLivreur.getNomLivreur(), fetchedLivreur.getNomLivreur());
+    }
+
+
+    @Test
+    void testGetLivreurById_Failure_NotFound() {
+        // Act
+        Livreur fetchedLivreur = livreurService.getLivreurById(999);
+
+        // Assert
+        assertNull(fetchedLivreur);
     }
 }

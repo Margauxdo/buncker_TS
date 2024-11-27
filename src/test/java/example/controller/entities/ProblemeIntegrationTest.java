@@ -1,4 +1,4 @@
-package example.integration.entities;
+package example.controller.entities;
 
 import example.entity.Client;
 import example.entity.Probleme;

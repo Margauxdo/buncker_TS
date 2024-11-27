@@ -37,5 +37,10 @@ public class RetourSecurite {
     @JoinColumn(name = "mouvement_id", nullable = true)
     private Mouvement mouvement;
 
+    public void addClient(Client client) {
+        clients.add(client);
+        client.setRetourSecurite(this);
+    }
+
 }
 

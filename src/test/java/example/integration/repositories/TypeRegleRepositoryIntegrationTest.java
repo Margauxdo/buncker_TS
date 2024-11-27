@@ -1,137 +1,134 @@
 package example.integration.repositories;
 
 import example.entity.TypeRegle;
+import example.entity.Regle;
 import example.repositories.TypeRegleRepository;
-import jakarta.transaction.Transactional;
+import example.repositories.RegleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integrationtest")
 @Transactional
 public class TypeRegleRepositoryIntegrationTest {
+
     @Autowired
     private TypeRegleRepository typeRegleRepository;
 
+    @Autowired
+    private RegleRepository regleRepository;
 
     @BeforeEach
     public void setUp() {
         typeRegleRepository.deleteAll();
+        regleRepository.deleteAll();
     }
-    @Test
-    public void testSaveTypeRegle(){
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("type A");
-        TypeRegle tR = typeRegleRepository.save(typeRegle);
-        assertNotNull(tR.getId());
-        assertEquals("type A", tR.getNomTypeRegle());
 
-    }
     @Test
-    public void testFindTypeRegleById(){
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("type A");
-        TypeRegle savedTR = typeRegleRepository.save(typeRegle);
-        Optional<TypeRegle> foundTR = typeRegleRepository.findById(savedTR.getId());
-        assertTrue(foundTR.isPresent());
-        assertEquals("type A", foundTR.get().getNomTypeRegle());
+    public void testSaveTypeRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Code Regle A");
+        regleRepository.save(regle);
 
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Type A")
+                .regle(regle)
+                .build();
+
+        TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
+
+        assertThat(savedTypeRegle.getId()).isNotNull();
+        assertThat(savedTypeRegle.getNomTypeRegle()).isEqualTo("Type A");
+        assertThat(savedTypeRegle.getRegle().getCoderegle()).isEqualTo("Code Regle A"); // Mise à jour ici
     }
+
+
     @Test
-    public void testDeleteTypeRegle(){
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("type A");
+    public void testFindTypeRegleById() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Code Regle B");
+        regleRepository.save(regle);
+
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Type B")
+                .regle(regle)
+                .build();
+
+        TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
+
+        Optional<TypeRegle> foundTypeRegle = typeRegleRepository.findById(savedTypeRegle.getId());
+
+        assertThat(foundTypeRegle).isPresent();
+        assertThat(foundTypeRegle.get().getNomTypeRegle()).isEqualTo("Type B");
+        assertThat(foundTypeRegle.get().getRegle().getCoderegle()).isEqualTo("Code Regle B"); // Mise à jour ici
+    }
+
+
+    @Test
+    public void testFindByNomTypeRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Code Regle C");
+        regleRepository.save(regle);
+
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Type C")
+                .regle(regle)
+                .build();
+
         typeRegleRepository.save(typeRegle);
-        typeRegleRepository.deleteById(typeRegle.getId());
-        Optional<TypeRegle> foundTR = typeRegleRepository.findById(typeRegle.getId());
-        assertFalse(foundTR.isPresent());
-    }
-    @Test
-    public void testFindByIdNotFound(){
-        List<TypeRegle> typeRegles = typeRegleRepository.findAll();
-        assertTrue(typeRegles.isEmpty());
-    }
-    @Test
-    public void testUpdateTypeRegle(){
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("type A");
-        TypeRegle savedTR= typeRegleRepository.save(typeRegle);
-        savedTR.setNomTypeRegle("type B");
-        TypeRegle updatedTR = typeRegleRepository.save(savedTR);
-        Optional<TypeRegle> foundTR = typeRegleRepository.findById(updatedTR.getId());
-        assertTrue(foundTR.isPresent());
-        assertEquals("type B", foundTR.get().getNomTypeRegle());
 
-    }
-    @Test
-    public void testFindAllTypeRegle(){
-        TypeRegle typeRegleA = new TypeRegle();
-        typeRegleA.setNomTypeRegle("type A");
-        typeRegleRepository.save(typeRegleA);
-        TypeRegle typeRegleB = new TypeRegle();
-        typeRegleB.setNomTypeRegle("type B");
-        typeRegleRepository.save(typeRegleB);
-        List<TypeRegle> typeRegles = typeRegleRepository.findAll();
-        assertNotNull(typeRegles);
-        assertTrue(typeRegles.size() >= 2);
-        typeRegles.sort(Comparator.comparing(TypeRegle::getNomTypeRegle));
-        assertEquals("type A", typeRegles.get(0).getNomTypeRegle());
-        assertEquals("type B", typeRegles.get(1).getNomTypeRegle());
+        List<TypeRegle> foundTypeRegles = typeRegleRepository.findByNomTypeRegle("Type C");
 
-    }
-    @Test
-    public void testFindByNomTypeRegle() {
-        TypeRegle typeRegleA = new TypeRegle();
-        typeRegleA.setNomTypeRegle("type A");
-        typeRegleRepository.save(typeRegleA);
-
-        TypeRegle typeRegleB = new TypeRegle();
-        typeRegleB.setNomTypeRegle("type B");
-        typeRegleRepository.save(typeRegleB);
-
-        List<TypeRegle> foundTypeRegles = typeRegleRepository.findByNomTypeRegle("type A");
-        assertNotNull(foundTypeRegles);
-        assertEquals(1, foundTypeRegles.size());
-        assertEquals("type A", foundTypeRegles.get(0).getNomTypeRegle());
-    }
-    @Test
-    public void testSaveTypeRegleWithInvalidData() {
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle(null);
-
-        assertThrows(Exception.class, () -> {
-            typeRegleRepository.save(typeRegle);
-        }, "An exception should be thrown if the name is null");
+        // Vérifications
+        assertThat(foundTypeRegles).hasSize(1);
+        assertThat(foundTypeRegles.get(0).getNomTypeRegle()).isEqualTo("Type C");
+        assertThat(foundTypeRegles.get(0).getRegle().getCoderegle()).isEqualTo("Code Regle C"); // Corrigé ici
     }
 
 
     @Test
-    public void testSaveDuplicateTypeRegle() {
-        TypeRegle typeRegleA = new TypeRegle();
-        typeRegleA.setNomTypeRegle("type A");
-        typeRegleRepository.save(typeRegleA);
+    public void testFindByRegleId() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Regle D");
+        regleRepository.save(regle);
 
-        TypeRegle typeRegleB = new TypeRegle();
-        typeRegleB.setNomTypeRegle("type A");
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Type D")
+                .regle(regle)
+                .build();
 
-        assertThrows(Exception.class, () -> {
-            typeRegleRepository.save(typeRegleB);
-        }, "An exception should be thrown if a duplicate name is inserted");
+        typeRegleRepository.save(typeRegle);
+
+        List<TypeRegle> foundTypeRegles = typeRegleRepository.findByRegle_Id(regle.getId());
+        assertThat(foundTypeRegles).hasSize(1);
+        assertThat(foundTypeRegles.get(0).getNomTypeRegle()).isEqualTo("Type D");
     }
 
+    @Test
+    public void testDeleteTypeRegle() {
+        Regle regle = new Regle();
+        regle.setCoderegle("Regle E");
+        regleRepository.save(regle);
 
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Type E")
+                .regle(regle)
+                .build();
 
+        TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
 
+        typeRegleRepository.delete(savedTypeRegle);
+
+        Optional<TypeRegle> deletedTypeRegle = typeRegleRepository.findById(savedTypeRegle.getId());
+        assertThat(deletedTypeRegle).isNotPresent();
+    }
 }

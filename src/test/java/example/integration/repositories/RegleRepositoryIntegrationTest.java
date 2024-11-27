@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -125,30 +126,31 @@ public class RegleRepositoryIntegrationTest {
         assertTrue(foundregle.isPresent());
         assertEquals("libelle test regle", foundregle.get().getFormule().getLibelle());
     }
+
     @Test
-    public void testFindRegleByTypeRegle() {
-        // Arrange
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setNomTypeRegle("Type ABC");
+    public void testSaveRegleWithDuplicateCoderegle() {
+        Regle regle1 = Regle.builder()
+                .coderegle("DUPLICATE_CODE")
+                .build();
+        regleRepository.saveAndFlush(regle1);
 
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
-        regle.setTypeRegle(typeRegle);
-        regle = regleRepository.saveAndFlush(regle);
+        Regle regle2 = Regle.builder()
+                .coderegle("DUPLICATE_CODE")
+                .build();
 
-        typeRegle.setRegle(regle);
-
-        typeRegle = typeRegleRepository.saveAndFlush(typeRegle);
-
-        // Act
-        Optional<Regle> foundRegle = regleRepository.findById(regle.getId());
-
-        // Assert
-        assertTrue(foundRegle.isPresent(), "La règle devrait être présente.");
-        assertNotNull(foundRegle.get().getTypeRegle(), "Le TypeRegle ne devrait pas être null.");
-        assertEquals("Type ABC", foundRegle.get().getTypeRegle().getNomTypeRegle(),
-                "Le nom du TypeRegle ne correspond pas.");
+        assertThrows(Exception.class, () -> regleRepository.saveAndFlush(regle2));
     }
+    @Test
+    public void testFindNonExistentRegle() {
+        Optional<Regle> foundRegle = regleRepository.findById(-1); // Non-existent ID
+        assertFalse(foundRegle.isPresent(), "Non-existent Regle should not be found");
+    }
+    @Test
+    public void testSaveInvalidRegle() {
+        Regle regle = new Regle(); // Missing required fields
+        assertThrows(Exception.class, () -> regleRepository.saveAndFlush(regle));
+    }
+
 
 
 

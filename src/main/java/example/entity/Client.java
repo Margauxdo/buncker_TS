@@ -73,4 +73,10 @@ public class Client {
     private Regle regle;
 
 
+    public void addValise(Valise valise) {
+        
+    }
+
+    public void addProbleme(Probleme probleme) {
+    }
 }

@@ -6,6 +6,7 @@ import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,17 +24,12 @@ public class RegleService implements IRegleService {
 
     @Override
     public Regle createRegle(Regle regle) {
-        if (regle == null) {
-            throw new IllegalArgumentException("La règle ne peut pas être nulle.");
-        }
-        // Validation de la relation avec Formule
-        if (regle.getFormule() != null && regle.getFormule().getId() != 0) {
-            Formule formule = formuleRepository.findById(regle.getFormule().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Formule non trouvée."));
-            regle.setFormule(formule);
+        if (regle.getCoderegle() == null || regle.getCoderegle().isEmpty()) {
+            throw new IllegalArgumentException("Coderegle cannot be null or empty");
         }
         return regleRepository.save(regle);
     }
+
 
     @Override
     public Regle updateRegle(int id, Regle regle) {
@@ -71,11 +67,20 @@ public class RegleService implements IRegleService {
         }
         regleRepository.deleteById(id);
     }
+    @Override
+    public Regle readRegleById(Long id) {
+        return regleRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new RegleNotFoundException("Regle not found with ID " + id));
+    }
+
 
     @Override
     public List<Regle> readAllRegles() {
         return regleRepository.findAll();
     }
+
+
+
     @Override
     public boolean regleExists(String coderegle) {
         return regleRepository.existsByCoderegle("code regle");

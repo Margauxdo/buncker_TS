@@ -9,6 +9,9 @@ public interface IRegleService {
     Regle readRegle(int id);
     Regle updateRegle(int id,Regle regle);
     void deleteRegle(int id);
+
+    Regle readRegleById(Long id);
+
     List<Regle> readAllRegles();
 
     boolean regleExists(String coderegle);

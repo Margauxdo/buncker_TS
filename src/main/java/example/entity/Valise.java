@@ -48,7 +48,7 @@ public class Valise {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise")
     private List<Mouvement> mouvementList = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)

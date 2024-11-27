@@ -1,14 +1,22 @@
 package example.integration.services;
 
+import example.entity.Client;
 import example.entity.TypeValise;
+import example.entity.Valise;
+import example.repositories.ClientRepository;
 import example.repositories.TypeValiseRepository;
+import example.repositories.ValiseRepository;
 import example.services.TypeValiseService;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,86 +24,241 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("integrationtest")
+@ActiveProfiles("test")
 public class TypeValiseServiceIntegrationTest {
 
     @Autowired
     private TypeValiseService typeValiseService;
+
     @Autowired
-    private TypeValiseRepository typeValiseRepository;
-    private TypeValise typeValise;
+    private ValiseRepository valiseRepository;
 
-    @BeforeEach
-    void setUp() {
-        typeValise = TypeValise.builder()
-                .description("description du type de ma valise")
-                .proprietaire("John Does")
+    @Autowired
+    private EntityManager entityManager;
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Test
+    void testCreateTypeValise_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
                 .build();
-        typeValise = typeValiseService.createTypeValise(typeValise);
-    }
-    @Test
-    public void testCreateTypeValise() {
-        //Act
-        TypeValise savedTV = typeValiseService.createTypeValise(typeValise);
-        // Assert
-        assertNotNull(savedTV);
-        assertEquals("description du type de ma valise", savedTV.getDescription());
-        assertEquals("John Does", savedTV.getProprietaire());
-    }
-    @Test
-    public void testUpdateTypeValise() {
-        // Arrange
-        TypeValise savedTV = typeValiseService.createTypeValise(typeValise);
-        // Act
-        savedTV.setDescription("new description");
-        savedTV.setProprietaire("new proprietaire");
-        //Assert
-        assertNotNull(savedTV);
-        assertEquals("new description", savedTV.getDescription());
-        assertEquals("new proprietaire", savedTV.getProprietaire());
-    }
-    @Test
-    public void testDeleteTypeValise() {
-        // Arrange
-        TypeValise savedTV = typeValiseService.createTypeValise(typeValise);
+        clientRepository.save(client);
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(12345L)
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Test Description")
+                .valise(valise)
+                .build();
 
         // Act
-        typeValiseService.deleteTypeValise(savedTV.getId());
+        TypeValise createdTypeValise = typeValiseService.createTypeValise(typeValise);
 
         // Assert
-        boolean isDeleted = !typeValiseRepository.existsById(savedTV.getId());
-        assertTrue(isDeleted, "Type Suitcase should be deleted from the database");
+        assertNotNull(createdTypeValise.getId());
+        assertEquals("John Doe", createdTypeValise.getProprietaire());
+        assertEquals("Test Description", createdTypeValise.getDescription());
+        assertNotNull(createdTypeValise.getValise());
+        assertEquals("Test Valise", createdTypeValise.getValise().getDescription());
+    }
+
+
+    @Test
+    void testGetTypeValiseById_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(12345L)
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Test Description")
+                .valise(valise)
+                .build();
+        TypeValise savedTypeValise = typeValiseService.createTypeValise(typeValise);
+
+        // Act
+        TypeValise foundTypeValise = typeValiseService.getTypeValise(savedTypeValise.getId());
+
+        // Assert
+        assertNotNull(foundTypeValise);
+        assertEquals("John Doe", foundTypeValise.getProprietaire());
+        assertEquals("Test Description", foundTypeValise.getDescription());
+        assertNotNull(foundTypeValise.getValise());
+        assertEquals(valise.getId(), foundTypeValise.getValise().getId());
+    }
+
+
+    @Test
+    void testUpdateTypeValise_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(12345L)
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Test Description")
+                .valise(valise)
+                .build();
+        TypeValise savedTypeValise = typeValiseService.createTypeValise(typeValise); // Save the TypeValise
+
+        savedTypeValise.setDescription("Updated Description");
+
+        // Act
+        TypeValise updatedTypeValise = typeValiseService.updateTypeValise(savedTypeValise.getId(), savedTypeValise);
+
+        // Assert
+        assertNotNull(updatedTypeValise);
+        assertEquals("Updated Description", updatedTypeValise.getDescription());
+        assertEquals(savedTypeValise.getId(), updatedTypeValise.getId());
+        assertEquals("John Doe", updatedTypeValise.getProprietaire());
+        assertNotNull(updatedTypeValise.getValise());
+    }
+
+
+
+    @Test
+    void testCreateTypeValise_ValidationFailure() {
+        // Arrange
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire(null)
+                .description(null)
+                .build();
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> typeValiseService.createTypeValise(typeValise));
     }
 
     @Test
-    public void testGetTypeValise() {
-        //Arrange
-        TypeValise savedTV = typeValiseService.createTypeValise(typeValise);
-        //Act
-        TypeValise retrievedTV = typeValiseService.getTypeValise(savedTV.getId());
-        //Assert
-        assertNotNull(retrievedTV);
-        assertEquals("description du type de ma valise", retrievedTV.getDescription());
-        assertEquals("John Does", retrievedTV.getProprietaire());
+    void testDeleteTypeValise_Success() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(12345L)
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Test Description")
+                .valise(valise)
+                .build();
+        TypeValise savedTypeValise = typeValiseService.createTypeValise(typeValise);
+
+        // Act
+        typeValiseService.deleteTypeValise(savedTypeValise.getId());
+        entityManager.flush();
+
+        // Assert
+        assertThrows(EntityNotFoundException.class, () -> typeValiseService.getTypeValise(savedTypeValise.getId()));
     }
     @Test
-    public void testGetTypeValises() {
-        //Arrange
-        typeValiseRepository.deleteAll();
-        TypeValise typeVal1 = TypeValise.builder()
-                .description("description Val1")
-                .proprietaire("Marie Georges")
-                .build();
-        TypeValise typeVal2 = TypeValise.builder()
-                .description("description Val2")
-                .proprietaire("Georges Dunois")
-                .build();
-        typeValiseService.createTypeValise(typeVal1);
-        typeValiseService.createTypeValise(typeVal2);
-        //Act
-        List<TypeValise> typeValises = typeValiseService.getTypeValises();
-        //Assert
-        assertNotNull(typeValises);
-        assertEquals(2, typeValises.size());
+    void testDeleteTypeValise_NotFound() {
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> typeValiseService.deleteTypeValise(999));
+        assertEquals("The suitcase type does not exist", exception.getMessage());
     }
+
+    @Test
+    void testGetTypeValise_NotFound() {
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> typeValiseService.getTypeValise(999));
+        assertEquals("TypeValise with ID 999 not found", exception.getMessage());
+    }
+
+
+    @Test
+    void testUpdateTypeValise_NotFound() {
+        // Arrange
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Updated Description")
+                .build();
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> typeValiseService.updateTypeValise(999, typeValise));
+    }
+    @Test
+    void testCreateTypeValise_WithInvalidValise() {
+        // Arrange
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Test Description")
+                .valise(null) // Valise manquante
+                .build();
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> typeValiseService.createTypeValise(typeValise));
+    }
+    @Test
+    void testCreateTypeValise_DuplicateFields() {
+        // Arrange
+        Client client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(12345L)
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        TypeValise typeValise1 = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Duplicate Description")
+                .valise(valise)
+                .build();
+        typeValiseService.createTypeValise(typeValise1);
+
+        TypeValise typeValise2 = TypeValise.builder()
+                .proprietaire("John Doe")
+                .description("Duplicate Description")
+                .valise(valise)
+                .build();
+
+        // Act & Assert
+        assertThrows(DataIntegrityViolationException.class, () -> typeValiseService.createTypeValise(typeValise2));
+    }
+
+
+
+
+
 }

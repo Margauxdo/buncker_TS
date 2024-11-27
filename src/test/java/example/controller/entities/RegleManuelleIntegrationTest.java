@@ -1,4 +1,4 @@
-package example.integration.entities;
+package example.controller.entities;
 
 import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;

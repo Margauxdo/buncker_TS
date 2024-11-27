@@ -28,7 +28,7 @@ public class Mouvement {
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
 
-    @ManyToOne
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "valise_id", nullable = false)
     private Valise valise;
 
@@ -45,12 +45,12 @@ public class Mouvement {
 
     public void addLivreur(Livreur livreur) {
         this.livreurs.add(livreur);
-        livreur.setMouvement(this); // Maintenir la cohérence de la relation bidirectionnelle
+        livreur.setMouvement(this);
     }
 
     public void removeLivreur(Livreur livreur) {
         this.livreurs.remove(livreur);
-        livreur.setMouvement(null); // Maintenir la cohérence de la relation bidirectionnelle
+        livreur.setMouvement(null);
     }
 
 

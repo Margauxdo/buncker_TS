@@ -10,6 +10,7 @@ import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +28,13 @@ public class    LivreurService implements ILivreurService {
         this.livreurRepository = livreurRepository;
         this.mouvementRepository = mouvementRepository;
     }
+    @Transactional
+    public void deleteLivreur(Long id) {
+        Livreur livreur = livreurRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Livreur not found with ID: " + id));
+        livreurRepository.delete(livreur);
+    }
+
 
     @Override
     public Livreur createLivreur(Livreur livreur) {
@@ -77,4 +85,5 @@ public class    LivreurService implements ILivreurService {
 
         return livreurRepository.findAll();
     }
+
 }

@@ -1,4 +1,4 @@
-package example.integration.entities;
+package example.integration.entity;
 
 import example.entity.Regle;
 import example.entity.TypeRegle;

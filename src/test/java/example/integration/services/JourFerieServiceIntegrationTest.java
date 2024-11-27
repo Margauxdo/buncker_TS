@@ -1,12 +1,10 @@
 package example.integration.services;
 
-import example.entity.Formule;
 import example.entity.JourFerie;
 import example.entity.Regle;
-import example.repositories.FormuleRepository;
 import example.repositories.JourFerieRepository;
-import example.repositories.RegleRepository;
 import example.services.JourFerieService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,100 +29,131 @@ public class JourFerieServiceIntegrationTest {
     @Autowired
     private JourFerieRepository jourFerieRepository;
 
-    @Autowired
-    private RegleRepository regleRepository;
-
-    @Autowired
-    private FormuleRepository formuleRepository;
-
     private JourFerie jourFerie;
 
     @BeforeEach
     void setUp() {
         jourFerieRepository.deleteAll();
-        regleRepository.deleteAll();
-
-        Regle regle = new Regle();
-        regle.setCoderegle("R123");
-        regle = regleRepository.save(regle);
 
         jourFerie = JourFerie.builder()
-                .regles(List.of(regle)) // Fixed invalid cast
+                .date(new Date())
+                .regles(new ArrayList<>()) // Start with an empty list of rules
                 .build();
     }
 
     @Test
-    public void testGetJourFerie() {
+    public void testCreateJourFerie_Success() {
         // Arrange
-        jourFerie = jourFerieRepository.save(jourFerie);
+        Regle regle = Regle.builder()
+                .coderegle("CODE123")
+                .build();
+        jourFerie.getRegles().add(regle);
 
         // Act
-        JourFerie retrievedJourFerie = jourFerieService.getJourFerie(jourFerie.getId());
+        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
 
         // Assert
-        assertNotNull(retrievedJourFerie, "The jour férié should not be null");
-        assertEquals(jourFerie.getId(), retrievedJourFerie.getId(), "The IDs should match");
-        assertEquals(1, retrievedJourFerie.getRegles().size(), "There should be one associated rule");
-        assertEquals("R123", retrievedJourFerie.getRegles().get(0).getCoderegle(), "The associated rule code should match");
+        assertNotNull(savedJourFerie);
+        assertNotNull(savedJourFerie.getId());
+        assertEquals(jourFerie.getDate(), savedJourFerie.getDate());
+        assertEquals(1, savedJourFerie.getRegles().size());
+        assertEquals("CODE123", savedJourFerie.getRegles().get(0).getCoderegle());
+    }
+
+
+    @Test
+    public void testCreateJourFerie_Failure_NoRegle() {
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            jourFerieService.saveJourFerie(jourFerie);
+        });
+        assertEquals("A JourFerie must have at least one associated Regle", exception.getMessage());
     }
 
     @Test
-    public void testGetJourFeries() {
+    public void testGetJourFerie_Success() {
         // Arrange
-        jourFerieRepository.save(jourFerie);
+        Regle regle = new Regle();
+        regle.setCoderegle("RULE_001");
+        jourFerie.getRegles().add(regle);
+
+        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
 
         // Act
-        List<JourFerie> jourFerieList = jourFerieService.getJourFeries();
+        JourFerie fetchedJourFerie = jourFerieService.getJourFerie(savedJourFerie.getId());
 
         // Assert
-        assertNotNull(jourFerieList, "The list of jour fériés should not be null");
-        assertEquals(1, jourFerieList.size(), "There should be one jour férié in the list");
-        assertEquals(jourFerie.getId(), jourFerieList.get(0).getId(), "The IDs should match");
+        assertNotNull(fetchedJourFerie);
+        assertEquals(savedJourFerie.getId(), fetchedJourFerie.getId());
+        assertEquals(savedJourFerie.getDate(), fetchedJourFerie.getDate());
+        assertEquals(1, fetchedJourFerie.getRegles().size());
+        assertEquals("RULE_001", fetchedJourFerie.getRegles().get(0).getCoderegle());
+    }
+
+
+    @Test
+    public void testGetJourFerie_Failure_NotFound() {
+        // Act
+        JourFerie fetchedJourFerie = jourFerieService.getJourFerie(999);
+
+        // Assert
+        assertNull(fetchedJourFerie, "A JourFerie with ID 999 should not exist.");
     }
 
     @Test
-    public void testSaveAndRetrieveJourFerie() {
+    public void testGetAllJourFeries() {
         // Arrange
-        jourFerie = jourFerieRepository.save(jourFerie);
+        JourFerie jourFerie1 = JourFerie.builder()
+                .date(new Date())
+                .regles(new ArrayList<>())
+                .build();
+        Regle regle1 = new Regle();
+        regle1.setCoderegle("R001");
+        regle1.setJourFerie(jourFerie1);
+        jourFerie1.getRegles().add(regle1);
+
+        jourFerieService.saveJourFerie(jourFerie1);
+
+        JourFerie jourFerie2 = JourFerie.builder()
+                .date(new Date())
+                .regles(new ArrayList<>())
+                .build();
+        Regle regle2 = new Regle();
+        regle2.setCoderegle("R002");
+        regle2.setJourFerie(jourFerie2);
+        jourFerie2.getRegles().add(regle2);
+
+        jourFerieService.saveJourFerie(jourFerie2);
 
         // Act
-        JourFerie savedJourFerie = jourFerieService.getJourFerie(jourFerie.getId());
+        List<JourFerie> jourFeries = jourFerieService.getJourFeries();
 
         // Assert
-        assertNotNull(savedJourFerie, "The saved jour férié should not be null");
-        assertEquals(jourFerie.getId(), savedJourFerie.getId(), "The IDs should match");
+        assertNotNull(jourFeries);
+        assertEquals(2, jourFeries.size());
     }
+
+
 
     @Test
     public void testDeleteJourFerie() {
-        // Arrange
-        jourFerie = jourFerieRepository.save(jourFerie);
+        Regle regle = Regle.builder()
+                .coderegle("CODE123")
+                .build();
 
-        // Act
-        jourFerieService.getAllDateFerie();
+        jourFerie.getRegles().add(regle);
 
-        // Assert
-        JourFerie deletedJourFerie = jourFerieService.getJourFerie(jourFerie.getId());
-        assertNull(deletedJourFerie, "The jour férié should be null after deletion");
+        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
+
+        // Act:
+        jourFerieService.deleteJourFerie(savedJourFerie.getId());
+
+        // Assert:
+        JourFerie deletedJourFerie = jourFerieService.getJourFerie(savedJourFerie.getId());
+        assertNull(deletedJourFerie, "The JourFerie should be deleted and not found again.");
     }
 
-    @Test
-    public void testSaveJourFerieWithFormule() {
-        // Arrange
-        Formule formule = new Formule();
-        formule.setFormule("Formule Test");
-        formuleRepository.save(formule);
 
-        JourFerie jourFerie = new JourFerie();
-        jourFerie.setDate(new Date()); // Properly set a date
-        jourFerie = jourFerieRepository.save(jourFerie);
 
-        // Act
-        JourFerie savedJourFerie = jourFerieService.getJourFerie(jourFerie.getId());
-
-        // Assert
-        assertNotNull(savedJourFerie, "The jour férié should not be null");
-        assertNotNull(savedJourFerie.getDate(), "The date should not be null");
-        assertEquals(jourFerie.getDate(), savedJourFerie.getDate(), "The dates should match");
-    }
 }
+

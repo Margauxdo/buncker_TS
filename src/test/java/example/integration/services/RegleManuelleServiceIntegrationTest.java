@@ -1,17 +1,23 @@
 package example.integration.services;
 
+import example.entity.Regle;
 import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
+import example.repositories.RegleRepository;
 import example.services.RegleManuelleService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,6 +33,8 @@ public class RegleManuelleServiceIntegrationTest {
     @Autowired
     private RegleManuelleRepository regleManuelleRepository;
     private RegleManuelle regleManuelle;
+    @Autowired
+    private RegleRepository regleRepository;
 
     @BeforeEach
     void setUp() {
@@ -119,19 +127,6 @@ public class RegleManuelleServiceIntegrationTest {
     }
 
     @Test
-    public void testDeleteRegleManuelle_NotFound() {
-        int id = 999;
-        when(regleManuelleRepository.existsById(id)).thenReturn(false);
-
-        Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
-            regleManuelleService.deleteRegleManuelle(id);
-        });
-
-        Assertions.assertEquals("Manual rule not found with ID: " + id, exception.getMessage());
-        verify(regleManuelleRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
-    @Test
     public void testCascadeDeleteRegleManuelle() {
         RegleManuelle savedRegle = regleManuelleService.createRegleManuelle(regleManuelle);
         regleManuelleService.deleteRegleManuelle(savedRegle.getId());
@@ -139,6 +134,38 @@ public class RegleManuelleServiceIntegrationTest {
         RegleManuelle deletedRegle = regleManuelleService.getRegleManuelle(savedRegle.getId());
         Assertions.assertNull(deletedRegle, "Manual rule should be deleted and not found again");
     }
+
+
+
+
+    @Test
+    public void testUpdateRegleManuelle_NotFound() {
+        // Arrange
+        int nonExistentId = 9999;
+        RegleManuelle regleManuelleToUpdate = RegleManuelle.builder()
+                .coderegle("A2568958no")
+                .createurRegle("Julie Martin")
+                .descriptionRegle("Description mise à jour")
+                .build();
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> {
+            regleManuelleService.updateRegleManuelle(nonExistentId, regleManuelleToUpdate);
+        }, "La mise à jour devrait échouer car l'ID n'existe pas");
+    }
+    @Test
+    public void testDeleteRegleManuelle_NotFound() {
+        // Arrange
+        int nonExistentId = 9999;
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> {
+            regleManuelleService.deleteRegleManuelle(nonExistentId);
+        }, "La suppression devrait échouer car l'ID n'existe pas");
+    }
+
+
+
 
 
 }

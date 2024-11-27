@@ -1,7 +1,9 @@
 package example.integration.repositories;
 
 import example.entity.Client;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
+import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -24,6 +27,8 @@ public class ClientRepositoryIntegrationTest {
 
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private ValiseRepository valiseRepository;
 
     @BeforeEach
     public void setUp() {
@@ -154,6 +159,8 @@ public class ClientRepositoryIntegrationTest {
         assertEquals("John Doe", clients.get(0).getName());
         assertEquals("jane.doe@example.com", clients.get(1).getEmail());
     }
+
+
 
 
 

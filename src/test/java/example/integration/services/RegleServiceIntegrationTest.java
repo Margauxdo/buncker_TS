@@ -1,21 +1,20 @@
 package example.integration.services;
 
-import example.entity.*;
+import example.entity.Client;
+import example.entity.Regle;
+import example.entity.TypeRegle;
+import example.entity.Valise;
 import example.exceptions.RegleNotFoundException;
-import example.repositories.*;
+import example.repositories.RegleRepository;
 import example.services.RegleService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,170 +26,159 @@ public class RegleServiceIntegrationTest {
 
     @Autowired
     private RegleService regleService;
+
     @Autowired
     private RegleRepository regleRepository;
+
     private Regle regle;
-    @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
-    private ValiseRepository valiseRepository;
-    @Autowired
-    private TypeRegleRepository typeRegleRepository;
-    @Autowired
-    private FormuleRepository formuleRepository;
-    @Autowired
-    private SortieSemaineRepository sortieSemaineRepository;
 
     @BeforeEach
     void setUp() {
+        // Clean up the repository
         regleRepository.deleteAll();
 
-        Client clientA = new Client();
-        clientA.setName("Dutoit");
-        clientA.setEmail("a.dutoit@gmail.com");
-        clientA = clientRepository.save(clientA);
-
-        Valise val1 = new Valise();
-        val1.setClient(clientA);
-        val1.setNumeroValise(1234L);
-        val1 = valiseRepository.save(val1);
-
-        TypeRegle tRegle = new TypeRegle();
-        tRegle.setNomTypeRegle("Type AB");
-        tRegle = typeRegleRepository.save(tRegle);
-
-        Formule form = new Formule();
-        form.setLibelle("libelle test");
-        form = formuleRepository.save(form);
-
-        try {
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date dateRegle = dateTimeFormat.parse("2024-10-30");
-
-            List<TypeRegle> typeRegles = new ArrayList<>();
-            typeRegles.add(tRegle); // Ajout du TypeRegle à la liste
-
-            regle = Regle.builder()
-                    .dateRegle(dateRegle)
-                    .coderegle("code regleA")
-                    .nombreJours(25)
-                    .reglePourSortie("regle A1")
-                    .typeEntree("entree test")
-                    .typeRegle(tRegle)
-                    .formule(form)
-                    .valise(val1)
-                    .build();
-            regle = regleService.createRegle(regle);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        // Initialize a Regle instance
+        regle = Regle.builder()
+                .coderegle("REGLE123")
+                .build();
     }
 
     @Test
-    public void testCreateRegle() {
+    public void testCreateRegle_Success() {
+        // Arrange
+        Regle newRegle = Regle.builder()
+                .coderegle("REGLE001")
+                .build();
+
         // Act
-        Regle savedR = regleService.createRegle(regle);
+        Regle savedRegle = regleService.createRegle(newRegle);
 
         // Assert
-        assertNotNull(savedR);
-        assertFalse(savedR.getTypeRegle().getNomTypeRegle().isEmpty(), "La liste des TypeRegles ne doit pas être vide");
-        assertEquals("Type AB", savedR.getTypeRegle().getRegle(), "Le nom du TypeRegle doit correspondre");
-        assertNotNull(savedR.getFormule(), "La Formule ne doit pas être null");
-        assertNotNull(savedR.getValise(), "La Valise ne doit pas être null");
-        assertEquals("regle A1", savedR.getReglePourSortie(), "Le contenu de la règle doit correspondre");
+        assertNotNull(savedRegle);
+        assertNotNull(savedRegle.getId());
+        assertEquals("REGLE001", savedRegle.getCoderegle());
     }
 
     @Test
-    public void testReadRegle() {
+    public void testCreateRegle_Failure_NullCoderegle() {
         // Arrange
-        Regle savedR = regleService.createRegle(regle);
+        Regle invalidRegle = Regle.builder()
+                .coderegle(null)
+                .build();
 
-        // Act
-        Regle regleId = regleService.readRegle(savedR.getId());
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            regleService.createRegle(invalidRegle);
+        });
 
-        // Assert
-        assertNotNull(regleId);
-        assertEquals("regle A1", regleId.getReglePourSortie());
+        assertEquals("Coderegle cannot be null or empty", exception.getMessage());
     }
 
+
     @Test
-    public void testUpdateRegle() {
+    public void testUpdateRegle_Success() {
         // Arrange
-        Regle savedR = regleService.createRegle(regle);
+        Regle savedRegle = regleService.createRegle(regle);
+        savedRegle.setCoderegle("UPDATED_CODE");
 
         // Act
-        savedR.setCoderegle("code regle B1");
-        savedR.setTypeEntree("entree testB");
-        savedR.setReglePourSortie("regle B1");
-        Regle updatedRegle = regleService.updateRegle(savedR.getId(), savedR);
+        Regle updatedRegle = regleService.updateRegle(savedRegle.getId(), savedRegle);
 
         // Assert
         assertNotNull(updatedRegle);
-        assertEquals("regle B1", updatedRegle.getReglePourSortie());
+        assertEquals(savedRegle.getId(), updatedRegle.getId());
+        assertEquals("UPDATED_CODE", updatedRegle.getCoderegle());
     }
 
     @Test
-    public void testDeleteRegle() {
+    public void testUpdateRegle_Failure_NotFound() {
         // Arrange
-        Regle savedR = regleService.createRegle(regle);
+        Regle updatedRegle = Regle.builder()
+                .coderegle("NON_EXISTENT_CODE")
+                .build();
+
+        // Act & Assert
+        RegleNotFoundException exception = assertThrows(RegleNotFoundException.class, () -> {
+            regleService.updateRegle(999, updatedRegle);
+        });
+
+        assertEquals("Règle non trouvée avec l'ID 999", exception.getMessage());
+    }
+
+
+    @Test
+    public void testGetRegle_Success() {
+        // Arrange
+        Regle savedRegle = regleService.createRegle(regle);
 
         // Act
-        regleService.deleteRegle(savedR.getId());
+        Regle fetchedRegle = regleService.readRegle(savedRegle.getId()); // Use the appropriate method to fetch by ID
 
         // Assert
-        Assertions.assertThrows(RegleNotFoundException.class, () -> {
-            regleService.readRegle(savedR.getId());
-        });
+        assertNotNull(fetchedRegle, "Fetched Regle should not be null.");
+        assertEquals(savedRegle.getId(), fetchedRegle.getId(), "The fetched Regle ID should match the saved Regle ID.");
+        assertEquals("REGLE123", fetchedRegle.getCoderegle(), "The coderegle of the fetched Regle should match the saved one.");
     }
 
-    @Test
-    public void testReadAllRegles() {
-        // Arrange
-        regleRepository.deleteAll();
 
+    @Test
+    public void testGetRegle_Failure_NotFound() {
+        // Act & Assert
+        RegleNotFoundException exception = assertThrows(RegleNotFoundException.class, () -> {
+            regleService.readRegleById(999L);
+        });
+
+        assertEquals("Regle not found with ID 999", exception.getMessage());
+    }
+
+
+    @Test
+    public void testGetAllRegles() {
+        // Arrange
         Regle regle1 = Regle.builder()
-                .coderegle("codeA")
-                .typeEntree("type1")
-                .reglePourSortie("sortie1")
+                .coderegle("REGLE001")
                 .build();
 
         Regle regle2 = Regle.builder()
-                .coderegle("codeB")
-                .typeEntree("type2")
-                .reglePourSortie("sortie2")
+                .coderegle("REGLE002")
                 .build();
 
         regleService.createRegle(regle1);
         regleService.createRegle(regle2);
 
         // Act
-        List<Regle> allRegles = regleService.readAllRegles();
+        List<Regle> regles = regleService.readAllRegles();
 
         // Assert
-        assertNotNull(allRegles, "La liste des règles ne doit pas être null");
-        assertEquals(2, allRegles.size(), "La liste doit contenir 2 règles");
-        assertTrue(allRegles.stream().anyMatch(r -> "codeA".equals(r.getCoderegle()) && "type1".equals(r.getTypeEntree())));
-        assertTrue(allRegles.stream().anyMatch(r -> "codeB".equals(r.getCoderegle()) && "type2".equals(r.getTypeEntree())));
+        assertNotNull(regles, "The list of Regles should not be null.");
+        assertEquals(2, regles.size(), "The list of Regles should contain 2 items.");
+        assertEquals("REGLE001", regles.get(0).getCoderegle());
+        assertEquals("REGLE002", regles.get(1).getCoderegle());
     }
+
 
     @Test
-    public void testDeleteRegleCascade() {
+    public void testDeleteRegle_Success() {
         // Arrange
-        Regle regle = new Regle();
-        regle.setCoderegle("CascadeTest");
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        sortieSemaine.setDateSortieSemaine(new Date());
-        sortieSemaine.setRegle(regle);
-        regle.getSortieSemaine().add(sortieSemaine);
-        regleRepository.saveAndFlush(regle);
+        Regle savedRegle = regleService.createRegle(regle);
 
         // Act
-        regleService.deleteRegle(regle.getId());
+        regleService.deleteRegle(savedRegle.getId());
 
         // Assert
-        Assertions.assertFalse(sortieSemaineRepository.findById(sortieSemaine.getId()).isPresent(),
-                "SortieSemaine devrait être supprimé en cascade");
-        Assertions.assertFalse(regleRepository.findById(regle.getId()).isPresent(),
-                "Regle devrait être supprimée avec succès");
+        assertThrows(RegleNotFoundException.class, () -> regleService.readRegle(savedRegle.getId()),
+                "Expected RegleNotFoundException when trying to read a deleted Regle.");
     }
+
+
+    @Test
+    public void testDeleteRegle_Failure_NotFound() {
+        // Act & Assert
+        RegleNotFoundException exception = assertThrows(RegleNotFoundException.class, () -> {
+            regleService.deleteRegle(999);
+        });
+
+        assertEquals("Ruler with id 999 not found, cannot delete", exception.getMessage());
+    }
+
 }

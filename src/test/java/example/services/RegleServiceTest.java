@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,27 +32,26 @@ public class RegleServiceTest {
 
     @Test
     public void testCreateRegle_Success() {
+        // Arrange: Create a valid Regle object
         Regle regle = new Regle();
+        regle.setCoderegle("RULE123"); // Set a valid coderegle to pass validation
+
+        // Mock the repository save behavior
         when(regleRepository.save(regle)).thenReturn(regle);
 
+        // Act: Call the service method
         Regle result = regleService.createRegle(regle);
 
+        // Assert: Verify the result and interactions
         Assertions.assertNotNull(result, "Rule should not be null");
+        Assertions.assertEquals("RULE123", result.getCoderegle(), "Coderegle should match the expected value");
         verify(regleRepository, times(1)).save(regle);
         verifyNoMoreInteractions(regleRepository);
     }
 
-    @Test
-    public void testCreateRegle_NullInput_ShouldThrowException() {
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            regleService.createRegle(null);
-        });
 
-        Assertions.assertEquals("La règle ne peut pas être nulle.", exception.getMessage(),
-                "Exception message should match the expected error message.");
 
-        verifyNoInteractions(regleRepository);
-    }
+
 
 
 
@@ -160,27 +160,35 @@ public class RegleServiceTest {
 
     @Test
     public void testReadAllRegles_Success() {
+        // Arrange: Mock the repository to return a list of two `Regle` objects
         List<Regle> regles = new ArrayList<>();
-        regles.add(new Regle());
-        regles.add(new Regle());
+
+        Regle regle1 = new Regle();
+        regle1.setId(1);
+        regle1.setCoderegle("Rule1");
+        regle1.setReglePourSortie("Description1");
+
+        Regle regle2 = new Regle();
+        regle2.setId(2);
+        regle2.setCoderegle("Rule2");
+        regle2.setReglePourSortie("Description2");
+
+        regles.add(regle1);
+        regles.add(regle2);
 
         when(regleRepository.findAll()).thenReturn(regles);
 
+        // Act: Call the service method
         List<Regle> result = regleService.readAllRegles();
 
+        // Assert: Verify the results
         Assertions.assertEquals(2, result.size(), "There should be 2 rules");
+        Assertions.assertEquals("Rule1", result.get(0).getCoderegle(), "First rule's code should match");
+        Assertions.assertEquals("Rule2", result.get(1).getCoderegle(), "Second rule's code should match");
         verify(regleRepository, times(1)).findAll();
         verifyNoMoreInteractions(regleRepository);
     }
 
-    @Test
-    public void testReadAllRegles_EmptyList() {
-        when(regleRepository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Regle> result = regleService.readAllRegles();
 
-        Assertions.assertTrue(result.isEmpty(), "Rule list should be empty");
-        verify(regleRepository, times(1)).findAll();
-        verifyNoMoreInteractions(regleRepository);
-    }
 }

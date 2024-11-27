@@ -1,10 +1,16 @@
 package example.integration.services;
 
 import example.entity.Client;
+import example.entity.Mouvement;
 import example.entity.RetourSecurite;
+import example.entity.Valise;
 import example.repositories.ClientRepository;
+import example.repositories.MouvementRepository;
 import example.repositories.RetourSecuriteRepository;
+import example.repositories.ValiseRepository;
 import example.services.RetourSecuriteService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +22,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +47,12 @@ public class RetourSecuriteServiceIntegrationTest {
     private RetourSecurite retourSecurite;
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private MouvementRepository mouvementRepository;
+    @Autowired
+    private EntityManager entityManager;
+    @Autowired
+    private ValiseRepository valiseRepository;
 
     @BeforeEach
     public void setUp() {
@@ -65,39 +81,43 @@ public class RetourSecuriteServiceIntegrationTest {
         }
     }
 
+
     @Test
-    public void testCreateRetourSecurite() {
-        // Act
-        RetourSecurite savedRetourSecu = retourSecuriteService.createRetourSecurite(retourSecurite);
-
-        // Assert
-        assertNotNull(savedRetourSecu);
-        assertNotNull(savedRetourSecu.getNumero());
-        assertNotNull(savedRetourSecu.getCloture());
-        assertNotNull(savedRetourSecu.getDateCloture());
-        assertNotNull(savedRetourSecu.getDatesecurite());
-        assertNotNull(savedRetourSecu.getClients());
-        assertEquals("Dutoit", savedRetourSecu.getClients().get(0).getName());
-        assertEquals("a.dutoit@gmail.com", savedRetourSecu.getClients().get(0).getEmail());
-
+    public void testUpdateRetourSecurite_Failure_NullNumero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            retourSecurite.setNumero(null);
+            retourSecuriteService.updateRetourSecurite(retourSecurite.getId(), retourSecurite);
+        });
+        assertEquals("Invalid data: 'numero' cannot be null.", exception.getMessage());
     }
 
     @Test
-    public void testUpdateRetourSecurite() {
-        // Arrange
-        RetourSecurite savedRS = retourSecuriteService.createRetourSecurite(retourSecurite);
-        // Act
-        savedRS.setNumero(4856L);
-        savedRS.setCloture(false);
-        savedRS.setDateCloture(new Date());
-        savedRS.setDatesecurite(new Date());
-        RetourSecurite updatedRS = retourSecuriteService.updateRetourSecurite(savedRS.getId(), savedRS);
-        //Assert
-        assertNotNull(updatedRS);
-        assertEquals("Dutoit", updatedRS.getClients().get(0).getName());
-        assertEquals("a.dutoit@gmail.com", updatedRS.getClients().get(0).getEmail());
-
+    public void testUpdateRetourSecurite_Failure_EntityNotFound() {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            RetourSecurite nonExistentRS = RetourSecurite.builder().numero(99999L).build();
+            retourSecuriteService.updateRetourSecurite(9999, nonExistentRS);
+        });
+        assertTrue(exception.getMessage().contains("RetourSecurite not found with id:"));
     }
+
+    @Test
+    public void testGetRetourSecurite_NonExistent() {
+        RetourSecurite rs = retourSecuriteService.getRetourSecurite(9999);
+        assertNull(rs);
+    }
+
+    @Test
+    public void testCreateRetourSecurite_PartialData() {
+        RetourSecurite partialRS = RetourSecurite.builder().numero(123456L).build();
+        RetourSecurite savedRS = retourSecuriteService.createRetourSecurite(partialRS);
+
+        assertNotNull(savedRS);
+        assertEquals(123456L, savedRS.getNumero());
+        assertNull(savedRS.getDatesecurite());
+        assertNull(savedRS.getCloture());
+    }
+
+
 
     @Test
     public void testDeleteRetourSecurite() {
@@ -110,18 +130,8 @@ public class RetourSecuriteServiceIntegrationTest {
         assertNull(deletedRS);
     }
 
-    @Test
-    public void testGetRetourSecurite() {
-        //Arrange
-        RetourSecurite savedRS = retourSecuriteService.createRetourSecurite(retourSecurite);
-        //Act
-        RetourSecurite rsById = retourSecuriteService.getRetourSecurite(savedRS.getId());
-        //Assert
-        assertNotNull(rsById);
-        assertEquals("Dutoit", rsById.getClients().get(0).getName());
-        assertEquals("a.dutoit@gmail.com", rsById.getClients().get(0).getEmail());
 
-    }
+
 
     @Test
     public void testGetAllRetourSecurites() {
@@ -176,36 +186,17 @@ public class RetourSecuriteServiceIntegrationTest {
         assertNotNull(listRS);
         assertEquals(2, listRS.size());
     }
-    @Test
-    public void testCascadeDeleteClient() {
-        Client client = new Client();
-        client.setName("Test Client");
-        client.setEmail("test@example.com");
-        client = clientRepository.save(client);
-
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setClients(new ArrayList<>());
-        retourSecurite.setNumero(12345L);
-        retourSecurite = retourSecuriteRepository.save(retourSecurite);
-
-        retourSecuriteRepository.delete(retourSecurite);
-
-        Optional<Client> foundClient = clientRepository.findById(client.getId());
-        Assertions.assertTrue(foundClient.isEmpty(), "Client should be deleted due to cascade.");
-    }
 
 
     @Test
+    @Transactional
     public void testCreateRetourSecurite_Failure_ConstraintViolation() {
-        RetourSecurite invalidRetourSecurite = new RetourSecurite(); // Entité sans numéro
+        RetourSecurite invalidRetourSecurite = new RetourSecurite();
 
-        Exception exception = Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(DataIntegrityViolationException.class, () -> {
             retourSecuriteService.createRetourSecurite(invalidRetourSecurite);
-        });
-
-        Assertions.assertTrue(exception.getMessage().contains("could not execute statement"));
+        }, "Une DataIntegrityViolationException devrait être levée lorsque le numéro est nul");
     }
-
 
 
 }

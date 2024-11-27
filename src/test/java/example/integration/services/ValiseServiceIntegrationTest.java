@@ -4,118 +4,227 @@ import example.entity.Client;
 import example.entity.Regle;
 import example.entity.TypeValise;
 import example.entity.Valise;
+import example.exceptions.ResourceNotFoundException;
 import example.repositories.ClientRepository;
 import example.repositories.RegleRepository;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
 import example.services.ValiseService;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ActiveProfiles("testintegration")
 @Transactional
-@ActiveProfiles("integrationtest")
-public class ValiseServiceIntegrationTest {
+class ValiseServiceIntegrationTest {
 
     @Autowired
     private ValiseService valiseService;
+
     @Autowired
     private ValiseRepository valiseRepository;
+
     @Autowired
     private ClientRepository clientRepository;
-    @Autowired
-    private RegleRepository regleRepository;
+
     @Autowired
     private TypeValiseRepository typeValiseRepository;
 
-    private Valise valise;
+    @Autowired
+    private RegleRepository regleRepository;
+
     private Client client;
     private TypeValise typeValise;
-    private Regle regle;
 
     @BeforeEach
     void setUp() {
         client = Client.builder()
-                .name("Test Client")
-                .email("testclient@example.com")
+                .name("John Doe")
+                .email("johndoe@example.com")
+                .telephoneExploitation("123456789")
                 .build();
-        clientRepository.save(client);
+        client = clientRepository.save(client);
 
         typeValise = TypeValise.builder()
-                .description("Test Type Valise")
-                .proprietaire("Test Proprietaire")
+                .proprietaire("Propriétaire 1")
+                .description("Description TypeValise")
                 .build();
-        typeValiseRepository.save(typeValise);
+        typeValise = typeValiseRepository.save(typeValise);
+    }
 
-        regle = Regle.builder()
-                .coderegle("TEST_CODE")
-                .build();
-        regleRepository.save(regle);
-
-        valise = Valise.builder()
+    @Test
+    void testCreateValise_Success() {
+        Valise valise = Valise.builder()
                 .description("Test Valise")
-                .numeroValise(12345L)
-                .client(client)
-                .regleSortie((List<Regle>) regle)
-                .typeValise(typeValise)
+                .numeroValise(123456L)
                 .dateCreation(new Date())
+                .client(client)
+                .typeValise(typeValise)
                 .build();
-    }
 
+        Valise savedValise = valiseService.createValise(valise);
 
-
-    @Test
-    public void testCreateValise() {
-        Valise createdValise = valiseService.createValise(valise);
-        assertNotNull(createdValise);
-        assertEquals("Test Valise", createdValise.getDescription());
-        assertEquals(client.getId(), createdValise.getClient().getId());
-        assertEquals(typeValise.getId(), createdValise.getTypeValise().getId());
+        assertNotNull(savedValise);
+        assertNotNull(savedValise.getId());
+        assertEquals("Test Valise", savedValise.getDescription());
+        assertEquals(client.getId(), savedValise.getClient().getId());
+        assertEquals(typeValise.getId(), savedValise.getTypeValise().getId());
     }
 
     @Test
-    public void testUpdateValise() {
-        Valise createdValise = valiseService.createValise(valise);
-        createdValise.setDescription("Updated Valise Description");
+    void testGetValiseById_Success() {
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(123456L)
+                .dateCreation(new Date())
+                .client(client)
+                .typeValise(typeValise)
+                .build();
+        valise = valiseRepository.save(valise);
 
-        Valise updatedValise = valiseService.updateValise(createdValise.getId(), createdValise);
+        Valise fetchedValise = valiseService.getValiseById(valise.getId());
+
+        assertNotNull(fetchedValise);
+        assertEquals(valise.getId(), fetchedValise.getId());
+        assertEquals("Test Valise", fetchedValise.getDescription());
+    }
+
+    @Test
+    void testGetValiseById_NotFound() {
+        int invalidId = 999;
+
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            valiseService.getValiseById(invalidId);
+        });
+
+        assertEquals("Valise not found with ID: " + invalidId, exception.getMessage());
+    }
+
+    @Test
+    void testUpdateValise_Success() {
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(123456L)
+                .dateCreation(new Date())
+                .client(client)
+                .typeValise(typeValise)
+                .build();
+        valise = valiseRepository.save(valise);
+
+        valise.setDescription("Updated Description");
+        Valise updatedValise = valiseService.updateValise(valise.getId(), valise);
+
         assertNotNull(updatedValise);
-        assertEquals("Updated Valise Description", updatedValise.getDescription());
+        assertEquals("Updated Description", updatedValise.getDescription());
     }
 
     @Test
-    public void testDeleteValise() {
-        Valise createdValise = valiseService.createValise(valise);
-        int valiseId = createdValise.getId();
+    void testDeleteValise_Success() {
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(123456L)
+                .dateCreation(new Date())
+                .client(client)
+                .typeValise(typeValise)
+                .build();
+        valise = valiseRepository.save(valise);
 
-        valiseService.deleteValise(valiseId);
-        assertFalse(valiseRepository.existsById(valiseId));
+        valiseService.deleteValise(valise.getId());
+
+        assertFalse(valiseRepository.existsById(valise.getId()));
     }
 
     @Test
-    public void testGetValiseById() {
-        Valise createdValise = valiseService.createValise(valise);
+    void testDeleteValise_NotFound() {
+        int invalidId = 999;
 
-        Valise foundValise = valiseService.getValiseById(createdValise.getId());
-        assertNotNull(foundValise);
-        assertEquals("Test Valise", foundValise.getDescription());
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            valiseService.deleteValise(invalidId);
+        });
+
+        assertEquals("The suitcase does not exist", exception.getMessage());
     }
 
     @Test
-    public void testGetAllValises() {
-        valiseService.createValise(valise);
+    void testCreateValise_WithRegles() {
+        Regle regle = Regle.builder()
+                .coderegle("R123")
+                .dateRegle(new Date())
+                .build();
+        regle = regleRepository.save(regle);
 
-        List<Valise> allValises = valiseService.getAllValises();
-        assertNotNull(allValises);
-        assertFalse(allValises.isEmpty());
+        List<Regle> regleList = new ArrayList<>();
+        regleList.add(regle);
+
+        Valise valise = Valise.builder()
+                .description("Valise avec règles")
+                .numeroValise(789012L)
+                .client(client)
+                .typeValise(typeValise)
+                .regleSortie(regleList)
+                .build();
+
+        Valise savedValise = valiseService.createValise(valise);
+
+        assertNotNull(savedValise);
+        assertEquals(1, savedValise.getRegleSortie().size());
+        assertEquals("R123", savedValise.getRegleSortie().get(0).getCoderegle());
     }
+
+    @Test
+    void testCreateValise_InvalidClient() {
+        Valise valise = Valise.builder()
+                .description("Valise sans client")
+                .numeroValise(123456L)
+                .build();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            valiseService.createValise(valise);
+        });
+
+        // Vérifiez que la cause est une IllegalArgumentException
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        assertEquals("Client ID is required", exception.getCause().getMessage());
+    }
+
+
+    @Test
+    void testGetAllValises() {
+        Valise valise1 = Valise.builder()
+                .description("Valise 1")
+                .numeroValise(111111L)
+                .client(client)
+                .typeValise(typeValise)
+                .build();
+        valiseRepository.save(valise1);
+
+        Valise valise2 = Valise.builder()
+                .description("Valise 2")
+                .numeroValise(222222L)
+                .client(client)
+                .typeValise(typeValise)
+                .build();
+        valiseRepository.save(valise2);
+
+        List<Valise> valises = valiseService.getAllValises();
+
+        assertNotNull(valises);
+        assertEquals(2, valises.size());
+    }
+
+
+
 }

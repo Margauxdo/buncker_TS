@@ -3,16 +3,15 @@ package example.integration.services;
 import example.entity.Client;
 import example.entity.Probleme;
 import example.entity.Valise;
+import example.exceptions.ResourceNotFoundException;
 import example.repositories.ClientRepository;
-import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;
 import example.services.ProblemeService;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,134 +19,150 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("integrationtest")
 public class ProblemeServiceIntegrationTest {
+
     @Autowired
     private ProblemeService problemeService;
-    @Autowired
-    private ProblemeRepository problemeRepository;
-    private Probleme probleme;
-    @Autowired
-    private ClientRepository clientRepository;
+
     @Autowired
     private ValiseRepository valiseRepository;
 
+    @Autowired
+    private ClientRepository clientRepository;
+
+    private Client client;
+    private Valise valise;
+    private Probleme probleme;
+
     @BeforeEach
     public void setUp() {
-        problemeRepository.deleteAll();
+        client = Client.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .build();
+        client = clientRepository.save(client);
 
-        Client clientA = new Client();
-        clientA.setName("Dutoit");
-        clientA.setEmail("a.dutoit@gmail.com");
-        clientA = clientRepository.save(clientA);
-
-        Valise val = new Valise();
-        val.setClient(clientA);
-        val.setNumeroValise(1234L);
-        val = valiseRepository.save(val);
+        valise = Valise.builder()
+                .description("Valise de test")
+                .numeroValise(123456L)
+                .refClient("RefClientTest")
+                .client(client)
+                .build();
+        valise = valiseRepository.save(valise);
 
         probleme = Probleme.builder()
-                .detailsProbleme("details du probleme de categorie A")
-                .descriptionProbleme("decrire mon probleme")
-                .client(clientA)
-                .valise(val)
+                .descriptionProbleme("Test description")
+                .detailsProbleme("Test details")
+                .client(client)
+                .valise(valise)
                 .build();
     }
 
-
-
     @Test
-    public void testCreateProbleme(){
+    void testCreateProbleme_Success() {
         // Act
-        Probleme savedPb = problemeService.createProbleme(probleme);
+        Probleme createdProbleme = problemeService.createProbleme(probleme);
 
         // Assert
-        assertNotNull(savedPb);
-        assertNotNull(savedPb.getClient());
-        assertNotNull(savedPb.getValise());
-        assertEquals("details du probleme de categorie A", savedPb.getDetailsProbleme());
-        assertEquals("decrire mon probleme", savedPb.getDescriptionProbleme());
+        assertNotNull(createdProbleme.getId());
+        assertEquals(probleme.getDescriptionProbleme(), createdProbleme.getDescriptionProbleme());
+        assertEquals(probleme.getDetailsProbleme(), createdProbleme.getDetailsProbleme());
+        assertNotNull(createdProbleme.getValise());
+        assertEquals(valise.getId(), createdProbleme.getValise().getId());
     }
 
     @Test
-    public void testUpdateProbleme(){
+    void testCreateProbleme_Failure_Duplicate() {
         // Arrange
-        Probleme savedPb = problemeService.createProbleme(probleme);
+        problemeService.createProbleme(probleme);
 
-        // Act
-        savedPb.setDetailsProbleme("details du probleme standard");
-        savedPb.setDescriptionProbleme("description du probleme de catégorie B1");
-        Probleme updatedPb = problemeService.updateProbleme(savedPb.getId(), savedPb);
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            problemeService.createProbleme(probleme);
+        });
 
-        // Assert
-        assertNotNull(updatedPb);
-        assertEquals(savedPb.getId(), updatedPb.getId());
-        assertEquals("details du probleme standard", updatedPb.getDetailsProbleme());
-        assertEquals("description du probleme de catégorie B1", updatedPb.getDescriptionProbleme());
+        assertEquals("Un problème avec cette description et ces détails existe déjà.", exception.getMessage());
     }
+
     @Test
-    public void testDeleteProbleme() {
+    void testUpdateProbleme_Success() {
         // Arrange
-        Probleme savedPb = problemeService.createProbleme(probleme);
+        Probleme createdProbleme = problemeService.createProbleme(probleme);
+        createdProbleme.setDetailsProbleme("Updated details");
 
         // Act
-        problemeService.deleteProbleme(savedPb.getId());
+        Probleme updatedProbleme = problemeService.updateProbleme(createdProbleme.getId(), createdProbleme);
 
         // Assert
-        Probleme deletedPb = problemeService.getProblemeById(savedPb.getId());
-        assertNull(deletedPb);
+        assertNotNull(updatedProbleme);
+        assertEquals("Updated details", updatedProbleme.getDetailsProbleme());
     }
 
     @Test
-    public void testGetProblemeById() {
+    void testUpdateProbleme_Failure_NotFound() {
+        // Act & Assert
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            problemeService.updateProbleme(999, probleme);
+        });
+
+        assertEquals("Problem not found with ID: 999", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteProbleme_Success() {
         // Arrange
-        Probleme savedPb = problemeService.createProbleme(probleme);
+        Probleme createdProbleme = problemeService.createProbleme(probleme);
 
         // Act
-        Probleme pbById = problemeService.getProblemeById(savedPb.getId());
+        problemeService.deleteProbleme(createdProbleme.getId());
 
         // Assert
-        assertNotNull(pbById);
-        assertEquals(savedPb.getId(), pbById.getId());
-        assertEquals("details du probleme de categorie A", pbById.getDetailsProbleme());
-        assertEquals("decrire mon probleme", pbById.getDescriptionProbleme());
+        assertFalse(problemeService.getAllProblemes().stream()
+                .anyMatch(p -> p.getId() == createdProbleme.getId()));
     }
 
     @Test
-    public void testGetAllProblemes(){
+    void testDeleteProbleme_Failure_NotFound() {
+        // Act & Assert
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            problemeService.deleteProbleme(999);
+        });
 
-        Client clientB = new Client();
-        clientB.setName("duterte");
-        clientB.setEmail("a.duterte@gmail.com");
-        clientB = clientRepository.saveAndFlush(clientB);
+        assertEquals("Problem not found with ID: 999", exception.getMessage());
+    }
 
-        Valise valB = new Valise();
-        valB.setClient(clientB);
-        valB.setNumeroValise(1236L);
-        valB = valiseRepository.saveAndFlush(valB);
-
-        Probleme pb1 = Probleme.builder()
-                .detailsProbleme("details du probleme standard")
-                .descriptionProbleme("description standard")
-                .client(clientB)
-                .valise(valB)
-                .build();
-        problemeService.createProbleme(pb1);
-
-        Probleme probleme = Probleme.builder()
-                .detailsProbleme("autre detail du probleme")
-                .descriptionProbleme("autre description")
-                .client(clientB)
-                .valise(valB)
-                .build();
+    @Test
+    void testGetAllProblemes() {
+        // Arrange
         problemeService.createProbleme(probleme);
 
         // Act
-        List<Probleme> allProblemes = problemeService.getAllProblemes();
+        List<Probleme> problemes = problemeService.getAllProblemes();
 
         // Assert
-        assertNotNull(allProblemes);
-        assertEquals(2, allProblemes.size());
+        assertFalse(problemes.isEmpty());
+        assertEquals(1, problemes.size());
     }
 
+    @Test
+    void testGetProblemeById_Success() {
+        // Arrange
+        Probleme createdProbleme = problemeService.createProbleme(probleme);
+
+        // Act
+        Probleme fetchedProbleme = problemeService.getProblemeById(createdProbleme.getId());
+
+        // Assert
+        assertNotNull(fetchedProbleme);
+        assertEquals(createdProbleme.getDescriptionProbleme(), fetchedProbleme.getDescriptionProbleme());
+    }
+
+    @Test
+    void testGetProblemeById_Failure_NotFound() {
+        // Act
+        Probleme fetchedProbleme = problemeService.getProblemeById(999);
+
+        // Assert
+        assertNull(fetchedProbleme);
+    }
 }

@@ -2,8 +2,10 @@ package example.integration.services;
 
 import example.entity.Regle;
 import example.entity.TypeRegle;
+import example.repositories.RegleRepository;
 import example.repositories.TypeRegleRepository;
 import example.services.TypeRegleService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,9 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -24,103 +24,178 @@ public class TypeRegleServiceIntegrationTest {
 
     @Autowired
     private TypeRegleService typeRegleService;
+
     @Autowired
     private TypeRegleRepository typeRegleRepository;
 
+    private Regle regle;
     private TypeRegle typeRegle;
+    @Autowired
+    private RegleRepository regleRepository;
 
     @BeforeEach
     void setUp() {
+        // Clean up repository
         typeRegleRepository.deleteAll();
 
+        // Prepare a Regle instance
+        regle = Regle.builder()
+                .coderegle("REGLE123")
+                .build();
+
+        // Prepare a TypeRegle instance
         typeRegle = TypeRegle.builder()
-                .nomTypeRegle("Type test")
+                .nomTypeRegle("Test TypeRegle")
+                .regle(regle)
                 .build();
-        typeRegle = typeRegleService.createTypeRegle(typeRegle);
     }
 
     @Test
-    public void testCreateTypeRegle() {
-        // Act
-        TypeRegle savedTR = typeRegleService.createTypeRegle(typeRegle);
-
-        // Assert
-        assertNotNull(savedTR);
-        assertEquals("Type test", savedTR.getNomTypeRegle());
-    }
-
-    @Test
-    public void testUpdateTypeRegle() {
+    public void testCreateTypeRegle_Success() {
         // Arrange
-        TypeRegle savedTR = typeRegleService.createTypeRegle(typeRegle);
-        // Act
-        savedTR.setNomTypeRegle("new type test");
-        TypeRegle updatedTR = typeRegleService.updateTypeRegle(savedTR.getId(),savedTR);
-        // Assert
-        assertNotNull(updatedTR);
-        assertEquals("new type test", updatedTR.getNomTypeRegle());
-
-    }
-    @Test
-    public void testDeleteTypeRegle() {
-        // Arrange
-        TypeRegle savedTR = typeRegleService.createTypeRegle(typeRegle);
-
-        // Act
-        typeRegleService.deleteTypeRegle(savedTR.getId());
-
-        // Assert
-        boolean isDeleted = typeRegleRepository.findById(savedTR.getId()).isEmpty();
-        assertTrue(isDeleted, "The Rule Type entity should be deleted from the database");
-    }
-
-    @Test
-    public void testGetTypeRegle() {
-        // Arrange
-        TypeRegle savedTR = typeRegleService.createTypeRegle(typeRegle);
-        //Act
-        TypeRegle retrievedTR = typeRegleService.getTypeRegle(savedTR.getId());
-        //Assert
-        assertNotNull(retrievedTR);
-        assertEquals("Type test", retrievedTR.getNomTypeRegle());
-    }
-    @Test
-    public void testGetTypeRegles() {
-        // Arrange
-        typeRegleRepository.deleteAll();
-        TypeRegle typeRegle1 = TypeRegle.builder()
-                .nomTypeRegle("Type commerce")
+        Regle regle = Regle.builder()
+                .coderegle("REGLE123")
                 .build();
-        TypeRegle typeRegle2 = TypeRegle.builder()
-                .nomTypeRegle("type banque")
-                .build();
-        typeRegleService.createTypeRegle(typeRegle1);
-        typeRegleService.createTypeRegle(typeRegle2);
-        // Act
-        List<TypeRegle> typeRegles = typeRegleService.getTypeRegles();
-        //Assert
-        assertNotNull(typeRegles);
-        assertEquals(2, typeRegles.size());
-    }
-
-    @Test
-    public void testCreateTypeRegle_WithRegle() {
-        Regle regle = new Regle();
-        regle.setCoderegle("ServiceRegle");
+        regle = regleRepository.save(regle);
 
         TypeRegle typeRegle = TypeRegle.builder()
-                .nomTypeRegle("Type D")
+                .nomTypeRegle("Test TypeRegle")
                 .regle(regle)
                 .build();
 
+        // Act
         TypeRegle savedTypeRegle = typeRegleService.createTypeRegle(typeRegle);
 
+        // Assert
         assertNotNull(savedTypeRegle);
-        assertEquals("Type D", savedTypeRegle.getNomTypeRegle());
+        assertNotNull(savedTypeRegle.getId());
+        assertEquals("Test TypeRegle", savedTypeRegle.getNomTypeRegle());
         assertNotNull(savedTypeRegle.getRegle());
-        assertEquals("ServiceRegle", savedTypeRegle.getRegle().getCoderegle());
+        assertEquals("REGLE123", savedTypeRegle.getRegle().getCoderegle());
+    }
+
+
+
+    @Test
+    public void testCreateTypeRegle_Failure_NoRegle() {
+        // Arrange
+        typeRegle.setRegle(null);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            typeRegleService.createTypeRegle(typeRegle);
+        });
+
+        assertEquals("Associated Regle must not be null", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateTypeRegle_Success() {
+        // Arrange
+        Regle regle = Regle.builder()
+                .coderegle("REGLE123")
+                .build();
+        regle = regleRepository.save(regle);
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Initial TypeRegle")
+                .regle(regle)
+                .build();
+        TypeRegle savedTypeRegle = typeRegleService.createTypeRegle(typeRegle);
+
+        savedTypeRegle.setNomTypeRegle("Updated TypeRegle");
+
+        // Act
+        TypeRegle updatedTypeRegle = typeRegleService.updateTypeRegle(savedTypeRegle.getId(), savedTypeRegle);
+
+        // Assert
+        assertNotNull(updatedTypeRegle);
+        assertEquals(savedTypeRegle.getId(), updatedTypeRegle.getId());
+        assertEquals("Updated TypeRegle", updatedTypeRegle.getNomTypeRegle());
+        assertNotNull(updatedTypeRegle.getRegle());
+        assertEquals("REGLE123", updatedTypeRegle.getRegle().getCoderegle());
+    }
+
+
+
+
+    @Test
+    public void testGetTypeRegle_Failure_NotFound() {
+        // Act
+        TypeRegle fetchedTypeRegle = typeRegleService.getTypeRegle(999);
+
+        // Assert
+        assertNull(fetchedTypeRegle, "TypeRegle with ID 999 should not exist.");
+    }
+
+    @Test
+    public void testGetAllTypeRegles() {
+        // Arrange
+        Regle regle1 = Regle.builder()
+                .coderegle("REGLE123")
+                .build();
+        regle1 = regleRepository.save(regle1);
+
+        Regle regle2 = Regle.builder()
+                .coderegle("REGLE456")
+                .build();
+        regle2 = regleRepository.save(regle2);
+
+        TypeRegle typeRegle1 = TypeRegle.builder()
+                .nomTypeRegle("TypeRegle 1")
+                .regle(regle1)
+                .build();
+        typeRegleService.createTypeRegle(typeRegle1);
+
+        TypeRegle typeRegle2 = TypeRegle.builder()
+                .nomTypeRegle("TypeRegle 2")
+                .regle(regle2)
+                .build();
+        typeRegleService.createTypeRegle(typeRegle2);
+
+        // Act
+        List<TypeRegle> typeRegles = typeRegleService.getTypeRegles();
+
+        // Assert
+        assertNotNull(typeRegles, "La liste des TypeRegle ne devrait pas être nulle.");
+        assertEquals(2, typeRegles.size(), "La liste des TypeRegle devrait contenir 2 éléments.");
+        assertEquals("TypeRegle 1", typeRegles.get(0).getNomTypeRegle());
+        assertEquals("TypeRegle 2", typeRegles.get(1).getNomTypeRegle());
+    }
+
+
+
+
+    @Test
+    public void testDeleteTypeRegle_Failure_NotFound() {
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            typeRegleService.deleteTypeRegle(999);
+        });
+
+        assertEquals("TypeRegle not found", exception.getMessage());
+    }
+
+
+    @Test
+    public void testDeleteTypeRegle_Success() {
+        // Arrange
+        Regle regle = Regle.builder()
+                .coderegle("REGLE123")
+                .build();
+        regle = regleRepository.save(regle);
+
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle("Deletable TypeRegle")
+                .regle(regle)
+                .build();
+        typeRegle = typeRegleService.createTypeRegle(typeRegle);
+
+        // Act
+        typeRegleService.deleteTypeRegle(typeRegle.getId());
+
+        // Assert
+        assertFalse(typeRegleRepository.existsById(typeRegle.getId()));
     }
 
 
 }
-

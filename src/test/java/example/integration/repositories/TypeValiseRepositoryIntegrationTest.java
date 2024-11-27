@@ -49,22 +49,25 @@ public class TypeValiseRepositoryIntegrationTest {
 
         Valise valise = new Valise();
         valise.setNumeroValise(25154L);
+        valise.setDescription("Description Valise");
         valise.setClient(client);
+        valiseRepository.save(valise);
 
         TypeValise typeValise = new TypeValise();
         typeValise.setProprietaire("Arthur Menart");
         typeValise.setDescription("Description de la valise");
-
-        List<Valise> valises = new ArrayList<>();
-        valises.add(valise);
         typeValise.setValise(valise);
 
         TypeValise savedTV = typeValiseRepository.save(typeValise);
+
+        // Assertions
         assertNotNull(savedTV.getId());
         assertEquals("Arthur Menart", savedTV.getProprietaire());
         assertEquals("Description de la valise", savedTV.getDescription());
+        assertNotNull(savedTV.getValise());
+        assertEquals(25154L, savedTV.getValise().getNumeroValise());
     }
-    @Test
+
     public void testFindTypeValiseById() {
         TypeValise typeValise = new TypeValise();
         typeValise.setProprietaire("Arthur Menart");
@@ -154,25 +157,26 @@ public class TypeValiseRepositoryIntegrationTest {
 
         Valise valise = new Valise();
         valise.setNumeroValise(25154L);
+        valise.setDescription("Description de la valise");
         valise.setClient(client);
+
 
         TypeValise typeValise = new TypeValise();
         typeValise.setProprietaire("Arthur Menart");
-        typeValise.setDescription("Description de la valise");
-
-        List<Valise> valises = new ArrayList<>();
-        valises.add(valise);
+        typeValise.setDescription("Description de type valise");
         typeValise.setValise(valise);
 
         typeValiseRepository.save(typeValise);
+
         typeValiseRepository.deleteById(typeValise.getId());
 
         Optional<TypeValise> foundTV = typeValiseRepository.findById(typeValise.getId());
         assertFalse(foundTV.isPresent(), "Le TypeValise devrait être supprimé");
 
         List<Valise> valisesAfterDelete = valiseRepository.findAll();
-        assertTrue(valisesAfterDelete.isEmpty(), "Suitcases associated with SuitcaseType should be deleted in cascade");
+        assertTrue(valisesAfterDelete.isEmpty(), "Les Valises associées au TypeValise devraient être supprimées en cascade");
     }
+
 
     @Test
     public void testUniqueConstraintViolation() {

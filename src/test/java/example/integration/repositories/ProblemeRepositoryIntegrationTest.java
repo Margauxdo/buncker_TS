@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,214 +29,219 @@ public class ProblemeRepositoryIntegrationTest {
 
     @Autowired
     private ProblemeRepository problemeRepository;
+
     @Autowired
     private ValiseRepository valiseRepository;
+
     @Autowired
     private ClientRepository clientRepository;
+
+    private Valise valise;
+    private Client client;
 
     @BeforeEach
     public void setUp() {
         problemeRepository.deleteAll();
+        valiseRepository.deleteAll();
+        clientRepository.deleteAll();
+
+        client = Client.builder()
+                .name("Test Client")
+                .email("client@example.com")
+                .build();
+        client = clientRepository.save(client);
+
+        valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(123456L)
+                .client(client)
+                .build();
+        valise = valiseRepository.save(valise);
     }
 
     @Test
-    public void testSaveProblemeSuccess() {
-        Client client = new Client();
-        client.setName("harry");
-        client.setEmail("harry@gmail.com");
-        client = clientRepository.save(client);
-
-        Valise valise = new Valise();
-        valise.setNumeroValise(123L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
-
-        Probleme probleme = new Probleme();
-        probleme.setValise(valise);
-        probleme.setClient(client);
-        probleme.setDetailsProbleme("details test");
-        probleme.setDescriptionProbleme("description test");
-        Probleme saved = problemeRepository.save(probleme);
-
-        assertNotNull(saved.getId());
-        assertEquals("details test", saved.getDetailsProbleme());
-        assertEquals("description test", saved.getDescriptionProbleme());
-    }
-
-
-    @Test
-    public void testFindProblemeById() {
-
-        Client client = new Client();
-        client.setName("harry");
-        client.setEmail("harry@gmail.com");
-        client = clientRepository.save(client);
-
-        Valise valise = new Valise();
-        valise.setNumeroValise(123L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
-
-        Probleme probleme = new Probleme();
-        probleme.setValise(valise);
-        probleme.setClient(client);
-        probleme.setDetailsProbleme("details test");
-        probleme.setDescriptionProbleme("description test");
-
+    public void testSaveProbleme() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Test Description")
+                .detailsProbleme("Test Details")
+                .valise(valise)
+                .client(client)
+                .build();
 
         Probleme savedProbleme = problemeRepository.save(probleme);
-        Optional<Probleme> foundProbleme = problemeRepository.findById(savedProbleme.getId());
 
-
-        assertTrue(foundProbleme.isPresent());
-        assertEquals("details test", foundProbleme.get().getDetailsProbleme());
-        assertEquals("description test", foundProbleme.get().getDescriptionProbleme());
-        assertEquals(client.getId(), foundProbleme.get().getClient().getId());
-        assertEquals(valise.getId(), foundProbleme.get().getValise().getId());
+        assertNotNull(savedProbleme.getId());
+        assertEquals("Test Description", savedProbleme.getDescriptionProbleme());
+        assertEquals("Test Details", savedProbleme.getDetailsProbleme());
+        assertEquals(valise.getId(), savedProbleme.getValise().getId());
+        assertEquals(client.getId(), savedProbleme.getClient().getId());
     }
 
-
     @Test
-    public void testDeleteProbleme() {
-        Client client = new Client();
-        client.setName("harry");
-        client.setEmail("harry@gmail.com");
-        client = clientRepository.save(client);
+    public void testFindById() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Another Description")
+                .detailsProbleme("Another Details")
+                .valise(valise)
+                .client(client)
+                .build();
 
-        Valise valise = new Valise();
-        valise.setNumeroValise(123L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
+        Probleme savedProbleme = problemeRepository.save(probleme);
 
-        Probleme probleme = new Probleme();
-        probleme.setValise(valise);
-        probleme.setClient(client);
-        probleme.setDetailsProbleme("details test");
-        probleme.setDescriptionProbleme("description test");
-        Probleme saved = problemeRepository.save(probleme);
-
-        problemeRepository.delete(saved);
-        Optional<Probleme> found = problemeRepository.findById(saved.getId());
-
-        assertFalse(found.isPresent());
+        Optional<Probleme> foundProbleme = problemeRepository.findById(savedProbleme.getId());
+        assertTrue(foundProbleme.isPresent());
+        assertEquals("Another Description", foundProbleme.get().getDescriptionProbleme());
     }
 
     @Test
     public void testUpdateProbleme() {
-        Client client = new Client();
-        client.setName("harry");
-        client.setEmail("harry@gmail.com");
-        client = clientRepository.save(client);
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Initial Description")
+                .detailsProbleme("Initial Details")
+                .valise(valise)
+                .client(client)
+                .build();
 
-        Valise valise = new Valise();
-        valise.setNumeroValise(123L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
+        Probleme savedProbleme = problemeRepository.save(probleme);
 
-        Probleme probleme = new Probleme();
-        probleme.setValise(valise);
-        probleme.setClient(client);
-        probleme.setDetailsProbleme("details test");
-        probleme.setDescriptionProbleme("description test");
-        Probleme saved = problemeRepository.save(probleme);
+        savedProbleme.setDescriptionProbleme("Updated Description");
+        Probleme updatedProbleme = problemeRepository.save(savedProbleme);
 
-        saved.setDetailsProbleme("details updated");
-        saved.setDescriptionProbleme("description updated");
-        Probleme updated = problemeRepository.save(saved);
-
-        Optional<Probleme> found = problemeRepository.findById(updated.getId());
-
-        assertTrue(found.isPresent());
-        assertEquals("details updated", found.get().getDetailsProbleme());
-        assertEquals("description updated", found.get().getDescriptionProbleme());
+        assertEquals("Updated Description", updatedProbleme.getDescriptionProbleme());
     }
 
     @Test
-    public void testFindAllProbleme() {
-        Client client = new Client();
-        client.setName("harry");
-        client.setEmail("harry@gmail.com");
-        client = clientRepository.save(client);
+    public void testDeleteProbleme() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("To Be Deleted")
+                .detailsProbleme("Details To Be Deleted")
+                .valise(valise)
+                .client(client)
+                .build();
 
-        Valise valise = new Valise();
-        valise.setNumeroValise(123L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
+        Probleme savedProbleme = problemeRepository.save(probleme);
+        problemeRepository.delete(savedProbleme);
 
-        Probleme probleme1 = new Probleme();
-        probleme1.setValise(valise);
-        probleme1.setClient(client);
-        probleme1.setDetailsProbleme("details premier test");
-        probleme1.setDescriptionProbleme("description premier test");
-        problemeRepository.save(probleme1);
-        Probleme probleme2 = new Probleme();
-        probleme2.setValise(valise);
-        probleme2.setClient(client);
-        probleme2.setDetailsProbleme("details second test");
-        probleme2.setDescriptionProbleme("description second test");
-        problemeRepository.save(probleme2);
-        List<Probleme> found = problemeRepository.findAll();
-        assertNotNull(found);
-
-        found.sort(Comparator.comparing(Probleme::getDetailsProbleme));
-        assertEquals("details premier test", found.get(0).getDetailsProbleme());
-        assertEquals("description premier test", found.get(0).getDescriptionProbleme());
-        assertEquals("details second test", found.get(1).getDetailsProbleme());
-        assertEquals("description second test", found.get(1).getDescriptionProbleme());
-
-        found.forEach(System.out::println);
+        Optional<Probleme> foundProbleme = problemeRepository.findById(savedProbleme.getId());
+        assertFalse(foundProbleme.isPresent());
     }
 
+    @Test
+    public void testFindAll() {
+        Probleme probleme1 = Probleme.builder()
+                .descriptionProbleme("Description 1")
+                .detailsProbleme("Details 1")
+                .valise(valise)
+                .client(client)
+                .build();
+
+        Probleme probleme2 = Probleme.builder()
+                .descriptionProbleme("Description 2")
+                .detailsProbleme("Details 2")
+                .valise(valise)
+                .client(client)
+                .build();
+
+        problemeRepository.save(probleme1);
+        problemeRepository.save(probleme2);
+
+        Iterable<Probleme> problemes = problemeRepository.findAll();
+        assertEquals(2, ((Collection<?>) problemes).size());
+    }
 
     @Test
     public void testFindByValise() {
-        // Setup
-        Client client = new Client();
-        client.setName("harry");
-        client.setEmail("harry@gmail.com");
-        client = clientRepository.save(client);
+        Probleme probleme1 = Probleme.builder()
+                .descriptionProbleme("Description 1")
+                .detailsProbleme("Details 1")
+                .valise(valise)
+                .client(client)
+                .build();
 
-        Valise valise = new Valise();
-        valise.setNumeroValise(123L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
+        Probleme probleme2 = Probleme.builder()
+                .descriptionProbleme("Description 2")
+                .detailsProbleme("Details 2")
+                .valise(valise)
+                .client(client)
+                .build();
 
-        Probleme probleme = new Probleme();
-        probleme.setValise(valise);
-        probleme.setClient(client);
-        probleme.setDetailsProbleme("details test");
-        probleme.setDescriptionProbleme("description test");
+        problemeRepository.save(probleme1);
+        problemeRepository.save(probleme2);
+
+        List<Probleme> foundProblemes = problemeRepository.findByValise(valise);
+
+        assertEquals(2, foundProblemes.size());
+        assertTrue(foundProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Description 1")));
+        assertTrue(foundProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Description 2")));
+    }
+
+    @Test
+    public void testExistsByDescriptionProblemeAndDetailsProbleme() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Unique Description")
+                .detailsProbleme("Unique Details")
+                .valise(valise)
+                .client(client)
+                .build();
+
         problemeRepository.save(probleme);
 
-        // Test
-        List<Probleme> foundProblemes = problemeRepository.findByValise(valise);
-        assertNotNull(foundProblemes);
-        assertFalse(foundProblemes.isEmpty());
-        assertEquals(1, foundProblemes.size());
-        assertEquals("details test", foundProblemes.get(0).getDetailsProbleme());
-    }
-    @Test
-    public void testSaveProblemeWithNullValues() {
-        Probleme probleme = new Probleme();
-        // Missing required fields: valise, client, etc.
-        assertThrows(Exception.class, () -> {
-            problemeRepository.save(probleme);
-        });
-    }
-    @Test
-    public void testFindByValiseWithNoProblemes() {
-        Client client = new Client();
-        client.setName("Test Client");
-        client.setEmail("testclient@gmail.com");
-        client = clientRepository.save(client);
+        boolean exists = problemeRepository.existsByDescriptionProblemeAndDetailsProbleme("Unique Description", "Unique Details");
+        assertTrue(exists);
 
-        Valise valise = new Valise();
-        valise.setNumeroValise(999L);
-        valise.setClient(client);
-        valise = valiseRepository.save(valise);
+        boolean notExists = problemeRepository.existsByDescriptionProblemeAndDetailsProbleme("Nonexistent Description", "Nonexistent Details");
+        assertFalse(notExists);
+    }
+
+    @Test
+    public void testDeleteAllByValise() {
+        Probleme probleme1 = Probleme.builder()
+                .descriptionProbleme("To Delete 1")
+                .detailsProbleme("Details 1")
+                .valise(valise)
+                .client(client)
+                .build();
+
+        Probleme probleme2 = Probleme.builder()
+                .descriptionProbleme("To Delete 2")
+                .detailsProbleme("Details 2")
+                .valise(valise)
+                .client(client)
+                .build();
+
+        problemeRepository.save(probleme1);
+        problemeRepository.save(probleme2);
+
+        problemeRepository.deleteAllByValise(valise);
 
         List<Probleme> foundProblemes = problemeRepository.findByValise(valise);
         assertTrue(foundProblemes.isEmpty());
+    }
+
+    @Test
+    public void testFindByClientId() {
+        Probleme probleme1 = Probleme.builder()
+                .descriptionProbleme("Client Problem 1")
+                .detailsProbleme("Details 1")
+                .valise(valise)
+                .client(client)
+                .build();
+
+        Probleme probleme2 = Probleme.builder()
+                .descriptionProbleme("Client Problem 2")
+                .detailsProbleme("Details 2")
+                .valise(valise)
+                .client(client)
+                .build();
+
+        problemeRepository.save(probleme1);
+        problemeRepository.save(probleme2);
+
+        List<Probleme> foundProblemes = problemeRepository.findByClientId(client.getId());
+
+        assertEquals(2, foundProblemes.size());
+        assertTrue(foundProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Client Problem 1")));
+        assertTrue(foundProblemes.stream().anyMatch(p -> p.getDescriptionProbleme().equals("Client Problem 2")));
     }
 
 

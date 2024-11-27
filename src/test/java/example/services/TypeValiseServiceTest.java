@@ -4,6 +4,7 @@ import example.entity.TypeValise;
 import example.entity.Valise;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,29 +93,47 @@ public class TypeValiseServiceTest {
 
     @Test
     public void testDeleteTypeValise_Success() {
+        // Arrange: Prepare test data and mocks
         int id = 1;
-        when(typeValiseRepository.existsById(id)).thenReturn(true);
+        TypeValise mockTypeValise = TypeValise.builder()
+                .id(id)
+                .proprietaire("John Doe")
+                .description("Business Valise")
+                .build();
 
+        // Mock `findById` to return the mockTypeValise
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.of(mockTypeValise));
+
+        // Act: Call the method to test
         typeValiseService.deleteTypeValise(id);
 
-        verify(typeValiseRepository, times(1)).existsById(id);
-        verify(typeValiseRepository, times(1)).deleteById(id);
+        // Assert: Verify interactions with the repository
+        verify(typeValiseRepository, times(1)).findById(id);
+        verify(typeValiseRepository, times(1)).delete(mockTypeValise);
         verifyNoMoreInteractions(typeValiseRepository);
     }
+
+
 
     @Test
     public void testDeleteTypeValise_Failure_Exception() {
+        // Arrange: Mock `findById` to return an empty Optional
         int id = 1;
-        when(typeValiseRepository.existsById(id)).thenReturn(false);
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+        // Act & Assert: Expect RuntimeException
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
             typeValiseService.deleteTypeValise(id);
         });
 
+        // Assert: Verify exception message
         Assertions.assertEquals("The suitcase type does not exist", exception.getMessage());
-        verify(typeValiseRepository, times(1)).existsById(id);
+
+        // Verify repository interactions
+        verify(typeValiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeValiseRepository);
     }
+
 
     @Test
     public void testGetTypeValise_Success(){
@@ -133,16 +152,29 @@ public class TypeValiseServiceTest {
         verifyNoMoreInteractions(typeValiseRepository);
     }
     @Test
-    public void testGetTypeValise_Failure_Exception(){
+    public void testGetTypeValise_Failure_Exception() {
+        // Arrange: Mock repository to return an empty Optional
         int id = 1;
         when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
 
-        TypeValise result = typeValiseService.getTypeValise(id);
+        // Act & Assert: Expect EntityNotFoundException
+        EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> typeValiseService.getTypeValise(id),
+                "Expected EntityNotFoundException when TypeValise is not found"
+        );
 
-        Assertions.assertNull(result, "Suitcase type must be null if not found");
+        Assertions.assertEquals(
+                "TypeValise with ID 1 not found",
+                exception.getMessage(),
+                "Exception message did not match"
+        );
+
+        // Verify interactions with the repository
         verify(typeValiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeValiseRepository);
     }
+
     @Test
     public void testGetTypeValises_Success(){
         List<TypeValise> typeValises = List.of(new TypeValise(), new TypeValise());
@@ -173,15 +205,23 @@ public class TypeValiseServiceTest {
     }
     @Test
     public void testNoInteractionWithTypeValiseRepository_Failure_Exception() {
+        // Arrange: Mock `findById` to return an empty Optional
         int id = 1;
         when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
 
-        TypeValise result = typeValiseService.getTypeValise(id);
+        // Act & Assert: Expect EntityNotFoundException
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            typeValiseService.getTypeValise(id);
+        });
 
-        Assertions.assertNull(result, "Suitcase type must be null if not found");
+        // Assert: Verify exception message
+        Assertions.assertEquals("TypeValise with ID " + id + " not found", exception.getMessage());
+
+        // Verify repository interactions
         verify(typeValiseRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeValiseRepository);
     }
+
 
 
 

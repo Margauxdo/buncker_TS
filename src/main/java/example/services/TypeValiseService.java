@@ -49,24 +49,19 @@ public class TypeValiseService implements ITypeValiseService {
         return typeValiseRepository.save(typeValise);
     }
 
-
-
-
     @Override
     public void deleteTypeValise(int id) {
-        if (!typeValiseRepository.existsById(id)) {
-            throw new RuntimeException("The suitcase type does not exist");
-        }
-        typeValiseRepository.deleteById(id);
+        TypeValise typeValise = typeValiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("The suitcase type does not exist"));
+        typeValiseRepository.delete(typeValise);
     }
-
-
 
 
     @Override
     public TypeValise getTypeValise(int id) {
+        return typeValiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("TypeValise with ID " + id + " not found"));
 
-        return typeValiseRepository.findById(id).orElse(null);
     }
 
     @Override

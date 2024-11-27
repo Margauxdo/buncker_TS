@@ -30,10 +30,8 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    @Setter
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mouvement_id", nullable = false)
-    @JsonManagedReference
     private Mouvement mouvement;
 
 
