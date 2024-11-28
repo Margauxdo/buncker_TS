@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/jourferies")
+@RequestMapping("/jourferie")
 public class JourFerieController {
 
     @Autowired

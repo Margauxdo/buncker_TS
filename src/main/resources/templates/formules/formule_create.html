@@ -1,32 +1,69 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <title>Créer une formule</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
 </head>
 <body>
-<h1>Créer une nouvelle formule</h1>
+<h1 style="text-align: center;">Créer une nouvelle formule</h1>
 
-<div th:if="${errorMessage}" style="color: red;">
+<div th:if="${errorMessage}" style="color: red; text-align: center;">
     <p th:text="${errorMessage}"></p>
 </div>
 
 <form th:action="@{/formules/create}" th:object="${formule}" method="post">
-
     <label for="libelle">Libellé:</label>
     <input type="text" id="libelle" th:field="*{formule.libelle}" required />
-    <br>
+
     <label for="description">Description:</label>
     <input type="text" id="description" th:field="*{formule.description}" required />
-    <br>
-    <label for="regle">Règle:</label>
-    <input type="text" id="regle" th:field="*{formule.regle}" required />
-    <br>
-    <button type="submit">Créer</button>
-</form>
 
-<a th:href="@{/formules/list}">Retour à la liste</a>
+    <label for="regle">Code règle:</label>
+    <input type="text" id="regle" th:field="*{regle.coderegle}" required />
+
+    <div style="text-align: center;">
+        <button type="submit">Créer</button>
+        <a th:href="@{/formules/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>
+

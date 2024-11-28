@@ -1,10 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Détails de la Règle</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        p strong {
+            color: #212529;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
+
+<h1>Détails de la Règle</h1>
+
+<div class="container">
+    <p><strong>Règle pour Sortie :</strong> <span th:text="${regle.reglePourSortie}"></span></p>
+    <p><strong>Code Règle :</strong> <span th:text="${regle.coderegle}"></span></p>
+    <p><strong>Date de Règle :</strong> <span th:text="${regle.dateRegle}"></span></p>
+    <p><strong>Nombre de Jours :</strong> <span th:text="${regle.nombreJours}"></span></p>
+    <p><strong>Calcul Calendrier :</strong> <span th:text="${regle.calculCalendaire}"></span></p>
+
+    <p><strong>Fermer JS1 :</strong> <span th:text="${regle.fermeJS1}"></span></p>
+    <p><strong>Fermer JS2 :</strong> <span th:text="${regle.fermeJS2}"></span></p>
+    <p><strong>Fermer JS3 :</strong> <span th:text="${regle.fermeJS3}"></span></p>
+    <p><strong>Fermer JS4 :</strong> <span th:text="${regle.fermeJS4}"></span></p>
+    <p><strong>Fermer JS5 :</strong> <span th:text="${regle.fermeJS5}"></span></p>
+    <p><strong>Fermer JS6 :</strong> <span th:text="${regle.fermeJS6}"></span></p>
+    <p><strong>Fermer JS7 :</strong> <span th:text="${regle.fermeJS7}"></span></p>
+
+    <p><strong>Type Entrée :</strong> <span th:text="${regle.typeEntree}"></span></p>
+    <p><strong>Nombre JSM Entrée :</strong> <span th:text="${regle.nbjsmEntree}"></span></p>
+
+    <p><strong>Valise :</strong> <span th:if="${regle.valise != null}" th:text="${regle.valise.name}"></span>
+        <span th:if="${regle.valise == null}">Non associée</span></p>
+
+    <p><strong>Type de Règle :</strong> <span th:if="${regle.typeRegle != null}" th:text="${regle.typeRegle.name}"></span>
+        <span th:if="${regle.typeRegle == null}">Non associée</span></p>
+
+    <p><strong>Formule :</strong> <span th:if="${regle.formule != null}" th:text="${regle.formule.name}"></span>
+        <span th:if="${regle.formule == null}">Non associée</span></p>
+
+    <p><strong>Jour Férié :</strong> <span th:if="${regle.jourFerie != null}" th:text="${regle.jourFerie.name}"></span>
+        <span th:if="${regle.jourFerie == null}">Non associé</span></p>
+
+    <a th:href="@{/regles/list}">Retour à la liste</a>
+</div>
 
 </body>
 </html>

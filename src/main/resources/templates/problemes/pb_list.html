@@ -1,10 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Liste des Problèmes</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+
+        .add-button {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .add-button a {
+            text-decoration: none;
+        }
+
+        .add-button button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-button button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
+<h1>Liste des Problèmes</h1>
+
+<!-- Table pour afficher les problèmes -->
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Détails</th>
+        <th>Client</th>
+        <th>Valise</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Boucle pour afficher les données des problèmes -->
+    <tr th:each="probleme : ${problemes}">
+        <td th:text="${probleme.id}"></td>
+        <td th:text="${probleme.descriptionProbleme}"></td>
+        <td th:text="${probleme.detailsProbleme}"></td>
+        <td th:text="${probleme.client.name}"></td>
+        <td th:text="${probleme.valise.name}"></td>
+        <td>
+            <!-- Action Voir -->
+            <form th:action="@{/problemes/view/{id}(id=${probleme.id})}" method="get" style="display:inline;">
+                <button type="submit">Voir</button>
+            </form>
+
+            <!-- Action Modifier -->
+            <form th:action="@{/problemes/edit/{id}(id=${probleme.id})}" method="get" style="display:inline;">
+                <button type="submit">Modifier</button>
+            </form>
+
+            <!-- Action Supprimer -->
+            <form th:action="@{/problemes/delete/{id}(id=${probleme.id})}" method="post" style="display:inline;"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce problème ?');">
+                <button type="submit" style="color: red;">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Bouton Ajouter un Problème -->
+<div class="add-button">
+    <a th:href="@{/problemes/create}">
+        <button type="button">Ajouter un Problème</button>
+    </a>
+</div>
 
 </body>
 </html>

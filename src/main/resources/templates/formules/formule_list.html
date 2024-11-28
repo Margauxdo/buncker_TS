@@ -3,6 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Liste des Formules</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,13 +52,13 @@
 </div>
 
 <!-- Table pour afficher les formules -->
-<table border="1">
+<table>
     <thead>
     <tr>
         <th>ID</th>
         <th>Libellé</th>
-        <th>Formule</th>
-        <th>Règle</th>
+        <th>Description</th>
+        <th>Code Règle</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -29,20 +67,36 @@
     <tr th:each="formule : ${formules}">
         <td th:text="${formule.id}"></td>
         <td th:text="${formule.libelle}"></td>
-        <td th:text="${formule.formule}"></td>
+        <td th:text="${formule.description}"></td>
         <td th:text="${formule.regle.coderegle}"></td>
         <td>
-            <a th:href="@{/formules/view/{id}(id=${formule.id})}">Voir</a> |
-            <a th:href="@{/formules/edit/{id}(id=${formule.id})}">Modifier</a> |
-            <a th:href="@{/formules/delete/{id}(id=${formule.id})}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette formule ?');">Supprimer</a>
+            <!-- Bouton pour Voir -->
+            <form th:action="@{/formules/view/{id}(id=${formule.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Voir la formule">Voir</button>
+            </form>
+
+            <!-- Bouton pour Modifier -->
+            <form th:action="@{/formules/edit/{id}(id=${formule.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Modifier la formule">Modifier</button>
+            </form>
+
+            <!-- Bouton pour Supprimer -->
+            <form th:action="@{/formules/delete/{id}(id=${formule.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formule ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <button type="submit" style="color: red;" aria-label="Supprimer la formule">Supprimer</button>
+            </form>
         </td>
     </tr>
     </tbody>
 </table>
 
 <!-- Lien vers la page de création d'une nouvelle formule -->
-<a href="/formules/create">Créer une nouvelle formule</a>
+<div style="margin-top: 20px;">
+    <a href="/formules/create">
+        <button type="button">Créer une nouvelle formule</button>
+    </a>
+</div>
 
 </body>
 </html>
-

@@ -104,13 +104,13 @@ public class FormuleController {
     }*/
 
     // Vue Thymeleaf pour lister les formules
-    @GetMapping("/formules/list")
+    @GetMapping("/list")
     public String viewFormuleList(Model model) {
         model.addAttribute("formules", formuleService.getAllFormules());
         return "formules/formule_list";
     }
     // Vue Thymeleaf pour voir une formule par ID
-    @GetMapping("/formules/view/{id}")
+    @GetMapping("/view/{id}")
     public String viewFormuleById(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
         if (formule == null) {
@@ -121,15 +121,16 @@ public class FormuleController {
     }
 
 
+
     // Formulaire Thymeleaf pour créer une formule
-    @GetMapping("/formules/create")
+    @GetMapping("/create")
     public String createFormuleForm(Model model) {
         model.addAttribute("formule", new Formule());
         return "formules/formule_create";
     }
 
     // Création d'une formule via formulaire Thymeleaf
-    @PostMapping("/formules/create")
+    @PostMapping("/create")
     public String createFormule(@Valid @ModelAttribute("formule") Formule formule,Model model){
         try {
             formuleService.createFormule(formule);
@@ -142,7 +143,7 @@ public class FormuleController {
     }
 
     // Formulaire Thymeleaf pour modifier une formule
-    @GetMapping("/formules/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String editFormuleForm(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
         if (formule == null) {
@@ -153,18 +154,18 @@ public class FormuleController {
     }
 
     // Modifier une formule via formulaire Thymeleaf
-    @PostMapping("/formules/edit/{id}")
+    @PostMapping("/edit/{id}")
     public String updateFormule(@PathVariable int id, @Valid @ModelAttribute("formule") Formule formule) {
         formuleService.updateFormule(id, formule);
-        return "redirect:/formules/formules_list";
+        return "redirect:/formules/list";
     }
 
     // Supprimer une formule via un formulaire Thymeleaf sécurisé
-    @PostMapping("/formules/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteFormule(@PathVariable int id) {
         System.out.println("Deleting Formule with ID: " + id);
         formuleService.deleteFormule(id);
-        return "redirect:/formules/formules_list";
+        return "redirect:/formules/list";
     }
 
 

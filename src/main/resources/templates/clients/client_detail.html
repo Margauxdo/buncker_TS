@@ -1,28 +1,92 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Détails du Client</title>
+    <meta charset="UTF-8">
+    <title>Détails du client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #343a40;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        p strong {
+            color: #212529;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
-<h1>Détails du Client</h1>
-<p><strong>Nom:</strong> <span th:text="${client.name}"></span></p>
-<p><strong>Email:</strong> <span th:text="${client.email}"></span></p>
-<p><strong>Adresse:</strong> <span th:text="${client.adresse}"></span></p>
-<p><strong>Téléphone:</strong> <span th:text="${client.telephoneExploitation}"></span></p>
-<p><strong>Ville:</strong> <span th:text="${client.ville}"></span></p>
-<p><strong>Fonction:</strong> <span th:text="${client.PersonnelEtFonction}"></span></p>
-<p><strong>Ramassage 1:</strong> <span th:text="${client.ramassage1}"></span></p>
-<p><strong>Ramassage 2:</strong> <span th:text="${client.ramassage2}"></span></p>
-<p><strong>Ramassage 3:</strong> <span th:text="${client.ramassage3}"></span></p>
-<p><strong>Ramassage 4:</strong> <span th:text="${client.ramassage4}"></span></p>
-<p><strong>Ramassage 5:</strong> <span th:text="${client.ramassage5}"></span></p>
-<p><strong>Ramassage 6:</strong> <span th:text="${client.ramassage6}"></span></p>
-<p><strong>Ramassage 7:</strong> <span th:text="${client.ramassage7}"></span></p>
-<p><strong>Envoi par défaut:</strong> <span th:text="${client.EnvoiparDefaut}"></span></p>
-<p><strong>Mémo retour Sécurité 1:</strong> <span th:text="${client.MemoRetourSecurite1}"></span></p>
-<p><strong>Mémo retour Sécurité 2:</strong> <span th:text="${client.MemoRetourSecurite2}"></span></p>
 
-<a href="/clients/list">Retour à la liste</a>
+<h1>Détails du client</h1>
+<div class="container">
+    <p><strong>ID :</strong> <span th:text="${client.id}"></span></p>
+    <p><strong>Nom :</strong> <span th:text="${client.name}"></span></p>
+    <p><strong>Email :</strong> <span th:text="${client.email}"></span></p>
+    <p><strong>Téléphone :</strong> <span th:text="${client.telephoneExploitation}"></span></p>
+    <p><strong>Adresse :</strong> <span th:text="${client.adresse}"></span></p>
+    <p><strong>Ville :</strong> <span th:text="${client.ville}"></span></p>
+    <p><strong>Fonction :</strong> <span th:text="${client.personnelEtFonction}"></span></p>
+
+    <h3>Ramassages</h3>
+    <p><strong>Ramassage 1 :</strong> <span th:text="${client.ramassage1}"></span></p>
+    <p><strong>Ramassage 2 :</strong> <span th:text="${client.ramassage2}"></span></p>
+    <p><strong>Ramassage 3 :</strong> <span th:text="${client.ramassage3}"></span></p>
+    <p><strong>Ramassage 4 :</strong> <span th:text="${client.ramassage4}"></span></p>
+    <p><strong>Ramassage 5 :</strong> <span th:text="${client.ramassage5}"></span></p>
+    <p><strong>Ramassage 6 :</strong> <span th:text="${client.ramassage6}"></span></p>
+    <p><strong>Ramassage 7 :</strong> <span th:text="${client.ramassage7}"></span></p>
+
+    <h3>Mémos Retour Sécurité</h3>
+    <p><strong>Mémo 1 :</strong> <span th:text="${client.memoRetourSecurite1}"></span></p>
+    <p><strong>Mémo 2 :</strong> <span th:text="${client.memoRetourSecurite2}"></span></p>
+
+    <p><strong>Type de suivi :</strong> <span th:text="${client.typeSuivie}"></span></p>
+    <p><strong>Envoi par défaut :</strong> <span th:text="${client.envoiparDefaut}"></span></p>
+    <p><strong>Code Client :</strong> <span th:text="${client.codeClient}"></span></p>
+
+    <h3>Associations</h3>
+    <p><strong>Règle associée :</strong> <span th:text="${client.regle.coderegle}"></span></p>
+    <p><strong>Retour Sécurité :</strong> <span th:text="${client.retourSecurite}"></span></p>
+
+    <a th:href="@{/clients/list}">Retour à la liste</a>
+</div>
+
 </body>
 </html>
-

@@ -2,6 +2,8 @@ package example.controller;
 
 import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
+import example.services.LivreurService;
+import example.services.ValiseService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,10 @@ public class MouvementController {
 
     @Autowired
     private static final Logger logger = LoggerFactory.getLogger(MouvementController.class);
+    @Autowired
+    private ValiseService valiseService;
+    @Autowired
+    private LivreurService livreurService;
 
     /*// API REST: Récupérer tous les mouvements
     @GetMapping("/api")
@@ -111,10 +117,13 @@ public class MouvementController {
 
     // Formulaire Thymeleaf pour créer un mouvement
     @GetMapping("/create")
-public String createMouvementForm(Model model) {
+    public String createMouvementForm(Model model) {
         model.addAttribute("mouvement", new Mouvement());
+        model.addAttribute("valises", valiseService.getAllValises()); // Assuming valiseService provides Valise data
+        model.addAttribute("allLivreurs", livreurService.getAllLivreurs()); // Assuming livreurService provides Livreur data
         return "mouvements/mouv_create";
     }
+
 
     // Création d'un mouvement via formulaire Thymeleaf
     @PostMapping("/create")

@@ -1,10 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Liste des Règles</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+
+        .add-button {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .add-button a {
+            text-decoration: none;
+        }
+
+        .add-button button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-button button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
+<h1>Liste des Règles</h1>
+
+<!-- Table pour afficher les règles -->
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Règle pour Sortie</th>
+        <th>Code Règle</th>
+        <th>Date Règle</th>
+        <th>Nombre de Jours</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Boucle pour afficher les données des règles -->
+    <tr th:each="regle : ${regles}">
+        <td th:text="${regle.id}"></td>
+        <td th:text="${regle.reglePourSortie}"></td>
+        <td th:text="${regle.coderegle}"></td>
+        <td th:text="${regle.dateRegle}"></td>
+        <td th:text="${regle.nombreJours}"></td>
+        <td>
+            <!-- Action Voir -->
+            <form th:action="@{/regles/view/{id}(id=${regle.id})}" method="get" style="display:inline;">
+                <button type="submit">Voir</button>
+            </form>
+
+            <!-- Action Modifier -->
+            <form th:action="@{/regles/edit/{id}(id=${regle.id})}" method="get" style="display:inline;">
+                <button type="submit">Modifier</button>
+            </form>
+
+            <!-- Action Supprimer -->
+            <form th:action="@{/regles/delete/{id}(id=${regle.id})}" method="post" style="display:inline;"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette règle ?');">
+                <button type="submit" style="color: red;">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Bouton Ajouter une Règle -->
+<div class="add-button">
+    <a th:href="@{/regles/create}">
+        <button type="button">Ajouter une Règle</button>
+    </a>
+</div>
 
 </body>
 </html>

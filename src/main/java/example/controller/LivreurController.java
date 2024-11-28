@@ -53,19 +53,18 @@ public class LivreurController {
     }
 
     // Création d'un livreur via formulaire Thymeleaf
-    @PostMapping("/create")
-    public String createLivreur(@Valid @ModelAttribute("livreur") Livreur livreur, Model model) {
+    @PostMapping("/livreurs/create")
+    public String createLivreur(@ModelAttribute Livreur livreur, Model model) {
         try {
             livreurService.createLivreur(livreur);
             return "redirect:/livreurs/list";
-        } catch (ConflictException e) {
-            model.addAttribute("errorMessage", "Un conflit s'est produit lors de la création du livreur.");
-            return "livreurs/livreur_create";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
-            return "livreurs/livreur_create";
+            return "livreurs/livreur_create"; // Return to the creation form with an error message
         }
     }
+
+
 
     // Formulaire Thymeleaf pour modifier un livreur
     @GetMapping("/edit/{id}")

@@ -86,4 +86,9 @@ public class    LivreurService implements ILivreurService {
         return livreurRepository.findAll();
     }
 
+    @Override
+    public void saveLivreur(Livreur livreur) {
+        livreurRepository.save(livreur);
+    }
+
 }

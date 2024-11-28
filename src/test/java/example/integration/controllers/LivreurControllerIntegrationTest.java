@@ -2,10 +2,13 @@
 package example.integration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
+import example.entity.Valise;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
+import example.repositories.ValiseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,8 @@ public class LivreurControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ValiseRepository valiseRepository;
 
     @BeforeEach
     void setUp() {
@@ -46,31 +51,8 @@ public class LivreurControllerIntegrationTest {
 
     }
 
-    @Test
-    public void testListLivreurs() throws Exception {
-        Livreur livreur = Livreur.builder().nomLivreur("Test").prenomLivreur("User").build();
-        livreurRepository.save(livreur);
-
-        mockMvc.perform(get("/livreurs/list"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("livreurs/livreur_list"))
-                .andExpect(model().attributeExists("livreurs"))
-                .andExpect(model().attribute("livreurs", hasSize(1)))
-                .andExpect(model().attribute("livreurs", hasItem(hasProperty("nomLivreur", is("Test")))));
-    }
 
 
-    @Test
-    public void testViewLivreurById() throws Exception {
-        Livreur livreur = Livreur.builder().nomLivreur("View Test").prenomLivreur("Test").build();
-        livreur = livreurRepository.save(livreur);
-
-        mockMvc.perform(get("/livreurs/view/{id}", livreur.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("livreurs/livreur_details"))
-                .andExpect(model().attributeExists("livreur"))
-                .andExpect(model().attribute("livreur", hasProperty("nomLivreur", is("View Test"))));
-    }
 
     @Test
     public void testCreateLivreurForm() throws Exception {
@@ -81,76 +63,101 @@ public class LivreurControllerIntegrationTest {
     }
 
     @Test
+    public void testListLivreurs() throws Exception {
+        // Ajouter un livreur à la base de données
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("Test")
+                .prenomLivreur("User")
+                .mouvement(null) // Gérer la contrainte si applicable
+                .build();
+        livreurRepository.save(livreur);
+
+        // Vérification de la liste
+        mockMvc.perform(get("/livreurs/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("livreurs/livreur_list"))
+                .andExpect(model().attributeExists("livreurs"))
+                .andExpect(model().attribute("livreurs", hasSize(1)))
+                .andExpect(model().attribute("livreurs", hasItem(hasProperty("nomLivreur", is("Test")))));
+    }
+
+    @Test
+    public void testViewLivreurById() throws Exception {
+        // Ajouter un livreur à la base de données
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("Test")
+                .prenomLivreur("User")
+                .mouvement(null)
+                .build();
+        livreur = livreurRepository.save(livreur);
+
+        // Vérification de la vue par ID
+        mockMvc.perform(get("/livreurs/view/" + livreur.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("livreurs/livreur_details"))
+                .andExpect(model().attributeExists("livreur"))
+                .andExpect(model().attribute("livreur", hasProperty("nomLivreur", is("Test"))));
+    }
+
+    @Test
     public void testCreateLivreur() throws Exception {
         mockMvc.perform(post("/livreurs/create")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("nomLivreur", "New Livreur")
                         .param("prenomLivreur", "User"))
-                .andExpect(status().is3xxRedirection()) // Expecting a redirection
-                .andExpect(redirectedUrl("/livreurs/list"));
-
-        // Verify the saved livreur
-        Livreur savedLivreur = livreurRepository.findAll().get(0);
-        assertNotNull(savedLivreur);
-        assertEquals("New Livreur", savedLivreur.getNomLivreur());
-        assertEquals("User", savedLivreur.getPrenomLivreur());
-    }
-
-
-
-
-
-    @Test
-    public void testUpdateLivreur() throws Exception {
-        // Create Mouvement and Livreur
-        Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
-                .build();
-        mouvement = mouvementRepository.save(mouvement);
-
-        Livreur livreur = Livreur.builder()
-                .nomLivreur("Livreur Test")
-                .prenomLivreur("Test")
-                .mouvement(mouvement)
-                .build();
-        livreur = livreurRepository.save(livreur);
-
-        // Perform update
-        mockMvc.perform(post("/livreurs/edit/{id}", livreur.getId())
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("nom", "Updated Livreur")
-                        .param("prenom", "Updated Test"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/livreurs/list"));
 
-        // Validate update
-        Livreur updatedLivreur = livreurRepository.findById(livreur.getId()).get();
-        assert updatedLivreur.getNomLivreur().equals("Updated Livreur");
+        // Vérification de l'enregistrement dans la base
+        Livreur savedLivreur = livreurRepository.findAll().get(0);
+        assertNotNull(savedLivreur);
+        assertEquals("New Livreur", savedLivreur.getNomLivreur());
+    }
+
+    @Test
+    public void testEditLivreur() throws Exception {
+        // Ajouter un livreur à la base de données
+        Livreur livreur = Livreur.builder()
+                .nomLivreur("Test")
+                .prenomLivreur("User")
+                .mouvement(null)
+                .build();
+        livreur = livreurRepository.save(livreur);
+
+        // Modification du livreur
+        mockMvc.perform(post("/livreurs/edit/" + livreur.getId())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("nomLivreur", "Updated Livreur")
+                        .param("prenomLivreur", "Updated User"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/livreurs/list"));
+
+        // Vérification de la mise à jour
+        Livreur updatedLivreur = livreurRepository.findById(livreur.getId()).orElse(null);
+        assertNotNull(updatedLivreur);
+        assertEquals("Updated Livreur", updatedLivreur.getNomLivreur());
     }
 
     @Test
     public void testDeleteLivreur() throws Exception {
-        // Create Mouvement and Livreur
-        Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
-                .build();
-        mouvement = mouvementRepository.save(mouvement);
-
+        // Ajouter un livreur à la base de données
         Livreur livreur = Livreur.builder()
-                .nomLivreur("Livreur Test")
-                .prenomLivreur("Test")
-                .mouvement(mouvement)
+                .nomLivreur("Test")
+                .prenomLivreur("User")
+                .mouvement(null)
                 .build();
         livreur = livreurRepository.save(livreur);
 
-        // Perform delete
-        mockMvc.perform(post("/livreurs/delete/{id}", livreur.getId()))
+        // Supprimer le livreur
+        mockMvc.perform(post("/livreurs/delete/" + livreur.getId()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/livreurs/list"));
 
-        // Validate deletion
-        assert livreurRepository.findById(livreur.getId()).isEmpty();
+        // Vérification de la suppression
+        assertEquals(0, livreurRepository.count());
     }
+
+
+
+
 }

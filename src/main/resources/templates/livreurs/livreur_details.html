@@ -1,10 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Détails du Livreur</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        p strong {
+            color: #212529;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
+<h1>Détails du Livreur</h1>
+
+<div class="container">
+    <p><strong>Code Livreur :</strong> <span th:text="${livreur.codeLivreur}"></span></p>
+    <p><strong>Nom :</strong> <span th:text="${livreur.nomLivreur}"></span></p>
+    <p><strong>Prénom :</strong> <span th:text="${livreur.prenomLivreur}"></span></p>
+    <p><strong>Numéro Carte Pro :</strong> <span th:text="${livreur.numeroCartePro}"></span></p>
+    <p><strong>Téléphone Portable :</strong> <span th:text="${livreur.telephonePortable}"></span></p>
+    <p><strong>Téléphone Kobby :</strong> <span th:text="${livreur.telephoneKobby}"></span></p>
+    <p><strong>Téléphone Alphapage :</strong> <span th:text="${livreur.telephoneAlphapage}"></span></p>
+    <p><strong>Mouvement :</strong> <span th:text="${livreur.mouvement.name}"></span></p>
+
+    <a th:href="@{/livreurs/list}">Retour à la liste</a>
+</div>
 
 </body>
 </html>

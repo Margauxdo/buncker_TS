@@ -1,27 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Liste des Clients</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+    </style>
 </head>
 <body>
+
 <h1>Liste des Clients</h1>
-<table border="1">
+
+<!-- Message d'erreur s'il y en a -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Table pour afficher les clients -->
+<table>
     <thead>
     <tr>
         <th>Nom</th>
         <th>Email</th>
+        <th>Adresse</th>
+        <th>Téléphone</th>
         <th>Ville</th>
+        <th>Fonction</th>
+        <th>Ramassage 1</th>
+        <th>Ramassage 2</th>
+        <th>Ramassage 3</th>
+        <th>Ramassage 4</th>
+        <th>Ramassage 5</th>
+        <th>Ramassage 6</th>
+        <th>Ramassage 7</th>
+        <th>Envoie par défaut</th>
+        <th>Mémo retour sécurité 1</th>
+        <th>Mémo retour sécurité 2</th>
+        <th>Code Client</th>
         <th>Actions</th>
     </tr>
     </thead>
     <tbody>
+    <!-- Boucle sur la liste des clients -->
     <tr th:each="client : ${clients}">
         <td th:text="${client.name}"></td>
         <td th:text="${client.email}"></td>
         <td th:text="${client.adresse}"></td>
         <td th:text="${client.telephoneExploitation}"></td>
         <td th:text="${client.ville}"></td>
-        <td th:text="${client.PersonnelEtFonction}"></td>
+        <td th:text="${client.personnelEtFonction}"></td>
         <td th:text="${client.ramassage1}"></td>
         <td th:text="${client.ramassage2}"></td>
         <td th:text="${client.ramassage3}"></td>
@@ -29,20 +91,39 @@
         <td th:text="${client.ramassage5}"></td>
         <td th:text="${client.ramassage6}"></td>
         <td th:text="${client.ramassage7}"></td>
-        <td th:text="${client.EnvoiparDefaut}"></td>
-        <td th:text="${client.MemoRetourSecurite1}"></td>
-        <td th:text="${client.MemoRetourSecurite2}"></td>
+        <td th:text="${client.envoiparDefaut}"></td>
+        <td th:text="${client.memoRetourSecurite1}"></td>
+        <td th:text="${client.memoRetourSecurite2}"></td>
+        <td th:text="${client.codeClient}"></td>
         <td>
-            <a th:href="@{'/clients/view/' + ${client.id}}">Détails</a>
-            <a th:href="@{'/clients/edit/' + ${client.id}}">Modifier</a>
-            <form th:action="@{'/clients/delete/' + ${client.id}}" method="post" style="display:inline;">
-                <button type="submit">Supprimer</button>
+            <!-- Bouton pour Voir -->
+            <form th:action="@{/clients/view/{id}(id=${client.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Voir le client">Voir</button>
+            </form>
+
+            <!-- Bouton pour Modifier -->
+            <form th:action="@{/clients/edit/{id}(id=${client.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Modifier le client">Modifier</button>
+            </form>
+
+            <!-- Bouton pour Supprimer -->
+            <form th:action="@{/clients/delete/{id}(id=${client.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <button type="submit" style="color: red;" aria-label="Supprimer le client">Supprimer</button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
-<a href="/clients/create">Ajouter un Client</a>
+
+<!-- Lien vers la page de création d'un nouveau client -->
+<div style="margin-top: 20px;">
+    <a href="/clients/create">
+        <button type="button">Ajouter un Client</button>
+    </a>
+</div>
+
 </body>
 </html>
 

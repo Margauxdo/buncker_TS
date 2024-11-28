@@ -10,4 +10,7 @@ public interface ILivreurService {
     void deleteLivreur(int id);
     Livreur getLivreurById(int id);
     List<Livreur> getAllLivreurs();
+
+
+    void saveLivreur(Livreur livreur);
 }

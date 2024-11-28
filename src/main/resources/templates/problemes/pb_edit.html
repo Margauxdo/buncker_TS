@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Créer un Problème</title>
+    <title>Modifier un Problème</title>
     <style>
         form {
             max-width: 600px;
@@ -19,7 +19,7 @@
             font-weight: bold;
         }
 
-        input, textarea, select {
+        input, select, textarea {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -40,28 +40,29 @@
             background-color: #0056b3;
         }
 
-        .action-buttons {
+        .actions {
             text-align: center;
         }
 
-        .action-buttons button {
-            margin: 5px;
+        .actions button {
+            margin: 0 5px;
         }
     </style>
 </head>
 <body>
-<h1 style="text-align: center;">Créer un Nouveau Problème</h1>
-<form th:action="@{/problemes/create}" th:object="${probleme}" method="post">
-    <label for="descriptionProbleme">Description du Problème :</label>
-    <textarea id="descriptionProbleme" th:field="*{descriptionProbleme}" required></textarea>
+<h1 style="text-align: center;">Modifier un Problème</h1>
+
+<form th:action="@{/problemes/edit/{id}(id=${probleme.id})}" th:object="${probleme}" method="post">
+    <label for="descriptionProbleme">Description :</label>
+    <textarea id="descriptionProbleme" th:field="*{descriptionProbleme}" rows="3" required></textarea>
 
     <label for="detailsProbleme">Détails :</label>
-    <textarea id="detailsProbleme" th:field="*{detailsProbleme}"></textarea>
+    <textarea id="detailsProbleme" th:field="*{detailsProbleme}" rows="5"></textarea>
 
     <label for="client">Client :</label>
     <select id="client" th:field="*{client.id}" required>
         <option value="" disabled selected>-- Sélectionnez un Client --</option>
-        <option th:each="cli : ${clients}" th:value="${cli.id}" th:text="${cli.name}"></option>
+        <option th:each="cl : ${clients}" th:value="${cl.id}" th:text="${cl.name}"></option>
     </select>
 
     <label for="valise">Valise :</label>
@@ -70,12 +71,14 @@
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
     </select>
 
-    <div class="action-buttons">
-        <button type="submit">Créer</button>
+
+    <div class="actions">
+        <button type="submit">Modifier</button>
         <a th:href="@{/problemes/list}">
-            <button type="button">Retour à la Liste</button>
+            <button type="button">Retour à la liste</button>
         </a>
     </div>
 </form>
+
 </body>
 </html>

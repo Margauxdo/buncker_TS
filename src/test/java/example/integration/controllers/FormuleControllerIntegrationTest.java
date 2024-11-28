@@ -1,7 +1,9 @@
 package example.integration.controllers;
 
 import example.entity.Formule;
+import example.entity.Regle;
 import example.repositories.FormuleRepository;
+import example.repositories.RegleRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,8 @@ public class FormuleControllerIntegrationTest {
 
     @Autowired
     private FormuleRepository formuleRepository;
+    @Autowired
+    private RegleRepository regleRepository;
 
     @BeforeEach
     public void setUp() {
@@ -41,7 +45,7 @@ public class FormuleControllerIntegrationTest {
                 .build();
         formuleRepository.save(formule);
 
-        mockMvc.perform(get("/formules/list"))
+        mockMvc.perform(get("/formules/formule_list"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("formules/formule_list"))
                 .andExpect(model().attribute("formules", hasSize(1)))
@@ -53,17 +57,27 @@ public class FormuleControllerIntegrationTest {
     // Test: View a single formule by ID
     @Test
     public void testViewFormuleById() throws Exception {
+        // Arrange
+        Regle regle= Regle.builder()
+                .coderegle("AW56")
+                .build();
+        regleRepository.save(regle);
+
         Formule formule = Formule.builder()
                 .libelle("Formule Test")
                 .formule("Description Test")
+                .regle(regle)
                 .build();
         formule = formuleRepository.save(formule);
 
+        // Act & Assert
         mockMvc.perform(get("/formules/view/{id}", formule.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("formules/formule_detail"))
+                .andExpect(model().attributeExists("formule"))
                 .andExpect(model().attribute("formule", hasProperty("libelle", is("Formule Test"))));
     }
+
 
     // Test: Show create formule form
     @Test
@@ -79,9 +93,10 @@ public class FormuleControllerIntegrationTest {
     public void testCreateFormule() throws Exception {
         mockMvc.perform(post("/formules/create")
                         .param("libelle", "New Formule")
-                        .param("formule", "This is a test formule"))
+                        .param("formule", "This is a test formule")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/formules/list"));
+                .andExpect(redirectedUrl("/formules/formule_list"));
 
         Formule savedFormule = formuleRepository.findAll().get(0);
         Assertions.assertEquals("New Formule", savedFormule.getLibelle());
@@ -114,9 +129,10 @@ public class FormuleControllerIntegrationTest {
 
         mockMvc.perform(post("/formules/edit/{id}", formule.getId())
                         .param("libelle", "Updated Formule")
-                        .param("formule", "Updated Description"))
+                        .param("formule", "Updated Description")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/formules/list"));
+                .andExpect(redirectedUrl("/formules/formule_list"));
 
         Formule updatedFormule = formuleRepository.findById(formule.getId()).orElseThrow();
         Assertions.assertEquals("Updated Formule", updatedFormule.getLibelle());
@@ -126,22 +142,17 @@ public class FormuleControllerIntegrationTest {
     // Test: Delete a formule
     @Test
     public void testDeleteFormule() throws Exception {
-        // Arrange
         Formule formule = Formule.builder()
                 .libelle("Delete Test")
                 .formule("Delete Description")
                 .build();
         formule = formuleRepository.save(formule);
 
-        // Act & Assert
         mockMvc.perform(post("/formules/delete/{id}", formule.getId())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection()) // Expecting a redirection
-                .andExpect(redirectedUrl("/formules/formules_list")); // Updated URL
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/formules/formule_list"));
 
-        // Validate that the formule is removed from the database
         Assertions.assertTrue(formuleRepository.findById(formule.getId()).isEmpty());
     }
-
-
 }

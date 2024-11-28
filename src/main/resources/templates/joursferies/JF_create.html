@@ -1,10 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Créer un Jour Férié</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Créer un Nouveau Jour Férié</h1>
+<form th:action="@{/jourferies/create}" th:object="${jourFerie}" method="post">
+    <label for="date">Date :</label>
+    <input type="date" id="date" th:field="*{date}" required />
 
+
+    <label for="regles">Règles associées :</label>
+    <select id="regles" multiple th:field="*{regles}" required>
+        <!-- Option par défaut pour guider l'utilisateur -->
+        <option value="" disabled selected>-- Sélectionnez une ou plusieurs Règles --</option>
+
+        <!-- Boucle pour afficher les règles disponibles -->
+        <option th:each="regle : ${allRegles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
+    </select>
+
+
+    <div style="text-align: center;">
+        <button type="submit">Créer</button>
+        <a th:href="@{/jourferies/list}">
+            <button type="button">Retour à la Liste</button>
+        </a>
+    </div>
+</form>
 </body>
 </html>

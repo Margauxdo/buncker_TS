@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Créer un Mouvement</title>
+    <title>Modifier un Mouvement</title>
     <style>
         form {
             max-width: 600px;
@@ -39,11 +39,20 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .actions {
+            text-align: center;
+        }
+
+        .actions button {
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
-<h1 style="text-align: center;">Créer un Nouveau Mouvement</h1>
-<form th:action="@{/mouvements/create}" th:object="${mouvement}" method="post">
+<h1 style="text-align: center;">Modifier un Mouvement</h1>
+
+<form th:action="@{/mouvements/edit/{id}(id=${mouvement.id})}" th:object="${mouvement}" method="post">
     <label for="dateHeureMouvement">Date et Heure :</label>
     <input type="datetime-local" id="dateHeureMouvement" th:field="*{dateHeureMouvement}" required />
 
@@ -62,12 +71,24 @@
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
     </select>
 
-    <label for="livreurs">Livreurs :</label>
+    <label for="livreurs">Livreurs associés :</label>
     <select id="livreurs" multiple th:field="*{livreurs}">
         <option th:each="livreur : ${allLivreurs}" th:value="${livreur.id}" th:text="${livreur.nomLivreur + ' ' + livreur.prenomLivreur}"></option>
     </select>
 
-    <button type="submit">Créer</button>
+    <label for="retourSecurites">Retours Sécurité associés :</label>
+    <select id="retourSecurites" multiple th:field="*{retourSecurites}">
+        <option th:each="retour : ${allRetourSecurites}" th:value="${retour.id}" th:text="${retour.numero}"></option>
+    </select>
+
+    <div class="actions">
+        <button type="submit">Modifier</button>
+        <a th:href="@{/mouvements/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
 </form>
+
 </body>
 </html>
+

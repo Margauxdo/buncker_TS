@@ -1,10 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Modifier un Livreur</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .actions {
+            text-align: center;
+        }
+
+        .actions button {
+            margin: 0 5px;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Modifier un Livreur</h1>
+
+<form th:action="@{/livreurs/edit/{id}(id=${livreur.id})}" th:object="${livreur}" method="post">
+    <label for="codeLivreur">Code Livreur :</label>
+    <input type="text" id="codeLivreur" th:field="*{codeLivreur}" />
+
+    <label for="motDePasse">Mot de Passe :</label>
+    <input type="password" id="motDePasse" th:field="*{motDePasse}" />
+
+    <label for="nomLivreur">Nom :</label>
+    <input type="text" id="nomLivreur" th:field="*{nomLivreur}" required />
+
+    <label for="prenomLivreur">Prénom :</label>
+    <input type="text" id="prenomLivreur" th:field="*{prenomLivreur}" required />
+
+    <label for="numeroCartePro">Numéro Carte Pro :</label>
+    <input type="text" id="numeroCartePro" th:field="*{numeroCartePro}" />
+
+    <label for="telephonePortable">Téléphone Portable :</label>
+    <input type="text" id="telephonePortable" th:field="*{telephonePortable}" />
+
+    <label for="telephoneKobby">Téléphone Kobby :</label>
+    <input type="text" id="telephoneKobby" th:field="*{telephoneKobby}" />
+
+    <label for="telephoneAlphapage">Téléphone Alphapage :</label>
+    <input type="text" id="telephoneAlphapage" th:field="*{telephoneAlphapage}" />
+
+    <label for="mouvement">Mouvement :</label>
+    <select id="mouvement" th:field="*{mouvement.id}" required>
+        <option th:each="mvt : ${mouvements}" th:value="${mvt.id}" th:text="${mvt.name}"></option>
+    </select>
+
+    <div class="actions">
+        <button type="submit">Modifier</button>
+        <a th:href="@{/livreurs/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>
