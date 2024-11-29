@@ -60,65 +60,71 @@ public class ClientController {
         return "redirect:/clients/clients_list";
     }*/
 
-    // Vue Thymeleaf pour lister les clients
-    @GetMapping("/list")
-    public String viewClients(Model model) {
-        model.addAttribute("clients", clientService.getAllClients());
-        return "clients/client_list";
-    }
 
-    // Vue Thymeleaf pour voir un client par ID
-    @GetMapping("/view/{id}")
-    public String viewClientById(@PathVariable int id, Model model) {
-        Client client = clientService.getClientById(id);
-        if (client == null) {
-            model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
-            return "clients/error";
+
+        // Vue Thymeleaf pour lister les clients
+        @GetMapping("/list")
+        public String viewClients(Model model) {
+            model.addAttribute("clients", clientService.getAllClients());
+            return "clients/client_list"; // Vue correcte
         }
-        model.addAttribute("client", client);
-        return "clients/client_detail";
-    }
 
-
-
-    // Formulaire Thymeleaf pour créer un client
-    @GetMapping("/create")
-    public String createClientForm(Model model) {
-        model.addAttribute("client", new Client());
-        return "clients/client_create";
-    }
-
-
-
-    // Création d'un client via formulaire Thymeleaf
-    @PostMapping("/create")
-    public String createClient(@Valid @ModelAttribute("client") Client client) {
-        clientService.createClient(client);
-        return "redirect:/clients/clients_list";
-    }
-
-    // Formulaire Thymeleaf pour modifier un client
-    @GetMapping("/edit/{id}")
-    public String editClientForm(@PathVariable int id, Model model) {
-        Client client = clientService.getClientById(id);
-        if (client == null) {
-            return "clients/error";
+        // Vue Thymeleaf pour voir un client par ID
+        @GetMapping("/view/{id}")
+        public String viewClientById(@PathVariable int id, Model model) {
+            Client client = clientService.getClientById(id);
+            if (client == null) {
+                model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
+                return "error"; // Assurez-vous que la vue "error.html" est bien dans le dossier principal
+            }
+            model.addAttribute("client", client);
+            return "clients/client_detail";
         }
-        model.addAttribute("client", client);
-        return "clients/client_edit";
+
+        // Formulaire Thymeleaf pour créer un client
+        @GetMapping("/create")
+        public String createClientForm(Model model) {
+            model.addAttribute("client", new Client());
+            return "clients/client_create";
+        }
+
+        // Création d'un client via formulaire Thymeleaf
+        @PostMapping("/create")
+        public String createClient(@Valid @ModelAttribute("client") Client client) {
+            clientService.createClient(client);
+            return "redirect:/clients/list"; // Chemin corrigé
+        }
+
+        // Formulaire Thymeleaf pour modifier un client
+        @GetMapping("/edit/{id}")
+        public String editClientForm(@PathVariable int id, Model model) {
+            Client client = clientService.getClientById(id);
+            if (client == null) {
+                model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
+                return "error"; // Vue d'erreur générale
+            }
+            model.addAttribute("client", client);
+            return "clients/client_edit";
+        }
+
+        // Modifier un client via formulaire Thymeleaf
+        @PostMapping("/edit/{id}")
+        public String updateClient(@PathVariable int id, @Valid @ModelAttribute("client") Client client) {
+            clientService.updateClient(id, client);
+            return "redirect:/clients/list"; // Chemin corrigé
+        }
+
+        // Supprimer un client via un formulaire Thymeleaf sécurisé
+        @PostMapping("/delete/{id}")
+        public String deleteClient(@PathVariable int id, Model model) {
+            Client client = clientService.getClientById(id);
+            if (client == null) {
+                model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
+                return "error";
+            }
+            clientService.deleteClient(id);
+            return "redirect:/clients/list"; // Chemin corrigé
+        }
     }
 
-    // Modifier un client via formulaire Thymeleaf
-    @PostMapping("/edit/{id}")
-    public String updateClient(@PathVariable int id, @Valid @ModelAttribute("client") Client client) {
-        clientService.updateClient(id, client);
-        return "redirect:/clients/clients_list";
-    }
 
-    // Supprimer un client via un formulaire Thymeleaf sécurisé
-    @PostMapping("/delete/{id}")
-    public String deleteClient(@PathVariable int id) {
-        clientService.deleteClient(id);
-        return "redirect:/clients/clients_list";
-    }
-}

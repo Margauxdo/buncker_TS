@@ -129,7 +129,7 @@ public class ValiseController {
     @PostMapping("/create")
     public String createValise(@Valid  @ModelAttribute("valise") Valise valise) {
         valiseService.createValise(valise);
-        return "redirect:/valises/valises_list";
+        return "redirect:/valise/list";
     }
 
     // Formulaire Thymeleaf pour modifier une valise
@@ -146,7 +146,7 @@ public class ValiseController {
     @PostMapping("/edit/{id}")
     public String updateValise(@PathVariable int id, @Valid  @ModelAttribute("valise") Valise valise) {
         valiseService.updateValise(id, valise);
-        return "redirect:/valises/valises_list";
+        return "redirect:/valise/list";
     }
     // Supprimer une valise via un formulaire Thymeleaf sécurisé
 

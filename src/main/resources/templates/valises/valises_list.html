@@ -1,10 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Liste des Valises</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+    </style>
 </head>
 <body>
+
+<h1>Liste des Valises</h1>
+
+<!-- Message d'erreur s'il y en a -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Table pour afficher les valises -->
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Numéro de Valise</th>
+        <th>Référence Client</th>
+        <th>Date de Sortie</th>
+        <th>Type de Valise</th>
+        <th>Client</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Boucle sur la liste des valises -->
+    <tr th:each="valise : ${valises}">
+        <td th:text="${valise.id}"></td>
+        <td th:text="${valise.description}"></td>
+        <td th:text="${valise.numeroValise}"></td>
+        <td th:text="${valise.refClient != null ? valise.refClient : 'Non défini'}"></td>
+        <td th:text="${valise.sortie != null ? valise.sortie : 'Non défini'}"></td>
+        <td th:text="${valise.typeValise != null ? valise.typeValise.description : 'Non défini'}"></td>
+        <td th:text="${valise.client != null ? valise.client.nom : 'Non défini'}"></td>
+        <td>
+            <!-- Bouton pour Voir -->
+            <form th:action="@{/valise/view/{id}(id=${valise.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Voir la valise">Voir</button>
+            </form>
+
+            <!-- Bouton pour Modifier -->
+            <form th:action="@{/valise/edit/{id}(id=${valise.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Modifier la valise">Modifier</button>
+            </form>
+
+            <!-- Bouton pour Supprimer -->
+            <form th:action="@{/valise/delete/{id}(id=${valise.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette valise ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <button type="submit" style="color: red;" aria-label="Supprimer la valise">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Lien vers la page de création d'une nouvelle valise -->
+<div style="margin-top: 20px;">
+    <a href="/valise/create">
+        <button type="button">Créer une nouvelle valise</button>
+    </a>
+</div>
 
 </body>
 </html>

@@ -82,7 +82,11 @@
     <p><strong>Code Client :</strong> <span th:text="${client.codeClient}"></span></p>
 
     <h3>Associations</h3>
-    <p><strong>Règle associée :</strong> <span th:text="${client.regle.coderegle}"></span></p>
+    <p><strong>Règle associée :</strong>
+        <span th:if="${client.regle != null}" th:text="${client.regle.coderegle}"></span>
+        <span th:if="${client.regle == null}">Aucune règle associée</span>
+    </p>
+
     <p><strong>Retour Sécurité :</strong> <span th:text="${client.retourSecurite}"></span></p>
 
     <a th:href="@{/clients/list}">Retour à la liste</a>

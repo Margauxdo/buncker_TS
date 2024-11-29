@@ -1,10 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Liste des Types de Valise</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+    </style>
 </head>
 <body>
+
+<h1>Liste des Types de Valise</h1>
+
+<!-- Message d'erreur s'il y en a -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Table pour afficher les types de valise -->
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Propriétaire</th>
+        <th>Description</th>
+        <th>Valise Associée</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Boucle sur la liste des types de valise -->
+    <tr th:each="typeValise : ${typesValise}">
+        <td th:text="${typeValise.id}"></td>
+        <td th:text="${typeValise.proprietaire}"></td>
+        <td th:text="${typeValise.description}"></td>
+        <td th:text="${typeValise.valise != null ? typeValise.valise.nom : 'Aucune'}"></td>
+        <td>
+            <!-- Bouton pour Voir -->
+            <form th:action="@{/typeValise/view/{id}(id=${typeValise.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Voir le type de valise">Voir</button>
+            </form>
+
+            <!-- Bouton pour Modifier -->
+            <form th:action="@{/typeValise/edit/{id}(id=${typeValise.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Modifier le type de valise">Modifier</button>
+            </form>
+
+            <!-- Bouton pour Supprimer -->
+            <form th:action="@{/typeValise/delete/{id}(id=${typeValise.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de valise ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <button type="submit" style="color: red;" aria-label="Supprimer le type de valise">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Lien vers la page de création d'un nouveau type de valise -->
+<div style="margin-top: 20px;">
+    <a href="/typeValise/create">
+        <button type="button">Créer un nouveau type de valise</button>
+    </a>
+</div>
 
 </body>
 </html>

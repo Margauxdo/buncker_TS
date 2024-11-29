@@ -1,10 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Modifier une Sortie Semaine</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Modifier une Sortie Semaine</h1>
+
+<form th:action="@{/sortieSemaine/edit/{id}(id=${sortieSemaine.id})}" th:object="${sortieSemaine}" method="post">
+    <!-- Champ pour la date de la sortie -->
+    <label for="dateSortieSemaine">Date de la Sortie Semaine :</label>
+    <input type="date" id="dateSortieSemaine" th:field="*{dateSortieSemaine}" required />
+
+    <!-- Relation avec Règle -->
+    <label for="regle">Règle :</label>
+    <select id="regle" th:field="*{regle}" th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.nom}">
+        <option value="" th:text="'Sélectionner une règle'"></option>
+    </select>
+
+    <div style="text-align: center;">
+        <button type="submit">Modifier</button>
+        <a th:href="@{/sortieSemaine/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>

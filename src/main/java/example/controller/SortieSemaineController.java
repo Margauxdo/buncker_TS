@@ -130,7 +130,7 @@ public class SortieSemaineController {
     @PostMapping("/delete/{id}")
     public String deleteSortieSemaine(@PathVariable int id) {
         sortieSemaineService.deleteSortieSemaine(id);
-        return "redirect:/sortieSemaines/SS_list";
+        return "redirect:/sortieSemaines/list";
     }
 
 

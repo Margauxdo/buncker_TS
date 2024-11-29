@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Détails du Type de Valise</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        p strong {
+            color: #212529;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        ul li {
+            color: #495057;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
+<h1>Détails du Type de Valise</h1>
+
+<div class="container">
+    <!-- Champs principaux de TypeValise -->
+    <p><strong>ID :</strong> <span th:text="${typeValise.id}"></span></p>
+    <p><strong>Propriétaire :</strong> <span th:text="${typeValise.proprietaire}"></span></p>
+    <p><strong>Description :</strong> <span th:text="${typeValise.description}"></span></p>
+
+    <!-- Relation avec Valise -->
+    <p><strong>Valise associée :</strong>
+        <span th:text="${typeValise.valise != null ? typeValise.valise.nom : 'Aucune'}"></span>
+    </p>
+
+    <a th:href="@{/typeValise/list}">Retour à la liste</a>
+</div>
 
 </body>
 </html>

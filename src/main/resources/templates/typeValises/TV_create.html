@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Créer un Type de Valise</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Créer un nouveau Type de Valise</h1>
+
+<div th:if="${errorMessage}" style="color: red; text-align: center;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<form th:action="@{/typeValise/create}" th:object="${typeValise}" method="post">
+    <!-- Champ pour le propriétaire -->
+    <label for="proprietaire">Propriétaire :</label>
+    <input type="text" id="proprietaire" th:field="*{proprietaire}" placeholder="Entrez le propriétaire" required />
+
+    <!-- Champ pour la description -->
+    <label for="description">Description :</label>
+    <input type="text" id="description" th:field="*{description}" placeholder="Entrez la description" required />
+
+    <!-- Relation avec Valise -->
+    <label for="valise">Valise associée :</label>
+    <select id="valise" th:field="*{valise}" th:each="valise : ${valises}" th:value="${valise.id}" th:text="${valise.nom}">
+        <option value="" th:text="'Aucune valise associée'"></option>
+    </select>
+
+    <div style="text-align: center;">
+        <button type="submit">Créer</button>
+        <a th:href="@{/typeValise/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>

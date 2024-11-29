@@ -107,10 +107,10 @@
             </form>
 
             <!-- Bouton pour Supprimer -->
+
             <form th:action="@{/clients/delete/{id}(id=${client.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
-                <button type="submit" style="color: red;" aria-label="Supprimer le client">Supprimer</button>
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?');">
+                <button type="submit" style="color: red;">Supprimer</button>
             </form>
         </td>
     </tr>

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Modifier un Type de Règle</title>
+    <title>Modifier une règle manuelle</title>
     <style>
         form {
             max-width: 600px;
@@ -19,7 +19,7 @@
             font-weight: bold;
         }
 
-        input, select {
+        input {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -51,22 +51,35 @@
     </style>
 </head>
 <body>
-<h1 style="text-align: center;">Modifier un Type de Règle</h1>
+<h1 style="text-align: center;">Modifier une règle manuelle</h1>
 
-<form th:action="@{/typeRegle/edit/{id}(id=${typeRegle.id})}" th:object="${typeRegle}" method="post">
-    <!-- Champ pour le nom du type de règle -->
-    <label for="nomTypeRegle">Nom du Type de Règle :</label>
-    <input type="text" id="nomTypeRegle" th:field="*{nomTypeRegle}" placeholder="Entrez le nom du type de règle" required />
+<form th:action="@{/reglesManuelles/edit/{id}(id=${regleManuelle.id})}" th:object="${regleManuelle}" method="post">
+    <!-- Champs hérités de Regle -->
+    <label for="reglePourSortie">Règle pour Sortie :</label>
+    <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
-    <!-- Relation avec Règle -->
-    <label for="regle">Règle :</label>
-    <select id="regle" th:field="*{regle}" th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.nom}">
-        <option value="" th:text="'Sélectionner une règle'"></option>
-    </select>
+    <label for="coderegle">Code de la règle :</label>
+    <input type="text" id="coderegle" th:field="*{coderegle}" required />
+
+    <label for="dateRegle">Date de la règle :</label>
+    <input type="date" id="dateRegle" th:field="*{dateRegle}" required />
+
+    <label for="nombreJours">Nombre de jours :</label>
+    <input type="number" id="nombreJours" th:field="*{nombreJours}" required />
+
+    <label for="calculCalendaire">Calcul calendaire :</label>
+    <input type="number" id="calculCalendaire" th:field="*{calculCalendaire}" />
+
+    <!-- Champs spécifiques à RegleManuelle -->
+    <label for="descriptionRegle">Description de la règle :</label>
+    <input type="text" id="descriptionRegle" th:field="*{descriptionRegle}" required />
+
+    <label for="createurRegle">Créateur de la règle :</label>
+    <input type="text" id="createurRegle" th:field="*{createurRegle}" required />
 
     <div style="text-align: center;">
         <button type="submit">Modifier</button>
-        <a th:href="@{/typeRegle/list}">
+        <a th:href="@{/reglesManuelles/list}">
             <button type="button">Retour à la liste</button>
         </a>
     </div>

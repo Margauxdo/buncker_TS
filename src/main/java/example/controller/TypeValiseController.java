@@ -125,7 +125,7 @@ public class TypeValiseController {
     @PostMapping("/create")
     public String createTypeValise(@Valid  @ModelAttribute("typeValise") TypeValise typeValise) {
         typeValiseService.createTypeValise(typeValise);
-        return "redirect:/typeValises/TV_list";
+        return "redirect:/typeValise/list";
     }
 
     // Formulaire Thymeleaf pour modifier un TV
@@ -144,7 +144,7 @@ public class TypeValiseController {
     @PostMapping("/edit/{id}")
     public String editTypeValise(@PathVariable int id, @Valid TypeValise typeValise) {
         typeValiseService.updateTypeValise(id, typeValise);
-        return "redirect:/typeValises/TV_list";
+        return "redirect:/typeValise/list";
     }
 
     // Supprimer un TV via un formulaire Thymeleaf sécurisé

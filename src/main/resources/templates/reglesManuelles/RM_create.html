@@ -1,10 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Créer une règle manuelle</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Créer une nouvelle règle manuelle</h1>
+
+<div th:if="${errorMessage}" style="color: red; text-align: center;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<form th:action="@{/reglesManuelles/create}" th:object="${regleManuelle}" method="post">
+    <!-- Champs hérités de Regle -->
+    <label for="reglePourSortie">Règle pour Sortie:</label>
+    <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
+
+    <label for="coderegle">Code Règle:</label>
+    <input type="text" id="coderegle" th:field="*{coderegle}" required />
+
+    <label for="dateRegle">Date Règle:</label>
+    <input type="date" id="dateRegle" th:field="*{dateRegle}" required />
+
+    <label for="nombreJours">Nombre de Jours:</label>
+    <input type="number" id="nombreJours" th:field="*{nombreJours}" required />
+
+    <label for="calculCalendaire">Calcul Calendaire:</label>
+    <input type="number" id="calculCalendaire" th:field="*{calculCalendaire}" />
+
+    <!-- Champs spécifiques à RegleManuelle -->
+    <label for="descriptionRegle">Description de la Règle:</label>
+    <input type="text" id="descriptionRegle" th:field="*{descriptionRegle}" required />
+
+    <label for="createurRegle">Créateur de la Règle:</label>
+    <input type="text" id="createurRegle" th:field="*{createurRegle}" required />
+
+    <div style="text-align: center;">
+        <button type="submit">Créer</button>
+        <a th:href="@{/reglesManuelles/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>

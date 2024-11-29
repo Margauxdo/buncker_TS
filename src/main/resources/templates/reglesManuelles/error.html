@@ -1,10 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Erreur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #dc3545; /* Couleur rouge pour signaler une erreur */
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+            font-size: 16px;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        li {
+            color: #721c24;
+            font-weight: bold;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
+
+<h1>Une erreur s'est produite</h1>
+
+<div class="container">
+    <p th:text="${errorMessage}">Un message d'erreur sera affiché ici.</p>
+
+    <div th:if="${validationErrors != null}">
+        <h2>Erreurs de Validation :</h2>
+        <ul>
+            <li th:each="error : ${validationErrors}" th:text="${error.key + ' : ' + error.value}"></li>
+        </ul>
+    </div>
+
+    <a th:href="@{/reglesManuelles/list}">Retour à la liste</a>
+</div>
 
 </body>
 </html>

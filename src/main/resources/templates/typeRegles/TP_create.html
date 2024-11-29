@@ -1,10 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Créer un Type de Règle</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Créer un nouveau Type de Règle</h1>
+
+<div th:if="${errorMessage}" style="color: red; text-align: center;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<form th:action="@{/typeRegle/create}" th:object="${typeRegle}" method="post">
+    <!-- Champ pour le nom du type de règle -->
+    <label for="nomTypeRegle">Nom du Type de Règle :</label>
+    <input type="text" id="nomTypeRegle" th:field="*{nomTypeRegle}" placeholder="Entrez le nom du type de règle" required />
+
+    <!-- Relation avec Règle -->
+    <label for="regle">Règle :</label>
+    <select id="regle" th:field="*{regle}" th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.nom}">
+        <option value="" th:text="'Sélectionner une règle'"></option>
+    </select>
+
+    <div style="text-align: center;">
+        <button type="submit">Créer</button>
+        <a th:href="@{/typeRegle/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>

@@ -1,10 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Créer une Valise</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
 </head>
 <body>
+<h1 style="text-align: center;">Créer une nouvelle Valise</h1>
+
+<div th:if="${errorMessage}" style="color: red; text-align: center;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<form th:action="@{/valise/create}" th:object="${valise}" method="post">
+    <!-- Champ pour la description -->
+    <label for="description">Description :</label>
+    <input type="text" id="description" th:field="*{description}" placeholder="Entrez une description" required />
+
+    <!-- Champ pour le numéro de valise -->
+    <label for="numeroValise">Numéro de Valise :</label>
+    <input type="number" id="numeroValise" th:field="*{numeroValise}" placeholder="Entrez le numéro de valise" required />
+
+    <!-- Champ pour la référence client -->
+    <label for="refClient">Référence Client :</label>
+    <input type="text" id="refClient" th:field="*{refClient}" placeholder="Entrez la référence client" />
+
+    <!-- Dates associées -->
+    <label for="sortie">Date de Sortie :</label>
+    <input type="date" id="sortie" th:field="*{sortie}" />
+
+    <label for="dateDernierMouvement">Date du Dernier Mouvement :</label>
+    <input type="date" id="dateDernierMouvement" th:field="*{dateDernierMouvement}" />
+
+    <label for="dateSortiePrevue">Date de Sortie Prévue :</label>
+    <input type="date" id="dateSortiePrevue" th:field="*{dateSortiePrevue}" />
+
+    <label for="dateRetourPrevue">Date de Retour Prévue :</label>
+    <input type="date" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" />
+
+    <label for="dateCreation">Date de Création :</label>
+    <input type="date" id="dateCreation" th:field="*{dateCreation}" />
+
+    <!-- Champ pour le numéro du jeu -->
+    <label for="numeroDujeu">Numéro du Jeu :</label>
+    <input type="text" id="numeroDujeu" th:field="*{numeroDujeu}" placeholder="Entrez le numéro du jeu" />
+
+    <!-- Relation avec TypeValise -->
+    <label for="typeValise">Type de Valise :</label>
+    <select id="typeValise" th:field="*{typeValise}" th:each="typeValise : ${typesValise}" th:value="${typeValise.id}" th:text="${typeValise.description}">
+        <option value="" th:text="'Sélectionner un type de valise'"></option>
+    </select>
+
+    <!-- Relation avec Client -->
+    <label for="client">Client :</label>
+    <select id="client" th:field="*{client}" th:each="client : ${clients}" th:value="${client.id}" th:text="${client.nom}">
+        <option value="" th:text="'Sélectionner un client'"></option>
+    </select>
+
+    <!-- Relation avec Mouvement (liste non éditable dans ce formulaire) -->
+    <label>Mouvements associés :</label>
+    <ul>
+        <li th:each="mouvement : ${valise.mouvementList}" th:text="${mouvement.description}"></li>
+    </ul>
+
+    <!-- Relation avec RegleSortie (liste non éditable dans ce formulaire) -->
+    <label>Règles associées :</label>
+    <ul>
+        <li th:each="regle : ${valise.regleSortie}" th:text="${regle.nom}"></li>
+    </ul>
+
+    <div style="text-align: center;">
+        <button type="submit">Créer</button>
+        <a th:href="@{/valise/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
+</form>
 
 </body>
 </html>

@@ -1,10 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Liste des Sorties Semaine</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        button[type="submit"][style*="color: red;"] {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+    </style>
 </head>
 <body>
+
+<h1>Liste des Sorties Semaine</h1>
+
+<!-- Message d'erreur s'il y en a -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Table pour afficher les sorties semaine -->
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Date de la Sortie</th>
+        <th>Règle Associée</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Boucle sur la liste des sorties semaine -->
+    <tr th:each="sortieSemaine : ${sortiesSemaine}">
+        <td th:text="${sortieSemaine.id}"></td>
+        <td th:text="${sortieSemaine.dateSortieSemaine}"></td>
+        <td th:text="${sortieSemaine.regle != null ? sortieSemaine.regle.nom : 'Aucune'}"></td>
+        <td>
+            <!-- Bouton pour Voir -->
+            <form th:action="@{/sortieSemaine/view/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Voir la sortie semaine">Voir</button>
+            </form>
+
+            <!-- Bouton pour Modifier -->
+            <form th:action="@{/sortieSemaine/edit/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Modifier la sortie semaine">Modifier</button>
+            </form>
+
+            <!-- Bouton pour Supprimer -->
+            <form th:action="@{/sortieSemaine/delete/{id}(id=${sortieSemaine.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie semaine ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <button type="submit" style="color: red;" aria-label="Supprimer la sortie semaine">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Lien vers la page de création d'une nouvelle sortie semaine -->
+<div style="margin-top: 20px;">
+    <a href="/sortieSemaine/create">
+        <button type="button">Créer une nouvelle sortie semaine</button>
+    </a>
+</div>
 
 </body>
 </html>

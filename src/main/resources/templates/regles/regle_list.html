@@ -44,31 +44,19 @@
         .add-button {
             margin-top: 20px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-start;
         }
 
         .add-button a {
             text-decoration: none;
         }
 
-        .add-button button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
 
-        .add-button button:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
 <body>
 <h1>Liste des Règles</h1>
 
-<!-- Table pour afficher les règles -->
 <table>
     <thead>
     <tr>
@@ -77,29 +65,52 @@
         <th>Code Règle</th>
         <th>Date Règle</th>
         <th>Nombre de Jours</th>
+        <th>Calcul Calendaire</th>
+        <th>Fermé JS1</th>
+        <th>Fermé JS2</th>
+        <th>Fermé JS3</th>
+        <th>Fermé JS4</th>
+        <th>Fermé JS5</th>
+        <th>Fermé JS6</th>
+        <th>Fermé JS7</th>
+        <th>Type d'Entrée</th>
+        <th>Nombre JSM Entrée</th>
+        <th>Valise</th>
+        <th>Type Règle</th>
+        <th>Formule</th>
+        <th>Jour Férié</th>
         <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Boucle pour afficher les données des règles -->
     <tr th:each="regle : ${regles}">
         <td th:text="${regle.id}"></td>
         <td th:text="${regle.reglePourSortie}"></td>
         <td th:text="${regle.coderegle}"></td>
         <td th:text="${regle.dateRegle}"></td>
         <td th:text="${regle.nombreJours}"></td>
+        <td th:text="${regle.calculCalendaire}"></td>
+        <td th:text="${regle.fermeJS1}"></td>
+        <td th:text="${regle.fermeJS2}"></td>
+        <td th:text="${regle.fermeJS3}"></td>
+        <td th:text="${regle.fermeJS4}"></td>
+        <td th:text="${regle.fermeJS5}"></td>
+        <td th:text="${regle.fermeJS6}"></td>
+        <td th:text="${regle.fermeJS7}"></td>
+        <td th:text="${regle.typeEntree}"></td>
+        <td th:text="${regle.nbjsmEntree}"></td>
+        <td th:text="${regle.valise != null ? regle.valise.id : 'N/A'}"></td>
+        <td th:text="${regle.typeRegle != null ? regle.typeRegle.id : 'N/A'}"></td>
+        <td th:text="${regle.formule != null ? regle.formule.id : 'N/A'}"></td>
+        <td th:text="${regle.jourFerie != null ? regle.jourFerie.id : 'N/A'}"></td>
+
         <td>
-            <!-- Action Voir -->
             <form th:action="@{/regles/view/{id}(id=${regle.id})}" method="get" style="display:inline;">
                 <button type="submit">Voir</button>
             </form>
-
-            <!-- Action Modifier -->
             <form th:action="@{/regles/edit/{id}(id=${regle.id})}" method="get" style="display:inline;">
                 <button type="submit">Modifier</button>
             </form>
-
-            <!-- Action Supprimer -->
             <form th:action="@{/regles/delete/{id}(id=${regle.id})}" method="post" style="display:inline;"
                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette règle ?');">
                 <button type="submit" style="color: red;">Supprimer</button>
@@ -109,7 +120,6 @@
     </tbody>
 </table>
 
-<!-- Bouton Ajouter une Règle -->
 <div class="add-button">
     <a th:href="@{/regles/create}">
         <button type="button">Ajouter une Règle</button>

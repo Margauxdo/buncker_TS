@@ -87,12 +87,13 @@ public class ClientControllerIntegrationTest {
                         .param("email", "alice@example.com")
                         .param("adresse", "789 Example St"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/clients/clients_list"));
+                .andExpect(redirectedUrl("/clients/list")); // Correspond au chemin du contrôleur
 
         Client savedClient = clientRepository.findAll().get(0);
         Assertions.assertEquals("Alice Doe", savedClient.getName());
         Assertions.assertEquals("alice@example.com", savedClient.getEmail());
     }
+
 
     // Test: Show edit client form
     @Test
@@ -125,12 +126,13 @@ public class ClientControllerIntegrationTest {
                         .param("email", "updated@example.com")
                         .param("adresse", "123 Updated St"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/clients/clients_list"));
+                .andExpect(redirectedUrl("/clients/list")); // Correspond au chemin utilisé dans le contrôleur
 
         Client updatedClient = clientRepository.findById(client.getId()).orElseThrow();
         Assertions.assertEquals("Updated Name", updatedClient.getName());
         Assertions.assertEquals("updated@example.com", updatedClient.getEmail());
     }
+
 
     // Test: Delete a client
     @Test
@@ -144,8 +146,9 @@ public class ClientControllerIntegrationTest {
 
         mockMvc.perform(post("/clients/delete/{id}", client.getId()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/clients/clients_list"));
+                .andExpect(redirectedUrl("/clients/list")); // Correspond à la redirection définie dans le contrôleur
 
         Assertions.assertTrue(clientRepository.findById(client.getId()).isEmpty());
     }
+
 }

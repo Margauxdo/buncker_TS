@@ -1,10 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Détails du Retour Sécurité</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        p strong {
+            color: #212529;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        ul li {
+            color: #495057;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
+<h1>Détails du Retour Sécurité</h1>
+
+<div class="container">
+    <!-- Champs principaux de RetourSecurite -->
+    <p><strong>ID :</strong> <span th:text="${retourSecurite.id}"></span></p>
+    <p><strong>Numéro :</strong> <span th:text="${retourSecurite.numero}"></span></p>
+    <p><strong>Date Sécurité :</strong> <span th:text="${retourSecurite.datesecurite}"></span></p>
+    <p><strong>Clôturé :</strong> <span th:text="${retourSecurite.cloture ? 'Oui' : 'Non'}"></span></p>
+    <p><strong>Date de Clôture :</strong> <span th:text="${retourSecurite.dateCloture}"></span></p>
+
+    <!-- Relation avec Mouvement -->
+    <p><strong>Mouvement :</strong>
+        <span th:text="${retourSecurite.mouvement != null ? retourSecurite.mouvement.nom : 'Aucun'}"></span>
+    </p>
+
+    <!-- Relation avec Clients -->
+    <p><strong>Clients associés :</strong></p>
+    <ul>
+        <li th:each="client : ${retourSecurite.clients}" th:text="${client.nom}"></li>
+    </ul>
+
+    <a th:href="@{/retoursSecurite/list}">Retour à la liste</a>
+</div>
 
 </body>
 </html>

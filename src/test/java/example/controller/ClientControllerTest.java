@@ -43,12 +43,12 @@ public class ClientControllerTest {
     // Test: Suppression d'un client - Succès
     @Test
     public void testDeleteClient_Success() {
-        doNothing().when(clientService).deleteClient(1);
+        doNothing().when(clientService).deleteClient(1); // Simule la suppression
 
-        String response = clientController.deleteClient(1);
+        String response = clientController.deleteClient(1, model); // Appelle la méthode avec les bons arguments
 
-        assertEquals("redirect:/clients/clients_list", response);
-        verify(clientService, times(1)).deleteClient(1); // Vérifie l'appel du service
+        assertEquals("redirect:/clients/list", response); // Vérifie la redirection
+        verify(clientService, times(1)).deleteClient(1); // Vérifie que le service a été appelé
     }
 
     // Test: Liste des clients - Succès

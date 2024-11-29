@@ -1,10 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Détails de la Règle Manuelle</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        p strong {
+            color: #212529;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #dee2e6;
+        }
+    </style>
 </head>
 <body>
+<h1>Détails de la Règle Manuelle</h1>
+
+<div class="container">
+    <!-- Champs hérités de Regle -->
+    <p><strong>Règle pour Sortie:</strong> <span th:text="${regleManuelle.reglePourSortie}"></span></p>
+    <p><strong>Code Règle:</strong> <span th:text="${regleManuelle.coderegle}"></span></p>
+    <p><strong>Date Règle:</strong> <span th:text="${regleManuelle.dateRegle}"></span></p>
+    <p><strong>Nombre de Jours:</strong> <span th:text="${regleManuelle.nombreJours}"></span></p>
+    <p><strong>Calcul Calendaire:</strong> <span th:text="${regleManuelle.calculCalendaire}"></span></p>
+
+    <!-- Champs spécifiques à RegleManuelle -->
+    <p><strong>Description de la Règle:</strong> <span th:text="${regleManuelle.descriptionRegle}"></span></p>
+    <p><strong>Créateur de la Règle:</strong> <span th:text="${regleManuelle.createurRegle}"></span></p>
+
+    <a th:href="@{/reglesManuelles/list}">Retour à la liste</a>
+</div>
 
 </body>
 </html>
