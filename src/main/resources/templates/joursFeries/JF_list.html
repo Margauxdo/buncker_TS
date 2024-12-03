@@ -57,7 +57,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="jourFerie : ${jourFerie}">
+    <tr th:each="jourFerie : ${jourFeries}">
         <td th:text="${jourFerie.id}"></td>
         <td th:text="${#dates.format(jourFerie.date, 'dd/MM/yyyy')}"></td>
         <td>
@@ -66,13 +66,13 @@
             </ul>
         </td>
         <td>
-            <form th:action="@{/jourferie/view/{id}(id=${jourFerie.id})}" method="get" style="display:inline;">
+            <form th:action="@{/jourferies/view/{id}(id=${jourFerie.id})}" method="get">
                 <button type="submit">Détails</button>
             </form>
-            <form th:action="@{/jourferie/edit/{id}(id=${jourFerie.id})}" method="get" style="display:inline;">
+            <form th:action="@{/jourferies/update/{id}(id=${jourFerie.id})}" method="get">
                 <button type="submit">Modifier</button>
             </form>
-            <form th:action="@{/jourferie/delete/{id}(id=${jourFerie.id})}" method="post" style="display:inline;"
+            <form th:action="@{/jourferies/delete/{id}(id=${jourFerie.id})}" method="post"
                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce jour férié ?');">
                 <button type="submit" style="color: red;">Supprimer</button>
             </form>
@@ -81,7 +81,7 @@
     </tbody>
 </table>
 <div style="margin-top: 20px;">
-    <a href="/jourferie/create">
+    <a th:href="@{/jourferies/create}">
         <button type="button">Ajouter un Jour Férié</button>
     </a>
 </div>

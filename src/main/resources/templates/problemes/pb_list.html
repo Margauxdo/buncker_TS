@@ -76,7 +76,8 @@
         <td th:text="${probleme.descriptionProbleme}"></td>
         <td th:text="${probleme.detailsProbleme}"></td>
         <td th:text="${probleme.client.name}"></td>
-        <td th:text="${probleme.valise.name}"></td>
+        <td th:text="${probleme.valise.description}"></td>
+
         <td>
             <!-- Action Voir -->
             <form th:action="@{/problemes/view/{id}(id=${probleme.id})}" method="get" style="display:inline;">

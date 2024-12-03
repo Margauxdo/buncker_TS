@@ -5,7 +5,9 @@ import example.entity.Regle;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
 import example.services.FormuleService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,21 +138,33 @@ public class FormuleServiceIntegrationTest {
 
 
     @Test
+    @Transactional
     public void testDeleteFormule() {
         // Arrange
-        Regle regle = new Regle();
-        regle.setCoderegle("CODE123");
+        Regle regle = Regle.builder()
+                .coderegle("CODE123")
+                .build();
         regle = regleRepository.save(regle);
 
-        formule.setRegle(regle);
+        Formule formule = Formule.builder()
+                .libelle("Libellé Test")
+                .formule("Description Test")
+                .regle(regle)
+                .build();
         Formule savedFormule = formuleService.createFormule(formule);
+
+        // Ensure the formule exists before deletion
+        assertNotNull(formuleService.getFormuleById(savedFormule.getId()), "Formule should exist before deletion");
 
         // Act
         formuleService.deleteFormule(savedFormule.getId());
 
         // Assert
-        Formule deletedFormule = formuleService.getFormuleById(savedFormule.getId());
-        assertNull(deletedFormule, "La Formule devrait être supprimée et ne devrait pas être récupérable par ID");
+        // Verify that the formule has been deleted
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            formuleService.getFormuleById(savedFormule.getId());
+        }, "Formule should be deleted and not retrievable");
     }
+
 
 }

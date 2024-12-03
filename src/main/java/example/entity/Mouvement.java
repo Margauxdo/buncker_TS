@@ -23,6 +23,8 @@ public class Mouvement {
     @Column(name = "mouvement_id")
     private int id;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Date dateHeureMouvement;
     private String statutSortie;
     private Date dateSortiePrevue;

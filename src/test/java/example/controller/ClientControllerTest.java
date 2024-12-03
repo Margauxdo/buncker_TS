@@ -31,25 +31,34 @@ public class ClientControllerTest {
     // Test: Création d'un client - Succès
     @Test
     public void testCreateClient_Success() {
+        // Arrange
         Client client = new Client();
         when(clientService.createClient(any(Client.class))).thenReturn(client);
 
+        // Act
         String response = clientController.createClient(client);
 
-        assertEquals("redirect:/clients/clients_list", response);
-        verify(clientService, times(1)).createClient(client); // Vérifie l'appel du service
+        // Assert
+        assertEquals("redirect:/clients/list", response); // Chemin mis à jour
+        verify(clientService, times(1)).createClient(client); // Vérifie que le service est appelé une fois
     }
+
 
     // Test: Suppression d'un client - Succès
     @Test
     public void testDeleteClient_Success() {
+        Client client = new Client(); // Simule un client existant
+        when(clientService.getClientById(1)).thenReturn(client); // Simule la récupération du client
         doNothing().when(clientService).deleteClient(1); // Simule la suppression
 
         String response = clientController.deleteClient(1, model); // Appelle la méthode avec les bons arguments
 
         assertEquals("redirect:/clients/list", response); // Vérifie la redirection
-        verify(clientService, times(1)).deleteClient(1); // Vérifie que le service a été appelé
+        verify(clientService, times(1)).getClientById(1); // Vérifie l'appel pour récupérer le client
+        verify(clientService, times(1)).deleteClient(1); // Vérifie l'appel pour supprimer le client
     }
+
+
 
     // Test: Liste des clients - Succès
     @Test
@@ -77,13 +86,14 @@ public class ClientControllerTest {
     // Test: Voir un client par ID - Non trouvé
     @Test
     public void testViewClientById_NotFound() {
-        when(clientService.getClientById(1)).thenReturn(null);
+        when(clientService.getClientById(1)).thenReturn(null); // Simule l'absence du client
 
-        String response = clientController.viewClientById(1, model);
+        String response = clientController.viewClientById(1, model); // Appelle la méthode
 
-        assertEquals("clients/error", response);
-        verify(model, times(1)).addAttribute(eq("errorMessage"), any());
+        assertEquals("error", response); // Vérifie que la vue retournée est "error"
+        verify(model, times(1)).addAttribute(eq("errorMessage"), any()); // Vérifie l'ajout du message d'erreur
     }
+
 
     // Test: Modifier un client - Succès
     @Test
@@ -100,25 +110,29 @@ public class ClientControllerTest {
     // Test: Modifier un client - Non trouvé
     @Test
     public void testEditClientForm_NotFound() {
-        when(clientService.getClientById(1)).thenReturn(null);
+        when(clientService.getClientById(1)).thenReturn(null); // Simule l'absence du client
 
-        String response = clientController.editClientForm(1, model);
+        String response = clientController.editClientForm(1, model); // Appelle la méthode
 
-        assertEquals("clients/error", response);
-        verify(clientService, times(1)).getClientById(1);
+        assertEquals("error", response); // Vérifie que la vue retournée est "error"
+        verify(clientService, times(1)).getClientById(1); // Vérifie l'appel au service
     }
+
+
+
 
     // Test: Mise à jour d'un client - Succès
     @Test
     public void testUpdateClient_Success() {
-        Client client = new Client();
-        when(clientService.updateClient(1, client)).thenReturn(client);
+        Client client = new Client(); // Simule un client
+        when(clientService.updateClient(1, client)).thenReturn(client); // Simule la mise à jour
 
-        String response = clientController.updateClient(1, client);
+        String response = clientController.updateClient(1, client); // Appelle la méthode
 
-        assertEquals("redirect:/clients/clients_list", response);
-        verify(clientService, times(1)).updateClient(1, client);
+        assertEquals("redirect:/clients/list", response); // Vérifie la redirection
+        verify(clientService, times(1)).updateClient(1, client); // Vérifie l'appel du service
     }
+
 
     // Test: Formulaire de création d'un client
     @Test

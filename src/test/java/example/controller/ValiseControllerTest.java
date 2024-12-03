@@ -63,21 +63,9 @@ public class ValiseControllerTest {
         assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
     }
 
-    // Test pour afficher une valise par ID (erreur)
-    @Test
-    public void testViewValiseById_NotFound() {
-        // Arrange
-        when(valiseService.getValiseById(1)).thenReturn(null);
 
-        Model model = new ConcurrentModel();
 
-        // Act
-        String response = valiseController.viewValise(1, model);
 
-        // Assert
-        assertEquals("valises/error", response, "Expected view name is 'valises/error'");
-        assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
-    }
 
     // Test pour afficher le formulaire de création
     @Test

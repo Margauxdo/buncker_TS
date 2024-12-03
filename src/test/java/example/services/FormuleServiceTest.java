@@ -5,6 +5,7 @@ import example.entity.Regle;
 import example.exceptions.FormuleNotFoundException;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,12 +97,15 @@ public class FormuleServiceTest {
 
         when(formuleRepository.findById(id)).thenReturn(Optional.empty());
 
-        Formule result = formuleService.getFormuleById(id);
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            formuleService.getFormuleById(id);
+        });
 
-        Assertions.assertNull(result, "Formule should be null if not found");
+        assertEquals("Formule avec l'Id 1 n'existe pas !", exception.getMessage());
         verify(formuleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(formuleRepository);
     }
+
 
 
     @Test

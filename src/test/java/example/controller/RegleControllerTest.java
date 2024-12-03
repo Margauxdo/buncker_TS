@@ -1,7 +1,9 @@
 package example.controller;
 
 import example.entity.Regle;
+import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -73,17 +75,19 @@ public class RegleControllerTest {
     @Test
     public void testViewRegle_NotFound() {
         // Arrange
-        when(regleService.readRegle(1)).thenReturn(null);
+        when(regleService.readRegle(1)).thenThrow(new RegleNotFoundException("Regle with ID 1 not found."));
 
         Model model = new ConcurrentModel();
 
-        // Act
-        String response = regleController.viewRegle(1, model);
+        // Act & Assert
+        Exception exception = Assertions.assertThrows(RegleNotFoundException.class, () -> {
+            regleController.viewRegle(1, model);
+        });
 
-        // Assert
-        assertEquals("regles/error", response);
+        assertEquals("Regle with ID 1 not found.", exception.getMessage());
         verify(regleService, times(1)).readRegle(1);
     }
+
 
     // Test: Formulaire de création de règle
     @Test
@@ -143,7 +147,8 @@ public class RegleControllerTest {
         String response = regleController.deleteRegle(1);
 
         // Assert
-        assertEquals("redirect:/regles/regle_list", response);
+        assertEquals("redirect:/regles/list", response, "Expected redirect URL is 'redirect:/regles/list'");
         verify(regleService, times(1)).deleteRegle(1);
     }
 }
+

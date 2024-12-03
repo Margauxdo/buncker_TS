@@ -1,18 +1,17 @@
-
 package example.integration.controllers;
 
 import example.entity.Client;
-import example.entity.TypeValise;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
-import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("integrationtest")
 public class ValiseControllerIntegrationTest {
 
     @Autowired
@@ -32,111 +32,133 @@ public class ValiseControllerIntegrationTest {
 
     @Autowired
     private ValiseRepository valiseRepository;
-
     @Autowired
     private ClientRepository clientRepository;
 
-    @Autowired
-    private TypeValiseRepository typeValiseRepository;
-
-    private Client client;
-    private TypeValise typeValise;
-
     @BeforeEach
-    public void setUp() {
-        // Initialisation des dépendances nécessaires
-        client = clientRepository.save(Client.builder().name("Client Test").build());
-        typeValise = typeValiseRepository.save(TypeValise.builder().description("Type Test").build());
+    void setUp() {
+        // Nettoyer la base avant chaque test
+        valiseRepository.deleteAll();
     }
 
     @Test
-    public void testViewValises() throws Exception {
-        Valise valise = valiseRepository.save(Valise.builder()
-                .description("Test Valise")
-                .client(client)
-                .typeValise(typeValise)
-                .build());
+    void testViewValisesList() throws Exception {
+        // Créer et sauvegarder un client pour le test
+        Client client = Client.builder()
+                .name("Client Test")
+                .email("client@test.com")
+                .build();
+        clientRepository.save(client);
 
+        // Créer et sauvegarder une valise pour le test
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(123L)
+                .dateCreation(new Date())
+                .client(client)
+                .build();
+        valiseRepository.save(valise);
+
+        // Effectuer la requête GET et valider la réponse
         mockMvc.perform(get("/valise/list"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("valises/valises_list"))
-                .andExpect(model().attributeExists("valises"))
-                .andExpect(model().attribute("valises", hasSize(1)))
+                .andExpect(status().isOk()) // Statut 200 attendu
+                .andExpect(content().contentType("text/html;charset=UTF-8")) // Vérifie le type de contenu
+                .andExpect(view().name("valises/valises_list")) // Vérifie le nom de la vue
+                .andExpect(model().attributeExists("valises")) // Vérifie que le modèle contient "valises"
+                .andExpect(model().attribute("valises", hasSize(1))) // Vérifie la taille de la liste "valises"
                 .andExpect(model().attribute("valises", hasItem(
-                        hasProperty("description", is("Test Valise"))
+                        allOf(
+                                hasProperty("description", is(valise.getDescription())),
+                                hasProperty("numeroValise", is(valise.getNumeroValise()))
+                        )
                 )));
     }
 
+
+
     @Test
-    public void testCreateValiseForm() throws Exception {
-        mockMvc.perform(get("/valise/create"))
+    void testViewValiseDetails() throws Exception {
+        Client client = Client.builder()
+                .name("Client Test")
+                .email("client@test.com")
+                .build();
+        clientRepository.save(client);
+
+        Valise valise = Valise.builder()
+                .description("Test Valise")
+                .numeroValise(123L)
+                .dateCreation(new Date())
+                .client(client)
+                .build();
+        Valise savedValise = valiseRepository.save(valise);
+
+        mockMvc.perform(get("/valise/view/{id}" + savedValise.getId()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("valises/valise_create"))
+                .andExpect(view().name("valises/valise_details"))
                 .andExpect(model().attributeExists("valise"));
+
+
     }
 
     @Test
-    public void testCreateValise() throws Exception {
+    void testCreateValise() throws Exception {
         mockMvc.perform(post("/valise/create")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("description", "New Valise")
-                        .param("client.id", String.valueOf(client.getId()))
-                        .param("typeValise.id", String.valueOf(typeValise.getId())))
+                        .param("numeroValise", "789"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/valises/valises_list"));
+                .andExpect(redirectedUrl("/valise/list"));
 
-        Valise savedValise = valiseRepository.findAll().get(0);
-        assert savedValise.getDescription().equals("New Valise");
+        // Vérifier si la valise est créée dans la base
+        Valise valise = valiseRepository.findAll().get(0);
+        Assertions.assertEquals("New Valise", valise.getDescription());
+        Assertions.assertEquals("789", valise.getNumeroValise());
+
     }
 
     @Test
-    public void testEditValiseForm() throws Exception {
-        Valise valise = valiseRepository.save(Valise.builder()
-                .description("Edit Test")
-                .client(client)
-                .typeValise(typeValise)
-                .build());
+    void testEditValise() throws Exception {
+        Valise valise = Valise.builder()
+                .description("Old Valise")
+                .numeroValise(111L)
+                .dateCreation(new Date())
+                .build();
+        Valise savedValise = valiseRepository.save(valise);
 
-        mockMvc.perform(get("/valise/edit/{id}", valise.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("valises/valise_edit"))
-                .andExpect(model().attributeExists("valise"))
-                .andExpect(model().attribute("valise", hasProperty("description", is("Edit Test"))));
-    }
-
-    @Test
-    public void testUpdateValise() throws Exception {
-        Valise valise = valiseRepository.save(Valise.builder()
-                .description("Update Test")
-                .client(client)
-                .typeValise(typeValise)
-                .build());
-
-        mockMvc.perform(post("/valise/edit/{id}", valise.getId())
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("description", "Updated Description")
-                        .param("client.id", String.valueOf(client.getId()))
-                        .param("typeValise.id", String.valueOf(typeValise.getId())))
+        mockMvc.perform(post("/valise/edit/{id}" + savedValise.getId())
+                        .param("description", "Updated Valise")
+                        .param("numeroValise", "222"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/valises/valises_list"));
+                .andExpect(redirectedUrl("/valise/list"));
 
-        Valise updatedValise = valiseRepository.findById(valise.getId()).orElse(null);
+        // Vérification de la mise à jour
+        Valise updatedValise = valiseRepository.findById(savedValise.getId()).orElse(null);
         assert updatedValise != null;
-        assert updatedValise.getDescription().equals("Updated Description");
+        assert updatedValise.getDescription().equals("Updated Valise");
     }
 
     @Test
-    public void testDeleteValise() throws Exception {
-        Valise valise = valiseRepository.save(Valise.builder()
-                .description("Delete Test")
-                .client(client)
-                .typeValise(typeValise)
-                .build());
+    void testDeleteValise() throws Exception {
+        Valise valise = Valise.builder()
+                .description("To Be Deleted")
+                .numeroValise(333L)
+                .dateCreation(new Date())
+                .build();
+        Valise savedValise = valiseRepository.save(valise);
 
-        mockMvc.perform(post("/valise/delete/{id}", valise.getId()))
+        mockMvc.perform(post("/valise/delete/{id}" + savedValise.getId()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/valises/valises_list"));
 
-        assert valiseRepository.findById(valise.getId()).isEmpty();
+        // Vérification de la suppression
+        assert valiseRepository.findById(savedValise.getId()).isEmpty();
+    }
+
+    @Test
+    void testViewErrorPage() throws Exception {
+        mockMvc.perform(get("/valise/view/999"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("valises/error"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", containsString("Valise avec l'Id")));
     }
 }

@@ -54,7 +54,9 @@
     <p><strong>Téléphone Portable :</strong> <span th:text="${livreur.telephonePortable}"></span></p>
     <p><strong>Téléphone Kobby :</strong> <span th:text="${livreur.telephoneKobby}"></span></p>
     <p><strong>Téléphone Alphapage :</strong> <span th:text="${livreur.telephoneAlphapage}"></span></p>
-    <p><strong>Mouvement :</strong> <span th:text="${livreur.mouvement.name}"></span></p>
+    <p><strong>Mouvement :</strong> <span th:text="${livreur.mouvement != null ? livreur.mouvement.statutSortie : 'Aucun mouvement'
+}"></span></p>
+
 
     <a th:href="@{/livreurs/list}">Retour à la liste</a>
 </div>

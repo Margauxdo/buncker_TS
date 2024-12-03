@@ -62,7 +62,9 @@
 
     <!-- Relation avec Regle -->
     <p><strong>Règle associée :</strong>
-        <span th:text="${typeRegle.regle != null ? typeRegle.regle.nom : 'Aucune'}"></span>
+
+        <span th:text="${typeValise.valise != null ? typeValise.valise.description : 'Aucune'}"></span>
+
     </p>
 
     <a th:href="@{/typeRegle/list}">Retour à la liste</a>

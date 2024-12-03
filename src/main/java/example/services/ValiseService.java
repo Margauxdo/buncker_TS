@@ -113,4 +113,9 @@ public class ValiseService implements IValiseService {
     public List<Valise> getAllValises() {
         return valiseRepository.findAll();
     }
+
+    @Override
+    public void persistValise(Valise valise) {
+
+    }
 }

@@ -12,6 +12,7 @@ import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,7 +34,11 @@ public class TypeRegleControllerTest {
     @Test
     public void testViewAllTypeRegles_Success() {
         // Arrange
-        when(typeRegleService.getTypeRegles()).thenReturn(List.of(new TypeRegle()));
+        List<TypeRegle> expectedTypeRegles = List.of(
+                new TypeRegle(1, "TypeRegle1", null),
+                new TypeRegle(2, "TypeRegle2", null)
+        );
+        when(typeRegleService.getTypeRegles()).thenReturn(expectedTypeRegles);
         Model model = new ConcurrentModel();
 
         // Act
@@ -41,16 +46,19 @@ public class TypeRegleControllerTest {
 
         // Assert
         assertEquals("typeRegles/TR_list", response, "Expected view name is 'typeRegles/TR_list'");
-        assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
-        assertNotNull(model.getAttribute("typeRegle"), "Expected non-null 'typeRegle' in model");
+        assertTrue(model.containsAttribute("typeRegles"), "Model should contain 'typeRegles' attribute");
+        assertEquals(expectedTypeRegles, model.getAttribute("typeRegles"), "Expected 'typeRegles' to match the returned list");
+        verify(typeRegleService, times(1)).getTypeRegles();
     }
+
 
     // **Test: Voir un TypeRegle par ID (Succès)**
     @Test
     public void testViewTypeRegleById_Success() {
         // Arrange
         TypeRegle typeRegle = new TypeRegle();
-        when(typeRegleService.getTypeRegle(1)).thenReturn(typeRegle);
+        typeRegle.setId(1); // Ajout d'un ID pour valider le contenu
+        when(typeRegleService.getTypeRegle(1)).thenReturn(Optional.of(typeRegle));
         Model model = new ConcurrentModel();
 
         // Act
@@ -59,8 +67,9 @@ public class TypeRegleControllerTest {
         // Assert
         assertEquals("typeRegles/TP_details", response, "Expected view name is 'typeRegles/TP_details'");
         assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
-        assertEquals(typeRegle, model.getAttribute("typeRegle"), "Expected 'typeRegle' in model");
+        assertEquals(Optional.of(typeRegle), model.getAttribute("typeRegle"), "Expected 'typeRegle' in model as Optional");
     }
+
 
     // **Test: Voir un TypeRegle par ID (Non trouvé)**
     @Test
@@ -98,7 +107,8 @@ public class TypeRegleControllerTest {
     public void testEditTypeRegleForm_Success() {
         // Arrange
         TypeRegle typeRegle = new TypeRegle();
-        when(typeRegleService.getTypeRegle(1)).thenReturn(typeRegle);
+        typeRegle.setId(1); // Ajout d'un ID pour valider le contenu
+        when(typeRegleService.getTypeRegle(1)).thenReturn(Optional.of(typeRegle));
         Model model = new ConcurrentModel();
 
         // Act
@@ -107,7 +117,7 @@ public class TypeRegleControllerTest {
         // Assert
         assertEquals("typeRegles/TR_edit", response, "Expected view name is 'typeRegles/TR_edit'");
         assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
-        assertEquals(typeRegle, model.getAttribute("typeRegle"), "Expected 'typeRegle' in model");
+        assertEquals(Optional.of(typeRegle), model.getAttribute("typeRegle"), "Expected 'typeRegle' in model as Optional");
     }
 
     // **Test: Afficher le formulaire de modification (Non trouvé)**

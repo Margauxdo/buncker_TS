@@ -10,4 +10,8 @@ public interface IValiseService {
     void deleteValise(int id);
     Valise getValiseById(int id);
     List<Valise> getAllValises();
+
+    void persistValise(Valise valise);
+
+
 }

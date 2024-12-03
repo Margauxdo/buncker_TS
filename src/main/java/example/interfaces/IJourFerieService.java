@@ -16,4 +16,6 @@ public interface IJourFerieService {
 
 
     void persistJourFerie(JourFerie jourFerie);
+
+    boolean existsByDate(Date date);
 }

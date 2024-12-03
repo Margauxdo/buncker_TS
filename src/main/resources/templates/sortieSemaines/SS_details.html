@@ -62,7 +62,7 @@
 
     <!-- Relation avec Regle -->
     <p><strong>Règle associée :</strong>
-        <span th:text="${sortieSemaine.regle != null ? sortieSemaine.regle.nom : 'Aucune'}"></span>
+        <span th:text="${sortieSemaine.regle != null ? 'Règle présente' : 'Aucune'}"></span>
     </p>
 
     <a th:href="@{/sortieSemaine/list}">Retour à la liste</a>

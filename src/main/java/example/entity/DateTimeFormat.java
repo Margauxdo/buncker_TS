@@ -1,2 +1,5 @@
-package example.entity;public @interface DateTimeFormat {
+package example.entity;
+
+public @interface DateTimeFormat {
+    String pattern();
 }

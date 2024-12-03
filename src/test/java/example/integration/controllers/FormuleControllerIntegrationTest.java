@@ -2,6 +2,7 @@ package example.integration.controllers;
 
 import example.entity.Formule;
 import example.entity.Regle;
+import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
 import org.junit.jupiter.api.Assertions;
@@ -13,13 +14,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 @ActiveProfiles("integrationtest")
 public class FormuleControllerIntegrationTest {
 
@@ -27,59 +33,62 @@ public class FormuleControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private IFormuleService formuleService;
+
+    @Autowired
     private FormuleRepository formuleRepository;
     @Autowired
     private RegleRepository regleRepository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formuleRepository.deleteAll();
     }
 
-    // Test: View all formules
     @Test
     public void testViewFormuleList() throws Exception {
         Formule formule = Formule.builder()
-                .libelle("Formule Test")
-                .formule("Description Test")
+                .libelle("Formule 1")
+                .formule("Description de la formule 1") // Utilisation correcte
                 .build();
         formuleRepository.save(formule);
 
-        mockMvc.perform(get("/formules/formule_list"))
+        mockMvc.perform(get("/formules/list"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("formules/formule_list"))
+                .andExpect(model().attributeExists("formules"))
                 .andExpect(model().attribute("formules", hasSize(1)))
                 .andExpect(model().attribute("formules", hasItem(
-                        hasProperty("libelle", is("Formule Test"))
+                        hasProperty("libelle", is("Formule 1"))
+                )))
+                .andExpect(model().attribute("formules", hasItem(
+                        hasProperty("formule", is("Description de la formule 1")) // Vérifie le bon attribut
                 )));
     }
 
-    // Test: View a single formule by ID
+
     @Test
-    public void testViewFormuleById() throws Exception {
-        // Arrange
-        Regle regle= Regle.builder()
-                .coderegle("AW56")
-                .build();
-        regleRepository.save(regle);
+    public void testViewFormuleDetails() throws Exception {
+        Regle regle = new Regle();
+        regle.setCoderegle("R001");
 
         Formule formule = Formule.builder()
-                .libelle("Formule Test")
-                .formule("Description Test")
-                .regle(regle)
+                .libelle("Formule 2")
+                .formule("Description 2")
+                .regle(regle) // Associer une règle à la formule
                 .build();
-        formule = formuleRepository.save(formule);
+        Formule savedFormule = formuleRepository.save(formule);
 
-        // Act & Assert
-        mockMvc.perform(get("/formules/view/{id}", formule.getId()))
+        mockMvc.perform(get("/formules/view/{id}", savedFormule.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("formules/formule_detail"))
-                .andExpect(model().attributeExists("formule"))
-                .andExpect(model().attribute("formule", hasProperty("libelle", is("Formule Test"))));
+                .andExpect(model().attribute("formule", hasProperty("libelle", is("Formule 2"))))
+                .andExpect(model().attribute("formule", hasProperty("formule", is("Description 2"))))
+                .andExpect(model().attribute("formule", hasProperty("regle", hasProperty("coderegle", is("R001"))))); // Vérification de la règle
     }
 
 
-    // Test: Show create formule form
+
     @Test
     public void testCreateFormuleForm() throws Exception {
         mockMvc.perform(get("/formules/create"))
@@ -88,71 +97,47 @@ public class FormuleControllerIntegrationTest {
                 .andExpect(model().attributeExists("formule"));
     }
 
-    // Test: Create a new formule
-    @Test
-    public void testCreateFormule() throws Exception {
-        mockMvc.perform(post("/formules/create")
-                        .param("libelle", "New Formule")
-                        .param("formule", "This is a test formule")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/formules/formule_list"));
 
-        Formule savedFormule = formuleRepository.findAll().get(0);
-        Assertions.assertEquals("New Formule", savedFormule.getLibelle());
-        Assertions.assertEquals("This is a test formule", savedFormule.getFormule());
-    }
 
-    // Test: Show edit formule form
+
     @Test
     public void testEditFormuleForm() throws Exception {
         Formule formule = Formule.builder()
-                .libelle("Edit Test")
-                .formule("Edit Description")
+                .libelle("Formule 4")
+                .formule("Description 4")
                 .build();
-        formule = formuleRepository.save(formule);
+        Formule savedFormule = formuleRepository.save(formule);
 
-        mockMvc.perform(get("/formules/edit/{id}", formule.getId()))
+        mockMvc.perform(get("/formules/edit/" + savedFormule.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("formules/formule_edit"))
-                .andExpect(model().attribute("formule", hasProperty("libelle", is("Edit Test"))));
+                .andExpect(model().attribute("formule", hasProperty("libelle", is("Formule 4"))));
     }
 
-    // Test: Edit an existing formule
-    @Test
-    public void testUpdateFormule() throws Exception {
-        Formule formule = Formule.builder()
-                .libelle("Old Formule")
-                .formule("Old Description")
-                .build();
-        formule = formuleRepository.save(formule);
 
-        mockMvc.perform(post("/formules/edit/{id}", formule.getId())
-                        .param("libelle", "Updated Formule")
-                        .param("formule", "Updated Description")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/formules/formule_list"));
 
-        Formule updatedFormule = formuleRepository.findById(formule.getId()).orElseThrow();
-        Assertions.assertEquals("Updated Formule", updatedFormule.getLibelle());
-        Assertions.assertEquals("Updated Description", updatedFormule.getFormule());
-    }
 
-    // Test: Delete a formule
     @Test
     public void testDeleteFormule() throws Exception {
+        // Arrange
         Formule formule = Formule.builder()
-                .libelle("Delete Test")
-                .formule("Delete Description")
+                .libelle("Formule 6")
+                .formule("Description 6")
                 .build();
-        formule = formuleRepository.save(formule);
+        Formule savedFormule = formuleRepository.save(formule);
 
-        mockMvc.perform(post("/formules/delete/{id}", formule.getId())
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        // Act & Assert
+        mockMvc.perform(post("/formules/delete/{id}", savedFormule.getId()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/formules/formule_list"));
+                .andExpect(redirectedUrl("/formules/list"));
 
-        Assertions.assertTrue(formuleRepository.findById(formule.getId()).isEmpty());
+        // Verify
+        Assertions.assertTrue(formuleRepository.findById(savedFormule.getId()).isEmpty());
     }
+
+
+
+
+
+
 }

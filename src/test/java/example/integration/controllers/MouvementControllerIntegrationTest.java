@@ -10,16 +10,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("integrationtest")
 public class MouvementControllerIntegrationTest {
 
     @Autowired
@@ -29,15 +41,19 @@ public class MouvementControllerIntegrationTest {
     private MouvementRepository mouvementRepository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mouvementRepository.deleteAll();
     }
 
     @Test
     public void testListAllMouvements() throws Exception {
+        // Define a specific date and time
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date specificDate = formatter.parse("2023-12-15 10:30:00");
+
         Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
+                .dateHeureMouvement(specificDate)
+                .statutSortie("Prévu")
                 .build();
         mouvementRepository.save(mouvement);
 
@@ -45,22 +61,29 @@ public class MouvementControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("mouvements/mouv_list"))
                 .andExpect(model().attributeExists("mouvements"))
-                .andExpect(model().attribute("mouvements", hasSize(1)));
+                .andExpect(model().attribute("mouvements", hasSize(1)))
+                .andExpect(model().attribute("mouvements", hasItem(
+                        hasProperty("statutSortie", is("Prévu"))
+                )));
     }
+
 
     @Test
     public void testViewMouvementById() throws Exception {
-        Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
-                .build();
-        mouvement = mouvementRepository.save(mouvement);
 
-        mockMvc.perform(get("/mouvements/view/{id}", mouvement.getId()))
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date specificDate = formatter.parse("2023-12-24 10:30:00");
+
+        Mouvement mouvement = Mouvement.builder()
+                .dateHeureMouvement(specificDate)
+                .statutSortie("Confirmé")
+                .build();
+        Mouvement savedMouvement = mouvementRepository.save(mouvement);
+
+        mockMvc.perform(get("/mouvements/view/{id}", savedMouvement.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("mouvements/mouv_details"))
-                .andExpect(model().attributeExists("mouvement"))
-                .andExpect(model().attribute("mouvement", hasProperty("statutSortie", is("Active"))));
+                .andExpect(model().attribute("mouvement", hasProperty("statutSortie", is("Confirmé"))));
     }
 
     @Test
@@ -68,67 +91,80 @@ public class MouvementControllerIntegrationTest {
         mockMvc.perform(get("/mouvements/create"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("mouvements/mouv_create"))
-                .andExpect(model().attributeExists("mouvement"));
+                .andExpect(model().attributeExists("mouvement"))
+                .andExpect(model().attributeExists("valises"))
+                .andExpect(model().attributeExists("allLivreurs"));
     }
 
     @Test
     public void testCreateMouvement() throws Exception {
         mockMvc.perform(post("/mouvements/create")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("dateHeureMouvement", "2024-11-26T10:00:00")
-                        .param("statutSortie", "Active"))
+                        .param("statutSortie", "Créé")
+                        .param("dateHeureMouvement", "2023-12-15 10:30:00")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/mouvements/mouv_list"));
+                .andExpect(redirectedUrl("/mouvements/list"));
 
-        Mouvement savedMouvement = mouvementRepository.findAll().get(0);
-        assert savedMouvement.getStatutSortie().equals("Active");
+        List<Mouvement> mouvements = mouvementRepository.findAll();
+        assertEquals(1, mouvements.size());
+        assertEquals("Créé", mouvements.get(0).getStatutSortie());
+        assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-12-15 10:30:00"), mouvements.get(0).getDateHeureMouvement());
     }
+
 
     @Test
     public void testEditMouvementForm() throws Exception {
         Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
+                .dateHeureMouvement(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-12-15 10:30:00"))
+                .statutSortie("Initial")
                 .build();
-        mouvement = mouvementRepository.save(mouvement);
+        mouvementRepository.save(mouvement);
 
         mockMvc.perform(get("/mouvements/edit/{id}", mouvement.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("mouvements/mouv_edit"))
                 .andExpect(model().attributeExists("mouvement"))
-                .andExpect(model().attribute("mouvement", hasProperty("statutSortie", is("Active"))));
+                .andExpect(model().attribute("mouvement", hasProperty("statutSortie", is("Initial"))));
     }
+
 
     @Test
     public void testUpdateMouvement() throws Exception {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date specificDate = formatter.parse("2024-12-15 10:30:00");
+
         Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
+                .dateHeureMouvement(specificDate)
+                .statutSortie("Prévu")
                 .build();
-        mouvement = mouvementRepository.save(mouvement);
+        Mouvement savedMouvement = mouvementRepository.save(mouvement);
 
-        mockMvc.perform(post("/mouvements/edit/{id}", mouvement.getId())
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("statutSortie", "Inactive"))
+        mockMvc.perform(post("/mouvements/edit/{id}", savedMouvement.getId())
+                        .param("statutSortie", "Modifié"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/mouvements/mouv_list"));
+                .andExpect(redirectedUrl("/mouvements/list"));
 
-        Mouvement updatedMouvement = mouvementRepository.findById(mouvement.getId()).orElse(null);
-        assert updatedMouvement != null;
-        assert updatedMouvement.getStatutSortie().equals("Inactive");
+        Mouvement updatedMouvement = mouvementRepository.findById(savedMouvement.getId()).orElseThrow();
+        assertEquals("Modifié", updatedMouvement.getStatutSortie());
     }
 
     @Test
     public void testDeleteMouvement() throws Exception {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date specificDate = formatter.parse("2023-12-15 10:30:00");
+
         Mouvement mouvement = Mouvement.builder()
-                .dateHeureMouvement(new Date())
-                .statutSortie("Active")
+                .dateHeureMouvement(specificDate)
+                .statutSortie("Supprimé")
                 .build();
-        mouvement = mouvementRepository.save(mouvement);
+        Mouvement savedMouvement = mouvementRepository.save(mouvement);
 
-        mockMvc.perform(post("/mouvements/delete/{id}", mouvement.getId()))
+        mockMvc.perform(post("/mouvements/delete/{id}", savedMouvement.getId()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/mouvements/mouv_list"));
+                .andExpect(redirectedUrl("/mouvements/list"));
 
-        assert mouvementRepository.findById(mouvement.getId()).isEmpty();
-    }}
+        assertTrue(mouvementRepository.findById(savedMouvement.getId()).isEmpty());
+    }
+}

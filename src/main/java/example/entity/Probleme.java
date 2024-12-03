@@ -37,7 +37,7 @@ public class Probleme {
 
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", nullable = true)
     private Client client;
 
 

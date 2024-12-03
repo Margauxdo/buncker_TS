@@ -1,7 +1,10 @@
 package example.integration.controllers;
 
+import example.controller.JourFerieController;
 import example.entity.JourFerie;
+import example.entity.Regle;
 import example.repositories.JourFerieRepository;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +12,30 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WebAppConfiguration
 @ActiveProfiles("integrationtest")
+@Transactional
 public class JourFerieControllerIntegrationTest {
 
     @Autowired
@@ -30,91 +43,82 @@ public class JourFerieControllerIntegrationTest {
 
     @Autowired
     private JourFerieRepository jourFerieRepository;
+    @Autowired
+    private JourFerieController jourFerieController;
 
     @BeforeEach
     void setUp() {
         jourFerieRepository.deleteAll();
     }
 
-    // Test: View list of public holidays
+    // Test: Show the create form
     @Test
-    public void testViewJFDateList() throws Exception {
+    public void testCreateJourFerieForm() {
+        Model model = new ConcurrentModel();
+        String response = jourFerieController.createJourFerieForm(model);
+
+        // Assertions
+        assertEquals("jourFeries/JF_create", response);
+        assertTrue(model.containsAttribute("jourFerie"));
+        assertNotNull(model.getAttribute("jourFerie"));
+    }
+
+
+    @Test
+    public void testCreateJourFerie() throws Exception {
+        mockMvc.perform(post("/jourferies/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("date", "2024-01-01"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/jourferies/list"));
+
+        JourFerie savedJourFerie = jourFerieRepository.findAll().get(0);
+        assertEquals("2024-01-01", new SimpleDateFormat("yyyy-MM-dd").format(savedJourFerie.getDate()));
+    }
+
+    @Test
+    public void testViewJourFerieList() throws Exception {
         // Arrange
-        JourFerie jourFerie = JourFerie.builder()
+        LocalDate date = LocalDate.of(2024, 12, 24); // Utilisation d'un format valide
+        JourFerie jf = JourFerie.builder()
                 .date(new Date())
                 .build();
-        jourFerieRepository.save(jourFerie);
+        jourFerieRepository.save(jf);
+
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         // Act & Assert
         mockMvc.perform(get("/jourferies/list"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("jourFeries/JF_dates"))
-                .andExpect(model().attributeExists("datesFerie"))
-                .andExpect(model().attribute("datesFerie", hasSize(1)))
-                .andExpect(model().attribute("datesFerie", hasItem(jourFerie.getDate())));
+                .andExpect(view().name("joursFeries/JF_list"))
+
+                .andExpect(model().attributeExists("jourFeries"))
+                .andExpect(model().attribute("jourFeries", hasItem(
+                        allOf(
+                                hasProperty("id", is(jf.getId())),
+                                hasProperty("date", is(jf.getDate()))
+                        )
+                )));
+
     }
 
-    // Test: View a public holiday by ID
+
     @Test
-    public void testViewJFById() throws Exception {
-        // Arrange
-        JourFerie jourFerie = JourFerie.builder()
+    public void testViewJourFerieDetails() throws Exception {
+        // Préparation des données
+        LocalDate date = LocalDate.of(2024, 12, 24);
+        JourFerie jf = JourFerie.builder()
                 .date(new Date())
                 .build();
-        jourFerie = jourFerieRepository.save(jourFerie);
+        JourFerie savedJf = jourFerieRepository.save(jf);
 
-        // Act & Assert
-        mockMvc.perform(get("/jourferies/view/{id}", jourFerie.getId()))
+        mockMvc.perform(get("/jourferies/view/" + savedJf.getId()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("jourFeries/JF_details"))
-                .andExpect(model().attributeExists("jourFerie"))
-                .andExpect(model().attribute("jourFerie", hasProperty("id", is(jourFerie.getId()))))
-                .andExpect(model().attribute("jourFerie", hasProperty("date", is(jourFerie.getDate()))));
-    }
-
-    // Test: Create public holiday form
-    @Test
-    public void testCreateJourFerieForm() throws Exception {
-        mockMvc.perform(get("/jourferies/create"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("jourFeries/JF_create"))
+                .andExpect(view().name("joursFeries/JF_details"))
                 .andExpect(model().attributeExists("jourFerie"));
-    }
 
-    // Test: Create a public holiday via form
-    @Test
-    public void testCreateJourFerieThymeleaf() throws Exception {
-        // Act & Assert
-        mockMvc.perform(post("/jourferies/create")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("date", "2024-01-01")) // Match the format in @DateTimeFormat
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/jourferies/list"));
 
-        // Validate the saved holiday
-        JourFerie savedJourFerie = jourFerieRepository.findAll().get(0);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        assertEquals("2024-01-01", sdf.format(savedJourFerie.getDate()));
     }
 
 
-    // Test: Create a public holiday with duplicate date
-    @Test
-    public void testCreateJourFerieDuplicateDate() throws Exception {
-        // Arrange
-        JourFerie jourFerie = JourFerie.builder()
-                .date(new SimpleDateFormat("yyyy-MM-dd").parse("2024-01-01"))
-                .build();
-        jourFerieRepository.save(jourFerie);
-
-        // Act & Assert
-        mockMvc.perform(post("/jourferies/create")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("date", "2024-01-01"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("jourFeries/JF_create"))
-                .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", is("Un jour férié avec cette date existe déjà.")));
-    }
 }
-

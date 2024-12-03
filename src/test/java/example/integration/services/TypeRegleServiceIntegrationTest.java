@@ -7,6 +7,7 @@ import example.repositories.TypeRegleRepository;
 import example.services.TypeRegleService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,8 +88,10 @@ public class TypeRegleServiceIntegrationTest {
             typeRegleService.createTypeRegle(typeRegle);
         });
 
-        assertEquals("Associated Regle must not be null", exception.getMessage());
+        assertEquals("La Regle associée ne peut pas être null", exception.getMessage(),
+                "Expected exception message does not match the actual message.");
     }
+
 
     @Test
     public void testUpdateTypeRegle_Success() {
@@ -121,11 +125,12 @@ public class TypeRegleServiceIntegrationTest {
     @Test
     public void testGetTypeRegle_Failure_NotFound() {
         // Act
-        TypeRegle fetchedTypeRegle = typeRegleService.getTypeRegle(999);
+        Optional<TypeRegle> fetchedTypeRegle = typeRegleService.getTypeRegle(999);
 
         // Assert
-        assertNull(fetchedTypeRegle, "TypeRegle with ID 999 should not exist.");
+        Assertions.assertTrue(fetchedTypeRegle.isEmpty(), "TypeRegle with ID 999 should not exist.");
     }
+
 
     @Test
     public void testGetAllTypeRegles() {
@@ -172,8 +177,10 @@ public class TypeRegleServiceIntegrationTest {
             typeRegleService.deleteTypeRegle(999);
         });
 
-        assertEquals("TypeRegle not found", exception.getMessage());
+        assertEquals("TypeRegle avec l'ID 999 est introuvable", exception.getMessage(),
+                "Expected exception message does not match the actual message.");
     }
+
 
 
     @Test

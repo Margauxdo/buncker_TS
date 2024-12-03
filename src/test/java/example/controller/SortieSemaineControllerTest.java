@@ -86,17 +86,22 @@ public class SortieSemaineControllerTest {
     @Test
     public void testViewSortieSemaineById_NotFound() {
         // Arrange
-        when(sortieSemaineService.getSortieSemaine(1)).thenReturn(null);
+        int id = 1;
+        when(sortieSemaineService.getSortieSemaine(id)).thenReturn(null); // Simulate the entity not found
+
         Model model = new ConcurrentModel();
 
         // Act
-        String response = sortieSemaineController.viewSortieSemaineById(1, model);
+        String response = sortieSemaineController.viewSortieSemaineById(id, model);
 
         // Assert
-        assertEquals("sortieSemaines/error", response);
-        assertTrue(model.containsAttribute("errormessage"));
-        assertEquals("sortieSemaine avec l'Id1non trouvé", model.getAttribute("errormessage"));
+        assertEquals("sortieSemaines/error", response, "Expected error view name when SortieSemaine is not found.");
+        assertTrue(model.containsAttribute("errormessage"), "Model should contain the error message attribute.");
+        assertEquals("SortieSemaine avec l'Id " + id + " non trouvée", model.getAttribute("errormessage"),
+                "The error message in the model is incorrect.");
+        verify(sortieSemaineService, times(1)).getSortieSemaine(id); // Ensure service method was called
     }
+
 
     // **Test: Formulaire de création d'une semaine**
     @Test
@@ -175,11 +180,17 @@ public class SortieSemaineControllerTest {
     // **Test: Supprimer une semaine - Succès**
     @Test
     public void testDeleteSortieSemaine_Success() {
+        // Arrange
+        doNothing().when(sortieSemaineService).deleteSortieSemaine(1); // Simulate deletion in the service
+
         // Act
-        String response = sortieSemaineController.deleteSortieSemaine(1);
+        String response = sortieSemaineController.deleteSortieSemaine(1); // Call the controller method
 
         // Assert
-        assertEquals("redirect:/sortieSemaines/SS_list", response);
-        verify(sortieSemaineService, times(1)).deleteSortieSemaine(1);
+        assertEquals("redirect:/sortieSemaines/SS_list", response, "The redirection URL is incorrect."); // Update the expected value
+        verify(sortieSemaineService, times(1)).deleteSortieSemaine(1); // Verify that the service method was called once
     }
+
+
+
 }

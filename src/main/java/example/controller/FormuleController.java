@@ -1,24 +1,25 @@
 package example.controller;
 
 import example.entity.Formule;
+import example.entity.Regle;
 import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
+import example.services.RegleService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ConcurrentModel;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
-@RestController
+@Controller
 @RequestMapping("/formules")
 public class FormuleController {
 
@@ -26,82 +27,25 @@ public class FormuleController {
     private IFormuleService formuleService;
 
     @Autowired
-    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(FormuleController.class);
+    @Autowired
+    private RegleService regleService;
 
     @ExceptionHandler(FormuleNotFoundException.class)
     public ResponseEntity<String> handleFormuleNotFoundException(FormuleNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
         return new ResponseEntity<>("Invalid data for Formula creation", HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public String handleEntityNotFoundException(EntityNotFoundException ex, Model model) {
         model.addAttribute("errorMessage", ex.getMessage());
         return "formules/error";
     }
-
-
-/*
-    // API REST: Récupérer tous les formules
-    @GetMapping("/api")
-    public List<Formule> getAllFormulesApi() {
-        List<Formule> formules = formuleService.getAllFormules();
-        return new ResponseEntity<>(formules, HttpStatus.OK).getBody();
-    }
-
-    // API REST: Récupérer une formule par ID
-    @GetMapping("/api/{id}")
-    public ResponseEntity<Formule> getFormuleByIdApi(@PathVariable int id) {
-        Formule formule = formuleService.getFormuleById(id);
-        return formule != null ? new ResponseEntity<>(formule, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    // API REST: Créer une formule
-    @PostMapping("/api")
-    public ResponseEntity<Formule> createFormuleApi(@Valid @RequestBody Formule formule) {
-
-
-        try {
-            Formule createdFormule = formuleService.createFormule(formule);
-            return new ResponseEntity<>(createdFormule, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } catch (RuntimeException e) {
-        logger.error("Erreur inattendue lors de la création de la formule : ", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
-
-
-}
-
-    // API REST: Modifier une formule
-    @PutMapping("/api/{id}")
-    public ResponseEntity<Formule> updateFormuleApi(@PathVariable int id, @RequestBody Formule formule) {
-        try {
-            Formule updatedFormule = formuleService.updateFormule(id, formule);
-            return updatedFormule != null ? new ResponseEntity<>(updatedFormule, HttpStatus.OK)
-                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // API REST: Supprimer une formule
-    @DeleteMapping("/api/{id}")
-    public ResponseEntity<Formule> deleteFormuleApi(@PathVariable int id) {
-        try {
-            formuleService.deleteFormule(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }*/
 
     // Vue Thymeleaf pour lister les formules
     @GetMapping("/list")
@@ -109,16 +53,14 @@ public class FormuleController {
         model.addAttribute("formules", formuleService.getAllFormules());
         return "formules/formule_list";
     }
+
     // Vue Thymeleaf pour voir une formule par ID
     @GetMapping("/view/{id}")
     public String viewFormuleById(@PathVariable int id, Model model) {
-        Formule formule = formuleService.getFormuleById(id);
-        if (formule == null) {
-            throw new EntityNotFoundException("Formule avec l'Id " + id + " n'existe pas !");
-        }
-        model.addAttribute("formule", formule);
+        model.addAttribute("formule", formuleService.getFormuleById(id));
         return "formules/formule_detail";
     }
+
 
 
 
@@ -131,45 +73,78 @@ public class FormuleController {
 
     // Création d'une formule via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createFormule(@Valid @ModelAttribute("formule") Formule formule,Model model){
+    public String createFormule(@Valid @ModelAttribute("formule") Formule formule,
+                                @RequestParam(value = "regle.id", required = false) Integer regleId, Model model) {
         try {
+            if (regleId != null) {
+                Regle regle = regleService.getRegleById(regleId);
+                formule.setRegle(regle);
+            } else {
+                throw new IllegalArgumentException("A valid Regle must be provided.");
+            }
             formuleService.createFormule(formule);
             return "redirect:/formules/list";
-        } catch (IllegalArgumentException e) {
-            // Ajouter le message d'erreur au modèle
+        } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "formules/formule_create";
         }
     }
+
+
 
     // Formulaire Thymeleaf pour modifier une formule
     @GetMapping("/edit/{id}")
     public String editFormuleForm(@PathVariable int id, Model model) {
         Formule formule = formuleService.getFormuleById(id);
         if (formule == null) {
-            return "formules/error";
+            throw new EntityNotFoundException("Formule with ID " + id + " does not exist.");
         }
         model.addAttribute("formule", formule);
         return "formules/formule_edit";
     }
 
+
     // Modifier une formule via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
-    public String updateFormule(@PathVariable int id, @Valid @ModelAttribute("formule") Formule formule) {
-        formuleService.updateFormule(id, formule);
-        return "redirect:/formules/list";
+    public String updateFormule(@PathVariable int id, @Valid @ModelAttribute("formule") Formule formule,
+                                @RequestParam(value = "regle.id", required = false) Integer regleId, Model model) {
+        try {
+            if (regleId != null) {
+                Regle regle = regleService.getRegleById(regleId);
+                formule.setRegle(regle);
+            }
+            formuleService.updateFormule(id, formule);
+            return "redirect:/formules/list";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "Formule not found.");
+            return "formules/formule_edit";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error updating formule.");
+            return "formules/formule_edit";
+        }
+
     }
+
+
+
+
+
+
 
     // Supprimer une formule via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
-    public String deleteFormule(@PathVariable int id) {
-        System.out.println("Deleting Formule with ID: " + id);
-        formuleService.deleteFormule(id);
-        return "redirect:/formules/list";
+    public ResponseEntity<Void> deleteFormule(@PathVariable int id, RedirectAttributes redirectAttributes) {
+        try {
+            formuleService.deleteFormule(id);
+            return ResponseEntity.status(HttpStatus.FOUND).header("Location", "/formules/list").build();
+        } catch (FormuleNotFoundException ex) {
+            logger.error("Error deleting Formule with ID: {}", id, ex);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            logger.error("Unexpected error deleting Formule with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
-
-
 
 
 }

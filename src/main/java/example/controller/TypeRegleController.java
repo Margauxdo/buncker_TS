@@ -1,23 +1,29 @@
 package example.controller;
 
+import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.interfaces.ITypeRegleService;
+import example.repositories.RegleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/typeRegle")
 public class TypeRegleController {
 
     @Autowired
     private ITypeRegleService typeRegleService;
+    @Autowired
+    private RegleRepository regleRepository;
 
     /*// API REST: Récupérer tous les TR
     @GetMapping("/api")
@@ -77,14 +83,16 @@ public class TypeRegleController {
     // Vue Thymeleaf pour lister les TR
     @GetMapping("/list")
     public String viewAllTypeRegles(Model model) {
-        model.addAttribute("typeRegle", typeRegleService.getTypeRegles());
+        List<TypeRegle> typeRegles = typeRegleService.getTypeRegles(); // Méthode pour récupérer les types de règle
+        model.addAttribute("typeRegles", typeRegles);
         return "typeRegles/TR_list";
     }
+
 
     // Vue Thymeleaf pour voir un TR par ID
     @GetMapping("/view/{id}")
     public String viewTypeRegleById(@PathVariable int id, Model model) {
-        TypeRegle typeRegle = typeRegleService.getTypeRegle(id);
+        Optional<TypeRegle> typeRegle = typeRegleService.getTypeRegle(id);
         if (typeRegle == null) {
             model.addAttribute("errorMessage", "typeRegle avec l'Id" + id + " non trouve !");
             return "typeRegles/error";
@@ -102,14 +110,21 @@ public class TypeRegleController {
 
     // Création d'un client via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createTypeRegle(@Valid @ModelAttribute("typeRegle") TypeRegle typeRegle) {
+    public ResponseEntity<Void> createTypeRegle(@Valid @ModelAttribute("typeRegle") TypeRegle typeRegle) {
         typeRegleService.createTypeRegle(typeRegle);
-        return "redirect:/typeRegles/TR_list";
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", "/typeRegles/TR_list")
+                .build();
     }
+
+
+
+
+
     // Formulaire Thymeleaf pour modifier un TR
     @GetMapping("/edit/{id}")
     public String editTypeRegleForm(@PathVariable int id, Model model) {
-        TypeRegle typeRegle = typeRegleService.getTypeRegle(id);
+        Optional<TypeRegle> typeRegle = typeRegleService.getTypeRegle(id);
         if (typeRegle  == null) {
             return "typeRegles/error";
         }
@@ -119,10 +134,30 @@ public class TypeRegleController {
 
     // Modifier un TR via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
-    public String updateTypeRegle(@PathVariable int id,@Valid @ModelAttribute("typeRegle") TypeRegle typeRegle) {
+    public String updateTypeRegle(@PathVariable int id,
+                                  @RequestParam("nomTypeRegle") String nomTypeRegle,
+                                  @RequestParam("regle") int regleId) {
+        // Fetch the associated Regle
+        Regle regle = regleRepository.findById(regleId)
+                .orElseThrow(() -> new EntityNotFoundException("La règle avec l'ID " + regleId + " est introuvable"));
+
+        // Create the updated TypeRegle object
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setId(id);
+        typeRegle.setNomTypeRegle(nomTypeRegle);
+        typeRegle.setRegle(regle);
+
+        // Update the TypeRegle using the service
         typeRegleService.updateTypeRegle(id, typeRegle);
+
+        // Log redirection
+        System.out.println("Redirecting to /typeRegles/TR_list");
+
+        // Return a redirect view
         return "redirect:/typeRegles/TR_list";
     }
+
+
     // Supprimer un TR via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteTypeRegle(@PathVariable int id, Model model) {

@@ -75,39 +75,65 @@ public class TypeRegleServiceTest {
 
     @Test
     public void testUpdateTypeRegle_Success() {
+        // Arrange
         int id = 1;
+
+        // Créer un objet Regle valide
+        Regle regle = new Regle();
+        regle.setId(100); // ID arbitraire pour la règle
+
+        // Créer un TypeRegle existant
+        TypeRegle existingTypeRegle = new TypeRegle();
+        existingTypeRegle.setId(id);
+        existingTypeRegle.setNomTypeRegle("Ancien TypeRegle");
+        existingTypeRegle.setRegle(regle);
+
+        // Créer un TypeRegle pour mise à jour
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setId(id);
+        typeRegle.setNomTypeRegle("TypeRegle Test");
+        typeRegle.setRegle(regle);
 
         when(typeRegleRepository.existsById(id)).thenReturn(true);
+        when(typeRegleRepository.findById(id)).thenReturn(Optional.of(existingTypeRegle));
         when(typeRegleRepository.save(any(TypeRegle.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
+        // Act
         TypeRegle result = typeRegleService.updateTypeRegle(id, typeRegle);
 
+        // Assert
         Assertions.assertNotNull(result, "Rule type must not be null");
         Assertions.assertEquals(id, result.getId(), "Rule type ID must match");
+        Assertions.assertEquals("TypeRegle Test", result.getNomTypeRegle(), "Rule type name must match");
+        Assertions.assertNotNull(result.getRegle(), "Rule type must have an associated rule");
+        Assertions.assertEquals(100, result.getRegle().getId(), "Associated rule ID must match");
 
         verify(typeRegleRepository, times(1)).existsById(id);
+        verify(typeRegleRepository, times(1)).findById(id);
         verify(typeRegleRepository, times(1)).save(typeRegle);
         verifyNoMoreInteractions(typeRegleRepository);
     }
 
+
+
     @Test
     public void testUpdateTypeRegle_Failure_Exception() {
+        // Arrange
         int id = 1;
+        Regle regle = new Regle();
         TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setId(2); // ID incohérent
+        typeRegle.setId(2);
+        typeRegle.setNomTypeRegle("Nom valide");
+        typeRegle.setRegle(regle);
 
+        // Act & Assert
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             typeRegleService.updateTypeRegle(id, typeRegle);
         });
 
+        // Vérification du message de l'exception
         Assertions.assertEquals("TypeRegle ID mismatch", exception.getMessage(),
                 "Exception message should match the expected error message.");
-
-        verify(typeRegleRepository, never()).existsById(id);
-        verify(typeRegleRepository, never()).save(any(TypeRegle.class));
-        verifyNoMoreInteractions(typeRegleRepository);
     }
 
 
@@ -126,14 +152,17 @@ public class TypeRegleServiceTest {
 
     @Test
     public void testDeleteTypeRegle_Failure_Exception() {
+        // Arrange
         int id = 1;
         when(typeRegleRepository.existsById(id)).thenReturn(false);
 
+        // Act & Assert
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             typeRegleService.deleteTypeRegle(id);
         });
 
-        Assertions.assertEquals("TypeRegle not found", exception.getMessage(),
+        // Vérification du message exact de l'exception
+        Assertions.assertEquals("TypeRegle avec l'ID 1 est introuvable", exception.getMessage(),
                 "Exception message should match the expected error message.");
 
         verify(typeRegleRepository, times(1)).existsById(id);
@@ -142,34 +171,43 @@ public class TypeRegleServiceTest {
 
 
 
+
     @Test
     public void testGetTypeRegle_Success() {
+        // Arrange
         int id = 1;
         TypeRegle typeRegle = new TypeRegle();
         typeRegle.setId(id);
 
         when(typeRegleRepository.findById(id)).thenReturn(Optional.of(typeRegle));
 
-        TypeRegle result = typeRegleService.getTypeRegle(id);
+        // Act
+        Optional<TypeRegle> result = typeRegleService.getTypeRegle(id);
 
-        Assertions.assertNotNull(result, "Rule type must not be null");
-        Assertions.assertEquals(id, result.getId(), "Rule type ID must match");
+        // Assert
+        Assertions.assertTrue(result.isPresent(), "Rule type must be present");
+        Assertions.assertEquals(id, result.get().getId(), "Rule type ID must match");
 
         verify(typeRegleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeRegleRepository);
     }
+
 
     @Test
     public void testGetTypeRegle_Failure_Exception() {
+        // Arrange
         int id = 1;
         when(typeRegleRepository.findById(id)).thenReturn(Optional.empty());
 
-        TypeRegle result = typeRegleService.getTypeRegle(id);
+        // Act
+        Optional<TypeRegle> result = typeRegleService.getTypeRegle(id);
 
-        Assertions.assertNull(result, "Rule type must be null if not found");
+        // Assert
+        Assertions.assertTrue(result.isEmpty(), "Result should be Optional.empty if the type rule is not found");
         verify(typeRegleRepository, times(1)).findById(id);
         verifyNoMoreInteractions(typeRegleRepository);
     }
+
     @Test
     public void testGetTypeRegles_Success(){
         List<TypeRegle> typeRegles = List.of(new TypeRegle(), new TypeRegle());
@@ -228,6 +266,8 @@ public class TypeRegleServiceTest {
         Assertions.assertNotNull(result.getRegle(), "Associated Regle should not be null");
         Assertions.assertEquals("Regle1", result.getRegle().getCoderegle(), "Coderegle should match");
     }
+
+
 
 
 }

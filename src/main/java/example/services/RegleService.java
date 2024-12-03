@@ -81,10 +81,21 @@ public class RegleService implements IRegleService {
 
 
 
+
     @Override
     public boolean regleExists(String coderegle) {
         return regleRepository.existsByCoderegle("code regle");
     }
+
+
+    public Regle getRegleById(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Regle ID cannot be null");
+        }
+        return regleRepository.findById(id)
+                .orElseThrow(() -> new RegleNotFoundException("Regle not found with ID " + id));
+    }
+
 
 
 }

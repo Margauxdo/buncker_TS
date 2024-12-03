@@ -2,6 +2,8 @@ package example.controller;
 
 import example.entity.Mouvement;
 import example.interfaces.IMouvementService;
+import example.services.LivreurService;
+import example.services.ValiseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,11 +23,20 @@ public class MouvementControllerTest {
     private MouvementController mouvementController;
 
     @Mock
+    private ValiseService valiseService;
+
+    @Mock
+    private LivreurService livreurService;
+
+    @Mock
     private IMouvementService mouvementService;
+    private Model model;
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.openMocks(this);
+        model = new ConcurrentModel();
     }
 
     // Test : Lister tous les mouvements - Succès
@@ -77,27 +88,41 @@ public class MouvementControllerTest {
     // Test : Formulaire de création de mouvement
     @Test
     public void testCreateMouvementForm() {
-        Model model = new ConcurrentModel();
+        // Mock the behavior of dependencies
+        when(valiseService.getAllValises()).thenReturn(List.of());
+        when(livreurService.getAllLivreurs()).thenReturn(List.of());
+
+        // Execute the controller method
         String response = mouvementController.createMouvementForm(model);
 
+        // Assert the results
         assertEquals("mouvements/mouv_create", response);
         assertTrue(model.containsAttribute("mouvement"));
+        assertTrue(model.containsAttribute("valises"));
+        assertTrue(model.containsAttribute("allLivreurs"));
         assertNotNull(model.getAttribute("mouvement"));
     }
 
     // Test : Création de mouvement - Succès
     @Test
     public void testCreateMouvement_Success() {
+        // Arrange
         Mouvement mouvement = new Mouvement();
         mouvement.setStatutSortie("En cours");
         mouvement.setDateHeureMouvement(new java.util.Date());
         when(mouvementService.createMouvement(any(Mouvement.class))).thenReturn(mouvement);
 
-        String response = mouvementController.createMouvementThymeleaf(mouvement);
+        // Mocking the Model object
+        Model model = mock(Model.class);
 
-        assertEquals("redirect:/mouvements/mouv_list", response);
+        // Act
+        String response = mouvementController.createMouvementThymeleaf(mouvement, model);
+
+        // Assert
+        assertEquals("redirect:/mouvements/list", response); // Corrected the redirect URL
         verify(mouvementService, times(1)).createMouvement(mouvement);
     }
+
 
     // Test : Formulaire de modification de mouvement - Succès
     @Test
@@ -132,17 +157,23 @@ public class MouvementControllerTest {
     // Test : Mise à jour de mouvement - Succès
     @Test
     public void testUpdateMouvement_Success() {
+        // Arrange
         Mouvement mouvement = new Mouvement();
         mouvement.setId(1);
         mouvement.setStatutSortie("Finalisé");
 
+        // Mocking the service and model
         when(mouvementService.updateMouvement(1, mouvement)).thenReturn(mouvement);
+        Model model = mock(Model.class);
 
-        String response = mouvementController.updateMouvement(1, mouvement);
+        // Act
+        String response = mouvementController.updateMouvement(1, mouvement, model);
 
-        assertEquals("redirect:/mouvements/mouv_list", response);
+        // Assert
+        assertEquals("redirect:/mouvements/list", response); // Corrected the redirect URL
         verify(mouvementService, times(1)).updateMouvement(1, mouvement);
     }
+
 
     // Test : Suppression de mouvement - Succès
     @Test

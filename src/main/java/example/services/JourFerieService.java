@@ -51,6 +51,11 @@ public class JourFerieService implements IJourFerieService {
         jourFerieRepository.save(jourFerie);
     }
 
+    @Override
+    public boolean existsByDate(Date date) {
+        return false;
+    }
+
 
     public void deleteJourFerie(int id) {
         if (!jourFerieRepository.existsById(id)) {

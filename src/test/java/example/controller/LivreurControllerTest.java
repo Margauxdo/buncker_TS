@@ -2,6 +2,7 @@
 package example.controller;
 
 import example.entity.Livreur;
+import example.entity.Mouvement;
 import example.exceptions.ConflictException;
 import example.interfaces.ILivreurService;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,10 +103,11 @@ public class LivreurControllerTest {
         Model model = new ConcurrentModel();
         String response = livreurController.createLivreur(livreur, model);
 
-        assertEquals("livreurs/livreur_create", response);
-        assertTrue(model.containsAttribute("errorMessage"));
-        assertEquals("Un conflit s'est produit lors de la création du livreur.", model.getAttribute("errorMessage"));
+        assertEquals("livreurs/livreur_create", response); // Vérifie la redirection
+        assertTrue(model.containsAttribute("errorMessage")); // Vérifie la présence du message d'erreur
+        assertEquals("Une erreur inattendue s'est produite.", model.getAttribute("errorMessage")); // Vérifie le message renvoyé
     }
+
 
     @Test
     public void testEditLivreurForm_Success() {
@@ -124,18 +126,27 @@ public class LivreurControllerTest {
 
     @Test
     public void testUpdateLivreur_Success() {
+        // Arrange: Create a valid Livreur object
         Livreur livreur = new Livreur();
         livreur.setId(1);
         livreur.setNomLivreur("Updated Name");
+        livreur.setMouvement(new Mouvement());
+        livreur.getMouvement().setId(1);
 
         when(livreurService.updateLivreur(1, livreur)).thenReturn(livreur);
 
+        // Prepare a Model object to pass to the controller
         Model model = new ConcurrentModel();
+
+        // Act: Call the update method
         String response = livreurController.updateLivreur(1, livreur, model);
 
-        assertEquals("redirect:/livreurs/list", response);
+        // Assert: Verify the results
+        assertEquals("redirect:/livreurs/list", response, "Expected redirection to the livreurs list page.");
         verify(livreurService, times(1)).updateLivreur(1, livreur);
+        assertFalse(model.containsAttribute("errorMessage"), "No error message should be present in the model.");
     }
+
 
     @Test
     public void testDeleteLivreur_Success() {

@@ -4,19 +4,31 @@ import example.entity.SortieSemaine;
 import example.interfaces.ISortieSemaineService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/sortieSemaine")
 public class SortieSemaineController {
 
     @Autowired
     private ISortieSemaineService sortieSemaineService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+    }
 
     /*// API REST: Récupérer tous les SS
     @GetMapping("/api")
@@ -88,10 +100,16 @@ public class SortieSemaineController {
     public String viewSortieSemaineById(@PathVariable int id, Model model) {
         SortieSemaine semaine = sortieSemaineService.getSortieSemaine(id);
         if (semaine == null) {
-            model.addAttribute("errormessage", "sortieSemaine avec l'Id" + id + "non trouvé");
+            model.addAttribute("errormessage", "SortieSemaine avec l'Id " + id + " non trouvée");
             return "sortieSemaines/error";
         }
+
+        String regleDescription = semaine.getRegle() != null
+                ? "Règle : " + semaine.getRegle().getCoderegle() // ou une autre propriété pertinente
+                : "Aucune règle associée";
         model.addAttribute("sortieSemaine", semaine);
+        model.addAttribute("regleDescription", regleDescription);
+
         return "sortieSemaines/SS_details";
     }
 
@@ -123,15 +141,19 @@ public class SortieSemaineController {
     // Modifier un SS via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
     public String updateSortieSemaine(@PathVariable int id, @Valid @ModelAttribute("sortieSemaine") SortieSemaine sortieSemaine) {
+        System.out.println("Date reçue : " + sortieSemaine.getDateSortieSemaine());
         sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
         return "redirect:/sortieSemaines/SS_list";
     }
+
     // Supprimer un SS via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteSortieSemaine(@PathVariable int id) {
         sortieSemaineService.deleteSortieSemaine(id);
-        return "redirect:/sortieSemaines/list";
+        return "redirect:/sortieSemaines/SS_list";
     }
+
+
 
 
 

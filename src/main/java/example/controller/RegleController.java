@@ -6,16 +6,22 @@ import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.FormuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/regles")
 @Validated
 public class RegleController {
@@ -25,6 +31,12 @@ public class RegleController {
 
     @Autowired
     private FormuleRepository formuleRepository;
+
+    @ExceptionHandler(RegleNotFoundException.class)
+    public String handleRegleNotFoundException(RegleNotFoundException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "regles/error";
+    }
 
     /*// API REST: Récupérer tous les regles
     @GetMapping("/api")
@@ -99,6 +111,13 @@ public class RegleController {
         }
     }*/
 
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+    }
+
     // Vue Thymeleaf pour lister les regles
     @GetMapping("/list")
     public String viewAllRegles(Model model) {
@@ -110,7 +129,7 @@ public class RegleController {
     public String viewRegle(@PathVariable int id, Model model) {
         Regle regle = regleService.readRegle(id);
         if (regle == null) {
-            return "regles/error";
+            throw new RegleNotFoundException("Regle with ID " + id + " not found.");
         }
         model.addAttribute("regle", regle);
         return "regles/regle_details";
@@ -126,9 +145,13 @@ public class RegleController {
     // Création d'une regle via formulaire Thymeleaf
     @PostMapping("/create")
     public String createRegle(@Valid @ModelAttribute("regle") Regle regle) {
+        if (regle.getTypeRegle() == null) {
+            throw new IllegalArgumentException("TypeRegle must be associated with a Regle");
+        }
         regleService.createRegle(regle);
-        return "redirect:/regles/regle_list";
+        return "redirect:/regles/list"; // Ensure redirection matches the expectation in the test
     }
+
     // Formulaire Thymeleaf pour modifier une regle
     @GetMapping("/edit/{id}")
     public String editRegleForm(@PathVariable int id, Model model) {
@@ -150,8 +173,11 @@ public class RegleController {
     @PostMapping("/delete/{id}")
     public String deleteRegle(@PathVariable int id) {
         regleService.deleteRegle(id);
-        return "redirect:/regles/regle_list";
+        return "redirect:/regles/list"; // Update to match test expectation
     }
+
+
+
 
 
 

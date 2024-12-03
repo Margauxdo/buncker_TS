@@ -11,14 +11,16 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 import static example.services.ValiseService.logger;
 
-@RestController
+@Controller
 @RequestMapping("/valise")
 public class ValiseController {
 
@@ -104,20 +106,19 @@ public class ValiseController {
     // Vue Thymeleaf pour lister les valises
     @GetMapping("/list")
     public String viewValises(Model model) {
-        model.addAttribute("valises", valiseService.getAllValises());
-        return "valises/valises_list";
+        List<Valise> valises = valiseService.getAllValises();
+        model.addAttribute("valises", valises);
+        return "valises/valises_list"; // Ensure this matches the Thymeleaf template location
     }
+
     // Vue Thymeleaf pour voir une valise par ID
     @GetMapping("/view/{id}")
     public String viewValise(@PathVariable int id, Model model) {
         Valise valise = valiseService.getValiseById(id);
-        if (valise == null) {
-            model.addAttribute("errorMessage", "Valise avec l'Id" + id + "non trouve");
-            return "valises/error";
-        }
         model.addAttribute("valise", valise);
         return "valises/valise_details";
     }
+
     // Formulaire Thymeleaf pour créer une valise
     @GetMapping("/create")
     public String createValiseForm(Model model) {
@@ -127,10 +128,30 @@ public class ValiseController {
 
     // Création d'une valise via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createValise(@Valid  @ModelAttribute("valise") Valise valise) {
-        valiseService.createValise(valise);
-        return "redirect:/valise/list";
+    public String createValise(
+            @Valid @ModelAttribute("valise") Valise valise,
+            BindingResult result,
+            Model model
+    ) {
+        if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            return "valises/valise_create"; // Ensure this path is correct
+        }
+        try {
+            boolean exists = valiseService.getAllValises().stream()
+                    .anyMatch(existingValise -> existingValise.getNumeroValise().equals(valise.getNumeroValise()));
+            if (exists) {
+                model.addAttribute("errorMessage", "Une valise avec ce numéro de valise existe déjà.");
+                return "valises/valise_create";
+            }
+            valiseService.persistValise(valise);
+            return "redirect:/valise/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
+            return "valises/valise_create";
+        }
     }
+
 
     // Formulaire Thymeleaf pour modifier une valise
     @GetMapping("/edit/{id}")

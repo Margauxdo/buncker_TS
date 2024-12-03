@@ -48,10 +48,10 @@
 
 <form th:action="@{/formules/create}" th:object="${formule}" method="post">
     <label for="libelle">Libellé:</label>
-    <input type="text" id="libelle" th:field="*{formule.libelle}" required />
+    <input type="text" id="libelle" th:field="*{libelle}" required />
 
-    <label for="description">Description:</label>
-    <input type="text" id="description" th:field="*{formule.description}" required />
+    <label for="formule">Description:</label>
+    <input type="text" id="formule" th:field="*{formule}" required />
 
     <label for="regle">Code règle:</label>
     <input type="text" id="regle" th:field="*{regle.coderegle}" required />

@@ -4,41 +4,16 @@
     <meta charset="UTF-8">
     <title>Modifier une formule</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f8f9fa;
-        }
-
-        button {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: 1px solid #ccc;
-            background-color: #f8f9fa;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #e2e6ea;
-        }
-
-        button[type="submit"][style*="color: red;"] {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
-        }
-
-        button[type="submit"][style*="color: red;"]:hover {
-            background-color: #f1b0b7;
+        h1 {
+            text-align: center;
+            margin-top: 20px;
         }
 
         form {
@@ -47,7 +22,8 @@
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #f8f9fa;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         label {
@@ -56,33 +32,63 @@
             font-weight: bold;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a.button {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        a.button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
-<h1 style="text-align: center;">Modifier une formule</h1>
+<h1>Modifier une formule</h1>
 
 <form th:action="@{/formules/edit/{id}(id=${formule.id})}" th:object="${formule}" method="post">
     <label for="libelle">Libellé :</label>
-    <input type="text" id="libelle" th:field="*{formule.libelle}" required />
+    <input type="text" id="libelle" th:field="*{libelle}" required />
 
-    <label for="description">Description :</label>
-    <input type="text" id="description" th:field="*{formule.description}" required />
+    <label for="formule">Description :</label>
+    <input type="text" id="formule" th:field="*{formule}" required />
 
-    <label for="regle">Code de la règle :</label>
-    <input type="text" id="regle" th:field="*{regle.coderegle}" required />
+    <!-- Sélection de la règle associée -->
+    <label for="regle">Règle associée :</label>
+    <select id="regle" th:field="*{regle.id}">
+        <option th:each="regle : ${regles}" th:value="${regle.id}"
+                th:text="${regle.coderegle}"
+                th:selected="${formule.regle != null and formule.regle.id == regle.id}">Sélectionnez une règle</option>
+    </select>
 
     <div style="text-align: center;">
         <button type="submit">Modifier</button>
-        <a th:href="@{/formules/list}">
-            <button type="button">Retour à la liste</button>
-        </a>
+        <a th:href="@{/formules/list}" class="button">Retour à la liste</a>
     </div>
 </form>
 

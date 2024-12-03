@@ -57,7 +57,7 @@
     <tr>
         <th>ID</th>
         <th>Libellé</th>
-        <th>Description</th>
+        <th>Formule</th>
         <th>Code Règle</th>
         <th>Actions</th>
     </tr>
@@ -67,8 +67,8 @@
     <tr th:each="formule : ${formules}">
         <td th:text="${formule.id}"></td>
         <td th:text="${formule.libelle}"></td>
-        <td th:text="${formule.description}"></td>
-        <td th:text="${formule.regle.coderegle}"></td>
+        <td th:text="${formule.formule}"></td>
+        <td th:text="${formule.regle?.coderegle}"></td>
         <td>
             <!-- Bouton pour Voir -->
             <form th:action="@{/formules/view/{id}(id=${formule.id})}" method="get" style="display:inline;">

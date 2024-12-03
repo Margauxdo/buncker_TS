@@ -54,10 +54,11 @@
     </select>
 
     <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valise.id}">
+    <select id="valise" th:field="*{valise.id}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
+        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.description}"></option>
     </select>
+
 
     <div class="action-buttons">
         <button type="submit">Créer</button>

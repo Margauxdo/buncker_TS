@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/mouvements")
 public class MouvementController {
 
@@ -127,9 +128,16 @@ public class MouvementController {
 
     // Création d'un mouvement via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createMouvementThymeleaf(@Valid @ModelAttribute("mouvement") Mouvement mouvement) {
-        mouvementService.createMouvement(mouvement);
-        return "redirect:/mouvements/mouv_list";
+    public String createMouvementThymeleaf(@Valid @ModelAttribute("mouvement") Mouvement mouvement, Model model) {
+        try {
+            mouvementService.createMouvement(mouvement);
+            return "redirect:/mouvements/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Failed to create Mouvement: " + e.getMessage());
+            model.addAttribute("valises", valiseService.getAllValises());
+            model.addAttribute("allLivreurs", livreurService.getAllLivreurs());
+            return "mouvements/mouv_create";
+        }
     }
 
     // Formulaire Thymeleaf pour modifier un mouvement
@@ -146,20 +154,25 @@ public class MouvementController {
 
 
     @PostMapping("/edit/{id}")
-    public String updateMouvement(@PathVariable int id, @Valid @ModelAttribute("mouvement") Mouvement mouvement){
-        mouvementService.updateMouvement(id, mouvement);
-        return "redirect:/mouvements/mouv_list";
+    public String updateMouvement(@PathVariable int id, @Valid @ModelAttribute("mouvement") Mouvement mouvement, Model model) {
+        try {
+            mouvementService.updateMouvement(id, mouvement);
+            return "redirect:/mouvements/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Failed to update Mouvement: " + e.getMessage());
+            model.addAttribute("valises", valiseService.getAllValises());
+            model.addAttribute("allLivreurs", livreurService.getAllLivreurs());
+            return "mouvements/mouv_edit";
+        }
     }
+        @PostMapping("/delete/{id}")
+        public String deleteMouvement ( @PathVariable int id){
+            mouvementService.deleteMouvement(id);
+            return "redirect:/mouvements/mouv_list";
+        }
 
-    @PostMapping("/delete/{id}")
-    public String deleteMouvement(@PathVariable int id) {
-        mouvementService.deleteMouvement(id);
-        return "redirect:/mouvements/mouv_list";
+
     }
-
-
-}
-
 
 
 

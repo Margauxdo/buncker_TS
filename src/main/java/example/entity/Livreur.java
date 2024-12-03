@@ -30,8 +30,8 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mouvement_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "mouvement_id", nullable = true)
     private Mouvement mouvement;
 
 

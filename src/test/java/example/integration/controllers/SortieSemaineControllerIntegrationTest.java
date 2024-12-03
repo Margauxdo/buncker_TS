@@ -11,18 +11,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WebAppConfiguration
+@ActiveProfiles("integrationtest")
 @Transactional
 public class SortieSemaineControllerIntegrationTest {
 
@@ -119,29 +125,59 @@ public class SortieSemaineControllerIntegrationTest {
 
     @Test
     public void testUpdateSortieSemaine() throws Exception {
-        SortieSemaine sortieSemaine = SortieSemaine.builder()
+
+        // Create and save a Regle entity
+        Regle regle = regleRepository.save(Regle.builder()
+                .coderegle("AX55")
+                .reglePourSortie("Sortie Test")
+                .dateRegle(new Date())
+                .build());
+
+        // Create and save a SortieSemaine entity
+        SortieSemaine sortieSemaine = sortieSemaineRepository.save(SortieSemaine.builder()
                 .dateSortieSemaine(new Date())
                 .regle(regle)
-                .build();
-        sortieSemaine = sortieSemaineRepository.save(sortieSemaine);
+                .build());
 
+        // Prepare a valid date in the required format
+        String validDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        // Perform POST request to update SortieSemaine
         mockMvc.perform(post("/sortieSemaine/edit/{id}", sortieSemaine.getId())
-                        .param("dateSortieSemaine", "2024-12-01")
+                        .param("dateSortieSemaine", validDate)
                         .param("regle.id", String.valueOf(regle.getId())))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/sortieSemaines/SS_list"));
+                .andExpect(redirectedUrl("/sortieSemaines/SS_list"))
+                .andDo(print());
     }
+
+
+
 
     @Test
     public void testDeleteSortieSemaine() throws Exception {
-        SortieSemaine sortieSemaine = SortieSemaine.builder()
+        // Générer un code unique pour éviter les conflits
+        String uniqueCode = "R" + System.currentTimeMillis();
+
+        // Créer et sauvegarder une entité Regle
+        Regle regle = regleRepository.save(Regle.builder()
+                .coderegle(uniqueCode)
+                .reglePourSortie("Sortie Test")
+                .dateRegle(new Date())
+                .build());
+
+        // Créer et sauvegarder une SortieSemaine associée
+        SortieSemaine sortieSemaine = sortieSemaineRepository.save(SortieSemaine.builder()
                 .dateSortieSemaine(new Date())
                 .regle(regle)
-                .build();
-        sortieSemaine = sortieSemaineRepository.save(sortieSemaine);
+                .build());
 
+        // Effectuer une requête POST pour supprimer la SortieSemaine
         mockMvc.perform(post("/sortieSemaine/delete/{id}", sortieSemaine.getId()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/sortieSemaines/SS_list"));
+                .andExpect(redirectedUrl("/sortieSemaines/SS_list")); // Vérifiez bien cette URL
     }
+
+
+
 }

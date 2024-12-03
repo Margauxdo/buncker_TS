@@ -87,6 +87,14 @@ public class LivreurController {
     @PostMapping("/edit/{id}")
     public String updateLivreur(@PathVariable int id, @Valid @ModelAttribute("livreur") Livreur livreur, Model model) {
         try {
+            if (livreur.getNomLivreur() == null || livreur.getNomLivreur().isEmpty()) {
+                model.addAttribute("errorMessage", "Le nom du livreur est obligatoire.");
+                return "livreurs/livreur_edit";
+            }
+            if (livreur.getMouvement() == null || livreur.getMouvement().getId() == 0) {
+                model.addAttribute("errorMessage", "Un mouvement valide est obligatoire.");
+                return "livreurs/livreur_edit";
+            }
             livreurService.updateLivreur(id, livreur);
             return "redirect:/livreurs/list";
         } catch (Exception e) {
@@ -94,6 +102,7 @@ public class LivreurController {
             return "livreurs/livreur_edit";
         }
     }
+
 
     // Supprimer un livreur via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
@@ -106,5 +115,6 @@ public class LivreurController {
             return "livreurs/error";
         }
     }
+
 }
 

@@ -24,9 +24,17 @@ public class Formule {
     @NotNull(message = "Libelle cannot be null")
     private String libelle;
 
+    @Column(name = "description", length = 500)
     private String formule;
 
     @ManyToOne
     @JoinColumn(name = "regle_id", nullable = true)
     private Regle regle;
+
+    public Formule(String libelle, String description, Regle regle) {
+        this.libelle = libelle;
+        this.formule = description;
+        this.regle = regle;
+    }
+
 }

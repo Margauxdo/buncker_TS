@@ -24,9 +24,20 @@ public class TypeRegle {
     @Column(name = "typeRegle_name", unique = true, nullable = false)
     private String nomTypeRegle;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "regle_id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "regle_id", nullable = true)
     private Regle regle;
+
+    public TypeRegle(int id, String type1, Object o) {
+        this.id = id;
+        this.nomTypeRegle = nomTypeRegle;
+        this.regle = regle;
+    }
+
+
+    public TypeRegle(String type1, Object o) {
+    }
 }
+
 
 

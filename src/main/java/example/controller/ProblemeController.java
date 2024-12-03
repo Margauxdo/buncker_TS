@@ -1,20 +1,22 @@
 package example.controller;
 
 import example.entity.Probleme;
-import example.exceptions.ResourceNotFoundException;
+import example.entity.Valise;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;
+import example.services.ClientService;
+import example.services.ValiseService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/pb")
 public class ProblemeController {
 
@@ -22,6 +24,10 @@ public class ProblemeController {
     private IProblemeService problemeService;
     @Autowired
     private ProblemeRepository problemeRepository;
+    @Autowired
+    private ClientService clientService;
+    @Autowired
+    private ValiseService valiseService;
 
     /*// API REST: Récupérer tous les pb
     @GetMapping("/api")
@@ -89,73 +95,131 @@ public class ProblemeController {
         }
     }*/
 
-    // Vue Thymeleaf pour lister les pb
-    @GetMapping("/list")
-    public String viewAllProblemes(Model model) {
-        model.addAttribute("problemes", problemeService.getAllProblemes());
-        return "problemes/pb_list";
-    }
 
-    // Vue Thymeleaf pour voir un pb par ID
+        @GetMapping("/list")
+        public String viewAllProblemes(Model model) {
+            List<Probleme> pbList = problemeService.getAllProblemes();
+            model.addAttribute("problemes", problemeService.getAllProblemes());
+            return "problemes/pb_list";
+        }
+
     @GetMapping("/view/{id}")
     public String viewProbleme(@PathVariable int id, Model model) {
         Probleme probleme = problemeService.getProblemeById(id);
         if (probleme == null) {
-            model.addAttribute("errorMessage", "Probleme ave l'ID" + id + "non trouve");
+            model.addAttribute("errorMessage", "Problème avec l'ID " + id + " non trouvé.");
             return "problemes/error";
         }
+
+        // Ajout de la liaison client au modèle si elle existe
+        if (probleme.getClient() != null) {
+            model.addAttribute("client", probleme.getClient());
+        }
+
         model.addAttribute("probleme", probleme);
-        return "problemes/pb_edit";
+        return "problemes/pb_details";
     }
 
-    // Formulaire Thymeleaf pour créer un pb
+
     @GetMapping("/create")
     public String createProblemeForm(Model model) {
         model.addAttribute("probleme", new Probleme());
+
+        // Add all Valises to the Model for the dropdown
+        List<Valise> valises = valiseService.getAllValises();
+        model.addAttribute("valises", valises);
+
         return "problemes/pb_create";
     }
 
-    // Création d'un pb via formulaire Thymeleaf
+
     @PostMapping("/create")
-    public String createProblemeForm(@Valid @ModelAttribute("probleme") Probleme probleme) {
-        problemeService.createProbleme(probleme);
-        return "redirect:/problemes/pb_list";
+    public String createProblemeForm(@Valid @ModelAttribute("probleme") Probleme probleme,
+                                     @RequestParam("valise.id") Long valiseId, Model model) {
+        try {
+            // Vérification si la Valise existe
+            Valise valise = valiseService.getValiseById(Math.toIntExact(valiseId));
+            if (valise == null) {
+                throw new EntityNotFoundException("La valise avec l'ID " + valiseId + " n'existe pas.");
+            }
+
+            // Association de la Valise au Problème
+            probleme.setValise(valise);
+
+            // Sauvegarde du Problème
+            problemeService.createProbleme(probleme);
+            return "redirect:/pb/list"; // Redirection en cas de succès
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "La valise avec l'ID " + valiseId + " est introuvable.");
+            return "problemes/error"; // Page d'erreur Thymeleaf
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la création du problème.");
+            return "problemes/error"; // Page d'erreur générique
+        }
     }
 
-    // Formulaire Thymeleaf pour modifier un pb
+
+
     @GetMapping("/edit/{id}")
     public String updatedProblemeForm(@PathVariable int id, Model model) {
         Probleme probleme = problemeService.getProblemeById(id);
         if (probleme == null) {
+            model.addAttribute("errorMessage", "Problème avec l'ID " + id + " non trouvé.");
             return "problemes/error";
         }
         model.addAttribute("probleme", probleme);
+        List<Valise> valises = valiseService.getAllValises();
+        model.addAttribute("valises", valises);
         return "problemes/pb_edit";
     }
 
-    // Modifier un pb via formulaire Thymeleaf
+
+
+
     @PostMapping("/edit/{id}")
-    public String updatedProbleme(@PathVariable int id, @Valid @ModelAttribute("probleme") Probleme probleme) {
-        problemeService.updateProbleme(id, probleme);
-        return "redirect:/problemes/pb_list";
+    public String updatedProbleme(@PathVariable int id, @Valid @ModelAttribute("probleme") Probleme probleme, Model model) {
+        try {
+            // Ensure the entity is correctly updated with its relationships
+            Probleme existingProbleme = problemeService.getProblemeById(id);
+            if (existingProbleme == null) {
+                model.addAttribute("errorMessage", "Problème non trouvé.");
+                return "problemes/error";
+            }
+
+            // Set the existing values if needed
+            probleme.setId(id);
+            probleme.setValise(existingProbleme.getValise());
+            probleme.setClient(existingProbleme.getClient());
+
+            // Proceed with update
+            problemeService.updateProbleme(id, probleme);
+            return "redirect:/pb/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la mise à jour du problème.");
+            return "problemes/error";
+        }
     }
 
-    // Supprimer un pb via un formulaire Thymeleaf sécurisé
+
     @PostMapping("/delete/{id}")
-    public String deleteProbleme(@PathVariable int id) {
-        problemeService.deleteProbleme(id);
-        return "redirect:/problemes/pb_list";
+    public String deleteProbleme(@PathVariable int id, Model model) {
+        try {
+            problemeService.deleteProbleme(id);  // Delete the "Probleme" entity
+            return "redirect:/pb/list";  // Redirect to the list of problems
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la suppression du problème.");
+            return "problemes/error";
+        }
     }
-
-
-
-
-
-
-
-
-
 
 
 
 }
+
+
+
+
+
+
+
+
