@@ -74,7 +74,9 @@
         <td th:text="${valise.refClient != null ? valise.refClient : 'Non défini'}"></td>
         <td th:text="${valise.sortie != null ? valise.sortie : 'Non défini'}"></td>
         <td th:text="${valise.typeValise != null ? valise.typeValise.description : 'Non défini'}"></td>
-        <td th:text="${valise.client != null ? valise.client.nom : 'Non défini'}"></td>
+        <td th:text="${valise.client != null ? valise.client.name : 'Non défini'}"></td>
+
+
         <td>
             <!-- Bouton pour Voir -->
             <form th:action="@{/valise/view/{id}(id=${valise.id})}" method="get" style="display:inline;">

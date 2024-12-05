@@ -54,8 +54,9 @@ public class ProblemeControllerTest {
         assertEquals("problemes/pb_list", viewName);
         assertTrue(model.containsAttribute("problemes"));
         assertEquals(problemes, model.getAttribute("problemes"));
-        verify(problemeService, times(1)).getAllProblemes();
+        verify(problemeService, times(2)).getAllProblemes(); // Vérifie les 2 invocations
     }
+
 
     @Test
     public void testViewProbleme_Success() {

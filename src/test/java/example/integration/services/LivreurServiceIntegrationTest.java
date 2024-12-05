@@ -6,6 +6,7 @@ import example.entity.Mouvement;
 import example.entity.Valise;
 import example.exceptions.RegleNotFoundException;
 import example.repositories.ClientRepository;
+import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
 import example.repositories.ValiseRepository;
 import example.services.LivreurService;
@@ -37,6 +38,8 @@ public class LivreurServiceIntegrationTest {
     private ValiseRepository valiseRepository;
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private LivreurRepository livreurRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -248,20 +251,29 @@ public class LivreurServiceIntegrationTest {
     }
 
     @Test
+    @Transactional // Ensures database state rollback after the test
     void testGetAllLivreurs() {
-        // Arrange
+        // Clear previous entries if any
+        livreurRepository.deleteAll();
+        mouvementRepository.deleteAll();
+        valiseRepository.deleteAll();
+        clientRepository.deleteAll();
+
+        // Arrange: Add a new client
         Client client = Client.builder()
                 .name("John Doe")
                 .email("john@doe.com")
                 .build();
         clientRepository.save(client);
 
+        // Arrange: Add a valise linked to the client
         Valise valise = Valise.builder()
                 .description("Valise de test")
                 .client(client)
                 .build();
         valiseRepository.save(valise);
 
+        // Arrange: Add a mouvement linked to the valise
         Mouvement mouvement = Mouvement.builder()
                 .dateHeureMouvement(new Date())
                 .statutSortie("En cours")
@@ -271,6 +283,7 @@ public class LivreurServiceIntegrationTest {
                 .build();
         mouvementRepository.save(mouvement);
 
+        // Arrange: Add a livreur linked to the mouvement
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV123")
@@ -278,13 +291,18 @@ public class LivreurServiceIntegrationTest {
                 .build();
         livreurService.createLivreur(livreur);
 
-        // Act
+        // Act: Retrieve all livreurs
         List<Livreur> livreurs = livreurService.getAllLivreurs();
 
-        // Assert
-        assertFalse(livreurs.isEmpty());
-        assertEquals(1, livreurs.size());
+        // Assert: Verify the expected data
+        assertFalse(livreurs.isEmpty(), "The list of livreurs should not be empty");
+        assertEquals(1, livreurs.size(), "There should be exactly one livreur in the database");
+        assertEquals("John Doe", livreurs.get(0).getNomLivreur(), "The livreur's name should match");
+        assertEquals("LIV123", livreurs.get(0).getCodeLivreur(), "The livreur's code should match");
     }
+
+
+
 
 
     @Test

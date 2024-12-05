@@ -27,7 +27,11 @@ public class Mouvement {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Date dateHeureMouvement;
     private String statutSortie;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date dateSortiePrevue;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date dateRetourPrevue;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -50,8 +54,9 @@ public class Mouvement {
         livreur.setMouvement(this);
     }
 
+
     public void removeLivreur(Livreur livreur) {
-        this.livreurs.remove(livreur);
+        livreurs.remove(livreur);
         livreur.setMouvement(null);
     }
 

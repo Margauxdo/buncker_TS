@@ -8,6 +8,7 @@ import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
 import example.services.MouvementService;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,12 +150,17 @@ public class MouvementServiceIntegrationTest {
 
     @Test
     void testGetMouvementById_Failure_NotFound() {
-        // Act
-        Mouvement fetchedMouvement = mouvementService.getMouvementById(999);
+        int nonExistentId = 999;
 
-        // Assert
-        assertNull(fetchedMouvement);
+        // Act & Assert
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            mouvementService.getMouvementById(nonExistentId);
+        });
+
+        // Validate the exception message
+        Assertions.assertEquals("Mouvement not found with ID: " + nonExistentId, exception.getMessage());
     }
+
 
 
     @Test

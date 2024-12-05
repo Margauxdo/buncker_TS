@@ -11,5 +11,6 @@ public interface IMouvementService {
     List<Mouvement> getAllMouvements();
     Mouvement getMouvementById(int id);
     boolean existsById(int id);
+    void persistMouvement(Mouvement mouvement);
 
 }

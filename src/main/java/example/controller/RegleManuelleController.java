@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -96,6 +97,7 @@ public class RegleManuelleController {
     // Vue Thymeleaf pour lister les RM
     @GetMapping("/list")
     public String listRegleManuelles(Model model) {
+        List<RegleManuelle> regleManuelles = regleManuelleService.getRegleManuelles();
         model.addAttribute("regleManuelles", regleManuelleService.getRegleManuelles());
         return "reglesManuelles/RM_list";
     }
@@ -119,10 +121,14 @@ public class RegleManuelleController {
 
     // Création d'une RM via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createRegleManuelle(@Valid @ModelAttribute("regleManuelle") RegleManuelle regleManuelle) {
+    public String createRegleManuelle(@Valid @ModelAttribute("regleManuelle") RegleManuelle regleManuelle, BindingResult result) {
+        if (result.hasErrors()) {
+            return "reglesManuelles/RM_create";
+        }
         regleManuelleService.createRegleManuelle(regleManuelle);
         return "redirect:/reglesManuelles/RM_list";
     }
+
     // Formulaire Thymeleaf pour modifier une RM
     @GetMapping("/edit/{id}")
     public String editRegleManuelleForm(@PathVariable int id, Model model) {

@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -74,34 +75,45 @@ public class MouvementControllerTest {
     // Test : Voir un mouvement par ID - Non trouvé
     @Test
     public void testViewMouvementById_NotFound() {
+        // Arrange
         when(mouvementService.getMouvementById(1)).thenReturn(null);
 
+        // Act
         Model model = new ConcurrentModel();
         String response = mouvementController.viewMouvementById(1, model);
 
-        assertEquals("mouvements/error", response);
-        assertTrue(model.containsAttribute("errorMessage"));
+        // Assert
+        assertEquals("mouvements/error", response); // Verify error page is returned
+        assertTrue(model.containsAttribute("errorMessage")); // Verify error message is added to model
         assertEquals("Mouvement avec l'ID 1 non trouvé.", model.getAttribute("errorMessage"));
-        verify(mouvementService, times(1)).getMouvementById(1);
+        verify(mouvementService, times(1)).getMouvementById(1); // Verify service interaction
     }
+
 
     // Test : Formulaire de création de mouvement
     @Test
     public void testCreateMouvementForm() {
-        // Mock the behavior of dependencies
+        // Arrange
         when(valiseService.getAllValises()).thenReturn(List.of());
         when(livreurService.getAllLivreurs()).thenReturn(List.of());
+        Model model = new ConcurrentModel();
 
-        // Execute the controller method
+        // Act
         String response = mouvementController.createMouvementForm(model);
 
-        // Assert the results
-        assertEquals("mouvements/mouv_create", response);
-        assertTrue(model.containsAttribute("mouvement"));
-        assertTrue(model.containsAttribute("valises"));
-        assertTrue(model.containsAttribute("allLivreurs"));
-        assertNotNull(model.getAttribute("mouvement"));
+        // Assert
+        assertEquals("mouvements/mouv_create", response, "The view name should be 'mouvements/mouv_create'");
+        assertTrue(model.containsAttribute("mouvement"), "Model should contain attribute 'mouvement'");
+        assertTrue(model.containsAttribute("valises"), "Model should contain attribute 'valises'");
+        assertTrue(model.containsAttribute("allLivreurs"), "Model should contain attribute 'allLivreurs'");
+        assertNotNull(model.getAttribute("mouvement"), "Attribute 'mouvement' should not be null");
+
+        // Verify interactions
+        verify(valiseService, times(1)).getAllValises();
+        verify(livreurService, times(1)).getAllLivreurs();
+        verifyNoMoreInteractions(valiseService, livreurService);
     }
+
 
     // Test : Création de mouvement - Succès
     @Test
@@ -110,18 +122,22 @@ public class MouvementControllerTest {
         Mouvement mouvement = new Mouvement();
         mouvement.setStatutSortie("En cours");
         mouvement.setDateHeureMouvement(new java.util.Date());
-        when(mouvementService.createMouvement(any(Mouvement.class))).thenReturn(mouvement);
 
-        // Mocking the Model object
+        // Mocking dependencies
+        when(mouvementService.createMouvement(any(Mouvement.class))).thenReturn(mouvement);
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(false);
         Model model = mock(Model.class);
 
         // Act
-        String response = mouvementController.createMouvementThymeleaf(mouvement, model);
+        String response = mouvementController.createMouvementThymeleaf(mouvement, bindingResult, model);
 
         // Assert
-        assertEquals("redirect:/mouvements/list", response); // Corrected the redirect URL
-        verify(mouvementService, times(1)).createMouvement(mouvement);
+        assertEquals("redirect:/mouvements/list", response); // Assert redirection
+        verify(mouvementService, times(1)).createMouvement(any(Mouvement.class)); // Verify service call
+        verify(bindingResult, times(1)).hasErrors(); // Verify validation check
     }
+
 
 
     // Test : Formulaire de modification de mouvement - Succès
@@ -143,16 +159,21 @@ public class MouvementControllerTest {
     // Test : Formulaire de modification de mouvement - Non trouvé
     @Test
     public void testEditMouvementForm_NotFound() {
+        // Arrange
         when(mouvementService.getMouvementById(1)).thenReturn(null);
-
         Model model = new ConcurrentModel();
+
+        // Act
         String response = mouvementController.editMouvementForm(1, model);
 
+        // Assert
         assertEquals("mouvements/error", response);
         assertTrue(model.containsAttribute("errorMessage"));
         assertEquals("Mouvement avec l'ID 1 non trouvé.", model.getAttribute("errorMessage"));
         verify(mouvementService, times(1)).getMouvementById(1);
+        verifyNoMoreInteractions(mouvementService);
     }
+
 
     // Test : Mise à jour de mouvement - Succès
     @Test
@@ -162,17 +183,22 @@ public class MouvementControllerTest {
         mouvement.setId(1);
         mouvement.setStatutSortie("Finalisé");
 
-        // Mocking the service and model
-        when(mouvementService.updateMouvement(1, mouvement)).thenReturn(mouvement);
+        BindingResult result = mock(BindingResult.class);
         Model model = mock(Model.class);
 
+        // Mocking BindingResult to indicate no validation errors
+        when(result.hasErrors()).thenReturn(false);
+        when(mouvementService.updateMouvement(1, mouvement)).thenReturn(mouvement);
+
         // Act
-        String response = mouvementController.updateMouvement(1, mouvement, model);
+        String response = mouvementController.updateMouvement(1, mouvement, result, model);
 
         // Assert
         assertEquals("redirect:/mouvements/list", response); // Corrected the redirect URL
         verify(mouvementService, times(1)).updateMouvement(1, mouvement);
+        verify(result, times(1)).hasErrors();
     }
+
 
 
     // Test : Suppression de mouvement - Succès
@@ -180,9 +206,10 @@ public class MouvementControllerTest {
     public void testDeleteMouvement_Success() {
         doNothing().when(mouvementService).deleteMouvement(1);
 
-        String response = mouvementController.deleteMouvement(1);
+        String response = mouvementController.deleteMouvement(1, new ConcurrentModel());
 
-        assertEquals("redirect:/mouvements/mouv_list", response);
+        assertEquals("redirect:/mouvements/list", response);
         verify(mouvementService, times(1)).deleteMouvement(1);
     }
+
 }

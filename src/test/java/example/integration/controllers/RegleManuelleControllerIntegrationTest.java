@@ -15,7 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -43,6 +47,7 @@ public class RegleManuelleControllerIntegrationTest {
         RegleManuelle regleManuelle = RegleManuelle.builder()
                 .descriptionRegle("Test Description")
                 .createurRegle("Admin")
+                .coderegle("CODE123") // Champ obligatoire ajouté
                 .build();
         regleManuelleRepository.save(regleManuelle);
 
@@ -54,12 +59,14 @@ public class RegleManuelleControllerIntegrationTest {
                 .andExpect(model().attribute("regleManuelles", hasSize(1)));
     }
 
+
     @Test
     public void testViewRegleManuelleById() throws Exception {
         // Arrange
         RegleManuelle regleManuelle = RegleManuelle.builder()
                 .descriptionRegle("Test View")
                 .createurRegle("Admin")
+                .coderegle("CODE123") // Ajout du champ obligatoire
                 .build();
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
@@ -68,8 +75,10 @@ public class RegleManuelleControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("reglesManuelles/RM_details"))
                 .andExpect(model().attributeExists("regleManuelle"))
-                .andExpect(model().attribute("regleManuelle", hasProperty("descriptionRegle", is("Test View"))));
+                .andExpect(model().attribute("regleManuelle", hasProperty("descriptionRegle", is("Test View"))))
+                .andExpect(model().attribute("regleManuelle", hasProperty("coderegle", is("CODE123"))));
     }
+
 
     @Test
     public void testCreateRegleManuelleForm() throws Exception {
@@ -84,14 +93,21 @@ public class RegleManuelleControllerIntegrationTest {
         mockMvc.perform(post("/reglemanuelle/create")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("descriptionRegle", "New Regle")
-                        .param("createurRegle", "Admin"))
+                        .param("createurRegle", "Admin")
+                        .param("coderegle", "CODE123")) // Ajout du champ obligatoire
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/reglesManuelles/RM_list"));
 
-        // Verify the RegleManuelle is saved
-        RegleManuelle saved = regleManuelleRepository.findAll().get(0);
-        assert saved.getDescriptionRegle().equals("New Regle");
+        // Vérification que la RegleManuelle est sauvegardée dans la base de données
+        List<RegleManuelle> regles = regleManuelleRepository.findAll();
+        assertFalse(regles.isEmpty(), "La liste des règles ne doit pas être vide");
+        RegleManuelle saved = regles.get(0);
+
+        assertEquals("New Regle", saved.getDescriptionRegle(), "La description de la règle est incorrecte");
+        assertEquals("Admin", saved.getCreateurRegle(), "Le créateur de la règle est incorrect");
+        assertEquals("CODE123", saved.getCoderegle(), "Le code de la règle est incorrect");
     }
+
 
     @Test
     public void testEditRegleManuelleForm() throws Exception {
@@ -99,6 +115,7 @@ public class RegleManuelleControllerIntegrationTest {
         RegleManuelle regleManuelle = RegleManuelle.builder()
                 .descriptionRegle("Edit Test")
                 .createurRegle("Admin")
+                .coderegle("CODE123") // Ajout de la valeur pour le champ obligatoire
                 .build();
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
@@ -110,12 +127,14 @@ public class RegleManuelleControllerIntegrationTest {
                 .andExpect(model().attribute("regleManuelle", hasProperty("descriptionRegle", is("Edit Test"))));
     }
 
+
     @Test
     public void testUpdateRegleManuelle() throws Exception {
         // Arrange
         RegleManuelle regleManuelle = RegleManuelle.builder()
                 .descriptionRegle("Old Description")
                 .createurRegle("Admin")
+                .coderegle("CODE123") // Ajout de la valeur pour le champ obligatoire
                 .build();
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
@@ -123,7 +142,8 @@ public class RegleManuelleControllerIntegrationTest {
         mockMvc.perform(post("/reglemanuelle/edit/{id}", regleManuelle.getId())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("descriptionRegle", "Updated Description")
-                        .param("createurRegle", "Admin"))
+                        .param("createurRegle", "Admin")
+                        .param("coderegle", "CODE123")) // Inclure le champ dans les paramètres
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/reglesManuelles/RM_list"));
 
@@ -133,12 +153,14 @@ public class RegleManuelleControllerIntegrationTest {
         assert updated.getDescriptionRegle().equals("Updated Description");
     }
 
+
     @Test
     public void testDeleteRegleManuelle() throws Exception {
         // Arrange
         RegleManuelle regleManuelle = RegleManuelle.builder()
                 .descriptionRegle("Delete Test")
                 .createurRegle("Admin")
+                .coderegle("CODE123") // Ajout d'une valeur pour le champ obligatoire
                 .build();
         regleManuelle = regleManuelleRepository.save(regleManuelle);
 
@@ -150,4 +172,5 @@ public class RegleManuelleControllerIntegrationTest {
         // Assert
         assert regleManuelleRepository.findById(regleManuelle.getId()).isEmpty();
     }
+
 }

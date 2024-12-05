@@ -55,8 +55,9 @@
     <label for="valise">Valise :</label>
     <select id="valise" th:field="*{valise.id}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
+        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.description}"></option>
     </select>
+
 
     <label for="livreurs">Livreurs :</label>
     <select id="livreurs" multiple th:field="*{livreurs}">

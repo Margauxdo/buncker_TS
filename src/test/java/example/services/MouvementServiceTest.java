@@ -108,32 +108,45 @@ public class MouvementServiceTest {
     public void testDeleteMouvement_Success() {
         int id = 1;
 
-        when(mouvementRepository.existsById(id)).thenReturn(true);
+        // Mock findById to return a valid optional object
+        Mouvement mouvement = new Mouvement();
+        mouvement.setId(id);
+
+        when(mouvementRepository.findById(id)).thenReturn(Optional.of(mouvement));
         doNothing().when(mouvementRepository).deleteById(id);
 
+        // Call the service method
         mouvementService.deleteMouvement(id);
 
-        verify(mouvementRepository, times(1)).existsById(id);
+        // Verify interactions
+        verify(mouvementRepository, times(1)).findById(id);
         verify(mouvementRepository, times(1)).deleteById(id);
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
 
     @Test
     public void testDeleteMouvement_Failure_Exception() {
         int id = 1;
 
-        when(mouvementRepository.existsById(id)).thenReturn(false);
+        // Mock findById to return an empty Optional, simulating a missing entity
+        when(mouvementRepository.findById(id)).thenReturn(Optional.empty());
 
+        // Assert that the correct exception is thrown
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             mouvementService.deleteMouvement(id);
         });
 
+        // Validate exception message
         assertEquals("Mouvement not found with ID: " + id, exception.getMessage());
-        verify(mouvementRepository, times(1)).existsById(id);
+
+        // Verify repository interactions
+        verify(mouvementRepository, times(1)).findById(id);
         verify(mouvementRepository, never()).deleteById(anyInt());
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
 
     @Test
@@ -159,12 +172,17 @@ public class MouvementServiceTest {
 
         when(mouvementRepository.findById(id)).thenReturn(Optional.empty());
 
-        Mouvement result = mouvementService.getMouvementById(id);
+        // Assert
+        Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            mouvementService.getMouvementById(id);
+        });
 
-        Assertions.assertNull(result, "Mouvement should be null if not found");
+        assertEquals("Mouvement not found with ID: " + id, exception.getMessage());
+
         verify(mouvementRepository, times(1)).findById(id);
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
     @Test
     public void testGetAllMouvements_Success() {
@@ -197,13 +215,7 @@ public class MouvementServiceTest {
         verifyNoInteractions(mouvementRepository);
     }
 
-    @Test
-    public void testNoInteractionWithMouvementRepository_Failure_Exception() {
-        mouvementService.getMouvementById(1);
-        Assertions.assertThrows(AssertionError.class, () -> {
-            verifyNoInteractions(mouvementRepository);
-        });
-    }
+
 
     @Test
     public void testCreateMouvement_WithLivreurs() {

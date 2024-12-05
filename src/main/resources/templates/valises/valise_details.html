@@ -71,11 +71,13 @@
     <!-- Relation avec TypeValise -->
     <p><strong>Type de Valise :</strong>
         <span th:text="${valise.typeValise != null ? valise.typeValise.description : 'Non défini'}"></span>
+
     </p>
 
     <!-- Relation avec Client -->
     <p><strong>Client :</strong>
-        <span th:text="${valise.client != null ? valise.client.nom : 'Non défini'}"></span>
+        <span th:text="${valise.client != null ? valise.client.name : 'Non défini'}"></span>
+
     </p>
 
     <!-- Relation avec MouvementList -->

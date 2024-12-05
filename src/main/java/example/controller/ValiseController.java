@@ -1,5 +1,6 @@
 package example.controller;
 
+import example.entity.Client;
 import example.entity.Valise;
 import example.interfaces.IValiseService;
 import example.exceptions.ResourceNotFoundException;
@@ -108,7 +109,7 @@ public class ValiseController {
     public String viewValises(Model model) {
         List<Valise> valises = valiseService.getAllValises();
         model.addAttribute("valises", valises);
-        return "valises/valises_list"; // Ensure this matches the Thymeleaf template location
+        return "valises/valises_list";
     }
 
     // Vue Thymeleaf pour voir une valise par ID
@@ -130,27 +131,21 @@ public class ValiseController {
     @PostMapping("/create")
     public String createValise(
             @Valid @ModelAttribute("valise") Valise valise,
+            @RequestParam("client.id") int clientId,
             BindingResult result,
-            Model model
-    ) {
+            Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
-            return "valises/valise_create"; // Ensure this path is correct
-        }
-        try {
-            boolean exists = valiseService.getAllValises().stream()
-                    .anyMatch(existingValise -> existingValise.getNumeroValise().equals(valise.getNumeroValise()));
-            if (exists) {
-                model.addAttribute("errorMessage", "Une valise avec ce numéro de valise existe déjà.");
-                return "valises/valise_create";
-            }
-            valiseService.persistValise(valise);
-            return "redirect:/valise/list";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
+            model.addAttribute("errorMessage", "Veuillez corriger les erreurs.");
             return "valises/valise_create";
         }
+
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found with ID: " + clientId));
+        valise.setClient(client);
+        valiseService.persistValise(valise);
+        return "redirect:/valise/list";
     }
+
 
 
     // Formulaire Thymeleaf pour modifier une valise

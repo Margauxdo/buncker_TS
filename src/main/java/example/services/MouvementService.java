@@ -29,12 +29,18 @@ public class MouvementService implements IMouvementService {
 
     @Override
     public Mouvement getMouvementById(int id) {
-        return mouvementRepository.findById(id).orElse(null);
-
+        return mouvementRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + id));
     }
+
     @Override
     public boolean existsById(int id) {
         return mouvementRepository.existsById(id);
+    }
+
+    @Override
+    public void persistMouvement(Mouvement mouvement) {
+
     }
 
 
@@ -58,11 +64,12 @@ public class MouvementService implements IMouvementService {
 
 
     @Override
-        public void deleteMouvement(int id) {
-            if (!mouvementRepository.existsById(id)) {
-                throw new EntityNotFoundException("Mouvement not found with ID: " + id);
-            }
-            mouvementRepository.deleteById(id);
-        }
+    public void deleteMouvement(int id) {
+        mouvementRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + id));
+        mouvementRepository.deleteById(id);
     }
+
+
+}
 

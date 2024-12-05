@@ -44,7 +44,7 @@ public class Valise {
     private TypeValise typeValise;
 
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 

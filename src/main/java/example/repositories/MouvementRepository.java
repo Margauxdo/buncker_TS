@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MouvementRepository extends JpaRepository<Mouvement, Integer> {
+
+
 }

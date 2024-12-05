@@ -10,10 +10,12 @@ import example.repositories.ClientRepository;
 import example.repositories.RegleRepository;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,13 +111,14 @@ public class ValiseService implements IValiseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Valise not found with ID: " + id));
     }
 
-    @Override
+    @Transactional
     public List<Valise> getAllValises() {
-        return valiseRepository.findAll();
+        List<Valise> valises = valiseRepository.findAll();
+        valises.forEach(valise -> Hibernate.initialize(valise.getClient())); // Initialisez les clients associés
+        return valises;
     }
-
     @Override
     public void persistValise(Valise valise) {
-
+        valiseRepository.save(valise);
     }
 }
