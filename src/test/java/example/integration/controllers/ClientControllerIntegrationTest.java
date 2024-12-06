@@ -151,4 +151,6 @@ public class ClientControllerIntegrationTest {
         Assertions.assertTrue(clientRepository.findById(client.getId()).isEmpty());
     }
 
+
+
 }

@@ -152,9 +152,16 @@ public class RegleServiceIntegrationTest {
         // Assert
         assertNotNull(regles, "The list of Regles should not be null.");
         assertEquals(2, regles.size(), "The list of Regles should contain 2 items.");
-        assertEquals("REGLE001", regles.get(0).getCoderegle());
-        assertEquals("REGLE002", regles.get(1).getCoderegle());
+
+        // Vérifie que les deux entités sont présentes dans la liste, indépendamment de leur ordre
+        boolean containsRegle1 = regles.stream().anyMatch(r -> "REGLE001".equals(r.getCoderegle()));
+        boolean containsRegle2 = regles.stream().anyMatch(r -> "REGLE002".equals(r.getCoderegle()));
+
+        assertTrue(containsRegle1, "The list should contain a Regle with coderegle REGLE001.");
+        assertTrue(containsRegle2, "The list should contain a Regle with coderegle REGLE002.");
     }
+
+
 
 
     @Test

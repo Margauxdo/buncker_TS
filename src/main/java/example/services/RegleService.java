@@ -34,19 +34,33 @@ public class RegleService implements IRegleService {
     @Override
     public Regle updateRegle(int id, Regle regle) {
         if (regle == null) {
-            throw new RegleNotFoundException("Règle non trouvée avec l'ID " + id);
+            throw new IllegalArgumentException("La règle fournie est nulle.");
         }
 
         return regleRepository.findById(id)
                 .map(existingRegle -> {
-                    existingRegle.setCoderegle(regle.getCoderegle());
-                    existingRegle.setDateRegle(regle.getDateRegle());
-                    existingRegle.setNombreJours(regle.getNombreJours());
+                    // Mise à jour des champs
+                    if (regle.getCoderegle() != null && !regle.getCoderegle().isEmpty()) {
+                        existingRegle.setCoderegle(regle.getCoderegle());
+                    }
+                    if (regle.getReglePourSortie() != null) {
+                        existingRegle.setReglePourSortie(regle.getReglePourSortie());
+                    }
+                    if (regle.getDateRegle() != null) {
+                        existingRegle.setDateRegle(regle.getDateRegle());
+                    }
+                    if (regle.getNombreJours() > 0) {
+                        existingRegle.setNombreJours(regle.getNombreJours());
+                    }
+
+                    // Gestion de la relation avec Formule (si nécessaire)
                     if (regle.getFormule() != null && regle.getFormule().getId() != 0) {
                         Formule formule = formuleRepository.findById(regle.getFormule().getId())
                                 .orElseThrow(() -> new IllegalArgumentException("Formule non trouvée."));
                         existingRegle.setFormule(formule);
                     }
+
+                    // Sauvegarde explicite de l'entité mise à jour
                     return regleRepository.save(existingRegle);
                 })
                 .orElseThrow(() -> new RegleNotFoundException("Règle non trouvée avec l'ID " + id));

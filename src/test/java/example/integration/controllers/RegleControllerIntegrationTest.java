@@ -148,6 +148,31 @@ public class RegleControllerIntegrationTest {
         assertFalse(regleRepository.existsById(regle.getId()));
     }
 
+    @Test
+    public void testEditRegle_Success() throws Exception {
+        // Étape 1 : Sauvegarder une règle initiale
+        Regle regle = regleRepository.save(Regle.builder()
+                .coderegle("EDIT1")
+                .reglePourSortie("Initial Rule")
+                .build());
+
+        // Étape 2 : Effectuer une requête POST pour mettre à jour la règle
+        mockMvc.perform(post("/regles/edit/" + regle.getId())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("coderegle", "EDIT1_UPDATED")
+                        .param("reglePourSortie", "Updated Rule"))
+                .andExpect(status().is3xxRedirection()) // Vérifie le statut de redirection
+                .andExpect(redirectedUrl("/regles/list")) // Vérifie l'URL redirigée
+                .andDo(print());
+
+        // Étape 3 : Valider les modifications dans la base de données
+        Regle updatedRegle = regleRepository.findById(regle.getId()).orElse(null);
+        assertNotNull(updatedRegle, "La règle mise à jour ne doit pas être nulle.");
+        assertEquals("EDIT1_UPDATED", updatedRegle.getCoderegle(), "Le code de la règle n'a pas été mis à jour correctement.");
+        assertEquals("Updated Rule", updatedRegle.getReglePourSortie(), "Le contenu de la règle n'a pas été mis à jour correctement.");
+    }
+
+
 
 
 

@@ -1,7 +1,9 @@
 package example.services;
 
+import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
+import example.entity.Valise;
 import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
@@ -155,16 +157,31 @@ public class MouvementServiceTest {
         Mouvement mouvement = new Mouvement();
         mouvement.setId(id);
 
+        // Création d'une Valise et d'un Client associés
+        Valise valise = new Valise();
+        valise.setId(1);
+        Client client = new Client();
+        valise.setClient(client);
+
+        mouvement.setValise(valise);  // Associer la Valise au Mouvement
+
+        // Mock du repository pour renvoyer le mouvement
         when(mouvementRepository.findById(id)).thenReturn(Optional.of(mouvement));
 
+        // Appel de la méthode dans le service
         Mouvement result = mouvementService.getMouvementById(id);
 
+        // Vérifications
         assertNotNull(result, "Mouvement should not be null");
         assertEquals(id, result.getId(), "Mouvement ID should match");
+        assertNotNull(result.getValise(), "Mouvement's Valise should not be null");
+        assertNotNull(result.getValise().getClient(), "Mouvement's Valise's Client should not be null");
 
+        // Vérification que la méthode du repository a bien été appelée
         verify(mouvementRepository, times(1)).findById(id);
         verifyNoMoreInteractions(mouvementRepository);
     }
+
 
     @Test
     public void testGetMouvementById_Failure_Exception() {

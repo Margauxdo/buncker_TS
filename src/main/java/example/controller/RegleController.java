@@ -165,10 +165,12 @@ public class RegleController {
 
     // Modifier une regle via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
-    public String updateRegle(@PathVariable int id,@Valid @ModelAttribute("regle") Regle regle) {
+    public String updateRegle(@PathVariable int id, @Valid @ModelAttribute("regle") Regle regle) {
         regleService.updateRegle(id, regle);
-        return "redirect:/regles/regle_list";
+        return "redirect:/regles/list"; // Mise à jour pour correspondre à l'URL attendue dans les tests
     }
+
+
     // Supprimer une regle via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteRegle(@PathVariable int id) {

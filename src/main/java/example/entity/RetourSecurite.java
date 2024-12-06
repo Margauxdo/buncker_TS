@@ -33,7 +33,7 @@ public class RetourSecurite {
     @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Client> clients;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mouvement_id", nullable = true)
     private Mouvement mouvement;
 

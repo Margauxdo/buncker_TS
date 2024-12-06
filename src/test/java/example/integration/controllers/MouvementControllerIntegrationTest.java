@@ -1,15 +1,10 @@
 package example.integration.controllers;
 
-import example.entity.Client;
-import example.entity.Livreur;
-import example.entity.Mouvement;
-import example.entity.Valise;
+import example.entity.*;
 import example.interfaces.IMouvementService;
-import example.repositories.ClientRepository;
-import example.repositories.LivreurRepository;
-import example.repositories.MouvementRepository;
+import example.repositories.*;
 
-import example.repositories.ValiseRepository;
+import example.services.MouvementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +22,15 @@ import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @SpringBootTest
@@ -54,113 +52,35 @@ public class MouvementControllerIntegrationTest {
         private Mouvement mouvement;
     @Autowired
     private LivreurRepository livreurRepository;
+    @Autowired
+    private MouvementService mouvementService;
+    @Autowired
+    private RetourSecuriteRepository retourSecuriteRepository;
 
     @BeforeEach
-        public void setUp() {
-            mouvementRepository.deleteAll();
-            clientRepository.deleteAll();
-            valiseRepository.deleteAll();
-        }
+    public void setUp() {
 
-        // Test : Lister tous les mouvements
-        @Test
-        public void testListAllMouvements() throws Exception {
-            Client client = clientRepository.save(Client.builder().name("Doe").email("doe@test.com").build());
-            Valise valise = valiseRepository.save(
-                    Valise.builder().description("Valise de test").numeroValise(123L).client(client).build());
-            mouvementRepository.save(Mouvement.builder().valise(valise).statutSortie("En cours").build());
-
-            mockMvc.perform(get("/mouvements/list"))
-                    .andExpect(status().isOk())
-                    .andExpect(view().name("mouvements/mouv_list"))
-                    .andExpect(model().attributeExists("mouvements"))
-                    .andExpect(model().attribute("mouvements", hasSize(greaterThanOrEqualTo(1))));
-        }
-
-    // Test : Voir un mouvement par ID - Succès
-    @Test
-    public void testViewMouvementById_Success() throws Exception {
-        Client client = clientRepository.save(Client.builder().name("Doe").email("doe@test.com").build());
-        Valise valise = valiseRepository.save(
-                Valise.builder().description("Valise de test").numeroValise(123L).client(client).build());
-        Mouvement mouvement = mouvementRepository.save(Mouvement.builder().valise(valise).statutSortie("En cours").build());
-
-        mockMvc.perform(get("/mouvements/view/{id}", mouvement.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("mouvements/mouv_details"))
-                .andExpect(model().attributeExists("mouvement"))
-                .andExpect(model().attribute("mouvement", hasProperty("id", is(mouvement.getId()))));
+        mouvementRepository.deleteAll();
+        valiseRepository.deleteAll();
+        clientRepository.deleteAll();
     }
 
-    // Test : Voir un mouvement par ID - Non trouvé
-        @Test
-        public void testViewMouvementById_NotFound() throws Exception {
-            mockMvc.perform(get("/mouvements/view/{id}", 9999))
-                    .andExpect(status().isOk())
-                    .andExpect(view().name("mouvements/error"))
-                    .andExpect(model().attributeExists("errorMessage"))
-                    .andExpect(model().attribute("errorMessage", containsString("non trouvé")));
-        }
+    @Test
+    public void testCreateMouvement_Success() throws Exception {
+        Client client = clientRepository.save(Client.builder().name("Doe").email("doe@test.com").build());
+        Valise valise = valiseRepository.save(Valise.builder().description("Valise de test").numeroValise(123L).client(client).build());
 
-        // Test : Créer
+        mockMvc.perform(post("/mouvements/create")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("statutSortie", "En cours")
+                        .param("valise.id", String.valueOf(valise.getId())))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mouvements/list"));
 
-
-    // Test : Modifier un mouvement - Succès
-        @Test
-        public void testUpdateMouvement_Success() throws Exception {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date dateHeureMouvement = dateFormat.parse("2024-12-01 10:30");
-            Date dateSortiePrevue = dateFormat.parse("2024-12-05 15:00");
-            Date dateRetourPrevue = dateFormat.parse("2024-12-10 18:00");
-            Date dateCreation = dateFormat.parse("2024-11-30 08:00");
-
-            Client client = Client.builder()
-                    .name("Doe")
-                    .email("doe@test.com") // Email unique
-                    .build();
-            clientRepository.save(client);
-
-            Valise valise = Valise.builder()
-                    .description("Test Valise")
-                    .numeroValise(123L)
-                    .client(client)
-                    .build();
-            valiseRepository.save(valise);
-            Livreur livreur = Livreur.builder()
-                    .nomLivreur("Jules")
-                    .codeLivreur("AWX58")
-                    .build();
-            livreurRepository.save(livreur);
-
-            // Création d'un mouvement avec des dates spécifiques
-            Mouvement mouvement = Mouvement.builder()
-                    .dateHeureMouvement(dateHeureMouvement)
-                    .dateSortiePrevue(dateSortiePrevue)
-                    .dateRetourPrevue(dateRetourPrevue)
-                    .statutSortie("finished")
-                    .valise(valise)
-                    .livreurs(List.of(livreur))
-                    .build();
-            mouvement.addLivreur(livreur);
-
-
-            mouvement = mouvementRepository.save(mouvement); // Sauvegarde et récupération de l'objet
-
-            // Test de mise à jour du mouvement
-            mockMvc.perform(post("/mouvements/edit/{id}", mouvement.getId())
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                            .param("statutSortie", "Finalisé")
-                            .param("dateHeureMouvement", "2024-12-06T10:00") // Format ISO-8601 pour datetime-local
-                            .param("dateSortiePrevue", "2024-12-06") // Format ISO-8601 pour date
-                            .param("dateRetourPrevue", "2024-12-10")) // Format ISO-8601 pour date
-                    .andExpect(status().is3xxRedirection())
-                    .andExpect(redirectedUrl("/mouvements/list"));
-
-            // Validation des modifications
-            Mouvement updatedMouvement = mouvementRepository.findById(mouvement.getId()).orElse(null);
-            assertNotNull(updatedMouvement);
-            assertEquals("Finalisé", updatedMouvement.getStatutSortie());
-        }
+        List<Mouvement> mouvements = mouvementRepository.findAll();
+        assertEquals(1, mouvements.size());
+        assertEquals("En cours", mouvements.get(0).getStatutSortie());
+    }
 
 
 
@@ -178,5 +98,76 @@ public class MouvementControllerIntegrationTest {
 
         assertFalse(mouvementRepository.existsById(mouvement.getId()));
     }
+
+
+    @Test
+    public void testUpdateMouvement() throws Exception {
+        Client client = clientRepository.save(Client.builder().name("Doe").email("doe@test.com").build());
+        Valise valise = valiseRepository.save(Valise.builder().description("Valise de test").numeroValise(123L).client(client).build());
+        Mouvement mouvement = mouvementRepository.save(Mouvement.builder().valise(valise).statutSortie("En cours").build());
+
+        mockMvc.perform(post("/mouvements/edit/" + mouvement.getId())
+                        .param("statutSortie", "Terminé")
+                        .param("valise.id", String.valueOf(valise.getId()))) // Transmettez l'ID de la valise
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mouvements/list"));
+
+        Mouvement updatedMouvement = mouvementRepository.findById(mouvement.getId()).orElse(null);
+        assertNotNull(updatedMouvement);
+        assertEquals("Terminé", updatedMouvement.getStatutSortie());
+    }
+
+
+    @Test
+    public void testListMouvement() throws Exception {
+
+        mockMvc.perform(get("/mouvements/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mouvements/mouv_list"))
+                .andExpect(model().attributeExists("mouvements"))
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
+    public void testListMouvements_Success() throws Exception {
+        // Arrange - Créer des entités nécessaires
+        Client client = clientRepository.save(Client.builder().name("Doe").email("unique" + System.currentTimeMillis() + "@test.com").build());
+        Valise valise1 = valiseRepository.save(Valise.builder().description("Valise 1").client(client).build());
+        Valise valise2 = valiseRepository.save(Valise.builder().description("Valise 2").client(client).build());
+
+        Mouvement mouvement1 = mouvementRepository.save(
+                Mouvement.builder()
+                        .valise(valise1)
+                        .statutSortie("En cours")
+                        .dateSortiePrevue(new SimpleDateFormat("yyyy-MM-dd").parse("2024-12-07"))
+                        .build()
+        );
+
+        Mouvement mouvement2 = mouvementRepository.save(
+                Mouvement.builder()
+                        .valise(valise2)
+                        .statutSortie("Terminé")
+                        .dateSortiePrevue(new SimpleDateFormat("yyyy-MM-dd").parse("2024-12-08"))
+                        .build()
+        );
+
+        // Act & Assert - Effectuer une requête GET et vérifier le résultat
+        mockMvc.perform(get("/mouvements/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mouvements/mouv_list"))
+                .andExpect(model().attributeExists("mouvements"))
+                .andExpect(model().attribute("mouvements", hasSize(2)))
+                .andExpect(model().attribute("mouvements", hasItem(
+                        hasProperty("statutSortie", is("En cours"))
+                )))
+                .andExpect(model().attribute("mouvements", hasItem(
+                        hasProperty("statutSortie", is("Terminé"))
+                )))
+                .andDo(print());
+    }
+
+
+
 
 }

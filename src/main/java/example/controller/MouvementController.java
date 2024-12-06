@@ -1,11 +1,14 @@
 package example.controller;
 
 import example.entity.Mouvement;
+import example.entity.Valise;
 import example.interfaces.IMouvementService;
+import example.repositories.MouvementRepository;
 import example.services.LivreurService;
 import example.services.ValiseService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,25 +29,24 @@ public class MouvementController {
 
     @Autowired
     private LivreurService livreurService;
+    @Autowired
+    private MouvementRepository mouvementRepository;
 
-    @GetMapping("/list")
-    public String listAllMouvements(Model model) {
-        List<Mouvement> mouvements = mouvementService.getAllMouvements();
-        model.addAttribute("mouvements", mouvements);
-        model.addAttribute("valises", valiseService.getAllValises());
-        return "mouvements/mouv_list";
-    }
 
     @GetMapping("/view/{id}")
-    public String viewMouvementById(@PathVariable int id, Model model) {
-        Mouvement mouvement = mouvementService.getMouvementById(id);
-        if (mouvement == null) {
-            model.addAttribute("errorMessage", "Mouvement avec l'ID " + id + " non trouvé.");
-            return "mouvements/error";
-        }
+    public String viewMouvementDetails(@PathVariable Long id, Model model) {
+        Mouvement mouvement = mouvementService.findByIdWithValise(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found"));
+
+        // Initialize lazy collection if necessary
+        Hibernate.initialize(mouvement.getLivreurs());
+
         model.addAttribute("mouvement", mouvement);
         return "mouvements/mouv_details";
     }
+
+
+
 
 
     @GetMapping("/create")
@@ -87,22 +89,43 @@ public class MouvementController {
     public String updateMouvement(
             @PathVariable int id,
             @Valid @ModelAttribute("mouvement") Mouvement mouvement,
-            BindingResult result, // BindingResult doit venir juste après @Valid
+            BindingResult result,
             Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Veuillez corriger les erreurs.");
             model.addAttribute("valises", valiseService.getAllValises());
             return "mouvements/mouv_edit";
         }
 
         try {
-            mouvementService.updateMouvement(id, mouvement);
+            Mouvement existingMouvement = mouvementService.getMouvementById(id);
+            if (existingMouvement == null) {
+                model.addAttribute("errorMessage", "Mouvement avec l'ID " + id + " non trouvé.");
+                return "mouvements/error";
+            }
+
+            existingMouvement.setStatutSortie(mouvement.getStatutSortie());
+            existingMouvement.setDateSortiePrevue(mouvement.getDateSortiePrevue());
+            existingMouvement.setDateRetourPrevue(mouvement.getDateRetourPrevue());
+
+            if (mouvement.getValise() != null && mouvement.getValise().getId() > 0) {
+                Valise valise = valiseService.getValiseById(mouvement.getValise().getId());
+                existingMouvement.setValise(valise);
+            } else {
+                model.addAttribute("errorMessage", "Valise non définie ou invalide pour ce mouvement.");
+                return "mouvements/mouv_edit";
+            }
+
+
+            mouvementService.updateMouvement(id, existingMouvement);
             return "redirect:/mouvements/list";
+
         } catch (EntityNotFoundException e) {
-            model.addAttribute("errorMessage", "Mouvement avec l'ID " + id + " non trouvé.");
+            model.addAttribute("errorMessage", "Erreur : Mouvement ou entités associées introuvables.");
             return "mouvements/error";
         }
     }
+
+
 
 
     @PostMapping("/delete/{id}")
@@ -115,4 +138,16 @@ public class MouvementController {
             return "mouvements/error";
         }
     }
+
+    @GetMapping("/list")
+    public String listAllMouvements(Model model) {
+        List<Mouvement> mouvements = mouvementService.getAllMouvements();
+        model.addAttribute("mouvements", mouvements);
+        return "mouvements/mouv_list";
+    }
+
+
+
+
+
 }

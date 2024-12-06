@@ -120,16 +120,17 @@ public class RegleServiceTest {
     }
 
     @Test
-    public void testUpdateRegle_NullInput_ShouldThrowNotFoundException() {
-        Exception exception = Assertions.assertThrows(RegleNotFoundException.class, () -> {
+    public void testUpdateRegle_NullInput_ShouldThrowIllegalArgumentException() {
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             regleService.updateRegle(1, null);
         });
 
-        Assertions.assertEquals("Règle non trouvée avec l'ID 1", exception.getMessage(),
+        Assertions.assertEquals("La règle fournie est nulle.", exception.getMessage(),
                 "Exception message should match the expected error message.");
 
         verifyNoInteractions(regleRepository);
     }
+
 
 
     @Test

@@ -5,8 +5,11 @@ import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
+import example.repositories.MouvementRepository;
 import example.repositories.ValiseRepository;
+import example.services.ClientService;
 import example.services.MouvementService;
+import example.services.ValiseService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +38,12 @@ public class MouvementServiceIntegrationTest {
 
     private Valise valise;
     private Mouvement mouvement;
+    @Autowired
+    private MouvementRepository mouvementRepository;
+    @Autowired
+    private ValiseService valiseService;
+    @Autowired
+    private ClientService clientService;
 
     @BeforeEach
     public void setUp() {
@@ -59,6 +68,7 @@ public class MouvementServiceIntegrationTest {
                 .dateRetourPrevue(new Date(System.currentTimeMillis() + 86400000L)) // +1 jour
                 .valise(valise)
                 .build();
+        mouvementRepository.deleteAll();;
     }
 
     @Test
@@ -166,6 +176,19 @@ public class MouvementServiceIntegrationTest {
     @Test
     void testGetAllMouvements_LargeDataset() {
         // Arrange
+        // Créez un Client valide
+        Client client = new Client();
+        client.setName("Test Client");
+        client.setEmail("testclient@example.com");
+        clientService.createClient(client); // Persistons le Client
+
+        // Créez une Valise associée au Client
+        Valise valise = new Valise();
+        valise.setClient(client); // Associez le Client à la Valise
+        valise.setDescription("Test Valise");
+        valiseService.createValise(valise); // Persistons la Valise
+
+        // Créez plusieurs Mouvements associés à la Valise
         for (int i = 0; i < 100; i++) {
             mouvementService.createMouvement(
                     Mouvement.builder()
@@ -173,7 +196,7 @@ public class MouvementServiceIntegrationTest {
                             .statutSortie("EN_TRANSIT_" + i)
                             .dateSortiePrevue(new Date())
                             .dateRetourPrevue(new Date(System.currentTimeMillis() + 86400000L))
-                            .valise(valise)
+                            .valise(valise) // Associez la Valise
                             .build()
             );
         }
@@ -182,8 +205,9 @@ public class MouvementServiceIntegrationTest {
         List<Mouvement> mouvements = mouvementService.getAllMouvements();
 
         // Assert
-        assertEquals(100, mouvements.size());
+        assertEquals(100, mouvements.size(), "Le nombre de mouvements retournés est incorrect.");
     }
+
 
 
 

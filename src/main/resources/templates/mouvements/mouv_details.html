@@ -61,12 +61,15 @@
     <p><strong>Statut de Sortie :</strong> <span th:text="${mouvement.statutSortie}"></span></p>
     <p><strong>Date de Sortie Prévue :</strong> <span th:text="${#dates.format(mouvement.dateSortiePrevue, 'dd/MM/yyyy')}"></span></p>
     <p><strong>Date de Retour Prévue :</strong> <span th:text="${#dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy')}"></span></p>
-    <p><strong>Valise :</strong> <span th:text="${mouvement.valise.name}"></span></p>
 
     <p><strong>Livreurs Associés :</strong></p>
     <ul>
-        <li th:each="livreur : ${mouvement.livreurs}" th:text="${livreur.nomLivreur + ' ' + livreur.prenomLivreur}"></li>
+        <li th:each="livreur : ${mouvement.livreurs}">
+            <span th:text="${livreur.nom}"></span>
+            <span th:text="${livreur.prenom}"></span>
+        </li>
     </ul>
+
 
     <p><strong>Retours Sécurité Associés :</strong></p>
     <ul>

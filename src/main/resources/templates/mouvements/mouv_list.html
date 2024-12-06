@@ -51,7 +51,6 @@
             text-decoration: none;
         }
 
-
     </style>
 </head>
 <body>
@@ -65,7 +64,8 @@
         <th>Statut Sortie</th>
         <th>Date Sortie Prévue</th>
         <th>Date Retour Prévue</th>
-        <th>Valise</th>
+        <th>Description Valise</th>
+        <th>Numéro Valise</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -76,7 +76,8 @@
         <td th:text="${mouvement.statutSortie}"></td>
         <td th:text="${#dates.format(mouvement.dateSortiePrevue, 'dd/MM/yyyy')}"></td>
         <td th:text="${#dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy')}"></td>
-        <td th:text="${mouvement.valise.nomValise}"></td>
+        <td th:text="${mouvement.valise.description}"></td>
+        <td th:text="${mouvement.valise.numeroValise}"></td>
         <td>
             <form th:action="@{/mouvements/view/{id}(id=${mouvement.id})}" method="get" style="display:inline;">
                 <button type="submit">Voir</button>
@@ -101,4 +102,3 @@
 
 </body>
 </html>
-
