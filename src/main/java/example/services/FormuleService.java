@@ -48,6 +48,7 @@ public class FormuleService implements IFormuleService {
             throw new RegleNotFoundException("Regle not found with ID: " + formule.getRegle().getId());
         }
 
+
         logger.info("Checking existence of Regle with ID: {}", formule.getRegle().getId());
         Regle regle = regleRepository.findById(formule.getRegle().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Regle not found with ID: " + formule.getRegle().getId()));

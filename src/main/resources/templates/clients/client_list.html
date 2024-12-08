@@ -97,9 +97,10 @@
         <td th:text="${client.codeClient}"></td>
         <td>
             <!-- Bouton pour Voir -->
-            <form th:action="@{/clients/view/{id}(id=${client.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Voir le client">Voir</button>
+            <form th:action="@{/clients/view/{id}(id=${client.id})}" method="get">
+                <button type="submit">Voir</button>
             </form>
+
 
             <!-- Bouton pour Modifier -->
             <form th:action="@{/clients/edit/{id}(id=${client.id})}" method="get" style="display:inline;">
@@ -119,10 +120,11 @@
 
 <!-- Lien vers la page de création d'un nouveau client -->
 <div style="margin-top: 20px;">
-    <a href="/clients/create">
+    <a th:href="@{/clients/create}">
         <button type="button">Ajouter un Client</button>
     </a>
 </div>
+
 
 </body>
 </html>

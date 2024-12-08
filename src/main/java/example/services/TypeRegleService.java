@@ -32,33 +32,33 @@ public class TypeRegleService implements ITypeRegleService {
     }
 
 
-        @Override
-        public TypeRegle createTypeRegle(String nomTypeRegle, Long regleId) {
-            Regle regle = regleRepository.findById(Math.toIntExact(regleId))
-                    .orElseThrow(() -> new EntityNotFoundException("La règle avec l'ID " + regleId + " est introuvable"));
+    @Override
+    public TypeRegle createTypeRegle(String nomTypeRegle, Long regleId) {
+        return null;
+    }
 
-            TypeRegle typeRegle = new TypeRegle();
-            typeRegle.setNomTypeRegle(nomTypeRegle);
-            typeRegle.setRegle(regle);
-
-            return typeRegleRepository.save(typeRegle);
-        }
-
-        @Override
+    @Override
         public TypeRegle createTypeRegle(TypeRegle typeRegle) {
             if (typeRegle == null) {
                 throw new IllegalArgumentException("TypeRegle ne peut pas être null");
             }
 
-            // Validation de la Regle associée
-            if (typeRegle.getRegle() == null) {
-                throw new IllegalArgumentException("La Regle associée ne peut pas être null");
+            // Validation de la règle associée
+            if (typeRegle.getRegle() == null || !regleRepository.existsById(typeRegle.getRegle().getId())) {
+                throw new IllegalArgumentException("La Regle associée est obligatoire et doit exister.");
             }
+            if (typeRegleRepository.existsByNomTypeRegle(typeRegle.getNomTypeRegle())) {
+                throw new IllegalArgumentException("Un TypeRegle avec ce nom existe déjà.");
+            }
+
 
             return typeRegleRepository.save(typeRegle);
         }
 
-        @Override
+
+
+
+    @Override
         @Transactional
         public void deleteTypeRegle(int id) {
             if (!typeRegleRepository.existsById(id)) {

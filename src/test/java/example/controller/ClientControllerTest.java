@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -31,17 +32,18 @@ public class ClientControllerTest {
     // Test: Création d'un client - Succès
     @Test
     public void testCreateClient_Success() {
-        // Arrange
-        Client client = new Client();
-        when(clientService.createClient(any(Client.class))).thenReturn(client);
+        Client client = new Client(); // Simule un client
+        BindingResult result = mock(BindingResult.class); // Crée un mock de BindingResult
 
-        // Act
-        String response = clientController.createClient(client);
+        when(result.hasErrors()).thenReturn(false); // Simule l'absence d'erreurs de validation
+        when(clientService.createClient(client)).thenReturn(client); // Simule la création du client
 
-        // Assert
-        assertEquals("redirect:/clients/list", response); // Chemin mis à jour
-        verify(clientService, times(1)).createClient(client); // Vérifie que le service est appelé une fois
+        String response = clientController.createClient(client, result); // Appelle la méthode
+
+        assertEquals("redirect:/clients/list", response); // Vérifie la redirection
+        verify(clientService, times(1)).createClient(client); // Vérifie l'appel au service
     }
+
 
 
     // Test: Suppression d'un client - Succès
@@ -125,13 +127,17 @@ public class ClientControllerTest {
     @Test
     public void testUpdateClient_Success() {
         Client client = new Client(); // Simule un client
-        when(clientService.updateClient(1, client)).thenReturn(client); // Simule la mise à jour
+        BindingResult result = mock(BindingResult.class); // Crée un mock de BindingResult
 
-        String response = clientController.updateClient(1, client); // Appelle la méthode
+        when(result.hasErrors()).thenReturn(false); // Simule l'absence d'erreurs de validation
+        when(clientService.updateClient(1, client)).thenReturn(client); // Simule la mise à jour du client
+
+        String response = clientController.updateClient(1, client, result); // Appelle la méthode
 
         assertEquals("redirect:/clients/list", response); // Vérifie la redirection
-        verify(clientService, times(1)).updateClient(1, client); // Vérifie l'appel du service
+        verify(clientService, times(1)).updateClient(1, client); // Vérifie l'appel au service
     }
+
 
 
     // Test: Formulaire de création d'un client

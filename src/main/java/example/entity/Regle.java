@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Inheritance(strategy = InheritanceType.JOINED) // Héritage JOINED
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "regle")
 public class Regle {
 
@@ -35,18 +35,21 @@ public class Regle {
     private Date dateRegle;
 
     @Column(name = "nombre_jours")
-    private int nombreJours;
+    private Integer nombreJours = 0;
 
     @Column(name = "calcul_calendaire")
-    private int calculCalendaire;
+    private Integer calculCalendaire =1;
+    public void setCalculCalendaire(Integer calculCalendaire) {
+        this.calculCalendaire = calculCalendaire != null ? calculCalendaire : 1; // Valeur par défaut
+    }
 
-    private Boolean fermeJS1;
-    private Boolean fermeJS2;
-    private Boolean fermeJS3;
-    private Boolean fermeJS4;
-    private Boolean fermeJS5;
-    private Boolean fermeJS6;
-    private Boolean fermeJS7;
+    private Boolean fermeJS1= false;
+    private Boolean fermeJS2 = false;
+    private Boolean fermeJS3 = false;
+    private Boolean fermeJS4 = false;
+    private Boolean fermeJS5 = false;
+    private Boolean fermeJS6 = false;
+    private Boolean fermeJS7 = false;
 
     @Column(name = "type_entree")
     private String typeEntree;
@@ -83,4 +86,17 @@ public class Regle {
 
     public void setSomeField(String someValue) {
     }
+
+    @Override
+    public String toString() {
+        return "Regle{" +
+                "id=" + id +
+                ", reglePourSortie='" + reglePourSortie + '\'' +
+                ", coderegle='" + coderegle + '\'' +
+                ", dateRegle=" + dateRegle +
+                ", nombreJours=" + nombreJours +
+                ", calculCalendaire=" + calculCalendaire +
+                '}';
+    }
+
 }

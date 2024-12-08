@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html  lang="FR" xmlns:th="http://www.thymeleaf.org">
+<html lang="FR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Liste des Valises</title>
@@ -76,24 +76,21 @@
         <td th:text="${valise.typeValise != null ? valise.typeValise.description : 'Non défini'}"></td>
         <td th:text="${valise.client != null ? valise.client.name : 'Non défini'}"></td>
 
-
         <td>
-            <!-- Bouton pour Voir -->
-            <form th:action="@{/valise/view/{id}(id=${valise.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Voir la valise">Voir</button>
+            <!-- Voir -->
+            <form th:action="@{/valise/view/{id}(id=${valise.id})}" method="get">
+                <button type="submit">Voir</button>
             </form>
-
-            <!-- Bouton pour Modifier -->
-            <form th:action="@{/valise/edit/{id}(id=${valise.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Modifier la valise">Modifier</button>
+            <!-- Modifier -->
+            <form th:action="@{/valise/edit/{id}(id=${valise.id})}" method="get">
+                <button type="submit">Modifier</button>
             </form>
-
-            <!-- Bouton pour Supprimer -->
+            <!-- Supprimer -->
             <form th:action="@{/valise/delete/{id}(id=${valise.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette valise ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
-                <button type="submit" style="color: red;" aria-label="Supprimer la valise">Supprimer</button>
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette valise ?');">
+                <button type="submit" style="color: red;">Supprimer</button>
             </form>
+
         </td>
     </tr>
     </tbody>

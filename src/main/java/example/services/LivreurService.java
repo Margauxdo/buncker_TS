@@ -42,12 +42,14 @@ public class    LivreurService implements ILivreurService {
             throw new ConflictException("Livreur avec ce code existe déjà.");
         }
 
-        if (livreur.getMouvement() != null) {
+        if (livreur.getMouvement() != null && livreur.getMouvement().getId() != 0) {
             Mouvement mouvement = mouvementRepository.findById(livreur.getMouvement().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + livreur.getMouvement().getId()));
-
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable."));
             livreur.setMouvement(mouvement);
+        } else {
+            livreur.setMouvement(null);
         }
+
 
         return livreurRepository.save(livreur);
     }
@@ -77,9 +79,10 @@ public class    LivreurService implements ILivreurService {
 
     @Override
     public Livreur getLivreurById(int id) {
-
-        return livreurRepository.findById(id).orElse(null);
+        return livreurRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Livreur not found with ID " + id));
     }
+
     @Override
     public List<Livreur> getAllLivreurs() {
 

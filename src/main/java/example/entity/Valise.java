@@ -39,19 +39,29 @@ public class Valise {
     private Date dateCreation;
     private String numeroDujeu;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "type_valise_id", nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "type_valise_id")
     private TypeValise typeValise;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
+
+
+
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise")
     private List<Mouvement> mouvementList = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
     private List<Regle> regleSortie = new ArrayList<>();
+
+
+    @Override
+    public String toString() {
+        return "Valise{id=" + id + ", description='" + description + "'}";
+    }
 
 }

@@ -89,7 +89,12 @@
 
     <p><strong>Retour Sécurité :</strong> <span th:text="${client.retourSecurite}"></span></p>
 
-    <a th:href="@{/clients/list}">Retour à la liste</a>
+    <div style="text-align: center;">
+    <a th:href="@{/clients/list}">
+        <button type="button">Retour à la liste</button>
+    </a>
+</div>
+
 </div>
 
 </body>

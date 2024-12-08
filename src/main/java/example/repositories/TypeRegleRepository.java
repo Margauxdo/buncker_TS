@@ -10,5 +10,6 @@ import java.util.List;
 public interface TypeRegleRepository extends JpaRepository<TypeRegle, Integer> {
     List<TypeRegle> findByNomTypeRegle(String nomTypeRegle);
     List<TypeRegle> findByRegle_Id(int regleId); // Recherche par ID de Regle
+    boolean existsByNomTypeRegle(String nomTypeRegle);
 }
 

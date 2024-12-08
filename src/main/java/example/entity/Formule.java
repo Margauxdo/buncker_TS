@@ -24,7 +24,7 @@ public class Formule {
     @NotNull(message = "Libelle cannot be null")
     private String libelle;
 
-    @Column(name = "description", length = 500)
+    @Column(name = "formule", length = 500)
     private String formule;
 
     @ManyToOne

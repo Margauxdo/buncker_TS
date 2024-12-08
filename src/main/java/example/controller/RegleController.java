@@ -1,10 +1,12 @@
 package example.controller;
 
-import example.entity.Formule;
-import example.entity.Regle;
+import example.entity.*;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.FormuleRepository;
+import example.repositories.JourFerieRepository;
+import example.repositories.TypeRegleRepository;
+import example.repositories.ValiseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
@@ -31,12 +33,14 @@ public class RegleController {
 
     @Autowired
     private FormuleRepository formuleRepository;
+    @Autowired
+    private ValiseRepository valiseRepository;
+    @Autowired
+    private TypeRegleRepository typeRegleRepository;
+    @Autowired
+    private JourFerieRepository jourFerieRepository;
 
-    @ExceptionHandler(RegleNotFoundException.class)
-    public String handleRegleNotFoundException(RegleNotFoundException ex, Model model) {
-        model.addAttribute("errorMessage", ex.getMessage());
-        return "regles/error";
-    }
+
 
     /*// API REST: Récupérer tous les regles
     @GetMapping("/api")
@@ -111,6 +115,12 @@ public class RegleController {
         }
     }*/
 
+    @ExceptionHandler(RegleNotFoundException.class)
+    public String handleRegleNotFoundException(RegleNotFoundException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "regles/error";
+    }
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -138,19 +148,47 @@ public class RegleController {
     // Formulaire Thymeleaf pour créer une regle
     @GetMapping("/create")
     public String createRegleForm(Model model) {
-        model.addAttribute("formule", new Formule());
+        Regle regle = new Regle();
+        regle.setNombreJours(0);
+        regle.setFermeJS1(false);
+        regle.setFermeJS2(false);
+        regle.setFermeJS3(false);
+        regle.setFermeJS4(false);
+        regle.setFermeJS5(false);
+        regle.setFermeJS6(false);
+        regle.setFermeJS7(false);
+
+        model.addAttribute("regle", regle);
+        model.addAttribute("valises", valiseRepository.findAll());
+        model.addAttribute("typesRegle", typeRegleRepository.findAll());
+        model.addAttribute("formules", formuleRepository.findAll());
+        model.addAttribute("joursFeries", jourFerieRepository.findAll());
+
         return "regles/regle_create";
     }
 
+
+
+
     // Création d'une regle via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createRegle(@Valid @ModelAttribute("regle") Regle regle) {
-        if (regle.getTypeRegle() == null) {
-            throw new IllegalArgumentException("TypeRegle must be associated with a Regle");
+    public String createRegle(@Valid @ModelAttribute("regle") Regle regle, Model model) {
+        try {
+            if (regle.getTypeRegle() == null) {
+                model.addAttribute("errorMessage", "Le Type de Règle est obligatoire.");
+                return "regles/regle_create"; // Retourne le formulaire avec le message d'erreur
+            }
+            regleService.createRegle(regle);
+            return "redirect:/regles/list"; // Redirection en cas de succès
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "regles/regle_create"; // Retourne le formulaire avec le message d'erreur
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur inattendue : " + e.getMessage());
+            return "regles/error"; // Redirige vers la page d'erreur générale
         }
-        regleService.createRegle(regle);
-        return "redirect:/regles/list"; // Ensure redirection matches the expectation in the test
     }
+
 
     // Formulaire Thymeleaf pour modifier une regle
     @GetMapping("/edit/{id}")

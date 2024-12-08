@@ -34,7 +34,7 @@ public class TypeValise {
     @NotNull
     private String description;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "valise_id", nullable = true)
     private Valise valise;
 

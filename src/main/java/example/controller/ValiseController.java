@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static example.services.ValiseService.logger;
 
 @Controller
@@ -103,29 +106,52 @@ public class ValiseController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }*/
+   /*@ExceptionHandler(Exception.class)
+   public String handleGlobalException(Exception ex, Model model) {
+       model.addAttribute("errorMessage", ex.getMessage());
+       return "valises/error";
+   }*/
+
 
     // Vue Thymeleaf pour lister les valises
     @GetMapping("/list")
     public String viewValises(Model model) {
-        List<Valise> valises = valiseService.getAllValises();
-        model.addAttribute("valises", valises);
+        try {
+            List<Valise> valises = valiseService.getAllValises();
+            model.addAttribute("valises", valises);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la récupération des valises : " + e.getMessage());
+            return "valises/error";
+        }
         return "valises/valises_list";
     }
 
     // Vue Thymeleaf pour voir une valise par ID
     @GetMapping("/view/{id}")
     public String viewValise(@PathVariable int id, Model model) {
-        Valise valise = valiseService.getValiseById(id);
-        model.addAttribute("valise", valise);
-        return "valises/valise_details";
+        logger.info("Action 'Voir' déclenchée pour la valise avec ID : {}", id);
+        try {
+            Valise valise = valiseService.getValiseById(id);
+            logger.debug("Valise récupérée pour affichage : {}", valise);
+            model.addAttribute("valise", valise);
+            return "valises/valise_details";
+        } catch (Exception e) {
+            logger.error("Erreur lors de l'affichage de la valise avec ID : {}", id, e);
+            model.addAttribute("errorMessage", "Erreur lors du chargement de la valise : " + e.getMessage());
+            return "valises/error";
+        }
     }
+
+
 
     // Formulaire Thymeleaf pour créer une valise
     @GetMapping("/create")
     public String createValiseForm(Model model) {
+        logger.info("Action 'Créer une nouvelle valise' déclenchée.");
         model.addAttribute("valise", new Valise());
         return "valises/valise_create";
     }
+
 
     // Création d'une valise via formulaire Thymeleaf
     @PostMapping("/create")
@@ -134,51 +160,91 @@ public class ValiseController {
             @RequestParam("client.id") int clientId,
             BindingResult result,
             Model model) {
+        logger.info("Action 'Créer' déclenchée pour une nouvelle valise avec client ID : {}", clientId);
         if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Veuillez corriger les erreurs.");
+            logger.warn("Erreurs de validation détectées lors de la création de la valise.");
+            model.addAttribute("errorMessage", "Veuillez corriger les erreurs dans le formulaire.");
             return "valises/valise_create";
         }
+        try {
+            Client client = clientRepository.findById(clientId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé avec l'ID : " + clientId));
+            valise.setClient(client);
+            logger.debug("Client associé à la nouvelle valise : {}", client);
 
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Client not found with ID: " + clientId));
-        valise.setClient(client);
-        valiseService.persistValise(valise);
-        return "redirect:/valise/list";
+            valiseService.persistValise(valise);
+            logger.info("Nouvelle valise créée avec succès : {}", valise);
+            return "redirect:/valise/list";
+        } catch (Exception e) {
+            logger.error("Erreur lors de la création de la valise", e);
+            model.addAttribute("errorMessage", "Une erreur interne s'est produite : " + e.getMessage());
+            return "valises/error";
+        }
     }
+
+
+
+
 
 
 
     // Formulaire Thymeleaf pour modifier une valise
     @GetMapping("/edit/{id}")
     public String editValiseForm(@PathVariable int id, Model model) {
-        Valise valise = valiseService.getValiseById(id);
-        if (valise == null) {
+        logger.info("Action 'Modifier' déclenchée pour afficher le formulaire de la valise avec ID : {}", id);
+        try {
+            Valise valise = valiseService.getValiseById(id);
+            logger.debug("Valise récupérée pour modification : {}", valise);
+            model.addAttribute("valise", valise);
+            return "valises/valise_edit";
+        } catch (Exception e) {
+            logger.error("Erreur lors du chargement de la valise pour modification avec ID : {}", id, e);
+            model.addAttribute("errorMessage", "Erreur lors du chargement de la valise : " + e.getMessage());
             return "valises/error";
         }
-        model.addAttribute("valise", valise);
-        return "valises/valise_edit";
     }
+
+
     // Modifier une valise via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
-    public String updateValise(@PathVariable int id, @Valid  @ModelAttribute("valise") Valise valise) {
-        valiseService.updateValise(id, valise);
-        return "redirect:/valise/list";
+    public String updateValise(
+            @PathVariable int id,
+            @Valid @ModelAttribute("valise") Valise valise,
+            BindingResult result,
+            Model model) {
+        logger.info("Action 'Modifier' déclenchée pour sauvegarder les modifications de la valise avec ID : {}", id);
+        if (result.hasErrors()) {
+            logger.warn("Erreurs de validation détectées lors de la modification de la valise avec ID : {}", id);
+            model.addAttribute("errorMessage", "Veuillez corriger les erreurs dans le formulaire.");
+            return "valises/valise_edit";
+        }
+        try {
+            Valise updatedValise = valiseService.updateValise(id, valise);
+            logger.info("Valise modifiée avec succès : {}", updatedValise);
+            return "redirect:/valise/list";
+        } catch (Exception e) {
+            logger.error("Erreur lors de la modification de la valise avec ID : {}", id, e);
+            model.addAttribute("errorMessage", "Une erreur est survenue : " + e.getMessage());
+            return "valises/error";
+        }
     }
-    // Supprimer une valise via un formulaire Thymeleaf sécurisé
+
+
 
     @PostMapping("/delete/{id}")
     public String deleteValise(@PathVariable int id, Model model) {
+        logger.info("Action 'Supprimer' déclenchée pour la valise avec ID : {}", id);
         try {
             valiseService.deleteValise(id);
-            return "redirect:/valises/valises_list";
-        } catch (ResourceNotFoundException e) {
-            model.addAttribute("errorMessage", "Valise with ID " + id + " not found!");
-            return "valises/error";
+            logger.info("Valise supprimée avec succès, ID : {}", id);
+            return "redirect:/valise/list";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "An unexpected error occurred while deleting the Valise.");
+            logger.error("Erreur lors de la suppression de la valise avec ID : {}", id, e);
+            model.addAttribute("errorMessage", "Erreur lors de la suppression de la valise : " + e.getMessage());
             return "valises/error";
         }
     }
+
 
 
 

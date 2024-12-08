@@ -21,7 +21,7 @@ public class Mouvement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mouvement_id")
-    private int id;
+    private Integer id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")

@@ -43,58 +43,23 @@
     </style>
 </head>
 <body>
-
 <h1>Liste des Types de Règle</h1>
-
-<!-- Message d'erreur s'il y en a -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}"></p>
-</div>
-
-<!-- Table pour afficher les types de règle -->
 <table>
     <thead>
     <tr>
         <th>ID</th>
-        <th>Nom du Type de Règle</th>
+        <th>Nom</th>
         <th>Règle Associée</th>
-        <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Boucle sur la liste des types de règle -->
-    <tr th:each="typeRegle : ${typesRegle}">
+    <tr th:each="typeRegle : ${typeRegles}">
         <td th:text="${typeRegle.id}"></td>
         <td th:text="${typeRegle.nomTypeRegle}"></td>
-        <td th:text="${typeRegle.regle != null ? typeRegle.regle.nom : 'Aucune'}"></td>
-        <td>
-            <!-- Bouton pour Voir -->
-            <form th:action="@{/typeRegle/view/{id}(id=${typeRegle.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Voir le type de règle">Voir</button>
-            </form>
-
-            <!-- Bouton pour Modifier -->
-            <form th:action="@{/typeRegle/edit/{id}(id=${typeRegle.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Modifier le type de règle">Modifier</button>
-            </form>
-
-            <!-- Bouton pour Supprimer -->
-            <form th:action="@{/typeRegle/delete/{id}(id=${typeRegle.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de règle ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
-                <button type="submit" style="color: red;" aria-label="Supprimer le type de règle">Supprimer</button>
-            </form>
-        </td>
+        <td th:text="${typeRegle.regle != null ? typeRegle.regle.coderegle : 'Aucune'}"></td>
     </tr>
     </tbody>
 </table>
-
-<!-- Lien vers la page de création d'un nouveau type de règle -->
-<div style="margin-top: 20px;">
-    <a href="/typeRegle/create">
-        <button type="button">Créer un nouveau type de règle</button>
-    </a>
-</div>
-
+<a th:href="@{/typeRegle/create}">Créer un nouveau Type de Règle</a>
 </body>
 </html>

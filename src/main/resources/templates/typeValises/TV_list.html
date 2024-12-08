@@ -71,9 +71,10 @@
         <td th:text="${typeValise.valise != null ? typeValise.valise.nom : 'Aucune'}"></td>
         <td>
             <!-- Bouton pour Voir -->
-            <form th:action="@{/typeValise/view/{id}(id=${typeValise.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Voir le type de valise">Voir</button>
+            <form th:action="@{/typeValise/view/{id}(id=${typeValise.id})}" method="get">
+                <button type="submit">Voir</button>
             </form>
+
 
             <!-- Bouton pour Modifier -->
             <form th:action="@{/typeValise/edit/{id}(id=${typeValise.id})}" method="get" style="display:inline;">
@@ -81,10 +82,10 @@
             </form>
 
             <!-- Bouton pour Supprimer -->
-            <form th:action="@{/typeValise/delete/{id}(id=${typeValise.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de valise ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
-                <button type="submit" style="color: red;" aria-label="Supprimer le type de valise">Supprimer</button>
+
+            <form th:action="@{/typeValise/delete/{id}(id=${client.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de valise ?');">
+                <button type="submit" style="color: red;">Supprimer</button>
             </form>
         </td>
     </tr>
@@ -93,7 +94,7 @@
 
 <!-- Lien vers la page de création d'un nouveau type de valise -->
 <div style="margin-top: 20px;">
-    <a href="/typeValise/create">
+    <a th:href="@{/typeValise/create}" >
         <button type="button">Créer un nouveau type de valise</button>
     </a>
 </div>

@@ -53,8 +53,9 @@
     <label for="formule">Description:</label>
     <input type="text" id="formule" th:field="*{formule}" required />
 
-    <label for="regle">Code règle:</label>
-    <input type="text" id="regle" th:field="*{regle.coderegle}" required />
+    <label for="regle">Règle ID :</label>
+    <input type="number" id="regle" th:field="*{regle.id}" required />
+
 
     <div style="text-align: center;">
         <button type="submit">Créer</button>

@@ -5,7 +5,7 @@
     <title>Modifier un Livreur</title>
     <style>
         form {
-            max-width: 600px;
+            max-width: 800px;
             margin: 20px auto;
             padding: 20px;
             border: 1px solid #ccc;
@@ -19,7 +19,7 @@
             font-weight: bold;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -27,32 +27,42 @@
             border-radius: 4px;
         }
 
-
-
-        .actions {
-            text-align: center;
+        button {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
         }
 
-        .actions button {
-            margin: 0 5px;
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
         }
     </style>
 </head>
 <body>
-<h1 style="text-align: center;">Modifier un Livreur</h1>
+<h1>Modifier un Livreur</h1>
 
-<form th:action="@{/livreurs/edit/{id}(id=${livreur.id})}" th:object="${livreur}" method="post">
+<!-- Affichage des messages d'erreur -->
+
+
+
+<form th:action="@{/livreurs/edit}" th:object="${livreur}" method="post">
     <label for="codeLivreur">Code Livreur :</label>
-    <input type="text" id="codeLivreur" th:field="*{codeLivreur}" />
+    <input type="text" id="codeLivreur" th:field="*{codeLivreur}" required />
 
     <label for="motDePasse">Mot de Passe :</label>
-    <input type="password" id="motDePasse" th:field="*{motDePasse}" />
+    <input type="password" id="motDePasse" th:field="*{motDePasse}" required />
 
     <label for="nomLivreur">Nom :</label>
     <input type="text" id="nomLivreur" th:field="*{nomLivreur}" required />
 
     <label for="prenomLivreur">Prénom :</label>
-    <input type="text" id="prenomLivreur" th:field="*{prenomLivreur}" required />
+    <input type="text" id="prenomLivreur" th:field="*{prenomLivreur}" />
 
     <label for="numeroCartePro">Numéro Carte Pro :</label>
     <input type="text" id="numeroCartePro" th:field="*{numeroCartePro}" />
@@ -67,17 +77,19 @@
     <input type="text" id="telephoneAlphapage" th:field="*{telephoneAlphapage}" />
 
     <label for="mouvement">Mouvement :</label>
-    <select id="mouvement" th:field="*{mouvement.id}" required>
-        <option th:each="mvt : ${mouvements}" th:value="${mvt.id}" th:text="${mvt.name}"></option>
+    <select id="mouvement" th:field="*{mouvement.id}">
+        <option value="" disabled selected>-- Sélectionnez un Mouvement --</option>
+        <option th:each="mouv : ${mouvements}" th:value="${mouv.id}" th:text="${mouv.description}"></option>
     </select>
 
-    <div class="actions">
-        <button type="submit">Modifier</button>
+    <div style="text-align: center;">
+        <button type="submit">Valider</button>
         <a th:href="@{/livreurs/list}">
             <button type="button">Retour à la liste</button>
         </a>
     </div>
 </form>
+
 
 </body>
 </html>

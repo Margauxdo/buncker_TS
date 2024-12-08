@@ -52,29 +52,21 @@
 </head>
 <body>
 <h1 style="text-align: center;">Modifier un Type de Valise</h1>
+<form action="#" th:action="@{/typeValise/edit/{id}(id=${typeValise.id})}" th:object="${typeValise}" method="post">
+  <input type="text" th:field="*{proprietaire}" placeholder="Propriétaire" required />
 
-<form th:action="@{/typeValise/edit/{id}(id=${typeValise.id})}" th:object="${typeValise}" method="post">
-  <!-- Champ pour le propriétaire -->
-  <label for="proprietaire">Propriétaire :</label>
-  <input type="text" id="proprietaire" th:field="*{proprietaire}" placeholder="Entrez le propriétaire" required />
-
-  <!-- Champ pour la description -->
-  <label for="description">Description :</label>
-  <input type="text" id="description" th:field="*{description}" placeholder="Entrez la description" required />
-
-  <!-- Relation avec Valise -->
-  <label for="valise">Valise associée :</label>
-  <select id="valise" th:field="*{valise}" th:each="valise : ${valises}" th:value="${valise.id}" th:text="${valise.nom}">
-    <option value="" th:text="'Aucune valise associée'"></option>
+  <input th:field="*{description}" placeholder="Description"/>
+  <select th:field="*{valise.id}">
+    <option th:each="valise : ${valises}" th:value="${valise.id}" th:text="${valise.description}"></option>
   </select>
-
   <div style="text-align: center;">
-    <button type="submit">Modifier</button>
+    <button type="submit">Valider</button>
     <a th:href="@{/typeValise/list}">
       <button type="button">Retour à la liste</button>
     </a>
   </div>
 </form>
+
 
 </body>
 </html>

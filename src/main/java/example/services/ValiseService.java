@@ -71,17 +71,25 @@ public class ValiseService implements IValiseService {
         }
     }
 
-    private List<Regle> validateRegles(List<Regle> regles) {
+    public List<Regle> validateRegles(List<Regle> regles) {
         List<Regle> validRegles = new ArrayList<>();
         for (Regle regle : regles) {
             if (regle.getId() != 0) {
                 Regle foundRegle = regleRepository.findById(regle.getId())
                         .orElseThrow(() -> new ResourceNotFoundException("Regle not found with ID: " + regle.getId()));
                 validRegles.add(foundRegle);
+            } else {
+                // Initialiser les champs requis de la règle si nécessaire
+                if (regle.getCalculCalendaire() == null) {
+                    regle.setCalculCalendaire(0); // Valeur par défaut pour un champ Integer
+                }
+                validRegles.add(regle);
             }
         }
         return validRegles;
     }
+
+
 
 
     @Override
@@ -105,20 +113,61 @@ public class ValiseService implements IValiseService {
         valiseRepository.deleteById(id);
     }
 
-    @Override
+    @Transactional
     public Valise getValiseById(int id) {
-        return valiseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Valise not found with ID: " + id));
+        Valise valise = valiseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Valise non trouvée avec ID : " + id));
+        Hibernate.initialize(valise.getClient());
+        Hibernate.initialize(valise.getTypeValise());
+        Hibernate.initialize(valise.getMouvementList());
+        return valise;
     }
+
+
+
+
 
     @Transactional
     public List<Valise> getAllValises() {
         List<Valise> valises = valiseRepository.findAll();
-        valises.forEach(valise -> Hibernate.initialize(valise.getClient())); // Initialisez les clients associés
+        valises.forEach(valise -> {
+
+            Hibernate.initialize(valise.getTypeValise());
+            Hibernate.initialize(valise.getClient());
+            Hibernate.initialize(valise.getRegleSortie());
+            valise.getRegleSortie().forEach(regle -> {
+                if (regle.getCalculCalendaire() == null) {
+                    regle.setCalculCalendaire(0); // Valeur par défaut pour éviter les erreurs
+                }
+            });
+        });
         return valises;
     }
+
+
     @Override
     public void persistValise(Valise valise) {
         valiseRepository.save(valise);
     }
+
+    @Override
+    public boolean existsById(int id) {
+        return valiseRepository.existsById(id);
+    }
+
+    @Override
+    public List<Valise> findAllWithClient() {
+        return List.of();
+    }
+
+    @Transactional
+    public Valise getValiseByIdWithDependencies(int id) {
+        Valise valise = valiseRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Valise not found"));
+        Hibernate.initialize(valise.getClient());
+        Hibernate.initialize(valise.getTypeValise());
+        return valise;
+    }
+
+
+
 }

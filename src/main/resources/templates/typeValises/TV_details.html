@@ -66,7 +66,11 @@
         <span th:text="${typeValise.valise != null ? typeValise.valise.nom : 'Aucune'}"></span>
     </p>
 
-    <a th:href="@{/typeValise/list}">Retour à la liste</a>
+    <div style="text-align: center;">
+        <a th:href="@{/typeValise/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
 </div>
 
 </body>

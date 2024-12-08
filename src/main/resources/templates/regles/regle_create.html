@@ -2,117 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Créer une Règle</title>
-    <style>
-        form {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-
-
-        .action-buttons {
-            text-align: center;
-        }
-
-        .action-buttons button {
-            margin: 5px;
-        }
-    </style>
+    <title>Créer une Nouvelle Règle</title>
 </head>
 <body>
-<h1 style="text-align: center;">Créer une Nouvelle Règle</h1>
+<h1>Créer une Nouvelle Règle</h1>
 <form th:action="@{/regles/create}" th:object="${regle}" method="post">
+    <!-- Code de la Règle -->
     <label for="coderegle">Code de la Règle :</label>
     <input type="text" id="coderegle" th:field="*{coderegle}" required />
 
+    <!-- Règle pour Sortie -->
     <label for="reglePourSortie">Règle pour Sortie :</label>
     <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
-    <label for="dateRegle">Date de la Règle :</label>
-    <input type="date" id="dateRegle" th:field="*{dateRegle}" required />
-
-    <label for="nombreJours">Nombre de Jours :</label>
-    <input type="number" id="nombreJours" th:field="*{nombreJours}" />
-
-    <label for="calculCalendaire">Calcul Calendaire :</label>
-    <input type="number" id="calculCalendaire" th:field="*{calculCalendaire}" />
-
-    <label for="fermeJS1">Fermer Jour Spécial 1 :</label>
-    <input type="checkbox" id="fermeJS1" th:field="*{fermeJS1}" />
-
-    <label for="fermeJS2">Fermer Jour Spécial 2 :</label>
-    <input type="checkbox" id="fermeJS2" th:field="*{fermeJS2}" />
-
-    <label for="fermeJS3">Fermer Jour Spécial 3 :</label>
-    <input type="checkbox" id="fermeJS3" th:field="*{fermeJS3}" />
-
-    <label for="fermeJS4">Fermer Jour Spécial 4 :</label>
-    <input type="checkbox" id="fermeJS4" th:field="*{fermeJS4}" />
-
-    <label for="fermeJS5">Fermer Jour Spécial 5 :</label>
-    <input type="checkbox" id="fermeJS5" th:field="*{fermeJS5}" />
-
-    <label for="fermeJS6">Fermer Jour Spécial 6 :</label>
-    <input type="checkbox" id="fermeJS6" th:field="*{fermeJS6}" />
-
-    <label for="fermeJS7">Fermer Jour Spécial 7 :</label>
-    <input type="checkbox" id="fermeJS7" th:field="*{fermeJS7}" />
-
-    <label for="typeEntree">Type d'Entrée :</label>
-    <input type="text" id="typeEntree" th:field="*{typeEntree}" />
-
-    <label for="nbjsmEntree">Nombre de JSM d'Entrée :</label>
-    <input type="number" id="nbjsmEntree" th:field="*{nbjsmEntree}" />
-
+    <!-- Valise -->
     <label for="valise">Valise :</label>
     <select id="valise" th:field="*{valise.id}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
     </select>
+    <p th:if="${#lists.isEmpty(valises)}" style="color: red;">Aucune valise disponible</p>
 
+
+    <!-- Type de Règle -->
     <label for="typeRegle">Type de Règle :</label>
     <select id="typeRegle" th:field="*{typeRegle.id}" required>
         <option value="" disabled selected>-- Sélectionnez un Type de Règle --</option>
         <option th:each="type : ${typesRegle}" th:value="${type.id}" th:text="${type.name}"></option>
     </select>
 
+    <!-- Formule -->
     <label for="formule">Formule :</label>
     <select id="formule" th:field="*{formule.id}">
         <option value="" disabled selected>-- Sélectionnez une Formule --</option>
         <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.name}"></option>
     </select>
 
+    <!-- Jour Férié -->
     <label for="jourFerie">Jour Férié :</label>
     <select id="jourFerie" th:field="*{jourFerie.id}">
         <option value="" disabled selected>-- Sélectionnez un Jour Férié --</option>
         <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.name}"></option>
     </select>
 
-    <div class="action-buttons">
-        <button type="submit">Créer</button>
-        <a th:href="@{/regles/list}">
-            <button type="button">Retour à la Liste</button>
-        </a>
-    </div>
+    <button type="submit">Créer</button>
 </form>
 </body>
 </html>

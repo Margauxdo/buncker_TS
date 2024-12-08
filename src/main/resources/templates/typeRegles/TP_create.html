@@ -53,9 +53,11 @@
 
     <!-- Relation avec Règle -->
     <label for="regle">Règle :</label>
-    <select id="regle" th:field="*{regle}" th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.nom}">
+    <select id="regle" th:field="*{regle.id}" required>
         <option value="" th:text="'Sélectionner une règle'"></option>
+        <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>
+
 
     <div style="text-align: center;">
         <button type="submit">Créer</button>

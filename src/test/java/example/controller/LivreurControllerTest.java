@@ -14,6 +14,9 @@ import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
 import java.util.List;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,25 +90,35 @@ public class LivreurControllerTest {
     public void testCreateLivreur_Success() {
         Livreur livreur = new Livreur();
         livreur.setNomLivreur("John Doe");
+
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(false);
         when(livreurService.createLivreur(any(Livreur.class))).thenReturn(livreur);
 
-        String response = livreurController.createLivreur(livreur, new ConcurrentModel());
+        Model model = new ConcurrentModel();
+        String response = livreurController.createLivreur(livreur, bindingResult, model);
 
         assertEquals("redirect:/livreurs/list", response);
         verify(livreurService, times(1)).createLivreur(livreur);
+        verify(bindingResult, times(1)).hasErrors();
     }
+
 
     @Test
     public void testCreateLivreur_Conflict() {
         Livreur livreur = new Livreur();
+
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(false);
         doThrow(new ConflictException("Conflict")).when(livreurService).createLivreur(any(Livreur.class));
 
         Model model = new ConcurrentModel();
-        String response = livreurController.createLivreur(livreur, model);
+        String response = livreurController.createLivreur(livreur, bindingResult, model);
 
-        assertEquals("livreurs/livreur_create", response); // Vérifie la redirection
-        assertTrue(model.containsAttribute("errorMessage")); // Vérifie la présence du message d'erreur
-        assertEquals("Une erreur inattendue s'est produite.", model.getAttribute("errorMessage")); // Vérifie le message renvoyé
+        assertEquals("livreurs/livreur_create", response);
+        assertTrue(model.containsAttribute("errorMessage"));
+        assertEquals("Une erreur inattendue s'est produite.", model.getAttribute("errorMessage"));
+        verify(livreurService, times(1)).createLivreur(livreur);
     }
 
 

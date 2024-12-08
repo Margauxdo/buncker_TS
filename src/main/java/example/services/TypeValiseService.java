@@ -30,12 +30,17 @@ public class TypeValiseService implements ITypeValiseService {
             throw new IllegalArgumentException("TypeValise or its associated Valise cannot be null");
         }
 
+        // Récupérer une Valise attachée à la session Hibernate
         Valise managedValise = valiseRepository.findById(typeValise.getValise().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + typeValise.getValise().getId()));
 
+        // Associer la Valise gérée à TypeValise
         typeValise.setValise(managedValise);
+
+        // Sauvegarder TypeValise
         return typeValiseRepository.save(typeValise);
     }
+
 
 
     @Override

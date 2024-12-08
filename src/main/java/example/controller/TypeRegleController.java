@@ -105,17 +105,23 @@ public class TypeRegleController {
     @GetMapping("/create")
     public String createTypeRegleForm(Model model) {
         model.addAttribute("typeRegle", new TypeRegle());
-        return "typeRegles/TP_create";
+        model.addAttribute("regles", regleRepository.findAll()); // Charger les règles disponibles
+        return "typeRegle/TP_create";
     }
+
 
     // Création d'un client via formulaire Thymeleaf
     @PostMapping("/create")
-    public ResponseEntity<Void> createTypeRegle(@Valid @ModelAttribute("typeRegle") TypeRegle typeRegle) {
-        typeRegleService.createTypeRegle(typeRegle);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", "/typeRegles/TR_list")
-                .build();
+    public String createTypeRegle(@Valid @ModelAttribute("typeRegle") TypeRegle typeRegle, Model model) {
+        try {
+            typeRegleService.createTypeRegle(typeRegle);
+            return "redirect:/typeRegle/list"; // Vue existante
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "typeRegle/TP_create"; // Retour au formulaire en cas d'erreur
+        }
     }
+
 
 
 

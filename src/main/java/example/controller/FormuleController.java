@@ -76,19 +76,41 @@ public class FormuleController {
     public String createFormule(@Valid @ModelAttribute("formule") Formule formule,
                                 @RequestParam(value = "regle.id", required = false) Integer regleId, Model model) {
         try {
+            // Log des données reçues
+            logger.info("Creating formule...");
+            logger.info("Received libelle: {}", formule.getLibelle());
+            logger.info("Received formule: {}", formule.getFormule());
+            logger.info("Received regle ID: {}", regleId);
+
+
+            // Vérification et récupération de la règle associée
             if (regleId != null) {
+                logger.info("Fetching Regle with ID: {}", regleId);
                 Regle regle = regleService.getRegleById(regleId);
                 formule.setRegle(regle);
+                logger.info("Regle fetched successfully: {}", regle);
             } else {
+                logger.warn("No Regle ID provided in the request.");
                 throw new IllegalArgumentException("A valid Regle must be provided.");
             }
+
+            // Création de la formule
+            logger.info("Saving formule: {}", formule);
             formuleService.createFormule(formule);
+            logger.info("Formule created successfully with ID: {}", formule.getId());
+
             return "redirect:/formules/list";
         } catch (Exception e) {
+            // Log de l'erreur
+            logger.error("Error occurred while creating formule: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", e.getMessage());
             return "formules/formule_create";
         }
     }
+
+
+
+
 
 
 

@@ -33,9 +33,18 @@ import java.util.List;
         }
 
         @Override
-        @Transactional
         public Client updateClient(int id, Client client) {
-            if (client.getId() != null && client.getId() != id) {
+            return null;
+        }
+
+        @Override
+        @Transactional
+        public Client updateClient(Integer id, Client client) {
+            if (id == null) {
+                throw new IllegalArgumentException("ID cannot be null");
+            }
+
+            if (client.getId() != null && !client.getId().equals(id)) {
                 throw new IllegalArgumentException("Client ID mismatch");
             }
 

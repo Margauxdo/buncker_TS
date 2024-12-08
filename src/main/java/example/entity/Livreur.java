@@ -23,14 +23,16 @@ public class Livreur {
     @Column(nullable = false)
     private String nomLivreur;
     private String prenomLivreur;
+    @Column(name = "numero_carte_pro")
     private String numeroCartePro;
+    @Column(name = "telephone_portable")
     private String telephonePortable;
     private String telephoneKobby;
 
 
     private String telephoneAlphapage;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mouvement_id", nullable = true)
     private Mouvement mouvement;
 

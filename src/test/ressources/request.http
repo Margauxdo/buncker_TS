@@ -4,8 +4,9 @@
 GET http://localhost:8080/clients/list
 Accept: text/html
 
+
 ### Afficher un client par ID (GET - Thymeleaf)
-GET http://localhost:8080/clients/view/1
+GET http://localhost:8080/clients/view/4
 Accept: text/html
 
 ### Afficher le formulaire de création de client (GET - Thymeleaf)
@@ -16,24 +17,26 @@ Accept: text/html
 POST http://localhost:8080/clients/create
 Content-Type: application/x-www-form-urlencoded
 
-name=John+Doe&email=john.doe%40example.com&adresse=123+Main+St&telephoneExploitation=0123456789&ville=Paris&personnelEtFonction=Manager
+name=Jules+Dupont&email=jules.d%40example.com&adresse=1+rue+de+Paris&ville=Paris&telephoneExploitation=0123456789
 
 ### Afficher le formulaire de modification d'un client (GET - Thymeleaf)
-GET http://localhost:8080/clients/edit/1
+GET http://localhost:8080/clients/edit/4
 Accept: text/html
-
 
 ### Modifier un client existant (POST - Thymeleaf)
 POST http://localhost:8080/clients/edit/1
 Content-Type: application/x-www-form-urlencoded
 
-name=Jane+Doe&email=jane.doe%40example.com&adresse=456+Elm+St&telephoneExploitation=0987654321&ville=Lyon&personnelEtFonction=Directrice
+name=Jean+Modifié&email=jean.modifie%40example.com&adresse=2+rue+modifiée&ville=Lyon&telephoneExploitation=0123456789
 
 ### Supprimer un client (POST - Thymeleaf)
-POST http://localhost:8080/clients/delete/1
+POST http://localhost:8080/clients/delete/2
 Accept: text/html
 
+
+
 # Section 2 : Thymeleaf pour l'entité Formule
+
 ### Liste des formules (GET - Thymeleaf)
 GET http://localhost:8080/formules/list
 Accept: text/html
@@ -46,24 +49,443 @@ Accept: text/html
 GET http://localhost:8080/formules/create
 Accept: text/html
 
-## Créer une nouvelle formule (POST - Thymeleaf)
+### Créer une nouvelle formule (POST - Thymeleaf)
 POST http://localhost:8080/formules/create
 Content-Type: application/x-www-form-urlencoded
 
-libelle=Formule+Premium&formule=Description+de+la+formule&regle.id=1
+libelle=Test+Libelle+thymeleaf&formule=Test+Description&regle.id=1
+
+
 
 ### Afficher le formulaire d'édition d'une formule (GET - Thymeleaf)
 GET http://localhost:8080/formules/edit/1
 Accept: text/html
 
-## Modifier une formule existante (POST - Thymeleaf)
+### Modifier une formule existante (POST - Thymeleaf)
 POST http://localhost:8080/formules/edit/1
 Content-Type: application/x-www-form-urlencoded
 
-libelle=Formule+Avancée&formule=Nouvelle+description&regle.id=2
 
-## Supprimer une formule (POST - Thymeleaf)
+
+### Supprimer une formule (POST - Thymeleaf)
 POST http://localhost:8080/formules/delete/1
 Accept: text/html
+
+
+
+# Section 3 : Thymeleaf pour l'entité Jour ferie
+
+### Liste des Jours feries (GET - Thymeleaf)
+GET http://localhost:8080/jourferies/list
+Accept: text/html
+
+
+### Voir un jour ferie par ID (GET - Thymeleaf)
+GET localhost:8080/jourferies/view/1
+Accept: text/html
+
+### Afficher le formulaire de création un jour ferie (GET - Thymeleaf)
+GET localhost:8080/jourferies/create
+Accept: text/html
+
+### Creer une nouvelle formule (POST - Thymeleaf)
+POST localhost:8080/jourferies/create
+Content-Type: application/x-www-form-urlencoded
+
+
+
+# Section 4 : Thymeleaf pour l'entité livreur
+
+### Liste des lireurs (GET - Thymeleaf)
+GET http://localhost:8080/livreurs/list
+Accept: text/html
+
+### Voir un livreur par ID (GET - Thymeleaf)
+GET localhost:8080/livreurs/view/2
+Accept: text/html
+
+### Afficher le formulaire de  création d'un livreur (GET - Thymeleaf)
+GET localhost:8080/livreurs/create
+Accept: text/html
+
+###Créer un nouveau livreur (POST - Thymeleaf)
+POST http://localhost:8080/livreurs/create
+Content-Type: application/x-www-form-urlencoded
+
+codeLivreur=256LI&motDePasse=1234&nomLivreur=Marc&prenomLivreur=Jean&numeroCartePro=1234ABC&telephonePortable=0789652569&telephoneKobby=0123456789&telephoneAlphapage=9876543210
+
+### Afficher le formulaire modification un livreur (GET - Thymeleaf)
+GET localhost:8080/livreurs/edit/2
+Accept: text/html
+
+### Modifier un livreur existant (POST - Thymeleaf)
+POST http://localhost:8080/livreurs/edit/2
+Content-Type: application/x-www-form-urlencoded
+
+codeLivreur=235LI&motDePasse=1234&nomLivreur=Harry&prenomLivreur=Jules&numeroCartePro=1234ABC&telephonePortable=0789652569&telephoneKobby=0123456789&telephoneAlphapage=9876543210
+
+
+
+###Supprimer un livreur (POST - Thymeleaf)
+POST http://localhost:8080/livreurs/delete/2
+Content-Type: application/x-www-form-urlencoded
+
+
+
+# Section 5 : Thymeleaf pour l'entité mouvement
+
+### Liste des mouvement (GET - Thymeleaf)
+GET localhost:8080/mouvements/list
+Accept: text/html
+
+
+### Voir un mouvement par ID (GET - Thymeleaf)
+GET localhost:8080/mouvements/view/1
+Accept: text/html
+
+
+### Afficher le formulaire de  création d'un mouvement (GET - Thymeleaf)
+GET localhost:8080/mouvements/create
+Accept: text/html
+
+### Créer un nouveau mouvement(POST - Thymeleaf)
+POST http://localhost:8080/mouvements/create
+Content-Type: application/x-www-form-urlencoded
+
+
+
+### Afficher le formulaire modification un mouvement (GET - Thymeleaf)
+GET http://localhost:8080/mouvements/edit/1
+Accept: text/html
+
+
+### Modifier un mouvement existant (POST - Thymeleaf)
+POST http://localhost:8080/mouvements/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+###Supprimer un mouvement (POST - Thymeleaf)
+POST http://localhost:8080/mouvements/delete/1
+Accept: text/html
+
+
+
+# Section 6 : Thymeleaf pour l'entité probleme
+### Liste des probleme (GET - Thymeleaf)
+GET http://localhost:8080/pb/list
+Accept: text/html
+
+### Voir un probleme par ID (GET - Thymeleaf)
+GET http://localhost:8080/pb/view/1
+Accept: text/html
+
+
+### Afficher le formulaire de  création d'un probleme (GET - Thymeleaf)
+GET http://localhost:8080/pb/create
+Accept: text/html
+
+
+### Créer un nouveau probleme(POST - Thymeleaf)
+POST http://localhost:8080/pb/create
+Content-Type: application/x-www-form-urlencoded
+
+
+### Afficher le formulaire modification un probleme (GET - Thymeleaf)
+GET http://localhost:8080/pb/edit/1
+Accept: text/html
+
+
+### Modifier un probleme existant (POST - Thymeleaf)
+POST http://localhost:8080/pb/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+
+###Supprimer un probleme(POST - Thymeleaf)
+POST http://localhost:8080/pb/delete/1
+
+
+# Section 7 : Thymeleaf pour l'entité regles
+
+### Liste des regles (GET - Thymeleaf)
+GET http://localhost:8080/regles/list
+Accept: text/html
+
+### Voir une regle par ID (GET - Thymeleaf)
+GET http://localhost:8080/regles/view/1
+Accept: text/html
+
+
+### Afficher le formulaire de  création d'une regle (GET - Thymeleaf)
+GET http://localhost:8080/regles/create
+Accept: text/html
+
+
+### Créer une nouvelle regle(POST - Thymeleaf)
+POST http://localhost:8080/regles/create
+Content-Type: application/x-www-form-urlencoded
+
+
+
+### Afficher le formulaire modification une regle (GET - Thymeleaf)
+GET http://localhost:8080/regles/edit/1
+Accept: text/html
+
+
+### Modifier une regle existant (POST - Thymeleaf)
+POST http://localhost:8080/regles/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+###Supprimer une regle(POST - Thymeleaf)
+POST http://localhost:8080/regles/delete/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+# Section 8 : Thymeleaf pour l'entité regles manuelle
+
+### Liste des regles man (GET - Thymeleaf)
+GET http://localhost:8080/reglemanuelle/list
+Accept: text/html
+
+### Voir une regle par ID (GET - Thymeleaf)
+GET http://localhost:8080/reglemanuelle/view/1
+Accept: text/html
+
+
+### Afficher le formulaire de  création d'une regle (GET - Thymeleaf)
+GET http://localhost:8080/reglemanuelle/create
+Accept: text/html
+
+
+### Créer une nouvelle regle(POST - Thymeleaf)
+POST http://localhost:8080/reglemanuelle/create
+Content-Type: application/x-www-form-urlencoded
+
+
+### Afficher le formulaire modification une regle (GET - Thymeleaf)
+GET http://localhost:8080/reglemanuelle/edit/1
+Accept: text/html
+
+
+### Modifier une regle existant (POST - Thymeleaf)
+POST http://localhost:8080/reglemanuelle/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+###Supprimer une regle(POST - Thymeleaf)
+POST http://localhost:8080/reglemanuelle/delete/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+## Section 9 : Thymeleaf pour l'entité retour secu
+### Liste des RS (GET - Thymeleaf)
+GET http://localhost:8080/retourSecurite/list
+Accept: text/html
+
+
+### Voir une RS par ID (GET - Thymeleaf)
+GET http://localhost:8080/retourSecurite/view/1
+Accept: text/html
+
+
+
+### Afficher le formulaire de  création d'un RS (GET - Thymeleaf)
+GET http://localhost:8080/retourSecurite/create
+Accept: text/html
+
+
+### Créer une nouvelle RS (POST - Thymeleaf)
+POST http://localhost:8080/retourSecurite/create
+Content-Type: application/x-www-form-urlencoded
+
+
+### Afficher le formulaire modification une regle (GET - Thymeleaf)
+GET http://localhost:8080/retourSecurite/edit/1
+Accept: text/html
+
+### Modifier un RS existant (POST - Thymeleaf)
+POST http://localhost:8080/retourSecurite/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+###Supprimer un RS(POST - Thymeleaf)
+POST http://localhost:8080/retourSecurite/delete/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+
+## Section 10 : Thymeleaf pour l'entité sortie semaine
+### Liste des SS (GET - Thymeleaf)
+GET http://localhost:8080/sortieSemaine/list
+Accept: text/html
+
+
+### Voir une SS par ID (GET - Thymeleaf)
+GET http://localhost:8080/sortieSemaine/view/1
+Accept: text/html
+
+
+
+### Afficher le formulaire de  création d'un SS (GET - Thymeleaf)
+GET http://localhost:8080/sortieSemaine/create
+Accept: text/html
+
+
+### Créer une nouvelle SS (POST - Thymeleaf)
+POST http://localhost:8080/sortieSemaine/create
+Content-Type: application/x-www-form-urlencoded
+
+
+### Afficher le formulaire modification une SS (GET - Thymeleaf)
+GET http://localhost:8080/sortieSemaine/edit/1
+Accept: text/html
+
+### Modifier un SS existant (POST - Thymeleaf)
+POST http://localhost:8080/sortieSemaine/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+###Supprimer un SS(POST - Thymeleaf)
+POST http://localhost:8080/sortieSemaine/delete/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+## Section 11 : Thymeleaf pour l'entité type regle
+### Liste des TR (GET - Thymeleaf)
+GET http://localhost:8080/typeRegle/list
+Accept: text/html
+
+
+### Voir une TR par ID (GET - Thymeleaf)
+GET http://localhost:8080/typeRegle/view/1
+Accept: text/html
+
+
+
+### Afficher le formulaire de  création d'un TR (GET - Thymeleaf)
+GET http://localhost:8080/typeRegle/create
+Accept: text/html
+
+
+### Créer une nouvelle TR (POST - Thymeleaf)
+POST http://localhost:8080/typeRegle/create
+Content-Type: application/x-www-form-urlencoded
+
+nomTypeRegle=Nouveau+&regle.id=1
+
+
+### Afficher le formulaire modification une TR (GET - Thymeleaf)
+GET http://localhost:8080/typeRegle/edit/1
+Accept: text/html
+
+### Modifier un TR existant (POST - Thymeleaf)
+POST http://localhost:8080/typeRegle/edit/1
+Content-Type: application/x-www-form-urlencoded
+
+nomTypeRegle=Nouveau+&regle.id=1
+
+
+###Supprimer un TR(POST - Thymeleaf)
+POST http://localhost:8080/typeRegle/delete/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+
+## Section 12 : Thymeleaf pour l'entité type valise
+### Liste des TV (GET - Thymeleaf)
+GET http://localhost:8080/typeValise/list
+Accept: text/html
+
+
+### Voir une TV par ID (GET - Thymeleaf)
+GET http://localhost:8080/typeValise/view/1
+Accept: text/html
+
+
+
+### Afficher le formulaire de  création d'un TV (GET - Thymeleaf)
+GET http://localhost:8080/typeValise/create
+Accept: text/html
+
+
+### Créer une nouvelle Tv (POST - Thymeleaf)
+POST http://localhost:8080/typeValise/create
+Content-Type: application/x-www-form-urlencoded
+
+description=test+type+valise&valise.id=11
+
+
+
+### Afficher le formulaire modification une TV (GET - Thymeleaf)
+GET http://localhost:8080/typeValise/edit/2
+Accept: text/html
+
+### Modifier un TV existant (POST - Thymeleaf)
+POST http://localhost:8080/typeValise/edit/2
+Content-Type: application/x-www-form-urlencoded
+
+description=test+type+valise+auchan&valise.id=11
+
+
+
+###Supprimer un TV(POST - Thymeleaf)
+POST http://localhost:8080/typeValise/delete/1
+Content-Type: application/x-www-form-urlencoded
+
+
+
+
+## Section 13 : Thymeleaf pour l'entité Valise
+### Liste des valises (GET - Thymeleaf)
+GET http://localhost:8080/valise/list
+Accept: text/html
+
+
+### Voir une valise par ID (GET - Thymeleaf)
+GET http://localhost:8080/valise/view/12
+Accept: text/html
+
+
+
+### Afficher le formulaire de  création d'une valise (GET - Thymeleaf)
+GET http://localhost:8080/valise/create
+Accept: text/html
+
+
+### Créer une nouvelle valise (POST - Thymeleaf)
+POST http://localhost:8080/valise/create
+Content-Type: application/x-www-form-urlencoded
+
+description=test+valise&numeroValise=25&client.id=4
+
+
+### Afficher le formulaire modification une valise (GET - Thymeleaf)
+GET http://localhost:8080/valise/edit/12
+Accept: text/html
+
+### Modifier une valise existant (POST - Thymeleaf)
+POST http://localhost:8080/valise/edit/12
+Content-Type: application/x-www-form-urlencoded
+
+description=test+valise+2&numeroValise=236&client.id=4
+
+
+###Supprimer une valise
+POST http://localhost:8080/valise/delete/12
+Content-Type: application/x-www-form-urlencoded
+
+
+
+
+
+
+
+
 
 

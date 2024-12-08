@@ -77,32 +77,51 @@ public class ClientServiceTest {
         verifyNoMoreInteractions(clientRepository);
     }
 
+
+
     @Test
     public void testUpdateClient_Success() {
+        // Arrange
         int id = 1;
 
+        // Existing client in the database
         Client existingClient = new Client();
         existingClient.setId(id);
         existingClient.setName("Old Name");
         existingClient.setEmail("old@example.com");
+
+        // Updates to be applied
         Client updatedClient = new Client();
-        updatedClient.setId(id);
+        updatedClient.setId(id); // Same ID as the path variable
         updatedClient.setName("Updated Name");
         updatedClient.setEmail("updated@example.com");
 
+        // Mock the repository behavior
         when(clientRepository.existsById(id)).thenReturn(true);
         when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
         when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
         Client result = clientService.updateClient(id, updatedClient);
+
+        // Assert
         Assertions.assertNotNull(result, "Client should not be null");
         Assertions.assertEquals(id, result.getId(), "Client ID should match");
         Assertions.assertEquals("Updated Name", result.getName(), "Name should be updated");
         Assertions.assertEquals("updated@example.com", result.getEmail(), "Email should be updated");
+
+        // Verify interactions
         verify(clientRepository, times(1)).existsById(id);
         verify(clientRepository, times(1)).findById(id);
-        verify(clientRepository, times(1)).save(existingClient);
+        verify(clientRepository, times(1)).save(argThat(client ->
+                client.getId() == id &&
+                        "Updated Name".equals(client.getName()) &&
+                        "updated@example.com".equals(client.getEmail())
+        ));
         verifyNoMoreInteractions(clientRepository);
     }
+
+
 
     @Test
     public void testUpdateClient_NotFound() {
@@ -143,28 +162,49 @@ public class ClientServiceTest {
 
     @Test
     public void testUpdateClient_Success_WhenIdMatches() {
+        // Arrange
         int id = 1;
+
         Client existingClient = new Client();
         existingClient.setId(id);
         existingClient.setName("Old Name");
         existingClient.setEmail("old@example.com");
+
         Client clientToUpdate = new Client();
         clientToUpdate.setId(id);
         clientToUpdate.setName("Updated Name");
         clientToUpdate.setEmail("updated@example.com");
+
+        // Mock du repository
         when(clientRepository.existsById(id)).thenReturn(true);
         when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
-        when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> {
+            Client savedClient = invocation.getArgument(0);
+            System.out.println("Saving client: " + savedClient);
+            return savedClient;
+        });
+
+        // Act
         Client updatedClient = clientService.updateClient(id, clientToUpdate);
-        Assertions.assertNotNull(updatedClient, "Client should be updated successfully");
+
+        // Assert
+        Assertions.assertNotNull(updatedClient, "Client should not be null");
         Assertions.assertEquals(id, updatedClient.getId(), "Client ID should match");
         Assertions.assertEquals("Updated Name", updatedClient.getName(), "Name should be updated");
         Assertions.assertEquals("updated@example.com", updatedClient.getEmail(), "Email should be updated");
+
+        // Vérification des interactions
         verify(clientRepository, times(1)).existsById(id);
         verify(clientRepository, times(1)).findById(id);
-        verify(clientRepository, times(1)).save(existingClient);
+        verify(clientRepository, times(1)).save(argThat(client ->
+                client.getId() == id &&
+                        "Updated Name".equals(client.getName()) &&
+                        "updated@example.com".equals(client.getEmail())
+        ));
         verifyNoMoreInteractions(clientRepository);
     }
+
+
 
     @Test
     public void testDeleteClient_Success() {
@@ -252,23 +292,30 @@ public class ClientServiceTest {
     }
     @Test
     public void testNoInteractionWithClientRepository_Failure_Exception() {
+        // Arrange
         int id = 1;
         Client client = new Client();
         client.setId(id);
 
+        // Simuler le comportement attendu du mock
         when(clientRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             clientService.updateClient(id, client);
         });
 
+        // Vérification du message d'exception
         Assertions.assertEquals("Client not found with ID 1", exception.getMessage(),
                 "The exception should correspond to 'Client not found with ID 1'");
 
-        verify(clientRepository, times(1)).existsById(id);
-        verify(clientRepository, never()).save(any(Client.class));
-        verifyNoMoreInteractions(clientRepository);
+        // Vérifications des interactions avec le mock
+        verify(clientRepository, times(1)).existsById(id); // Vérifie l'appel à existsById
+        verify(clientRepository, never()).save(any(Client.class)); // Vérifie que save() n'a pas été appelé
+        verifyNoMoreInteractions(clientRepository); // Vérifie qu'il n'y a pas d'autres interactions
     }
+
+
 
 
     @Test
