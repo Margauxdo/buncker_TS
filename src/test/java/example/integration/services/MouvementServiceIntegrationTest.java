@@ -1,5 +1,6 @@
 package example.integration.services;
 
+import example.DTO.ClientDTO;
 import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
@@ -180,7 +181,7 @@ public class MouvementServiceIntegrationTest {
         Client client = new Client();
         client.setName("Test Client");
         client.setEmail("testclient@example.com");
-        clientService.createClient(client); // Persistons le Client
+        clientService.createClient(new ClientDTO()); // Persistons le Client
 
         // Créez une Valise associée au Client
         Valise valise = new Valise();

@@ -1,20 +1,23 @@
 package example.interfaces;
 
+import example.DTO.ClientDTO;
 import example.entity.Client;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface IClientService {
-    Client createClient(Client client);
 
-    @Transactional
-    Client updateClient(Integer id, Client client);
+    void createClient(ClientDTO clientDTO);
+
+    void updateClient(Integer id, ClientDTO clientDTO);
 
     void deleteClient(int id);
-    Client getClientById(int id);
-    List<Client> getAllClients();
+
+    ClientDTO getClientById(int id);
+
+    List<ClientDTO> getAllClients();
+
     boolean existsById(int id);
-
-
 }
+
+

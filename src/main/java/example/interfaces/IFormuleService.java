@@ -1,14 +1,18 @@
+
 package example.interfaces;
 
-
-import example.entity.Formule;
+import example.DTO.FormuleDTO;
 
 import java.util.List;
 
 public interface IFormuleService {
-    Formule createFormule(Formule formule);
-    Formule updateFormule(int id, Formule formule);
-    Formule getFormuleById(int id);
-    List<Formule> getAllFormules();
+    FormuleDTO createFormule(FormuleDTO formuleDTO);
+
+    FormuleDTO updateFormule(int id, FormuleDTO formuleDTO);
+
     void deleteFormule(int id);
+
+    FormuleDTO getFormuleById(int id);
+
+    List<FormuleDTO> getAllFormules();
 }

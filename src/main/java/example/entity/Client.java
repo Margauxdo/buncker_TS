@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 
 import java.util.ArrayList;
@@ -55,13 +57,15 @@ public class Client {
 
     private String codeClient;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Valise> valises = new ArrayList<>();
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Valise> valises;
 
 
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    @Column(name = "pb_list")
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Probleme> problemes;
 
     @ManyToOne

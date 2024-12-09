@@ -84,37 +84,14 @@
         <td th:text="${client.telephoneExploitation}"></td>
         <td th:text="${client.ville}"></td>
         <td th:text="${client.personnelEtFonction}"></td>
-        <td th:text="${client.ramassage1}"></td>
-        <td th:text="${client.ramassage2}"></td>
-        <td th:text="${client.ramassage3}"></td>
-        <td th:text="${client.ramassage4}"></td>
-        <td th:text="${client.ramassage5}"></td>
-        <td th:text="${client.ramassage6}"></td>
-        <td th:text="${client.ramassage7}"></td>
-        <td th:text="${client.envoiparDefaut}"></td>
-        <td th:text="${client.memoRetourSecurite1}"></td>
-        <td th:text="${client.memoRetourSecurite2}"></td>
-        <td th:text="${client.codeClient}"></td>
+
         <td>
-            <!-- Bouton pour Voir -->
-            <form th:action="@{/clients/view/{id}(id=${client.id})}" method="get">
-                <button type="submit">Voir</button>
-            </form>
-
-
-            <!-- Bouton pour Modifier -->
-            <form th:action="@{/clients/edit/{id}(id=${client.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Modifier le client">Modifier</button>
-            </form>
-
-            <!-- Bouton pour Supprimer -->
-
-            <form th:action="@{/clients/delete/{id}(id=${client.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?');">
-                <button type="submit" style="color: red;">Supprimer</button>
-            </form>
+            <ul>
+                <li th:each="valise : ${client.valises}" th:text="${valise.description}"></li>
+            </ul>
         </td>
     </tr>
+
     </tbody>
 </table>
 

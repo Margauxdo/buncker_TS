@@ -1,124 +1,98 @@
 package example.services;
 
+import example.DTO.FormuleDTO;
 import example.entity.Formule;
 import example.entity.Regle;
 import example.exceptions.FormuleNotFoundException;
-import example.exceptions.RegleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FormuleService implements IFormuleService {
 
-
-    private FormuleRepository formuleRepository;
+    private final FormuleRepository formuleRepository;
     private final RegleRepository regleRepository;
-
     private static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
 
-    @Autowired
     public FormuleService(FormuleRepository formuleRepository, RegleRepository regleRepository) {
-
-
-
         this.formuleRepository = formuleRepository;
         this.regleRepository = regleRepository;
     }
 
-    @Override
-    public Formule createFormule(Formule formule) {
-        logger.info("Creating formule with details: {}", formule);
-
-        // Validate that the Regle exists and is valid
-        if (formule.getRegle() == null || formule.getRegle().getId() == 0) {
-            logger.error("Regle is null or missing ID during formule creation.");
-            throw new IllegalArgumentException("A valid Regle must be provided to create a formule.");
-        }
-
-        if (!regleRepository.existsById(formule.getRegle().getId())) {
-            logger.error("Regle with ID {} not found.", formule.getRegle().getId());
-            throw new RegleNotFoundException("Regle not found with ID: " + formule.getRegle().getId());
-        }
-
-
-        logger.info("Checking existence of Regle with ID: {}", formule.getRegle().getId());
-        Regle regle = regleRepository.findById(formule.getRegle().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Regle not found with ID: " + formule.getRegle().getId()));
-
-        // Associate the Regle and save the Formule
-        formule.setRegle(regle);
-        logger.info("Creating formule: libelle={}, regleId={}",
-                formule.getLibelle(),
-                formule.getRegle().getId());
-
-        Formule savedFormule = formuleRepository.save(formule);
-        logger.info("Formule created successfully with ID: {}", savedFormule.getId());
-        return savedFormule;
+    private FormuleDTO convertToDTO(Formule formule) {
+        return FormuleDTO.builder()
+                .id(formule.getId())
+                .libelle(formule.getLibelle())
+                .formule(formule.getFormule())
+                .regleId(formule.getRegle() != null ? formule.getRegle().getId() : 0)
+                .regleCode(formule.getRegle() != null ? formule.getRegle().getCoderegle() : "Non défini")
+                .build();
     }
 
+    private Formule convertToEntity(FormuleDTO formuleDTO) {
+        Formule formule = new Formule();
+        formule.setId(formuleDTO.getId());
+        formule.setLibelle(formuleDTO.getLibelle());
+        formule.setFormule(formuleDTO.getFormule());
 
-
-
-
-
-
-
-
-
-
+        if (formuleDTO.getRegleId() != 0) {
+            Regle regle = regleRepository.findById(formuleDTO.getRegleId())
+                    .orElseThrow(() -> new EntityNotFoundException("Règle introuvable pour l'ID " + formuleDTO.getRegleId()));
+            formule.setRegle(regle);
+        }
+        return formule;
+    }
 
     @Override
-    public Formule updateFormule(int id, Formule formule) {
+    public FormuleDTO createFormule(FormuleDTO formuleDTO) {
+        Formule formule = convertToEntity(formuleDTO);
+        Formule savedFormule = formuleRepository.save(formule);
+        return convertToDTO(savedFormule);
+    }
+
+    @Override
+    public FormuleDTO updateFormule(int id, FormuleDTO formuleDTO) {
         return formuleRepository.findById(id)
                 .map(existingFormule -> {
-                    existingFormule.setLibelle(formule.getLibelle());
-                    existingFormule.setFormule(formule.getFormule());
-                    return formuleRepository.save(existingFormule);
+                    existingFormule.setLibelle(formuleDTO.getLibelle());
+                    existingFormule.setFormule(formuleDTO.getFormule());
+                    if (formuleDTO.getRegleId() != 0) {
+                        Regle regle = regleRepository.findById(formuleDTO.getRegleId())
+                                .orElseThrow(() -> new EntityNotFoundException("Règle introuvable pour l'ID " + formuleDTO.getRegleId()));
+                        existingFormule.setRegle(regle);
+                    }
+                    return convertToDTO(formuleRepository.save(existingFormule));
                 })
-                .orElseThrow(() -> new FormuleNotFoundException("Formule not found for ID " + id));
+                .orElseThrow(() -> new FormuleNotFoundException("Formule introuvable pour l'ID " + id));
     }
-
-
-
-    public List<Formule> getAllFormules() {
-        return formuleRepository.findAll();
-    }
-
-
 
     @Override
     public void deleteFormule(int id) {
         if (!formuleRepository.existsById(id)) {
-            throw new FormuleNotFoundException("Formule not found for ID " + id);
+            throw new FormuleNotFoundException("Formule introuvable pour l'ID " + id);
         }
         formuleRepository.deleteById(id);
     }
 
     @Override
-    public Formule getFormuleById(int id) {
-        Formule formule = formuleRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Formule avec l'Id " + id + " n'existe pas !"));
-        if (formule.getRegle() == null) {
-            formule.setRegle(Regle.builder().coderegle("Non défini").build());
-        }
-        return formule;
+    public FormuleDTO getFormuleById(int id) {
+        Formule formule = formuleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Formule introuvable pour l'ID " + id));
+        return convertToDTO(formule);
     }
 
-
-
-
+    @Override
+    public List<FormuleDTO> getAllFormules() {
+        return formuleRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 }
-
-
-
-
-
-

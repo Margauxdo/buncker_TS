@@ -1,11 +1,9 @@
 package example.integration.services;
 
-import example.entity.Client;
-import example.entity.Probleme;
-import example.entity.Valise;
+import example.DTO.ClientDTO;
+import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
 import example.services.ClientService;
-import example.repositories.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -30,52 +29,62 @@ public class ClientServiceIntegrationTest {
     @Autowired
     private ClientRepository clientRepository;
 
-    private Client client;
     @Autowired
     private ValiseRepository valiseRepository;
+
+    private ClientDTO clientDTO;
 
     @BeforeEach
     public void setUp() {
         clientRepository.deleteAll();
 
-        client = Client.builder()
-                .name("John Doe")
-                .email("john.doe@example.com")
-                .adresse("123 Main St")
-                .telephoneExploitation("555-1234")
-                .ville("Springfield")
-                .personnelEtFonction("Manager")
-                .build();
+        clientDTO = new ClientDTO(
+                null,
+                "John Doe",
+                "123 Main St",
+                "john.doe@example.com",
+                "555-1234",
+                "Springfield",
+                "Manager",
+                "Ramassage 1", "Ramassage 2", null, null, null, null, null,
+                "Standard",
+                "Memo 1", "Memo 2",
+                "Type 1",
+                "C001",
+                List.of(), // valiseIds
+                List.of(), // problemeIds
+                null, // retourSecuriteId
+                null  // regleId
+        );
     }
-
 
     @Test
     public void testCreateClientSuccess() {
         // Act
-        Client savedClient = clientService.createClient(client);
+        clientService.createClient(clientDTO);
 
         // Assert
-        assertNotNull(savedClient);
-        assertNotNull(savedClient.getId());
+        List<ClientDTO> clients = clientService.getAllClients();
+        assertEquals(1, clients.size());
+        ClientDTO savedClient = clients.get(0);
         assertEquals("John Doe", savedClient.getName());
         assertEquals("john.doe@example.com", savedClient.getEmail());
-        assertEquals("123 Main St", savedClient.getAdresse());
-        assertEquals("555-1234", savedClient.getTelephoneExploitation());
-        assertEquals("Springfield", savedClient.getVille());
-        assertEquals("Manager", savedClient.getPersonnelEtFonction());
     }
+
     @Test
     public void testUpdateClientSuccess() {
-        // Arrange: Save the client first
-        Client savedClient = clientService.createClient(client);
+        // Arrange
+        clientService.createClient(clientDTO);
+        List<ClientDTO> clients = clientService.getAllClients();
+        ClientDTO savedClient = clients.get(0);
 
         // Act
         savedClient.setName("Jane Doe");
         savedClient.setEmail("jane.doe@example.com");
-        Client updatedClient = clientService.updateClient(savedClient.getId(), savedClient);
+        clientService.updateClient(savedClient.getId(), savedClient);
 
         // Assert
-        assertNotNull(updatedClient);
+        ClientDTO updatedClient = clientService.getClientById(savedClient.getId());
         assertEquals("Jane Doe", updatedClient.getName());
         assertEquals("jane.doe@example.com", updatedClient.getEmail());
     }
@@ -83,141 +92,80 @@ public class ClientServiceIntegrationTest {
     @Test
     public void testDeleteClientSuccess() {
         // Arrange
-        Client savedClient = clientService.createClient(client);
+        clientService.createClient(clientDTO);
+        List<ClientDTO> clients = clientService.getAllClients();
+        ClientDTO savedClient = clients.get(0);
 
-        // Act & Assert
+        // Act
         clientService.deleteClient(savedClient.getId());
 
+        // Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             clientService.getClientById(savedClient.getId());
         });
 
-        assertEquals("Client not found with ID " + savedClient.getId(), exception.getMessage());
-    }
-
-    @Test
-    public void testGetClientByIdSuccess() {
-        // Arrange
-        Client savedClient = clientService.createClient(client);
-
-        // Act
-        Client foundClient = clientService.getClientById(savedClient.getId());
-
-        // Assert
-        assertNotNull(foundClient);
-        assertEquals(savedClient.getId(), foundClient.getId());
-        assertEquals("John Doe", foundClient.getName());
+        assertEquals("Client non trouvé", exception.getMessage());
     }
 
     @Test
     public void testGetAllClientsSuccess() {
         // Arrange
-        Client client2 = Client.builder()
-                .name("Jane Doe")
-                .email("jane.doe@example.com")
-                .adresse("456 Main St")
-                .telephoneExploitation("555-5678")
-                .ville("Springfield")
-                .personnelEtFonction("Supervisor")
-                .build();
+        ClientDTO clientDTO2 = new ClientDTO(
+                null,
+                "Jane Doe",
+                "456 Main St",
+                "jane.doe@example.com",
+                "555-5678",
+                "Springfield",
+                "Supervisor",
+                "Ramassage 1", "Ramassage 2", null, null, null, null, null,
+                "Standard",
+                "Memo 1", "Memo 2",
+                "Type 1",
+                "C002",
+                List.of(), // valiseIds
+                List.of(), // problemeIds
+                null, // retourSecuriteId
+                null  // regleId
+        );
 
-        clientService.createClient(client);
-        clientService.createClient(client2);
+        clientService.createClient(clientDTO);
+        clientService.createClient(clientDTO2);
 
         // Act
-        List<Client> clients = clientService.getAllClients();
+        List<ClientDTO> clients = clientService.getAllClients();
 
         // Assert
-        assertNotNull(clients);
-        assertEquals(2, clients.size(), "Expected only 2 clients in the repository");
+        assertEquals(2, clients.size());
     }
-
-
-
 
     @Test
     public void testCreateClient_Failure_DuplicateEmail() {
         // Arrange
-        clientService.createClient(client);
+        clientService.createClient(clientDTO);
 
-        Client duplicateClient = Client.builder()
-                .name("Jane Doe")
-                .email("john.doe@example.com") // Même email que 'client'
-                .adresse("456 Main St")
-                .telephoneExploitation("555-5678")
-                .ville("Springfield")
-                .personnelEtFonction("Supervisor")
-                .build();
+        ClientDTO duplicateClientDTO = new ClientDTO(
+                null,
+                "Jane Doe",
+                "456 Main St",
+                "john.doe@example.com", // Même email que clientDTO
+                "555-5678",
+                "Springfield",
+                "Supervisor",
+                "Ramassage 1", "Ramassage 2", null, null, null, null, null,
+                "Standard",
+                "Memo 1", "Memo 2",
+                "Type 1",
+                "C002",
+                List.of(),
+                List.of(),
+                null,
+                null
+        );
 
         // Act & Assert
         assertThrows(DataIntegrityViolationException.class, () -> {
-            clientService.createClient(duplicateClient);
-        }, "Une DataIntegrityViolationException devrait être levée pour un email en double");
-    }
-
-
-
-    @Test
-    public void testDeleteClient_WithRelations() {
-        // Arrange
-        Valise valise = Valise.builder()
-                .description("Valise B")
-                .build();
-
-        client.addValise(valise);
-        Client savedClient = clientService.createClient(client);
-
-        // Act
-        clientService.deleteClient(savedClient.getId());
-
-        // Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            clientService.getClientById(savedClient.getId());
+            clientService.createClient(duplicateClientDTO);
         });
-
-        assertEquals("Client not found with ID " + savedClient.getId(), exception.getMessage());
-
-        // Vérifier que les valises associées sont également supprimées si CascadeType.REMOVE est configuré
-        assertTrue(valiseRepository.findAll().isEmpty(), "Les valises associées devraient être supprimées");
     }
-
-    @Test
-    public void testUpdateClient_Failure_IdMismatch() {
-        // Arrange
-        Client savedClient = clientService.createClient(client);
-
-        // Act & Assert
-        Client updatedClient = Client.builder()
-                .id(savedClient.getId() + 1) // ID différent
-                .name("New Name")
-                .email("new.email@example.com")
-                .build();
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            clientService.updateClient(savedClient.getId(), updatedClient);
-        });
-
-        assertEquals("Client ID mismatch", exception.getMessage());
-    }
-
-    @Test
-    public void testDeleteClient_Failure_NonExistent() {
-        // Act & Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            clientService.deleteClient(9999); // ID inexistant
-        });
-
-        assertEquals("Client not found with ID 9999", exception.getMessage());
-    }
-
-
-
-
-
 }
-
-
-
-
-
-

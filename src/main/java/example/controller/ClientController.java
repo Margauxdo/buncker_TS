@@ -1,14 +1,15 @@
 package example.controller;
 
-import example.entity.Client;
+import example.DTO.ClientDTO;
 import example.interfaces.IClientService;
+import jakarta.validation.Valid;
+import org.hibernate.loader.MultipleBagFetchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/clients")
@@ -17,119 +18,90 @@ public class ClientController {
     @Autowired
     private IClientService clientService;
 
-     /*// API REST: Récupérer tous les clients
-    @GetMapping("/api")
-    public ResponseEntity<List<Client>> getAllClientsApi() {
-        List<Client> clients = clientService.getAllClients();
-        return ResponseEntity.ok(clients);
-    }
+    @ControllerAdvice
+    public class GlobalExceptionHandler {
 
-    // API REST: Récupérer un client par ID
-    @GetMapping("/api/{id}")
-    public ResponseEntity<Client> getClientByIdApi(@PathVariable int id) {
-        Client client = clientService.getClientById(id);
-        return client != null ? ResponseEntity.ok(client)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    // API REST: Créer un client
-    @PostMapping("/api")
-    public ResponseEntity<Client> createClientApi(@Valid @RequestBody Client client) {
-        Client newClient = clientService.createClient(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newClient);
-    }
-
-    // API REST: Modifier un client
-    @PutMapping("/api/{id}")
-    public ResponseEntity<Client> updateClientApi(@PathVariable int id, @RequestBody Client client) {
-        Client updatedClient = clientService.updateClient(id, client);
-        if (updatedClient == null) {
-            throw new EntityNotFoundException("Client not found with ID " + id);  // Cette ligne lèvera une exception capturée par l'@ExceptionHandler
+        @ExceptionHandler(MultipleBagFetchException.class)
+        public String handleMultipleBagFetchException(MultipleBagFetchException ex, Model model) {
+            model.addAttribute("errorMessage", "Erreur lors du chargement des données : " + ex.getMessage());
+            return "clients/error";
         }
-        return ResponseEntity.ok(updatedClient);
     }
 
 
-    // API REST: Supprimer un client
-    @PostMapping("/delete/{id}")
-    public String deleteClientApi(@PathVariable int id) {
-        clientService.deleteClient(id); // Ici, existsById n'est pas utilisé
-        return "redirect:/clients/clients_list";
-    }*/
 
+    // Vue Thymeleaf pour lister les clients
+    @GetMapping("/list")
+    public String viewClients(Model model) {
+        List<ClientDTO> clients = clientService.getAllClients();
+        model.addAttribute("clients", clients);
+        return "clients/client_list"; // Vue correcte
+    }
 
-
-        // Vue Thymeleaf pour lister les clients
-        @GetMapping("/list")
-        public String viewClients(Model model) {
-            model.addAttribute("clients", clientService.getAllClients());
-            return "clients/client_list"; // Vue correcte
+    // Vue Thymeleaf pour voir un client par ID
+    @GetMapping("/view/{id}")
+    public String viewClientById(@PathVariable int id, Model model) {
+        ClientDTO client = clientService.getClientById(id);
+        if (client == null) {
+            model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
+            return "clients/error"; // Assurez-vous que la vue "error.html" est bien dans le dossier principal
         }
+        model.addAttribute("client", client);
+        return "clients/client_detail";
+    }
 
-        // Vue Thymeleaf pour voir un client par ID
-        @GetMapping("/view/{id}")
-        public String viewClientById(@PathVariable int id, Model model) {
-            Client client = clientService.getClientById(id);
-            if (client == null) {
-                model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
-                return "clients/error"; // Assurez-vous que la vue "error.html" est bien dans le dossier principal
-            }
-            model.addAttribute("client", client);
-            return "clients/client_detail";
-        }
+    // Formulaire Thymeleaf pour créer un client
+    @GetMapping("/create")
+    public String createClientForm(Model model) {
+        model.addAttribute("client", new ClientDTO());
+        return "clients/client_create";
+    }
 
-        // Formulaire Thymeleaf pour créer un client
-        @GetMapping("/create")
-        public String createClientForm(Model model) {
-            model.addAttribute("client", new Client());
-            return "clients/client_create";
-        }
-
-        // Création d'un client via formulaire Thymeleaf
-        @PostMapping("/create")
-        public String createClient(@Valid @ModelAttribute("client") Client client, BindingResult result) {
-            if (result.hasErrors()) {
-                return "clients/client_create"; // Retourne au formulaire s'il y a des erreurs
-            }
-            clientService.createClient(client);
+    // Création d'un client via formulaire Thymeleaf
+    @PostMapping("/create")
+    public String createClient(@Valid @ModelAttribute("client") ClientDTO clientDTO, Model model) {
+        try {
+            clientService.createClient(clientDTO);
             return "redirect:/clients/list"; // Redirige vers la liste après création
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la création du client : " + e.getMessage());
+            return "clients/error";
         }
-
+    }
 
     // Formulaire Thymeleaf pour modifier un client
-        @GetMapping("/edit/{id}")
-        public String editClientForm(@PathVariable int id, Model model) {
-            Client client = clientService.getClientById(id);
-            if (client == null) {
-                model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
-                return "clients/error"; // Vue d'erreur générale
-            }
-            model.addAttribute("client", client);
-            return "clients/client_edit";
+    @GetMapping("/edit/{id}")
+    public String editClientForm(@PathVariable int id, Model model) {
+        ClientDTO client = clientService.getClientById(id);
+        if (client == null) {
+            model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
+            return "clients/error"; // Vue d'erreur générale
         }
+        model.addAttribute("client", client);
+        return "clients/client_edit";
+    }
 
-        // Modifier un client via formulaire Thymeleaf
-        @PostMapping("/edit/{id}")
-        public String updateClient(@PathVariable int id, @Valid @ModelAttribute("client") Client client, BindingResult result) {
-            if (result.hasErrors()) {
-                return "clients/client_edit"; // Retourne au formulaire en cas d'erreurs
-            }
-            clientService.updateClient(id, client);
+    // Modifier un client via formulaire Thymeleaf
+    @PostMapping("/edit/{id}")
+    public String updateClient(@PathVariable int id, @Valid @ModelAttribute("client") ClientDTO clientDTO, Model model) {
+        try {
+            clientService.updateClient(id, clientDTO);
             return "redirect:/clients/list"; // Redirige vers la liste
-        }
-
-
-    // Supprimer un client via un formulaire Thymeleaf sécurisé
-        @PostMapping("/delete/{id}")
-        public String deleteClient(@PathVariable int id, Model model) {
-            Client client = clientService.getClientById(id);
-            if (client == null) {
-                model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
-                return "clients/error";
-            }
-            clientService.deleteClient(id);
-            return "redirect:/clients/list"; // Chemin corrigé
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la modification du client : " + e.getMessage());
+            return "clients/error";
         }
     }
 
-
+    // Supprimer un client via un formulaire Thymeleaf sécurisé
+    @PostMapping("/delete/{id}")
+    public String deleteClient(@PathVariable int id, Model model) {
+        try {
+            clientService.deleteClient(id);
+            return "redirect:/clients/list"; // Chemin corrigé
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la suppression du client : " + e.getMessage());
+            return "clients/error";
+        }
+    }
+}
