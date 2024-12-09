@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface IClientService {
     Client createClient(Client client);
-    Client updateClient(int id, Client client);
 
     @Transactional
     Client updateClient(Integer id, Client client);

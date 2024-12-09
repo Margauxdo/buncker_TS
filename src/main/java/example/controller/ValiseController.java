@@ -10,13 +10,17 @@ import example.repositories.TypeValiseRepository;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -36,6 +40,13 @@ public class ValiseController {
     private RegleRepository regleRepository;
     @Autowired
     private TypeValiseRepository typeValiseRepository;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+    }
 
    /* // API REST: Récupérer tous les valises
     @GetMapping("/api")
@@ -116,6 +127,7 @@ public class ValiseController {
     // Vue Thymeleaf pour lister les valises
     @GetMapping("/list")
     public String viewValises(Model model) {
+        logger.info("Controller - Get -> valises/list");
         try {
             List<Valise> valises = valiseService.getAllValises();
             model.addAttribute("valises", valises);

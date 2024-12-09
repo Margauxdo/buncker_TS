@@ -116,14 +116,13 @@ public class ValiseService implements IValiseService {
     @Transactional
     public Valise getValiseById(int id) {
         Valise valise = valiseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Valise non trouvée avec ID : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Valise not found with ID: " + id));
         Hibernate.initialize(valise.getClient());
         Hibernate.initialize(valise.getTypeValise());
-        Hibernate.initialize(valise.getMouvementList());
+        Hibernate.initialize(valise.getMouvementList()); // Initialize the mouvementList
+        Hibernate.initialize(valise.getRegleSortie());  // Initialize other lazy-loaded associations if needed
         return valise;
     }
-
-
 
 
 

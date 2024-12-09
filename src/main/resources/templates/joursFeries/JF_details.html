@@ -51,12 +51,13 @@
 </head>
 <body>
 <h1>Détails du Jour Férié</h1>
-<div class="container">
-    <p><strong>Date :</strong> <span th:text="${jourFerie.date}"></span></p>
-    <p><strong>Règles associées :</strong></p>
-    <ul>
-        <li th:each="regle : ${jourFerie.regles}" th:text="${regle.coderegle}"></li>
-    </ul>
+<p>Date : <span th:text="${jourFerie.date}"></span></p>
+<h2>Règles Associées</h2>
+<ul>
+    <li th:each="regle : ${jourFerie.regles}" th:text="${regle.coderegle}"></li>
+</ul>
+
+
     <a th:href="@{/jourferies/list}">Retour à la Liste</a>
 </div>
 </body>

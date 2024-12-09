@@ -34,10 +34,11 @@ public class JourFerieController {
 
     @GetMapping("/view/{id}")
     public String viewJFById(@PathVariable int id, Model model) {
-            JourFerie jourFerie = jourFerieService.getJourFerie(id);
-            model.addAttribute("jourFerie", jourFerie);
-            return "joursFeries/JF_details"; // Correspond au chemin du fichier dans le dossier templates
-        }
+        JourFerie jourFerie = jourFerieService.getJourFerie(id);
+        model.addAttribute("jourFerie", jourFerie);
+        return "joursFeries/JF_details";
+    }
+
 
 
 

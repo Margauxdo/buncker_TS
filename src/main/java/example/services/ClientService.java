@@ -33,11 +33,6 @@ import java.util.List;
         }
 
         @Override
-        public Client updateClient(int id, Client client) {
-            return null;
-        }
-
-        @Override
         @Transactional
         public Client updateClient(Integer id, Client client) {
             if (id == null) {

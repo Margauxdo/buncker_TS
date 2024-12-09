@@ -64,30 +64,30 @@
     </thead>
     <tbody>
     <!-- Boucle sur la liste des types de valise -->
-    <tr th:each="typeValise : ${typesValise}">
+    <tr th:each="typeValise : ${typeValises}">
         <td th:text="${typeValise.id}"></td>
         <td th:text="${typeValise.proprietaire}"></td>
         <td th:text="${typeValise.description}"></td>
-        <td th:text="${typeValise.valise != null ? typeValise.valise.nom : 'Aucune'}"></td>
+
+        <td th:text="${typeValise.valise }"></td>
+
         <td>
-            <!-- Bouton pour Voir -->
-            <form th:action="@{/typeValise/view/{id}(id=${typeValise.id})}" method="get">
-                <button type="submit">Voir</button>
-            </form>
+        <form th:action="@{/typeValise/view/{id}(id=${typeValise.id})}" method="get">
+        <button type="submit">Voir</button>
+        </form>
 
 
-            <!-- Bouton pour Modifier -->
-            <form th:action="@{/typeValise/edit/{id}(id=${typeValise.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Modifier le type de valise">Modifier</button>
-            </form>
+        <form th:action="@{/typeValise/edit/{id}(id=${typeValise.id})}" method="get" style="display:inline;">
+        <button type="submit" aria-label="Modifier le type de valise">Modifier</button>
+        </form>
 
-            <!-- Bouton pour Supprimer -->
-
-            <form th:action="@{/typeValise/delete/{id}(id=${client.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de valise ?');">
-                <button type="submit" style="color: red;">Supprimer</button>
-            </form>
+        <form th:action="@{/typeValise/delete/{id}(id=${typeValise.id})}" method="post"
+          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de valise ?');">
+        <button type="submit" style="color: red;">Supprimer</button>
+        </form>
         </td>
+
+
     </tr>
     </tbody>
 </table>

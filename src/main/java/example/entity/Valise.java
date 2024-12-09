@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,10 +33,16 @@ public class Valise {
     @NotNull
     private Long numeroValise;
     private String refClient;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date sortie;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateDernierMouvement;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateSortiePrevue;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateRetourPrevue;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateCreation;
     private String numeroDujeu;
 
@@ -48,8 +55,6 @@ public class Valise {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
-
-
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise")

@@ -52,35 +52,44 @@
 </head>
 <body>
 <h1 style="text-align: center;">Modifier une Valise</h1>
+<!--<div th:if="${errorMessage}" style="color: red;">
+  <p th:text="${errorMessage}"></p>
+</div>-->
+
 
 <form th:action="@{/valise/edit/{id}(id=${valise.id})}" th:object="${valise}" method="post">
   <!-- Champ pour la description -->
   <label for="description">Description :</label>
   <input type="text" id="description" th:field="*{description}" placeholder="Entrez la description" required />
+  <div th:if="${#fields.hasErrors('description')}" style="color: red;">
+    <p th:errors="*{description}"></p>
+  </div>
 
   <!-- Champ pour le numéro de valise -->
   <label for="numeroValise">Numéro de Valise :</label>
   <input type="number" id="numeroValise" th:field="*{numeroValise}" placeholder="Entrez le numéro de valise" required />
-
+  <div th:if="${#fields.hasErrors('numeroValise')}" style="color: red;">
+    <p th:errors="*{numeroValise}"></p>
+  </div>
   <!-- Champ pour la référence client -->
   <label for="refClient">Référence Client :</label>
   <input type="text" id="refClient" th:field="*{refClient}" placeholder="Entrez la référence client" />
 
   <!-- Dates associées -->
   <label for="sortie">Date de Sortie :</label>
-  <input type="date" id="sortie" th:field="*{sortie}" />
+  <input type="date" data-date="" data-date-format="yyyy-MM-dd" id="sortie" th:field="*{sortie}" />
 
   <label for="dateDernierMouvement">Date du Dernier Mouvement :</label>
-  <input type="date" id="dateDernierMouvement" th:field="*{dateDernierMouvement}" />
+  <input type="date" data-date="" data-date-format="yyyy-MM-dd" id="dateDernierMouvement" th:field="*{dateDernierMouvement}" />
 
   <label for="dateSortiePrevue">Date de Sortie Prévue :</label>
-  <input type="date" id="dateSortiePrevue" th:field="*{dateSortiePrevue}" />
+  <input type="date" data-date="" data-date-format="yyyy-MM-dd" id="dateSortiePrevue" th:field="*{dateSortiePrevue}" />
 
   <label for="dateRetourPrevue">Date de Retour Prévue :</label>
-  <input type="date" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" />
+  <input type="date" data-date="" data-date-format="yyyy-MM-dd" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" />
 
   <label for="dateCreation">Date de Création :</label>
-  <input type="date" id="dateCreation" th:field="*{dateCreation}" />
+  <input type="date" data-date="" data-date-format="yyyy-MM-dd" id="dateCreation" th:field="*{dateCreation}" />
 
   <!-- Champ pour le numéro du jeu -->
   <label for="numeroDujeu">Numéro du Jeu :</label>

@@ -22,8 +22,12 @@ public class JourFerieService implements IJourFerieService {
 
     @Override
     public JourFerie getJourFerie(int id) {
-        return jourFerieRepository.findById(id).orElse(null);
+        return jourFerieRepository.findByIdWithRegles(id).orElseThrow(() ->
+                new EntityNotFoundException("JourFerie not found with ID: " + id));
     }
+
+
+
 
     @Override
     public List<JourFerie> getJourFeries() {
