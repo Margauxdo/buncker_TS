@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.SortieSemaineDTO;
 import example.entity.Regle;
 import example.entity.SortieSemaine;
 import example.repositories.SortieSemaineRepository;
@@ -39,7 +40,7 @@ class SortieSemaineServiceTest {
 
         when(sortieSemaineRepository.save(semaine)).thenReturn(semaine);
 
-        SortieSemaine result = sortieSemaineService.createSortieSemaine(semaine);
+        SortieSemaineDTO result = sortieSemaineService.createSortieSemaine(new SortieSemaineDTO());
 
         assertNotNull(result, "The result must not be null after creation.");
         verify(sortieSemaineRepository, times(1)).save(semaine);
@@ -54,7 +55,7 @@ class SortieSemaineServiceTest {
         when(sortieSemaineRepository.existsById(id)).thenReturn(true);
         when(sortieSemaineRepository.save(semaine)).thenReturn(semaine);
 
-        SortieSemaine result = sortieSemaineService.updateSortieSemaine(id, semaine);
+        SortieSemaineDTO result = sortieSemaineService.updateSortieSemaine(id, semaine);
 
         assertNotNull(result, "Update must return a non-null object.");
         verify(sortieSemaineRepository, times(1)).existsById(id);
@@ -105,7 +106,7 @@ class SortieSemaineServiceTest {
         SortieSemaine semaine = new SortieSemaine();
         when(sortieSemaineRepository.findById(id)).thenReturn(Optional.of(semaine));
 
-        SortieSemaine result = sortieSemaineService.getSortieSemaine(id);
+        SortieSemaineDTO result = sortieSemaineService.getSortieSemaine(id);
 
         assertNotNull(result, "he retrieval should return a non-null object.");
         verify(sortieSemaineRepository, times(1)).findById(id);
@@ -117,7 +118,7 @@ class SortieSemaineServiceTest {
         int id = 1;
         when(sortieSemaineRepository.findById(id)).thenReturn(Optional.empty());
 
-        SortieSemaine result = sortieSemaineService.getSortieSemaine(id);
+        SortieSemaineDTO result = sortieSemaineService.getSortieSemaine(id);
 
         assertNull(result, "Retrieval of a non-existent ID should return null.");
         verify(sortieSemaineRepository, times(1)).findById(id);
@@ -130,7 +131,7 @@ class SortieSemaineServiceTest {
         semaines.add(new SortieSemaine());
         when(sortieSemaineRepository.findAll()).thenReturn(semaines);
 
-        List<SortieSemaine> result = sortieSemaineService.getAllSortieSemaine();
+        List<SortieSemaineDTO> result = sortieSemaineService.getAllSortieSemaine();
 
         assertNotNull(result, "The list of weeks must not be null");
         assertEquals(1, result.size(), "The list of weeks must not be null. The size of the list must be 1.");
@@ -165,7 +166,7 @@ class SortieSemaineServiceTest {
         }
         when(sortieSemaineRepository.findAll()).thenReturn(semaines);
 
-        List<SortieSemaine> result = sortieSemaineService.getAllSortieSemaine();
+        List<SortieSemaineDTO> result = sortieSemaineService.getAllSortieSemaine();
 
         assertEquals(1000, result.size(), "The list size should be 1000.");
         verify(sortieSemaineRepository, times(1)).findAll();

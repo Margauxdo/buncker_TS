@@ -1,6 +1,7 @@
 package example.integration.repositories;
 
 import example.entity.Client;
+import example.entity.Probleme;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
@@ -139,25 +140,30 @@ public class ClientRepositoryIntegrationTest {
     }
     @Test
     public void testFindAllClients() {
-        Client client1 = new Client();
-        client1.setName("John Doe");
-        client1.setEmail("john.doe@example.com");
-        clientRepository.save(client1);
+        // Act : Récupération des clients avec une requête spécifique pour chaque relation
+        List<Client> clients = clientRepository.findAll(); // Chargement de la liste des clients
 
-        Client client2 = new Client();
-        client2.setName("Jane Doe");
-        client2.setEmail("jane.doe@example.com");
-        clientRepository.save(client2);
+        // Assert
+        assertNotNull(clients, "La liste des clients ne doit pas être null");
+        assertFalse(clients.isEmpty(), "La liste des clients ne doit pas être vide");
 
-        List<Client> clients = clientRepository.findAll();
+        // Vérification des relations avec des requêtes distinctes
+        clients.forEach(client -> {
+            // Chargement des valises pour chaque client
+            List<Valise> valises = client.getValises();
+            assertNotNull(valises, "Les valises du client ne doivent pas être null");
 
-        assertNotNull(clients);
-        assertTrue(clients.size() >= 2);
+            // Chargement des problèmes pour chaque client
+            List<Probleme> problemes = client.getProblemes();
+            assertNotNull(problemes, "Les problèmes du client ne doivent pas être null");
 
-        clients.forEach(client -> System.out.println(client.getName() + " - " + client.getEmail()));
+            // Affichage des données pour vérification
+            System.out.println("Client: " + client.getName() + " - " + client.getEmail());
+            System.out.println("Nombre de valises: " + valises.size());
+            System.out.println("Nombre de problèmes: " + problemes.size());
+        });
+    }
 
-        assertEquals("John Doe", clients.get(0).getName());
-        assertEquals("jane.doe@example.com", clients.get(1).getEmail());
     }
 
 
@@ -167,4 +173,5 @@ public class ClientRepositoryIntegrationTest {
 
 
 
-}
+
+

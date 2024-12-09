@@ -1,5 +1,6 @@
 package example.integration.services;
 
+import example.DTO.ValiseDTO;
 import example.entity.Client;
 import example.entity.Regle;
 import example.entity.TypeValise;
@@ -64,28 +65,30 @@ class ValiseServiceIntegrationTest {
                 .build();
         typeValise = typeValiseRepository.save(typeValise);
     }
-
     @Test
     void testCreateValise_Success() {
-        Valise valise = Valise.builder()
+        // Arrange
+        ValiseDTO valiseDTO = ValiseDTO.builder()
                 .description("Test Valise")
                 .numeroValise(123456L)
-                .dateCreation(new Date())
-                .client(client)
-                .typeValise(typeValise)
+                .clientId(client.getId())
+                .typeValiseId(typeValise.getId())
                 .build();
 
-        Valise savedValise = valiseService.createValise(valise);
+        // Act
+        ValiseDTO savedValise = valiseService.createValise(valiseDTO);
 
+        // Assert
         assertNotNull(savedValise);
         assertNotNull(savedValise.getId());
         assertEquals("Test Valise", savedValise.getDescription());
-        assertEquals(client.getId(), savedValise.getClient().getId());
-        assertEquals(typeValise.getId(), savedValise.getTypeValise().getId());
+        assertEquals(client.getId(), savedValise.getClientId());
+        assertEquals(typeValise.getId(), savedValise.getTypeValiseId());
     }
 
     @Test
     void testGetValiseById_Success() {
+        // Arrange
         Valise valise = Valise.builder()
                 .description("Test Valise")
                 .numeroValise(123456L)
@@ -95,12 +98,45 @@ class ValiseServiceIntegrationTest {
                 .build();
         valise = valiseRepository.save(valise);
 
-        Valise fetchedValise = valiseService.getValiseById(valise.getId());
+        // Act
+        ValiseDTO fetchedValise = valiseService.getValiseById(valise.getId());
 
+        // Assert
         assertNotNull(fetchedValise);
         assertEquals(valise.getId(), fetchedValise.getId());
         assertEquals("Test Valise", fetchedValise.getDescription());
     }
+
+    @Test
+    void testCreateValise_WithRegles() {
+        // Arrange
+        Regle regle = Regle.builder()
+                .coderegle("R123")
+                .dateRegle(new Date())
+                .build();
+        regle = regleRepository.save(regle);
+
+        List<Integer> regleIds = List.of(regle.getId());
+
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .description("Valise avec règles")
+                .numeroValise(789012L)
+                .clientId(client.getId())
+                .typeValiseId(typeValise.getId())
+                .regleSortieIds(regleIds)
+                .build();
+
+        // Act
+        ValiseDTO savedValise = valiseService.createValise(valiseDTO);
+
+        // Assert
+        assertNotNull(savedValise);
+        assertEquals(1, savedValise.getRegleSortieIds().size());
+        assertEquals(regle.getId(), savedValise.getRegleSortieIds().get(0));
+    }
+
+
+
 
     @Test
     void testGetValiseById_NotFound() {
@@ -115,6 +151,7 @@ class ValiseServiceIntegrationTest {
 
     @Test
     void testUpdateValise_Success() {
+        // Arrange
         Valise valise = Valise.builder()
                 .description("Test Valise")
                 .numeroValise(123456L)
@@ -124,9 +161,18 @@ class ValiseServiceIntegrationTest {
                 .build();
         valise = valiseRepository.save(valise);
 
-        valise.setDescription("Updated Description");
-        Valise updatedValise = valiseService.updateValise(valise.getId(), valise);
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .id(valise.getId())
+                .description("Updated Description")
+                .numeroValise(valise.getNumeroValise())
+                .clientId(client.getId())
+                .typeValiseId(typeValise.getId())
+                .build();
 
+        // Act
+        ValiseDTO updatedValise = valiseService.updateValise(valise.getId(), valiseDTO);
+
+        // Assert
         assertNotNull(updatedValise);
         assertEquals("Updated Description", updatedValise.getDescription());
     }
@@ -158,41 +204,19 @@ class ValiseServiceIntegrationTest {
         assertEquals("The suitcase does not exist", exception.getMessage());
     }
 
-    @Test
-    void testCreateValise_WithRegles() {
-        Regle regle = Regle.builder()
-                .coderegle("R123")
-                .dateRegle(new Date())
-                .build();
-        regle = regleRepository.save(regle);
 
-        List<Regle> regleList = new ArrayList<>();
-        regleList.add(regle);
-
-        Valise valise = Valise.builder()
-                .description("Valise avec règles")
-                .numeroValise(789012L)
-                .client(client)
-                .typeValise(typeValise)
-                .regleSortie(regleList)
-                .build();
-
-        Valise savedValise = valiseService.createValise(valise);
-
-        assertNotNull(savedValise);
-        assertEquals(1, savedValise.getRegleSortie().size());
-        assertEquals("R123", savedValise.getRegleSortie().get(0).getCoderegle());
-    }
 
     @Test
     void testCreateValise_InvalidClient() {
-        Valise valise = Valise.builder()
+        // Arrange
+        ValiseDTO valiseDTO = ValiseDTO.builder()
                 .description("Valise sans client")
                 .numeroValise(123456L)
                 .build();
 
+        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            valiseService.createValise(valise);
+            valiseService.createValise(valiseDTO);
         });
 
         // Vérifiez que la cause est une IllegalArgumentException
@@ -219,11 +243,18 @@ class ValiseServiceIntegrationTest {
                 .build();
         valiseRepository.save(valise2);
 
-        List<Valise> valises = valiseService.getAllValises();
+        List<ValiseDTO> valises = valiseService.getAllValises();
 
         assertNotNull(valises);
         assertEquals(2, valises.size());
     }
+
+
+
+
+
+
+
 
 
 

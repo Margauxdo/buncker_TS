@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entity.TypeRegle;
+import example.DTO.TypeRegleDTO;
 import example.interfaces.ITypeRegleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,9 +33,9 @@ public class TypeRegleControllerTest {
     @Test
     public void testViewAllTypeRegles_Success() {
         // Arrange
-        List<TypeRegle> expectedTypeRegles = List.of(
-                new TypeRegle(1, "TypeRegle1", null),
-                new TypeRegle(2, "TypeRegle2", null)
+        List<TypeRegleDTO> expectedTypeRegles = List.of(
+                TypeRegleDTO.builder().id(1).nomTypeRegle("TypeRegle1").build(),
+                TypeRegleDTO.builder().id(2).nomTypeRegle("TypeRegle2").build()
         );
         when(typeRegleService.getTypeRegles()).thenReturn(expectedTypeRegles);
         Model model = new ConcurrentModel();
@@ -45,31 +44,28 @@ public class TypeRegleControllerTest {
         String response = typeRegleController.viewAllTypeRegles(model);
 
         // Assert
-        assertEquals("typeRegles/TR_list", response, "Expected view name is 'typeRegles/TR_list'");
-        assertTrue(model.containsAttribute("typeRegles"), "Model should contain 'typeRegles' attribute");
-        assertEquals(expectedTypeRegles, model.getAttribute("typeRegles"), "Expected 'typeRegles' to match the returned list");
+        assertEquals("typeRegles/TR_list", response);
+        assertTrue(model.containsAttribute("typeRegles"));
+        assertEquals(expectedTypeRegles, model.getAttribute("typeRegles"));
         verify(typeRegleService, times(1)).getTypeRegles();
     }
-
 
     // **Test: Voir un TypeRegle par ID (Succès)**
     @Test
     public void testViewTypeRegleById_Success() {
         // Arrange
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setId(1); // Ajout d'un ID pour valider le contenu
-        when(typeRegleService.getTypeRegle(1)).thenReturn(Optional.of(typeRegle));
+        TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder().id(1).nomTypeRegle("TypeRegle1").build();
+        when(typeRegleService.getTypeRegle(1)).thenReturn(typeRegleDTO);
         Model model = new ConcurrentModel();
 
         // Act
         String response = typeRegleController.viewTypeRegleById(1, model);
 
         // Assert
-        assertEquals("typeRegles/TP_details", response, "Expected view name is 'typeRegles/TP_details'");
-        assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
-        assertEquals(Optional.of(typeRegle), model.getAttribute("typeRegle"), "Expected 'typeRegle' in model as Optional");
+        assertEquals("typeRegles/TP_details", response);
+        assertTrue(model.containsAttribute("typeRegle"));
+        assertEquals(typeRegleDTO, model.getAttribute("typeRegle"));
     }
-
 
     // **Test: Voir un TypeRegle par ID (Non trouvé)**
     @Test
@@ -82,8 +78,8 @@ public class TypeRegleControllerTest {
         String response = typeRegleController.viewTypeRegleById(1, model);
 
         // Assert
-        assertEquals("typeRegles/error", response, "Expected view name is 'typeRegles/error'");
-        assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
+        assertEquals("typeRegles/error", response);
+        assertTrue(model.containsAttribute("errorMessage"));
         assertEquals("typeRegle avec l'Id1 non trouve !", model.getAttribute("errorMessage"));
     }
 
@@ -97,27 +93,26 @@ public class TypeRegleControllerTest {
         String response = typeRegleController.createTypeRegleForm(model);
 
         // Assert
-        assertEquals("typeRegles/TP_create", response, "Expected view name is 'typeRegles/TP_create'");
-        assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
-        assertNotNull(model.getAttribute("typeRegle"), "Expected 'typeRegle' in model");
+        assertEquals("typeRegles/TP_create", response);
+        assertTrue(model.containsAttribute("typeRegle"));
+        assertNotNull(model.getAttribute("typeRegle"));
     }
 
     // **Test: Afficher le formulaire de modification (Succès)**
     @Test
     public void testEditTypeRegleForm_Success() {
         // Arrange
-        TypeRegle typeRegle = new TypeRegle();
-        typeRegle.setId(1); // Ajout d'un ID pour valider le contenu
-        when(typeRegleService.getTypeRegle(1)).thenReturn(Optional.of(typeRegle));
+        TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder().id(1).nomTypeRegle("TypeRegle1").build();
+        when(typeRegleService.getTypeRegle(1)).thenReturn(typeRegleDTO);
         Model model = new ConcurrentModel();
 
         // Act
         String response = typeRegleController.editTypeRegleForm(1, model);
 
         // Assert
-        assertEquals("typeRegles/TR_edit", response, "Expected view name is 'typeRegles/TR_edit'");
-        assertTrue(model.containsAttribute("typeRegle"), "Model should contain 'typeRegle' attribute");
-        assertEquals(Optional.of(typeRegle), model.getAttribute("typeRegle"), "Expected 'typeRegle' in model as Optional");
+        assertEquals("typeRegles/TR_edit", response);
+        assertTrue(model.containsAttribute("typeRegle"));
+        assertEquals(typeRegleDTO, model.getAttribute("typeRegle"));
     }
 
     // **Test: Afficher le formulaire de modification (Non trouvé)**
@@ -131,7 +126,7 @@ public class TypeRegleControllerTest {
         String response = typeRegleController.editTypeRegleForm(1, model);
 
         // Assert
-        assertEquals("typeRegles/error", response, "Expected view name is 'typeRegles/error'");
+        assertEquals("typeRegles/error", response);
     }
 
     // **Test: Supprimer un TypeRegle (Succès)**
@@ -145,7 +140,7 @@ public class TypeRegleControllerTest {
         String response = typeRegleController.deleteTypeRegle(1, model);
 
         // Assert
-        assertEquals("redirect:/typeRegles/TR_list", response, "Expected redirect to 'typeRegles/TR_list'");
+        assertEquals("redirect:/typeRegles/TR_list", response);
         verify(typeRegleService, times(1)).deleteTypeRegle(1);
     }
 
@@ -160,8 +155,8 @@ public class TypeRegleControllerTest {
         String response = typeRegleController.deleteTypeRegle(1, model);
 
         // Assert
-        assertEquals("typeRegles/error", response, "Expected view name is 'typeRegles/error'");
-        assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
+        assertEquals("typeRegles/error", response);
+        assertTrue(model.containsAttribute("errorMessage"));
         assertEquals("TypeRegle avec l'ID 1 non trouvé !", model.getAttribute("errorMessage"));
         verify(typeRegleService, times(1)).deleteTypeRegle(1);
     }

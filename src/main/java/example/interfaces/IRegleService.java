@@ -1,18 +1,18 @@
 package example.interfaces;
 
-import example.entity.Regle;
+import example.DTO.RegleDTO;
 
 import java.util.List;
 
 public interface IRegleService {
-    Regle createRegle(Regle regle);
-    Regle readRegle(int id);
-    Regle updateRegle(int id,Regle regle);
+    RegleDTO createRegle(RegleDTO regleDTO);
+
+    RegleDTO readRegle(int id);
+
+    List<RegleDTO> readAllRegles();
+
+    RegleDTO updateRegle(int id, RegleDTO regleDTO);
+    RegleDTO getRegleById(int id);
+    List<RegleDTO> getAllRegles();
     void deleteRegle(int id);
-
-    Regle readRegleById(Long id);
-
-    List<Regle> readAllRegles();
-
-    boolean regleExists(String coderegle);
 }

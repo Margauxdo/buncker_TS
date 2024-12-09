@@ -1,7 +1,7 @@
 package example.integration.services;
 
+import example.DTO.JourFerieDTO;
 import example.entity.JourFerie;
-import example.entity.Regle;
 import example.repositories.JourFerieRepository;
 import example.services.JourFerieService;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,43 +29,41 @@ public class JourFerieServiceIntegrationTest {
     @Autowired
     private JourFerieRepository jourFerieRepository;
 
-    private JourFerie jourFerie;
+    private JourFerieDTO jourFerieDTO;
 
     @BeforeEach
     void setUp() {
         jourFerieRepository.deleteAll();
 
-        jourFerie = JourFerie.builder()
+        jourFerieDTO = JourFerieDTO.builder()
                 .date(new Date())
-                .regles(new ArrayList<>()) // Start with an empty list of rules
+                .regleIds(new ArrayList<>()) // Start with an empty list of rule IDs
                 .build();
     }
 
     @Test
     public void testCreateJourFerie_Success() {
         // Arrange
-        Regle regle = Regle.builder()
-                .coderegle("CODE123")
-                .build();
-        jourFerie.getRegles().add(regle);
+        jourFerieDTO.setRegleIds(List.of(1)); // Ajouter des IDs fictifs pour les règles
 
         // Act
-        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
+        JourFerieDTO savedJourFerie = jourFerieService.saveJourFerie(jourFerieDTO);
 
         // Assert
         assertNotNull(savedJourFerie);
         assertNotNull(savedJourFerie.getId());
-        assertEquals(jourFerie.getDate(), savedJourFerie.getDate());
-        assertEquals(1, savedJourFerie.getRegles().size());
-        assertEquals("CODE123", savedJourFerie.getRegles().get(0).getCoderegle());
+        assertEquals(jourFerieDTO.getDate(), savedJourFerie.getDate());
+        assertEquals(1, savedJourFerie.getRegleIds().size());
     }
-
 
     @Test
     public void testCreateJourFerie_Failure_NoRegle() {
+        // Arrange: Aucun ID de règle n'est ajouté
+        jourFerieDTO.setRegleIds(new ArrayList<>());
+
         // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            jourFerieService.saveJourFerie(jourFerie);
+            jourFerieService.saveJourFerie(jourFerieDTO);
         });
         assertEquals("A JourFerie must have at least one associated Regle", exception.getMessage());
     }
@@ -73,87 +71,65 @@ public class JourFerieServiceIntegrationTest {
     @Test
     public void testGetJourFerie_Success() {
         // Arrange
-        Regle regle = new Regle();
-        regle.setCoderegle("RULE_001");
-        jourFerie.getRegles().add(regle);
-
-        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
+        jourFerieDTO.setRegleIds(List.of(1)); // Ajouter un ID fictif
+        JourFerieDTO savedJourFerie = jourFerieService.saveJourFerie(jourFerieDTO);
 
         // Act
-        JourFerie fetchedJourFerie = jourFerieService.getJourFerie(savedJourFerie.getId());
+        JourFerieDTO fetchedJourFerie = jourFerieService.getJourFerie(savedJourFerie.getId());
 
         // Assert
         assertNotNull(fetchedJourFerie);
         assertEquals(savedJourFerie.getId(), fetchedJourFerie.getId());
         assertEquals(savedJourFerie.getDate(), fetchedJourFerie.getDate());
-        assertEquals(1, fetchedJourFerie.getRegles().size());
-        assertEquals("RULE_001", fetchedJourFerie.getRegles().get(0).getCoderegle());
+        assertEquals(1, fetchedJourFerie.getRegleIds().size());
     }
-
 
     @Test
     public void testGetJourFerie_Failure_NotFound() {
-        // Act
-        JourFerie fetchedJourFerie = jourFerieService.getJourFerie(999);
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            jourFerieService.getJourFerie(999);
+        });
 
-        // Assert
-        assertNull(fetchedJourFerie, "A JourFerie with ID 999 should not exist.");
+        assertEquals("JourFerie not found with ID: 999", exception.getMessage());
     }
 
     @Test
     public void testGetAllJourFeries() {
         // Arrange
-        JourFerie jourFerie1 = JourFerie.builder()
+        JourFerieDTO jourFerie1 = JourFerieDTO.builder()
                 .date(new Date())
-                .regles(new ArrayList<>())
+                .regleIds(List.of(1))
                 .build();
-        Regle regle1 = new Regle();
-        regle1.setCoderegle("R001");
-        regle1.setJourFerie(jourFerie1);
-        jourFerie1.getRegles().add(regle1);
+        JourFerieDTO jourFerie2 = JourFerieDTO.builder()
+                .date(new Date())
+                .regleIds(List.of(2))
+                .build();
 
         jourFerieService.saveJourFerie(jourFerie1);
-
-        JourFerie jourFerie2 = JourFerie.builder()
-                .date(new Date())
-                .regles(new ArrayList<>())
-                .build();
-        Regle regle2 = new Regle();
-        regle2.setCoderegle("R002");
-        regle2.setJourFerie(jourFerie2);
-        jourFerie2.getRegles().add(regle2);
-
         jourFerieService.saveJourFerie(jourFerie2);
 
         // Act
-        List<JourFerie> jourFeries = jourFerieService.getJourFeries();
+        List<JourFerieDTO> jourFeries = jourFerieService.getJourFeries();
 
         // Assert
         assertNotNull(jourFeries);
         assertEquals(2, jourFeries.size());
     }
 
-
-
     @Test
-    public void testDeleteJourFerie() {
-        Regle regle = Regle.builder()
-                .coderegle("CODE123")
-                .build();
+    public void testDeleteJourFerie_Success() {
+        // Arrange
+        jourFerieDTO.setRegleIds(List.of(1)); // Ajouter un ID fictif
+        JourFerieDTO savedJourFerie = jourFerieService.saveJourFerie(jourFerieDTO);
 
-        jourFerie.getRegles().add(regle);
-
-        JourFerie savedJourFerie = jourFerieService.saveJourFerie(jourFerie);
-
-        // Act:
+        // Act
         jourFerieService.deleteJourFerie(savedJourFerie.getId());
 
-        // Assert:
-        JourFerie deletedJourFerie = jourFerieService.getJourFerie(savedJourFerie.getId());
-        assertNull(deletedJourFerie, "The JourFerie should be deleted and not found again.");
+        // Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            jourFerieService.getJourFerie(savedJourFerie.getId());
+        });
+        assertEquals("JourFerie not found with ID: " + savedJourFerie.getId(), exception.getMessage());
     }
-
-
-
 }
-

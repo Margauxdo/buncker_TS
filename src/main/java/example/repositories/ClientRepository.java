@@ -1,5 +1,6 @@
 package example.repositories;
 
+import example.DTO.ClientDTO;
 import example.entity.Client;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,8 +22,13 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     @EntityGraph(attributePaths = {"valises", "problemes"})
     List<Client> findAll();
 
+
+
     @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises WHERE c.id = :id")
     Optional<Client> findByIdWithValises(@Param("id") Integer id);
+
+    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises LEFT JOIN FETCH c.problemes WHERE c.id = :id")
+    Optional<Client> findClientWithRelationsById(@Param("id") int id);
 
 
 }

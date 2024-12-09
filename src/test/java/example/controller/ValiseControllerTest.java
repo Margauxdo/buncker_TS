@@ -1,5 +1,6 @@
 package example.controller;
 
+import example.DTO.ValiseDTO;
 import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
@@ -10,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,39 +32,6 @@ public class ValiseControllerTest {
 
     // **Tests Thymeleaf**
 
-    // Test pour afficher toutes les valises
-    @Test
-    public void testViewValises_Success() {
-        // Arrange
-        when(valiseService.getAllValises()).thenReturn(java.util.List.of(new Valise()));
-
-        Model model = new ConcurrentModel();
-
-        // Act
-        String response = valiseController.viewValises(model);
-
-        // Assert
-        assertEquals("valises/valises_list", response, "Expected view name is 'valises/valises_list'");
-        assertTrue(model.containsAttribute("valises"), "Model should contain 'valises' attribute");
-    }
-
-    // Test pour afficher une valise par ID (succès)
-    @Test
-    public void testViewValiseById_Success() {
-        // Arrange
-        Valise valise = new Valise();
-        when(valiseService.getValiseById(1)).thenReturn(valise);
-
-        Model model = new ConcurrentModel();
-
-        // Act
-        String response = valiseController.viewValise(1, model);
-
-        // Assert
-        assertEquals("valises/valise_details", response, "Expected view name is 'valises/valise_details'");
-        assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
-        assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
-    }
 
 
 
@@ -85,8 +55,11 @@ public class ValiseControllerTest {
     @Test
     public void testEditValiseForm_Success() {
         // Arrange
-        Valise valise = new Valise();
-        when(valiseService.getValiseById(1)).thenReturn(valise);
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .id(1)
+                .description("Test Valise")
+                .build();
+        when(valiseService.getValiseById(1)).thenReturn(valiseDTO);
 
         Model model = new ConcurrentModel();
 
@@ -96,7 +69,9 @@ public class ValiseControllerTest {
         // Assert
         assertEquals("valises/valise_edit", response, "Expected view name is 'valises/valise_edit'");
         assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
-        assertEquals(valise, model.getAttribute("valise"), "Expected 'valise' in model");
+        ValiseDTO valiseFromModel = (ValiseDTO) model.getAttribute("valise");
+        assertNotNull(valiseFromModel, "Valise should not be null");
+        assertEquals(valiseDTO.getDescription(), valiseFromModel.getDescription(), "Description should match");
     }
 
     // Test pour afficher le formulaire de modification (erreur)
@@ -130,7 +105,53 @@ public class ValiseControllerTest {
         verify(valiseService, times(1)).deleteValise(1);
     }
 
-    // Test pour supprimer une valise (erreur)
+
+
+    @Test
+    public void testViewValises_Success() {
+        // Arrange
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .id(1)
+                .description("Test Valise")
+                .build();
+        when(valiseService.getAllValises()).thenReturn(List.of(valiseDTO));
+
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = valiseController.viewValises(model);
+
+        // Assert
+        assertEquals("valises/valises_list", response, "Expected view name is 'valises/valises_list'");
+        assertTrue(model.containsAttribute("valises"), "Model should contain 'valises' attribute");
+        List<ValiseDTO> valises = (List<ValiseDTO>) model.getAttribute("valises");
+        assertNotNull(valises, "Valises should not be null");
+        assertEquals(1, valises.size(), "Valises list should contain one item");
+        assertEquals("Test Valise", valises.get(0).getDescription(), "Description should match");
+    }
+
+    @Test
+    public void testViewValiseById_Success() {
+        // Arrange
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .id(1)
+                .description("Test Valise")
+                .build();
+        when(valiseService.getValiseById(1)).thenReturn(valiseDTO);
+
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = valiseController.viewValise(1, model);
+
+        // Assert
+        assertEquals("valises/valise_details", response, "Expected view name is 'valises/valise_details'");
+        assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
+        ValiseDTO valise = (ValiseDTO) model.getAttribute("valise");
+        assertNotNull(valise, "Valise should not be null");
+        assertEquals("Test Valise", valise.getDescription(), "Description should match");
+    }
+
     @Test
     public void testDeleteValise_NotFound() {
         // Arrange
@@ -147,4 +168,5 @@ public class ValiseControllerTest {
         assertEquals("Valise with ID 1 not found!", model.getAttribute("errorMessage"));
         verify(valiseService, times(1)).deleteValise(1);
     }
+
 }

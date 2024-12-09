@@ -1,5 +1,7 @@
 package example.controller;
 
+import example.DTO.ProblemeDTO;
+import example.DTO.ValiseDTO;
 import example.entity.Probleme;
 import example.entity.Valise;
 import example.interfaces.IProblemeService;
@@ -45,24 +47,32 @@ public class ProblemeControllerTest {
 
     @Test
     public void testViewAllProblemes_Success() {
-        List<Probleme> problemes = List.of(new Probleme(), new Probleme());
+        // Arrange
+        List<ProblemeDTO> problemes = List.of(
+                ProblemeDTO.builder().id(1).descriptionProbleme("Problème 1").build(),
+                ProblemeDTO.builder().id(2).descriptionProbleme("Problème 2").build()
+        );
         when(problemeService.getAllProblemes()).thenReturn(problemes);
 
         Model model = new ConcurrentModel();
+
+        // Act
         String viewName = problemeController.viewAllProblemes(model);
 
+        // Assert
         assertEquals("problemes/pb_list", viewName);
         assertTrue(model.containsAttribute("problemes"));
         assertEquals(problemes, model.getAttribute("problemes"));
-        verify(problemeService, times(2)).getAllProblemes(); // Vérifie les 2 invocations
+        verify(problemeService, times(1)).getAllProblemes();
     }
+
 
 
     @Test
     public void testViewProbleme_Success() {
         // Arrange
-        Probleme probleme = new Probleme();
-        when(problemeService.getProblemeById(1)).thenReturn(probleme);
+        ProblemeDTO problemeDTO = ProblemeDTO.builder().id(1).descriptionProbleme("Problème Exemple").build();
+        when(problemeService.getProblemeById(1)).thenReturn(problemeDTO);
 
         Model model = new ConcurrentModel();
 
@@ -70,19 +80,23 @@ public class ProblemeControllerTest {
         String viewName = problemeController.viewProbleme(1, model);
 
         // Assert
-        assertEquals("problemes/pb_details", viewName); // Updated to match the actual view name
+        assertEquals("problemes/pb_details", viewName);
         assertTrue(model.containsAttribute("probleme"));
-        assertEquals(probleme, model.getAttribute("probleme"));
+        assertEquals(problemeDTO, model.getAttribute("probleme"));
         verify(problemeService, times(1)).getProblemeById(1);
     }
+
 
 
 
     @Test
     public void testCreateProblemeForm() {
         // Arrange
-        List<Valise> mockValises = List.of(new Valise(), new Valise()); // Mocked list of Valises
-        when(valiseService.getAllValises()).thenReturn(mockValises); // Simulate service behavior
+        List<ValiseDTO> mockValises = List.of(
+                ValiseDTO.builder().id(1).description("Valise 1").build(),
+                ValiseDTO.builder().id(2).description("Valise 2").build()
+        );
+        when(valiseService.getAllValises()).thenReturn(mockValises);
 
         Model model = new ConcurrentModel();
 
@@ -90,25 +104,31 @@ public class ProblemeControllerTest {
         String viewName = problemeController.createProblemeForm(model);
 
         // Assert
-        assertEquals("problemes/pb_create", viewName, "The expected view name is incorrect.");
-        assertTrue(model.containsAttribute("probleme"), "The model should contain the 'probleme' attribute.");
-        assertTrue(model.containsAttribute("valises"), "The model should contain the 'valises' attribute.");
-        assertEquals(mockValises, model.getAttribute("valises"), "The list of valises does not match.");
-        verify(valiseService, times(1)).getAllValises(); // Verify service interaction
+        assertEquals("problemes/pb_create", viewName);
+        assertTrue(model.containsAttribute("probleme"), "The model should contain a 'probleme' attribute");
+        assertTrue(model.containsAttribute("valises"), "The model should contain a 'valises' attribute");
+        assertEquals(mockValises, model.getAttribute("valises"), "The valises attribute should match the mock valises");
+        verify(valiseService, times(1)).getAllValises();
     }
+
+
 
 
     @Test
     public void testUpdatedProblemeForm_Success() {
-        Probleme probleme = new Probleme();
-        when(problemeService.getProblemeById(1)).thenReturn(probleme);
+        // Arrange
+        ProblemeDTO problemeDTO = ProblemeDTO.builder().id(1).descriptionProbleme("Problème Exemple").build();
+        when(problemeService.getProblemeById(1)).thenReturn(problemeDTO);
 
         Model model = new ConcurrentModel();
+
+        // Act
         String viewName = problemeController.updatedProblemeForm(1, model);
 
+        // Assert
         assertEquals("problemes/pb_edit", viewName);
         assertTrue(model.containsAttribute("probleme"));
-        assertEquals(probleme, model.getAttribute("probleme"));
+        assertEquals(problemeDTO, model.getAttribute("probleme"));
         verify(problemeService, times(1)).getProblemeById(1);
     }
 

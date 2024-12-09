@@ -1,13 +1,13 @@
 package example.interfaces;
 
-import example.entity.RegleManuelle;
+import example.DTO.RegleManuelleDTO;
 
 import java.util.List;
 
 public interface IRegleManuelleService {
-    RegleManuelle createRegleManuelle(RegleManuelle regleManuelle);
-    RegleManuelle updateRegleManuelle(int id, RegleManuelle regleManuelle);
+    RegleManuelleDTO createRegleManuelle(RegleManuelleDTO regleManuelleDTO);
+    RegleManuelleDTO updateRegleManuelle(int id, RegleManuelleDTO regleManuelleDTO);
     void deleteRegleManuelle(int id);
-    RegleManuelle getRegleManuelle(int id);
-    List<RegleManuelle> getRegleManuelles();
+    RegleManuelleDTO getRegleManuelle(int id);
+    List<RegleManuelleDTO> getRegleManuelles();
 }

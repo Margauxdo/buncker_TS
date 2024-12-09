@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.TypeRegleDTO;
 import example.entity.Regle;
 import example.entity.TypeRegle;
 import example.interfaces.ITypeRegleService;
@@ -11,89 +12,75 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TypeRegleService implements ITypeRegleService {
 
-    private final TypeRegleRepository typeRegleRepository;
-    private final RegleRepository regleRepository;
+    @Autowired
+    private TypeRegleRepository typeRegleRepository;
 
     @Autowired
-    public TypeRegleService(TypeRegleRepository typeRegleRepository, RegleRepository regleRepository) {
-        this.typeRegleRepository = typeRegleRepository;
-        this.regleRepository = regleRepository;
+    private RegleRepository regleRepository;
+
+    @Override
+    public TypeRegleDTO createTypeRegle(TypeRegleDTO typeRegleDTO) {
+        Regle regle = regleRepository.findById(typeRegleDTO.getRegleId())
+                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegleId() + " est introuvable"));
+
+        TypeRegle typeRegle = TypeRegle.builder()
+                .nomTypeRegle(typeRegleDTO.getNomTypeRegle())
+                .regle(regle)
+                .build();
+
+        TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
+
+        return mapToDTO(savedTypeRegle);
     }
 
-
     @Override
-    public Optional<TypeRegle> getTypeRegle(int id) {
-        return typeRegleRepository.findById(id);
+    @Transactional
+    public TypeRegleDTO updateTypeRegle(int id, TypeRegleDTO typeRegleDTO) {
+        TypeRegle existingTypeRegle = typeRegleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("TypeRegle avec l'ID " + id + " est introuvable"));
+
+        Regle regle = regleRepository.findById(typeRegleDTO.getRegleId())
+                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegleId() + " est introuvable"));
+
+        existingTypeRegle.setNomTypeRegle(typeRegleDTO.getNomTypeRegle());
+        existingTypeRegle.setRegle(regle);
+
+        TypeRegle updatedTypeRegle = typeRegleRepository.save(existingTypeRegle);
+        return mapToDTO(updatedTypeRegle);
     }
 
-
     @Override
-    public TypeRegle createTypeRegle(String nomTypeRegle, Long regleId) {
-        return null;
-    }
-
-    @Override
-        public TypeRegle createTypeRegle(TypeRegle typeRegle) {
-            if (typeRegle == null) {
-                throw new IllegalArgumentException("TypeRegle ne peut pas être null");
-            }
-
-            // Validation de la règle associée
-            if (typeRegle.getRegle() == null || !regleRepository.existsById(typeRegle.getRegle().getId())) {
-                throw new IllegalArgumentException("La Regle associée est obligatoire et doit exister.");
-            }
-            if (typeRegleRepository.existsByNomTypeRegle(typeRegle.getNomTypeRegle())) {
-                throw new IllegalArgumentException("Un TypeRegle avec ce nom existe déjà.");
-            }
-
-
-            return typeRegleRepository.save(typeRegle);
-        }
-
-
-
-
-    @Override
-        @Transactional
-        public void deleteTypeRegle(int id) {
-            if (!typeRegleRepository.existsById(id)) {
-                throw new EntityNotFoundException("TypeRegle avec l'ID " + id + " est introuvable");
-            }
-            typeRegleRepository.deleteById(id);
-        }
-
-        @Override
-        public List<TypeRegle> getTypeRegles() {
-            return typeRegleRepository.findAll();
-        }
-
-    @Override
-    public TypeRegle updateTypeRegle(int id, TypeRegle typeRegle) {
-        if (typeRegle == null || typeRegle.getRegle() == null) {
-            throw new IllegalArgumentException("TypeRegle ou Regle associé est null");
-        }
-
-        if (id != typeRegle.getId()) {
-            throw new IllegalArgumentException("TypeRegle ID mismatch");
-        }
-
+    public void deleteTypeRegle(int id) {
         if (!typeRegleRepository.existsById(id)) {
             throw new EntityNotFoundException("TypeRegle avec l'ID " + id + " est introuvable");
         }
-
-        TypeRegle existingTypeRegle = typeRegleRepository.findById(id).orElseThrow();
-        existingTypeRegle.setNomTypeRegle(typeRegle.getNomTypeRegle());
-        existingTypeRegle.setRegle(typeRegle.getRegle());
-
-        return typeRegleRepository.save(existingTypeRegle);
+        typeRegleRepository.deleteById(id);
     }
 
+    @Override
+    public TypeRegleDTO getTypeRegle(int id) {
+        return typeRegleRepository.findById(id)
+                .map(this::mapToDTO)
+                .orElseThrow(() -> new EntityNotFoundException("TypeRegle avec l'ID " + id + " est introuvable"));
+    }
 
+    @Override
+    public List<TypeRegleDTO> getTypeRegles() {
+        return typeRegleRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
+    private TypeRegleDTO mapToDTO(TypeRegle typeRegle) {
+        return TypeRegleDTO.builder()
+                .id(typeRegle.getId())
+                .nomTypeRegle(typeRegle.getNomTypeRegle())
+                .regleId(typeRegle.getRegle().getId())
+                .build();
+    }
 }
-

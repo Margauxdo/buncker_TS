@@ -1,19 +1,13 @@
 package example.controller;
 
+import example.DTO.SortieSemaineDTO;
 import example.entity.SortieSemaine;
 import example.interfaces.ISortieSemaineService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -23,142 +17,59 @@ public class SortieSemaineController {
     @Autowired
     private ISortieSemaineService sortieSemaineService;
 
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
-        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
-    }
-
-    /*// API REST: Récupérer tous les SS
-    @GetMapping("/api")
-    public ResponseEntity<List<SortieSemaine>> getAllSortieSemaineApi() {
-        try {
-            List<SortieSemaine> sortieSemaines = sortieSemaineService.getAllSortieSemaine();
-            return new ResponseEntity<>(sortieSemaines, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    // API REST: Récupérer un SS par ID
-    @GetMapping("/api/{id}")
-    public ResponseEntity<SortieSemaine> getSortieSemaineApi(@PathVariable int id) {
-        SortieSemaine sortieSemaine = sortieSemaineService.getSortieSemaine(id);
-        return sortieSemaine != null ? new ResponseEntity<>(sortieSemaine, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    // API REST: Créer un SS
-    @PostMapping("/api")
-    public ResponseEntity<SortieSemaine> createSortieSemaineApi(@Valid @RequestBody SortieSemaine sortieSemaine) {
-        try {
-            SortieSemaine createdSortie = sortieSemaineService.createSortieSemaine(sortieSemaine);
-            return new ResponseEntity<>(createdSortie, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // API REST: Modifier un SS
-    @PutMapping("/api/{id}")
-    public ResponseEntity<SortieSemaine> updateSortieSemaineApi(@PathVariable int id, @RequestBody SortieSemaine sortieSemaine) {
-        try {
-            SortieSemaine updatedSortie = sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
-            return updatedSortie != null ?
-                    new ResponseEntity<>(updatedSortie, HttpStatus.OK) :
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-
-    // API REST: Supprimer un SS
-    @DeleteMapping("/api/{id}")
-    public ResponseEntity<Void> deleteSortieSemaineApi(@PathVariable int id) {
-        try {
-            sortieSemaineService.deleteSortieSemaine(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
-    // Vue Thymeleaf pour lister les clients
+    // Vue Thymeleaf pour lister les SortieSemaine
     @GetMapping("/list")
     public String viewSortieSemaine(Model model) {
-        model.addAttribute("sortieSemaine", sortieSemaineService.getAllSortieSemaine());
+        List<SortieSemaineDTO> sortieSemaines = sortieSemaineService.getAllSortieSemaine();
+        model.addAttribute("sortieSemaine", sortieSemaines);
         return "sortieSemaines/SS_list";
     }
 
-    // Vue Thymeleaf pour voir une SS par ID
+    // Vue Thymeleaf pour voir une SortieSemaine par ID
     @GetMapping("/view/{id}")
     public String viewSortieSemaineById(@PathVariable int id, Model model) {
-        SortieSemaine semaine = sortieSemaineService.getSortieSemaine(id);
-        if (semaine == null) {
-            model.addAttribute("errormessage", "SortieSemaine avec l'Id " + id + " non trouvée");
+        SortieSemaineDTO sortieSemaine = sortieSemaineService.getSortieSemaine(id);
+        if (sortieSemaine == null) {
+            model.addAttribute("errormessage", "SortieSemaine avec l'ID " + id + " non trouvée");
             return "sortieSemaines/error";
         }
-
-        String regleDescription = semaine.getRegle() != null
-                ? "Règle : " + semaine.getRegle().getCoderegle() // ou une autre propriété pertinente
-                : "Aucune règle associée";
-        model.addAttribute("sortieSemaine", semaine);
-        model.addAttribute("regleDescription", regleDescription);
-
+        model.addAttribute("sortieSemaine", sortieSemaine);
         return "sortieSemaines/SS_details";
     }
 
-    // Formulaire Thymeleaf pour créer un SS
+    // Formulaire Thymeleaf pour créer une SortieSemaine
     @GetMapping("/create")
     public String createSortieSemaineForm(Model model) {
-        model.addAttribute("sortieSemaine", new SortieSemaine());
+        model.addAttribute("sortieSemaine", new SortieSemaineDTO());
         return "sortieSemaines/SS_create";
     }
 
-    // Création d'un SS via formulaire Thymeleaf
     @PostMapping("/create")
-    public String createSortieSemaine(@Valid @ModelAttribute("sortieSemaine") SortieSemaine sortieSemaine) {
-        sortieSemaineService.createSortieSemaine(sortieSemaine);
-        return "redirect:/sortieSemaines/SS_list";
+    public String createSortieSemaine(@ModelAttribute("sortieSemaine") SortieSemaineDTO sortieSemaineDTO) {
+        sortieSemaineService.createSortieSemaine(sortieSemaineDTO);
+        return "redirect:/sortieSemaine/list";
     }
 
-    // Formulaire Thymeleaf pour modifier un SS
+    // Formulaire Thymeleaf pour modifier une SortieSemaine
     @GetMapping("/edit/{id}")
     public String editSortieSemaineForm(@PathVariable int id, Model model) {
-        SortieSemaine semaine = sortieSemaineService.getSortieSemaine(id);
-        if (semaine == null) {
+        SortieSemaineDTO sortieSemaine = sortieSemaineService.getSortieSemaine(id);
+        if (sortieSemaine == null) {
             return "sortieSemaines/error";
         }
-        model.addAttribute("sortieSemaine", semaine);
+        model.addAttribute("sortieSemaine", sortieSemaine);
         return "sortieSemaines/SS_edit";
     }
 
-    // Modifier un SS via formulaire Thymeleaf
     @PostMapping("/edit/{id}")
-    public String updateSortieSemaine(@PathVariable int id, @Valid @ModelAttribute("sortieSemaine") SortieSemaine sortieSemaine) {
-        System.out.println("Date reçue : " + sortieSemaine.getDateSortieSemaine());
-        sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
-        return "redirect:/sortieSemaines/SS_list";
+    public String updateSortieSemaine(@PathVariable int id, @ModelAttribute("sortieSemaine") SortieSemaine sortieSemaineDTO) {
+        sortieSemaineService.updateSortieSemaine(id, sortieSemaineDTO);
+        return "redirect:/sortieSemaine/list";
     }
 
-    // Supprimer un SS via un formulaire Thymeleaf sécurisé
     @PostMapping("/delete/{id}")
     public String deleteSortieSemaine(@PathVariable int id) {
         sortieSemaineService.deleteSortieSemaine(id);
-        return "redirect:/sortieSemaines/SS_list";
+        return "redirect:/sortieSemaine/list";
     }
-
-
-
-
-
-
-
-
-
 }

@@ -1,17 +1,13 @@
 package example.interfaces;
 
-import example.entity.TypeRegle;
+import example.DTO.TypeRegleDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ITypeRegleService {
-    TypeRegle createTypeRegle(String nomTypeRegle, Long regleId);
-
-    TypeRegle createTypeRegle(TypeRegle typeRegle);
-   TypeRegle updateTypeRegle(int id, TypeRegle typeRegle);
-   void deleteTypeRegle(int id);
-   Optional<TypeRegle> getTypeRegle(int id);
-   List<TypeRegle> getTypeRegles();
-
+    TypeRegleDTO createTypeRegle(TypeRegleDTO typeRegleDTO);
+    TypeRegleDTO updateTypeRegle(int id, TypeRegleDTO typeRegleDTO);
+    void deleteTypeRegle(int id);
+    TypeRegleDTO getTypeRegle(int id);
+    List<TypeRegleDTO> getTypeRegles();
 }

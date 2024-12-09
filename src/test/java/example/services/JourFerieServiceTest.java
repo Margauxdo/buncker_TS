@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.JourFerieDTO;
 import example.entity.JourFerie;
 import example.repositories.JourFerieRepository;
 import org.junit.jupiter.api.Assertions;
@@ -37,7 +38,7 @@ public class JourFerieServiceTest {
 
         when(jourFerieRepository.findById(id)).thenReturn(Optional.of(jourFerie));
 
-        JourFerie result = jourFerieService.getJourFerie(id);
+        JourFerieDTO result = jourFerieService.getJourFerie(id);
 
         Assertions.assertNotNull(result, "JourFerie should not be null");
         Assertions.assertEquals(id, result.getId(), "JourFerie ID should match");
@@ -53,7 +54,7 @@ public class JourFerieServiceTest {
 
         when(jourFerieRepository.findById(id)).thenReturn(Optional.empty());
 
-        JourFerie result = jourFerieService.getJourFerie(id);
+        JourFerieDTO result = jourFerieService.getJourFerie(id);
 
         Assertions.assertNull(result, "JourFerie should be null if not found");
 
@@ -70,7 +71,7 @@ public class JourFerieServiceTest {
 
         when(jourFerieRepository.findAll()).thenReturn(jourFeries);
 
-        List<JourFerie> result = jourFerieService.getJourFeries();
+        List<JourFerieDTO> result = jourFerieService.getJourFeries();
 
         Assertions.assertEquals(2, result.size(), "The list of jourFeries should contain 2 elements");
 
@@ -83,7 +84,7 @@ public class JourFerieServiceTest {
     public void testGetJourFeries_EmptyList() {
         when(jourFerieRepository.findAll()).thenReturn(new ArrayList<>());
 
-        List<JourFerie> result = jourFerieService.getJourFeries();
+        List<JourFerieDTO> result = jourFerieService.getJourFeries();
 
         Assertions.assertTrue(result.isEmpty(), "The list of jourFeries should be empty");
 

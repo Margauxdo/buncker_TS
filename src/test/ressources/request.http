@@ -6,7 +6,7 @@ Accept: text/html
 
 
 ### Afficher un client par ID (GET - Thymeleaf)
-GET http://localhost:8080/clients/view/4
+GET http://localhost:8080/clients/view/1
 Accept: text/html
 
 ### Afficher le formulaire de création de client (GET - Thymeleaf)

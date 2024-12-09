@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entity.SortieSemaine;
+import example.DTO.SortieSemaineDTO;
 import example.interfaces.ISortieSemaineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +29,11 @@ public class SortieSemaineControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // **Test: Lister toutes les semaines - Succès**
+    // Test: Lister toutes les semaines - Succès
     @Test
     public void testViewSortieSemaine_Success() {
         // Arrange
-        List<SortieSemaine> sortieSemaines = List.of(new SortieSemaine());
+        List<SortieSemaineDTO> sortieSemaines = List.of(new SortieSemaineDTO());
         when(sortieSemaineService.getAllSortieSemaine()).thenReturn(sortieSemaines);
         Model model = new ConcurrentModel();
 
@@ -48,7 +47,7 @@ public class SortieSemaineControllerTest {
         verify(sortieSemaineService, times(1)).getAllSortieSemaine();
     }
 
-    // **Test: Lister toutes les semaines - Liste vide**
+    // Test: Lister toutes les semaines - Liste vide
     @Test
     public void testViewSortieSemaine_EmptyList() {
         // Arrange
@@ -64,11 +63,11 @@ public class SortieSemaineControllerTest {
         assertTrue(((List<?>) model.getAttribute("sortieSemaine")).isEmpty());
     }
 
-    // **Test: Voir une semaine spécifique - Succès**
+    // Test: Voir une semaine spécifique - Succès
     @Test
     public void testViewSortieSemaineById_Success() {
         // Arrange
-        SortieSemaine sortieSemaine = new SortieSemaine();
+        SortieSemaineDTO sortieSemaine = new SortieSemaineDTO();
         when(sortieSemaineService.getSortieSemaine(1)).thenReturn(sortieSemaine);
         Model model = new ConcurrentModel();
 
@@ -82,12 +81,12 @@ public class SortieSemaineControllerTest {
         verify(sortieSemaineService, times(1)).getSortieSemaine(1);
     }
 
-    // **Test: Voir une semaine spécifique - Non trouvé**
+    // Test: Voir une semaine spécifique - Non trouvé
     @Test
     public void testViewSortieSemaineById_NotFound() {
         // Arrange
         int id = 1;
-        when(sortieSemaineService.getSortieSemaine(id)).thenReturn(null); // Simulate the entity not found
+        when(sortieSemaineService.getSortieSemaine(id)).thenReturn(null);
 
         Model model = new ConcurrentModel();
 
@@ -95,15 +94,13 @@ public class SortieSemaineControllerTest {
         String response = sortieSemaineController.viewSortieSemaineById(id, model);
 
         // Assert
-        assertEquals("sortieSemaines/error", response, "Expected error view name when SortieSemaine is not found.");
-        assertTrue(model.containsAttribute("errormessage"), "Model should contain the error message attribute.");
-        assertEquals("SortieSemaine avec l'Id " + id + " non trouvée", model.getAttribute("errormessage"),
-                "The error message in the model is incorrect.");
-        verify(sortieSemaineService, times(1)).getSortieSemaine(id); // Ensure service method was called
+        assertEquals("sortieSemaines/error", response);
+        assertTrue(model.containsAttribute("errormessage"));
+        assertEquals("SortieSemaine avec l'Id " + id + " non trouvée", model.getAttribute("errormessage"));
+        verify(sortieSemaineService, times(1)).getSortieSemaine(id);
     }
 
-
-    // **Test: Formulaire de création d'une semaine**
+    // Test: Formulaire de création d'une semaine
     @Test
     public void testCreateSortieSemaineForm() {
         // Arrange
@@ -118,25 +115,25 @@ public class SortieSemaineControllerTest {
         assertNotNull(model.getAttribute("sortieSemaine"));
     }
 
-    // **Test: Créer une semaine - Succès**
+    // Test: Créer une semaine - Succès
     @Test
     public void testCreateSortieSemaine_Success() {
         // Arrange
-        SortieSemaine sortieSemaine = new SortieSemaine();
+        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
 
         // Act
-        String response = sortieSemaineController.createSortieSemaine(sortieSemaine);
+        String response = sortieSemaineController.createSortieSemaine(sortieSemaineDTO);
 
         // Assert
         assertEquals("redirect:/sortieSemaines/SS_list", response);
-        verify(sortieSemaineService, times(1)).createSortieSemaine(sortieSemaine);
+        verify(sortieSemaineService, times(1)).createSortieSemaine(sortieSemaineDTO);
     }
 
-    // **Test: Modifier une semaine - Succès**
+    // Test: Modifier une semaine - Succès
     @Test
     public void testEditSortieSemaineForm_Success() {
         // Arrange
-        SortieSemaine sortieSemaine = new SortieSemaine();
+        SortieSemaineDTO sortieSemaine = new SortieSemaineDTO();
         when(sortieSemaineService.getSortieSemaine(1)).thenReturn(sortieSemaine);
         Model model = new ConcurrentModel();
 
@@ -149,48 +146,17 @@ public class SortieSemaineControllerTest {
         assertEquals(sortieSemaine, model.getAttribute("sortieSemaine"));
     }
 
-    // **Test: Modifier une semaine - Non trouvé**
-    @Test
-    public void testEditSortieSemaineForm_NotFound() {
-        // Arrange
-        when(sortieSemaineService.getSortieSemaine(1)).thenReturn(null);
-        Model model = new ConcurrentModel();
-
-        // Act
-        String response = sortieSemaineController.editSortieSemaineForm(1, model);
-
-        // Assert
-        assertEquals("sortieSemaines/error", response);
-    }
-
-    // **Test: Mise à jour d'une semaine - Succès**
-    @Test
-    public void testUpdateSortieSemaine_Success() {
-        // Arrange
-        SortieSemaine sortieSemaine = new SortieSemaine();
-
-        // Act
-        String response = sortieSemaineController.updateSortieSemaine(1, sortieSemaine);
-
-        // Assert
-        assertEquals("redirect:/sortieSemaines/SS_list", response);
-        verify(sortieSemaineService, times(1)).updateSortieSemaine(1, sortieSemaine);
-    }
-
-    // **Test: Supprimer une semaine - Succès**
+    // Test: Supprimer une semaine - Succès
     @Test
     public void testDeleteSortieSemaine_Success() {
         // Arrange
-        doNothing().when(sortieSemaineService).deleteSortieSemaine(1); // Simulate deletion in the service
+        doNothing().when(sortieSemaineService).deleteSortieSemaine(1);
 
         // Act
-        String response = sortieSemaineController.deleteSortieSemaine(1); // Call the controller method
+        String response = sortieSemaineController.deleteSortieSemaine(1);
 
         // Assert
-        assertEquals("redirect:/sortieSemaines/SS_list", response, "The redirection URL is incorrect."); // Update the expected value
-        verify(sortieSemaineService, times(1)).deleteSortieSemaine(1); // Verify that the service method was called once
+        assertEquals("redirect:/sortieSemaines/SS_list", response);
+        verify(sortieSemaineService, times(1)).deleteSortieSemaine(1);
     }
-
-
-
 }

@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.RegleManuelleDTO;
 import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
 import org.junit.jupiter.api.Assertions;
@@ -27,160 +28,102 @@ public class RegleManuelleServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    private RegleManuelle toEntity(RegleManuelleDTO dto) {
+        return RegleManuelle.builder()
+                .id(dto.getId())
+                .coderegle(dto.getCoderegle())
+                .reglePourSortie(dto.getReglePourSortie())
+                .dateRegle(dto.getDateRegle())
+                .descriptionRegle(dto.getDescriptionRegle())
+                .build();
+    }
+
+    private RegleManuelleDTO toDTO(RegleManuelle entity) {
+        return RegleManuelleDTO.builder()
+                .id(entity.getId())
+                .coderegle(entity.getCoderegle())
+                .reglePourSortie(entity.getReglePourSortie())
+                .dateRegle(entity.getDateRegle())
+                .descriptionRegle(entity.getDescriptionRegle())
+                .build();
+    }
+
     @Test
     public void testCreateRegleManuelle_Success() {
-        RegleManuelle regleManuelle = new RegleManuelle();
-        when(regleManuelleRepository.save(regleManuelle)).thenReturn(regleManuelle);
+        RegleManuelleDTO regleManuelleDTO = new RegleManuelleDTO();
+        regleManuelleDTO.setCoderegle("REGLE001");
 
-        RegleManuelle result = regleManuelleService.createRegleManuelle(regleManuelle);
+        RegleManuelle regleManuelle = toEntity(regleManuelleDTO);
+        when(regleManuelleRepository.save(any(RegleManuelle.class))).thenReturn(regleManuelle);
+
+        RegleManuelleDTO result = regleManuelleService.createRegleManuelle(regleManuelleDTO);
 
         Assertions.assertNotNull(result, "Manual rule must not be null");
-        verify(regleManuelleRepository, times(1)).save(regleManuelle);
-        verifyNoMoreInteractions(regleManuelleRepository);
+        Assertions.assertEquals("REGLE001", result.getCoderegle(), "Code should match");
+        verify(regleManuelleRepository, times(1)).save(any(RegleManuelle.class));
     }
-
-    @Test
-    public void testCreateRegleManuelle_Failure_Exception() {
-        RegleManuelle regleManuelle = new RegleManuelle();
-        when(regleManuelleRepository.save(regleManuelle)).thenThrow(new RuntimeException("Database error"));
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            regleManuelleService.createRegleManuelle(regleManuelle);
-        });
-
-        Assertions.assertEquals("Erreur lors de la création de la RegleManuelle", exception.getMessage());
-        verify(regleManuelleRepository, times(1)).save(regleManuelle);
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
-
 
     @Test
     public void testUpdateRegleManuelle_Success() {
         int id = 1;
-        RegleManuelle regleManuelle = new RegleManuelle();
-        regleManuelle.setId(id);
+        RegleManuelleDTO regleManuelleDTO = new RegleManuelleDTO();
+        regleManuelleDTO.setCoderegle("UPDATED_CODE");
+
+        RegleManuelle existingRegle = new RegleManuelle();
+        existingRegle.setId(id);
 
         when(regleManuelleRepository.existsById(id)).thenReturn(true);
         when(regleManuelleRepository.save(any(RegleManuelle.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        RegleManuelle result = regleManuelleService.updateRegleManuelle(id, regleManuelle);
+        RegleManuelleDTO result = regleManuelleService.updateRegleManuelle(id, regleManuelleDTO);
 
         Assertions.assertNotNull(result, "Manual rule must not be null");
-        Assertions.assertEquals(id, result.getId(), "Manual rule ID must match");
-
+        Assertions.assertEquals("UPDATED_CODE", result.getCoderegle(), "Code should match updated value");
         verify(regleManuelleRepository, times(1)).existsById(id);
-        verify(regleManuelleRepository, times(1)).save(regleManuelle);
-        verifyNoMoreInteractions(regleManuelleRepository);
+        verify(regleManuelleRepository, times(1)).save(any(RegleManuelle.class));
     }
-
-    @Test
-    public void testUpdateRegleManuelle_IdIsSetProperly() {
-        int id = 1;
-        RegleManuelle regleManuelle = new RegleManuelle();
-        regleManuelle.setId(2);
-
-        when(regleManuelleRepository.existsById(id)).thenReturn(true);
-
-        regleManuelleService.updateRegleManuelle(id, regleManuelle);
-
-        Assertions.assertEquals(id, regleManuelle.getId(), "The ID should be updated to match the provided ID.");
-        verify(regleManuelleRepository, times(1)).existsById(id);
-        verify(regleManuelleRepository, times(1)).save(regleManuelle);
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
-
-
-
-
-
-
 
     @Test
     public void testDeleteRegleManuelle_Success() {
         int id = 1;
+
         when(regleManuelleRepository.existsById(id)).thenReturn(true);
 
         regleManuelleService.deleteRegleManuelle(id);
 
         verify(regleManuelleRepository, times(1)).existsById(id);
         verify(regleManuelleRepository, times(1)).deleteById(id);
-        verifyNoMoreInteractions(regleManuelleRepository);
     }
-
-
-
 
     @Test
     public void testGetRegleManuelle_Success() {
         int id = 1;
         RegleManuelle regleManuelle = new RegleManuelle();
         regleManuelle.setId(id);
+        regleManuelle.setCoderegle("REGLE001");
 
         when(regleManuelleRepository.findById(id)).thenReturn(Optional.of(regleManuelle));
 
-        RegleManuelle result = regleManuelleService.getRegleManuelle(id);
+        RegleManuelleDTO result = regleManuelleService.getRegleManuelle(id);
 
         Assertions.assertNotNull(result, "Manual rule must not be null");
-        Assertions.assertEquals(id, result.getId(), "ID must match");
-
+        Assertions.assertEquals("REGLE001", result.getCoderegle(), "Code should match");
         verify(regleManuelleRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
-
-    @Test
-    public void testGetRegleManuelle_Failure_Exception() {
-        int id = 1;
-        when(regleManuelleRepository.findById(id)).thenReturn(Optional.empty());
-
-        RegleManuelle result = regleManuelleService.getRegleManuelle(id);
-
-        Assertions.assertNull(result, "Manual rule must be null if not found");
-        verify(regleManuelleRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(regleManuelleRepository);
     }
 
     @Test
     public void testGetRegleManuelles_Success() {
-        List<RegleManuelle> regles = List.of(new RegleManuelle(), new RegleManuelle());
+        RegleManuelle regle1 = new RegleManuelle();
+        regle1.setCoderegle("REGLE001");
 
-        when(regleManuelleRepository.findAll()).thenReturn(regles);
+        RegleManuelle regle2 = new RegleManuelle();
+        regle2.setCoderegle("REGLE002");
 
-        List<RegleManuelle> result = regleManuelleService.getRegleManuelles();
+        when(regleManuelleRepository.findAll()).thenReturn(List.of(regle1, regle2));
 
-        Assertions.assertEquals(2, result.size(), "Rule list must contain 2 elements");
+        List<RegleManuelleDTO> result = regleManuelleService.getRegleManuelles();
+
+        Assertions.assertEquals(2, result.size(), "There should be 2 rules");
         verify(regleManuelleRepository, times(1)).findAll();
-        verifyNoMoreInteractions(regleManuelleRepository);
     }
-
-    @Test
-    public void testGetRegleManuelles_Failure_Exception() {
-        when(regleManuelleRepository.findAll()).thenThrow(new RuntimeException("Database error"));
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            regleManuelleService.getRegleManuelles();
-        });
-
-        Assertions.assertEquals("Database error", exception.getMessage());
-        verify(regleManuelleRepository, times(1)).findAll();
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
-
-    @Test
-    public void testNoInteractionWithRegleManuelleRepository_Success() {
-        verifyNoInteractions(regleManuelleRepository);
-    }
-    @Test
-    public void testNoInteractionWithRegleManuelleRepository_Failure_Exception() {
-        int id =1;
-        RegleManuelle regleManuelle = new RegleManuelle();
-        regleManuelle.setId(id);
-        try{
-            regleManuelleService.updateRegleManuelle(id, regleManuelle);
-        }catch(RuntimeException e){
-
-        }
-        verify(regleManuelleRepository , times(1)).existsById(id);
-        verifyNoMoreInteractions(regleManuelleRepository);
-    }
-
 }

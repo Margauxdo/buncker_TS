@@ -30,7 +30,10 @@ public class ClientDTO {
     private String memoRetourSecurite2;
     private String typeSuivie;
     private String codeClient;
+
     private List<Integer> valiseIds = new ArrayList<>();
+    private List<String> valisesDescriptions = new ArrayList<>(); // Initialisé pour éviter les NPE
+
     private List<Integer> problemeIds = new ArrayList<>();
     private Integer retourSecuriteId;
     private Integer regleId;

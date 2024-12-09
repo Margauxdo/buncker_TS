@@ -1,17 +1,18 @@
 package example.interfaces;
 
+import example.DTO.SortieSemaineDTO;
 import example.entity.SortieSemaine;
 
 import java.util.List;
 
 public interface ISortieSemaineService {
 
-    SortieSemaine createSortieSemaine(SortieSemaine semaine);
-    SortieSemaine updateSortieSemaine(int id, SortieSemaine semaine);
+    SortieSemaineDTO createSortieSemaine(SortieSemaineDTO sortieSemaineDTO);
+    SortieSemaineDTO updateSortieSemaine(int id, SortieSemaine sortieSemaineDTO);
+
+    SortieSemaineDTO updateSortieSemaine(int id, SortieSemaineDTO sortieSemaineDTO);
+
     void deleteSortieSemaine(int id);
-    SortieSemaine getSortieSemaine(int id);
-    List<SortieSemaine> getAllSortieSemaine();
-
-
-    boolean existsById(int id);
+    SortieSemaineDTO getSortieSemaine(int id);
+    List<SortieSemaineDTO> getAllSortieSemaine();
 }

@@ -24,32 +24,39 @@ public class ClientService implements IClientService {
     }
 
     // Méthode pour convertir un Client en ClientDTO
-    private ClientDTO convertToDTO(Client client) {
-        return new ClientDTO(
-                client.getId(),
-                client.getName(),
-                client.getAdresse(),
-                client.getEmail(),
-                client.getTelephoneExploitation(),
-                client.getVille(),
-                client.getPersonnelEtFonction(),
-                client.getRamassage1(),
-                client.getRamassage2(),
-                client.getRamassage3(),
-                client.getRamassage4(),
-                client.getRamassage5(),
-                client.getRamassage6(),
-                client.getRamassage7(),
-                client.getEnvoiparDefaut(),
-                client.getMemoRetourSecurite1(),
-                client.getMemoRetourSecurite2(),
-                client.getTypeSuivie(),
-                client.getCodeClient(),
-                client.getValises() != null ? client.getValises().stream().map(Valise::getId).collect(Collectors.toList()) : List.of(),
-                client.getProblemes() != null ? client.getProblemes().stream().map(Probleme::getId).collect(Collectors.toList()) : List.of(),
-                client.getRetourSecurite() != null ? client.getRetourSecurite().getId() : null,
-                client.getRegle() != null ? client.getRegle().getId() : null
-        );
+    private ClientDTO convertToDto(Client client) {
+        ClientDTO clientDTO = new ClientDTO();
+        clientDTO.setId(client.getId());
+        clientDTO.setName(client.getName());
+        clientDTO.setAdresse(client.getAdresse());
+        clientDTO.setEmail(client.getEmail());
+        clientDTO.setTelephoneExploitation(client.getTelephoneExploitation());
+        clientDTO.setVille(client.getVille());
+        clientDTO.setPersonnelEtFonction(client.getPersonnelEtFonction());
+        clientDTO.setRamassage1(client.getRamassage1());
+        clientDTO.setRamassage2(client.getRamassage2());
+        clientDTO.setRamassage3(client.getRamassage3());
+        clientDTO.setRamassage4(client.getRamassage4());
+        clientDTO.setRamassage5(client.getRamassage5());
+        clientDTO.setRamassage6(client.getRamassage6());
+        clientDTO.setRamassage7(client.getRamassage7());
+        clientDTO.setEnvoiparDefaut(client.getEnvoiparDefaut());
+        clientDTO.setMemoRetourSecurite1(client.getMemoRetourSecurite1());
+        clientDTO.setMemoRetourSecurite2(client.getMemoRetourSecurite2());
+        clientDTO.setTypeSuivie(client.getTypeSuivie());
+        clientDTO.setCodeClient(client.getCodeClient());
+        clientDTO.setRetourSecuriteId(client.getRetourSecurite() != null ? client.getRetourSecurite().getId() : null);
+        clientDTO.setRegleId(client.getRegle() != null ? client.getRegle().getId() : null);
+
+        // Mapper les valises
+        if (client.getValises() != null) {
+            client.getValises().forEach(valise -> {
+                clientDTO.getValiseIds().add(valise.getId());
+                clientDTO.getValisesDescriptions().add(valise.getDescription());
+            });
+        }
+
+        return clientDTO;
     }
 
     // Méthode pour convertir un ClientDTO en Client
@@ -101,46 +108,22 @@ public class ClientService implements IClientService {
         clientRepository.delete(client);
     }
 
-    @Override
     @Transactional
+    @Override
     public ClientDTO getClientById(int id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client non trouvé"));
         Hibernate.initialize(client.getValises());
-        return convertToDTO(client);
+        Hibernate.initialize(client.getProblemes());
+        return convertToDto(client);
     }
 
     @Override
     public List<ClientDTO> getAllClients() {
         return clientRepository.findAll().stream()
-                .map(client -> new ClientDTO(
-                        client.getId(),
-                        client.getName(),
-                        client.getAdresse(),
-                        client.getEmail(),
-                        client.getTelephoneExploitation(),
-                        client.getVille(),
-                        client.getPersonnelEtFonction(),
-                        client.getRamassage1(),
-                        client.getRamassage2(),
-                        client.getRamassage3(),
-                        client.getRamassage4(),
-                        client.getRamassage5(),
-                        client.getRamassage6(),
-                        client.getRamassage7(),
-                        client.getEnvoiparDefaut(),
-                        client.getMemoRetourSecurite1(),
-                        client.getMemoRetourSecurite2(),
-                        client.getTypeSuivie(),
-                        client.getCodeClient(),
-                        null, // Ne pas charger les relations complexes
-                        null,
-                        null,
-                        null
-                ))
+                .map(this::convertToDto) // Utilisation correcte de convertToDto
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public boolean existsById(int id) {

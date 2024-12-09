@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.ProblemeDTO;
 import example.entity.Probleme;
 import example.exceptions.ResourceNotFoundException;
 import example.repositories.ProblemeRepository;
@@ -117,7 +118,7 @@ public class ProblemeServiceTest {
         Probleme probleme = new Probleme();
         probleme.setId(id);
         when(problemeRepository.findById(id)).thenReturn(Optional.of(probleme));
-        Probleme result = problemeService.getProblemeById(id);
+        ProblemeDTO result = problemeService.getProblemeById(id);
         Assertions.assertNotNull(result, "Problem not found");
         Assertions.assertEquals(id, result.getId(), "Problem not found");
         verify(problemeRepository, times(1)).findById(id);
@@ -128,7 +129,7 @@ public class ProblemeServiceTest {
         int id = 1;
         when(problemeRepository.findById(id)).thenReturn(Optional.empty());
 
-        Probleme result = problemeService.getProblemeById(id);
+        ProblemeDTO result = problemeService.getProblemeById(id);
 
         Assertions.assertNull(result, "Problem should be null if not found");
         verify(problemeRepository, times(1)).findById(id);
@@ -142,7 +143,7 @@ public class ProblemeServiceTest {
         problemeList.add(new Probleme());
 
         when(problemeRepository.findAll()).thenReturn(problemeList);
-        List<Probleme> result = problemeService.getAllProblemes();
+        List<ProblemeDTO> result = problemeService.getAllProblemes();
         Assertions.assertEquals(2, result.size(), "List of problems");
         verify(problemeRepository, times(1)).findAll();
         verifyNoMoreInteractions(problemeRepository);

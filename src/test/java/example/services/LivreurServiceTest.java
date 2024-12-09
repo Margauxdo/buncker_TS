@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.LivreurDTO;
 import example.entity.Livreur;
 import example.exceptions.RegleNotFoundException;
 import example.repositories.LivreurRepository;
@@ -50,7 +51,7 @@ public class LivreurServiceTest {
 
         when(livreurRepository.findById(1)).thenReturn(Optional.of(livreur));
 
-        Livreur result = livreurService.getLivreurById(1);
+        LivreurDTO result = livreurService.getLivreurById(1);
 
         assertNotNull(result);
         assertEquals("John Doe", result.getNomLivreur());
@@ -153,7 +154,7 @@ public class LivreurServiceTest {
     public void testGetLivreurById_Failure_Exception(){
         int id = 1;
         when(livreurRepository.findById(id)).thenReturn(Optional.empty());
-        Livreur result = livreurService.getLivreurById(id);
+        LivreurDTO result = livreurService.getLivreurById(id);
         Assertions.assertNull(result,"Livreur should not be null");
         verify(livreurRepository, times(1)).findById(id);
         verifyNoMoreInteractions(livreurRepository);
@@ -163,7 +164,7 @@ public class LivreurServiceTest {
         List<Livreur> livreurs = new ArrayList<>();
         livreurs.add(new Livreur());
         when(livreurRepository.findAll()).thenReturn(livreurs);
-        List<Livreur> result = livreurService.getAllLivreurs();
+        List<LivreurDTO> result = livreurService.getAllLivreurs();
         Assertions.assertEquals(1,result.size(),"la liste des livreurs devrait contenir un element");
         verify(livreurRepository, times(1)).findAll();
         verifyNoMoreInteractions(livreurRepository);

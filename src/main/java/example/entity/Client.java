@@ -12,7 +12,9 @@ import org.hibernate.annotations.FetchMode;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name= "client")
@@ -58,15 +60,12 @@ public class Client {
     private String codeClient;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SUBSELECT)
-    private List<Valise> valises;
-
-
-
+    private Set<Valise> valises = new HashSet<>();
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SUBSELECT)
-    private List<Probleme> problemes;
+    private Set<Probleme> problemes = new HashSet<>();
+
+
 
     @ManyToOne
     @JoinColumn(name = "retourSecurite_id")

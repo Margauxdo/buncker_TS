@@ -1,21 +1,21 @@
 package example.services;
 
+import example.DTO.LivreurDTO;
 import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.exceptions.ConflictException;
-import example.exceptions.RegleNotFoundException;
 import example.interfaces.ILivreurService;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class    LivreurService implements ILivreurService {
+public class LivreurService implements ILivreurService {
 
     @Autowired
     private LivreurRepository livreurRepository;
@@ -23,75 +23,100 @@ public class    LivreurService implements ILivreurService {
     @Autowired
     private MouvementRepository mouvementRepository;
 
-    public LivreurService(LivreurRepository livreurRepository) {
-
+    public LivreurService(LivreurRepository livreurRepository, MouvementRepository mouvementRepository) {
         this.livreurRepository = livreurRepository;
         this.mouvementRepository = mouvementRepository;
     }
-    @Transactional
-    public void deleteLivreur(Long id) {
-        Livreur livreur = livreurRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Livreur not found with ID: " + id));
-        livreurRepository.delete(livreur);
+
+    private LivreurDTO convertToDTO(Livreur livreur) {
+        return LivreurDTO.builder()
+                .id(livreur.getId())
+                .codeLivreur(livreur.getCodeLivreur())
+                .motDePasse(livreur.getMotDePasse())
+                .nomLivreur(livreur.getNomLivreur())
+                .prenomLivreur(livreur.getPrenomLivreur())
+                .numeroCartePro(livreur.getNumeroCartePro())
+                .telephonePortable(livreur.getTelephonePortable())
+                .telephoneKobby(livreur.getTelephoneKobby())
+                .telephoneAlphapage(livreur.getTelephoneAlphapage())
+                .mouvementId(livreur.getMouvement() != null ? livreur.getMouvement().getId() : null)
+                .build();
     }
 
+    private Livreur convertToEntity(LivreurDTO livreurDTO) {
+        Livreur livreur = new Livreur();
+        livreur.setId(livreurDTO.getId());
+        livreur.setCodeLivreur(livreurDTO.getCodeLivreur());
+        livreur.setMotDePasse(livreurDTO.getMotDePasse());
+        livreur.setNomLivreur(livreurDTO.getNomLivreur());
+        livreur.setPrenomLivreur(livreurDTO.getPrenomLivreur());
+        livreur.setNumeroCartePro(livreurDTO.getNumeroCartePro());
+        livreur.setTelephonePortable(livreurDTO.getTelephonePortable());
+        livreur.setTelephoneKobby(livreurDTO.getTelephoneKobby());
+        livreur.setTelephoneAlphapage(livreurDTO.getTelephoneAlphapage());
+
+        if (livreurDTO.getMouvementId() != null) {
+            Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
+            livreur.setMouvement(mouvement);
+        }
+
+        return livreur;
+    }
+
+    @Override
+    public LivreurDTO createLivreur(LivreurDTO livreurDTO) {
+        if (livreurRepository.existsByCodeLivreur(livreurDTO.getCodeLivreur())) {
+            throw new ConflictException("Livreur with this code already exists.");
+        }
+        Livreur livreur = convertToEntity(livreurDTO);
+        return convertToDTO(livreurRepository.save(livreur));
+    }
+
+    @Override
+    public LivreurDTO updateLivreur(int id, LivreurDTO livreurDTO) {
+        if (!livreurRepository.existsById(id)) {
+            throw new EntityNotFoundException("Livreur not found with ID " + id);
+        }
+        Livreur livreur = convertToEntity(livreurDTO);
+        livreur.setId(id);
+        return convertToDTO(livreurRepository.save(livreur));
+    }
 
     @Override
     public Livreur createLivreur(Livreur livreur) {
-        if (livreurRepository.existsByCodeLivreur(livreur.getCodeLivreur())) {
-            throw new ConflictException("Livreur avec ce code existe déjà.");
-        }
-
-        if (livreur.getMouvement() != null && livreur.getMouvement().getId() != 0) {
-            Mouvement mouvement = mouvementRepository.findById(livreur.getMouvement().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable."));
-            livreur.setMouvement(mouvement);
-        } else {
-            livreur.setMouvement(null);
-        }
-
-
-        return livreurRepository.save(livreur);
+        return null;
     }
-
-
 
     @Override
     public Livreur updateLivreur(int id, Livreur livreur) {
-        if (!livreurRepository.existsById(id)) {
-            throw new RegleNotFoundException("Delivery person not found with ID " + id);
-        }
-        livreur.setId(id);
-        return livreurRepository.save(livreur);
+        return null;
     }
-
-
-
 
     @Override
     public void deleteLivreur(int id) {
         if (!livreurRepository.existsById(id)) {
-            throw new EntityNotFoundException("delivery person not found with ID: " + id);
+            throw new EntityNotFoundException("Livreur not found with ID " + id);
         }
         livreurRepository.deleteById(id);
     }
 
-
     @Override
-    public Livreur getLivreurById(int id) {
-        return livreurRepository.findById(id)
+    public LivreurDTO getLivreurById(int id) {
+        Livreur livreur = livreurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Livreur not found with ID " + id));
+        return convertToDTO(livreur);
     }
 
     @Override
-    public List<Livreur> getAllLivreurs() {
-
-        return livreurRepository.findAll();
+    public List<LivreurDTO> getAllLivreurs() {
+        return livreurRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void saveLivreur(Livreur livreur) {
-        livreurRepository.save(livreur);
-    }
 
+    }
 }

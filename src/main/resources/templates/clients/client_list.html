@@ -56,44 +56,60 @@
     <thead>
     <tr>
         <th>Nom</th>
-        <th>Email</th>
         <th>Adresse</th>
+        <th>Email</th>
         <th>Téléphone</th>
         <th>Ville</th>
-        <th>Fonction</th>
-        <th>Ramassage 1</th>
-        <th>Ramassage 2</th>
-        <th>Ramassage 3</th>
-        <th>Ramassage 4</th>
-        <th>Ramassage 5</th>
-        <th>Ramassage 6</th>
-        <th>Ramassage 7</th>
-        <th>Envoie par défaut</th>
-        <th>Mémo retour sécurité 1</th>
-        <th>Mémo retour sécurité 2</th>
         <th>Code Client</th>
+        <th>Valises</th>
+        <th>Problèmes</th>
+        <th>Retour Sécurité</th>
+        <th>Règle</th>
         <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Boucle sur la liste des clients -->
     <tr th:each="client : ${clients}">
-        <td th:text="${client.name}"></td>
-        <td th:text="${client.email}"></td>
-        <td th:text="${client.adresse}"></td>
-        <td th:text="${client.telephoneExploitation}"></td>
-        <td th:text="${client.ville}"></td>
-        <td th:text="${client.personnelEtFonction}"></td>
-
+        <td th:text="${client.name}">Nom</td>
+        <td th:text="${client.adresse}">Adresse</td>
+        <td th:text="${client.email}">Email</td>
+        <td th:text="${client.telephoneExploitation}">Téléphone</td>
+        <td th:text="${client.ville}">Ville</td>
+        <td th:text="${client.codeClient}">Code Client</td>
         <td>
             <ul>
-                <li th:each="valise : ${client.valises}" th:text="${valise.description}"></li>
+                <li th:each="description : ${client.valisesDescriptions}" th:text="${description}"></li>
             </ul>
         </td>
-    </tr>
+        <td>
+            <ul>
+                <li th:each="probleme : ${client.problemeIds}" th:text="'Problème ID: ' + ${probleme}"></li>
+            </ul>
+        </td>
+        <td th:text="${client.retourSecuriteId != null ? client.retourSecuriteId : 'N/A'}">Retour Sécurité</td>
+        <td th:text="${client.regleId != null ? client.regleId : 'N/A'}">Règle</td>
+        <td>
+            <!-- Bouton pour Voir -->
+            <form th:action="@{/client/view/{id}(id=${client.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Voir le client">Voir</button>
+            </form>
 
+            <!-- Bouton pour Modifier -->
+            <form th:action="@{/client/edit/{id}(id=${client.id})}" method="get" style="display:inline;">
+                <button type="submit" aria-label="Modifier le client">Modifier</button>
+            </form>
+
+            <!-- Bouton pour Supprimer -->
+            <form th:action="@{/client/delete/{id}(id=${client.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <button type="submit" style="color: red;" aria-label="Supprimer le client">Supprimer</button>
+            </form>
+        </td>
+    </tr>
     </tbody>
 </table>
+
 
 <!-- Lien vers la page de création d'un nouveau client -->
 <div style="margin-top: 20px;">
@@ -102,7 +118,5 @@
     </a>
 </div>
 
-
 </body>
 </html>
-

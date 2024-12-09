@@ -1,5 +1,6 @@
 package example.integration.services;
 
+import example.DTO.SortieSemaineDTO;
 import example.entity.Regle;
 import example.entity.SortieSemaine;
 import example.repositories.RegleRepository;
@@ -26,137 +27,132 @@ public class SortieSemaineServiceIntegrationTest {
 
     @Autowired
     private SortieSemaineService sortieSemaineService;
-    @Autowired
-    private SortieSemaineRepository semaineRepository;
-    private SortieSemaine semaine;
+
     @Autowired
     private SortieSemaineRepository sortieSemaineRepository;
+
     @Autowired
     private RegleRepository regleRepository;
+
+    private SortieSemaineDTO semaineDTO;
 
     @BeforeEach
     public void setUp() {
         sortieSemaineRepository.deleteAll();
-        Regle regle1 = new Regle();
-        regle1.setCoderegle("25463AL");
-        regle1 = regleRepository.save(regle1);
+        regleRepository.deleteAll();
+
+        Regle regle = new Regle();
+        regle.setCoderegle("25463AL");
+        regle = regleRepository.save(regle);
+
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Date d1 = sdf.parse("01/01/2016");
+            Date date = sdf.parse("01/01/2016");
 
-
-            semaine = SortieSemaine.builder()
-                    .dateSortieSemaine(d1)
-                    .regle(regle1)
+            semaineDTO = SortieSemaineDTO.builder()
+                    .dateSortieSemaine(date)
+                    .regleId(regle.getId())
                     .build();
-            semaine = sortieSemaineService.createSortieSemaine(semaine);
+            semaineDTO = sortieSemaineService.createSortieSemaine(semaineDTO);
 
-        }catch (ParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
+
     @Test
     public void testCreateSortieSemaine() {
         // Act
-        SortieSemaine savedSem = sortieSemaineService.createSortieSemaine(semaine);
-        //Assert
-        assertNotNull(savedSem);
-        assertNotNull(savedSem.getDateSortieSemaine());
-        assertNotNull(savedSem.getRegle());
-        assertEquals("25463AL",savedSem.getRegle().getCoderegle());
+        SortieSemaineDTO savedDTO = sortieSemaineService.createSortieSemaine(semaineDTO);
+
+        // Assert
+        assertNotNull(savedDTO);
+        assertNotNull(savedDTO.getDateSortieSemaine());
+        assertNotNull(savedDTO.getRegleId());
+        assertEquals(semaineDTO.getRegleId(), savedDTO.getRegleId());
     }
+
     @Test
-    public void testupdateSortieSemaine() {
+    public void testUpdateSortieSemaine() {
         // Arrange
-        SortieSemaine savedSem = sortieSemaineService.createSortieSemaine(semaine);
         Regle newRegle = new Regle();
         newRegle.setCoderegle("569823ZZ");
         newRegle = regleRepository.save(newRegle);
 
-        // Act -
-        savedSem.setRegle(newRegle);
-        SortieSemaine updatedSem = sortieSemaineService.updateSortieSemaine(savedSem.getId(), savedSem);
+        semaineDTO.setRegleId(newRegle.getId());
+
+        // Act
+        SortieSemaineDTO updatedDTO = sortieSemaineService.updateSortieSemaine(semaineDTO.getId(), semaineDTO);
 
         // Assert
-        assertNotNull(updatedSem, "The update of SortieSemaine failed, the entity is nulll");
-        assertEquals("569823ZZ", updatedSem.getRegle().getCoderegle(),
-                "Rule code was not updated correctly.");
+        assertNotNull(updatedDTO);
+        assertEquals(newRegle.getId(), updatedDTO.getRegleId());
     }
-
-
 
     @Test
     public void testDeleteSortieSemaine() {
         // Arrange
-        SortieSemaine savedSem = sortieSemaineService.createSortieSemaine(semaine);
+        int id = semaineDTO.getId();
 
         // Act
-        sortieSemaineService.deleteSortieSemaine(savedSem.getId());
+        sortieSemaineService.deleteSortieSemaine(id);
 
         // Assert
-        boolean exists = semaineRepository.findById(savedSem.getId()).isPresent();
-        assertFalse(exists, "The SortieSemaine entity should no longer exist after deletion.");
+        boolean exists = sortieSemaineRepository.findById(id).isPresent();
+        assertFalse(exists);
     }
 
     @Test
-    public void testGetSortieSemaine(){
-        //Arrange
-        SortieSemaine savedSem = sortieSemaineService.createSortieSemaine(semaine);
-        //Act
-        SortieSemaine semById = sortieSemaineService.getSortieSemaine(savedSem.getId());
-        //Assert
-        assertNotNull(semById);
-        assertEquals("25463AL",semById.getRegle().getCoderegle());
+    public void testGetSortieSemaine() {
+        // Act
+        SortieSemaineDTO foundDTO = sortieSemaineService.getSortieSemaine(semaineDTO.getId());
 
+        // Assert
+        assertNotNull(foundDTO);
+        assertEquals(semaineDTO.getId(), foundDTO.getId());
     }
+
     @Test
     public void testGetAllSortieSemaine() {
         sortieSemaineRepository.deleteAll();
         regleRepository.deleteAll();
 
         // Arrange
+        Regle regle1 = new Regle();
+        regle1.setCoderegle("25445ML");
+        regle1 = regleRepository.save(regle1);
+
         Regle regle2 = new Regle();
-        regle2.setCoderegle("25445ML");
+        regle2.setCoderegle("569823AL");
         regle2 = regleRepository.save(regle2);
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Date d1 = sdf.parse("25/11/2024");
+            Date date1 = sdf.parse("25/11/2024");
+            Date date2 = sdf.parse("20/11/2024");
 
-            SortieSemaine sem1 = SortieSemaine.builder()
-                    .dateSortieSemaine(d1)
-                    .regle(regle2)
+            SortieSemaineDTO dto1 = SortieSemaineDTO.builder()
+                    .dateSortieSemaine(date1)
+                    .regleId(regle1.getId())
                     .build();
-            sortieSemaineService.createSortieSemaine(sem1);
 
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        Regle regle3 = new Regle();
-        regle3.setCoderegle("569823AL");
-        regle3 = regleRepository.save(regle3);
-
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Date d1 = sdf.parse("20/11/2024");
-
-            SortieSemaine sem2 = SortieSemaine.builder()
-                    .dateSortieSemaine(d1)
-                    .regle(regle3)
+            SortieSemaineDTO dto2 = SortieSemaineDTO.builder()
+                    .dateSortieSemaine(date2)
+                    .regleId(regle2.getId())
                     .build();
-            sortieSemaineService.createSortieSemaine(sem2);
+
+            sortieSemaineService.createSortieSemaine(dto1);
+            sortieSemaineService.createSortieSemaine(dto2);
 
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
         // Act
-        List<SortieSemaine> listSem = sortieSemaineService.getAllSortieSemaine();
+        List<SortieSemaineDTO> sortieSemaines = sortieSemaineService.getAllSortieSemaine();
 
         // Assert
-        assertNotNull(listSem);
-        assertEquals(2, listSem.size(), "Expected exactly 2 SortieSemaine entries in the list");
+        assertNotNull(sortieSemaines);
+        assertEquals(2, sortieSemaines.size());
     }
-
 }

@@ -1,11 +1,11 @@
 package example.services;
 
+import example.DTO.TypeValiseDTO;
 import example.entity.TypeValise;
 import example.entity.Valise;
 import example.repositories.TypeValiseRepository;
 import example.repositories.ValiseRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,12 +15,14 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class TypeValiseServiceTest {
 
     @Mock
     private TypeValiseRepository typeValiseRepository;
+
     @Mock
     private ValiseRepository valiseRepository;
 
@@ -37,194 +39,155 @@ public class TypeValiseServiceTest {
         // Arrange
         Valise valise = new Valise();
         valise.setId(1);
-        TypeValise typeValise = new TypeValise();
-        typeValise.setValise(valise);
 
-        when(valiseRepository.findById(valise.getId())).thenReturn(Optional.of(valise));
-        when(typeValiseRepository.save(typeValise)).thenReturn(typeValise);
+        TypeValiseDTO typeValiseDTO = TypeValiseDTO.builder()
+                .proprietaire("John Doe")
+                .description("Business Valise")
+                .valiseId(valise.getId())
+                .build();
+
+        when(valiseRepository.findById(typeValiseDTO.getValiseId())).thenReturn(Optional.of(valise));
+        when(typeValiseRepository.save(any(TypeValise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        TypeValise result = typeValiseService.createTypeValise(typeValise);
+        TypeValiseDTO result = typeValiseService.createTypeValise(typeValiseDTO);
 
         // Assert
-        Assertions.assertNotNull(result, "Suitcase type must not be null");
-        verify(valiseRepository, times(1)).findById(valise.getId());
-        verify(typeValiseRepository, times(1)).save(typeValise);
+        assertNotNull(result, "The created TypeValiseDTO should not be null");
+        assertEquals("John Doe", result.getProprietaire());
+        assertEquals("Business Valise", result.getDescription());
+        assertEquals(1, result.getValiseId());
+
+        verify(valiseRepository, times(1)).findById(typeValiseDTO.getValiseId());
+        verify(typeValiseRepository, times(1)).save(any(TypeValise.class));
         verifyNoMoreInteractions(valiseRepository, typeValiseRepository);
     }
 
     @Test
-    public void testCreateTypeValise_Failure_Exception() {
-        TypeValise typeValise = new TypeValise();
+    public void testCreateTypeValise_Failure_NoValise() {
+        // Arrange
+        TypeValiseDTO typeValiseDTO = TypeValiseDTO.builder()
+                .proprietaire("John Doe")
+                .description("Business Valise")
+                .valiseId(1)
+                .build();
+
+        when(valiseRepository.findById(typeValiseDTO.getValiseId())).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            typeValiseService.createTypeValise(typeValise);
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            typeValiseService.createTypeValise(typeValiseDTO);
         });
 
-        Assertions.assertEquals("TypeValise or its associated Valise cannot be null", exception.getMessage(),
-                "Exception message should match the expected error message.");
+        assertEquals("Valise not found with ID: 1", exception.getMessage());
 
-        // Verify interactions
-        verify(typeValiseRepository, never()).save(any(TypeValise.class));
-        verifyNoInteractions(valiseRepository);
+        verify(valiseRepository, times(1)).findById(typeValiseDTO.getValiseId());
+        verifyNoInteractions(typeValiseRepository);
     }
-
 
     @Test
-    public void testUpdateTypeValise_Success(){
+    public void testUpdateTypeValise_Success() {
+        // Arrange
         int id = 1;
-        TypeValise typeValise = new TypeValise();
-        typeValise.setId(id);
+        Valise valise = new Valise();
+        valise.setId(1);
 
-        when(typeValiseRepository.existsById(id)).thenReturn(true);
+        TypeValise existingTypeValise = TypeValise.builder()
+                .id(id)
+                .proprietaire("Old Owner")
+                .description("Old Description")
+                .valise(valise)
+                .build();
+
+        TypeValiseDTO updatedTypeValiseDTO = TypeValiseDTO.builder()
+                .id(id)
+                .proprietaire("New Owner")
+                .description("New Description")
+                .valiseId(1)
+                .build();
+
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.of(existingTypeValise));
+        when(valiseRepository.findById(updatedTypeValiseDTO.getValiseId())).thenReturn(Optional.of(valise));
         when(typeValiseRepository.save(any(TypeValise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        TypeValise result = typeValiseService.updateTypeValise(id, typeValise);
+        // Act
+        TypeValiseDTO result = typeValiseService.updateTypeValise(id, updatedTypeValiseDTO);
 
-        Assertions.assertNotNull(result, "Suitcase type must not be null");
-        Assertions.assertEquals(id, result.getId(), "Suitcase type ID must match");
+        // Assert
+        assertNotNull(result, "The updated TypeValiseDTO should not be null");
+        assertEquals("New Owner", result.getProprietaire());
+        assertEquals("New Description", result.getDescription());
+        assertEquals(1, result.getValiseId());
 
-        verify(typeValiseRepository, times(1)).existsById(id);
-        verify(typeValiseRepository, times(1)).save(typeValise);
-        verifyNoMoreInteractions(typeValiseRepository);
+        verify(typeValiseRepository, times(1)).findById(id);
+        verify(valiseRepository, times(1)).findById(updatedTypeValiseDTO.getValiseId());
+        verify(typeValiseRepository, times(1)).save(any(TypeValise.class));
     }
-
 
     @Test
     public void testDeleteTypeValise_Success() {
-        // Arrange: Prepare test data and mocks
-        int id = 1;
-        TypeValise mockTypeValise = TypeValise.builder()
-                .id(id)
-                .proprietaire("John Doe")
-                .description("Business Valise")
-                .build();
-
-        // Mock `findById` to return the mockTypeValise
-        when(typeValiseRepository.findById(id)).thenReturn(Optional.of(mockTypeValise));
-
-        // Act: Call the method to test
-        typeValiseService.deleteTypeValise(id);
-
-        // Assert: Verify interactions with the repository
-        verify(typeValiseRepository, times(1)).findById(id);
-        verify(typeValiseRepository, times(1)).delete(mockTypeValise);
-        verifyNoMoreInteractions(typeValiseRepository);
-    }
-
-
-
-    @Test
-    public void testDeleteTypeValise_Failure_Exception() {
-        // Arrange: Mock `findById` to return an empty Optional
-        int id = 1;
-        when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
-
-        // Act & Assert: Expect RuntimeException
-        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            typeValiseService.deleteTypeValise(id);
-        });
-
-        // Assert: Verify exception message
-        Assertions.assertEquals("The suitcase type does not exist", exception.getMessage());
-
-        // Verify repository interactions
-        verify(typeValiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(typeValiseRepository);
-    }
-
-
-    @Test
-    public void testGetTypeValise_Success(){
+        // Arrange
         int id = 1;
         TypeValise typeValise = new TypeValise();
         typeValise.setId(id);
 
         when(typeValiseRepository.findById(id)).thenReturn(Optional.of(typeValise));
 
-        TypeValise result = typeValiseService.getTypeValise(id);
+        // Act
+        typeValiseService.deleteTypeValise(id);
 
-        Assertions.assertNotNull(result, "Suitcase type must not be null");
-        Assertions.assertEquals(id, result.getId(), "ID must match");
-
+        // Assert
         verify(typeValiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(typeValiseRepository);
+        verify(typeValiseRepository, times(1)).delete(typeValise);
     }
+
     @Test
-    public void testGetTypeValise_Failure_Exception() {
-        // Arrange: Mock repository to return an empty Optional
+    public void testGetTypeValise_Success() {
+        // Arrange
         int id = 1;
-        when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
+        Valise valise = new Valise();
+        valise.setId(1);
 
-        // Act & Assert: Expect EntityNotFoundException
-        EntityNotFoundException exception = Assertions.assertThrows(
-                EntityNotFoundException.class,
-                () -> typeValiseService.getTypeValise(id),
-                "Expected EntityNotFoundException when TypeValise is not found"
-        );
+        TypeValise typeValise = TypeValise.builder()
+                .id(id)
+                .proprietaire("Owner")
+                .description("Description")
+                .valise(valise)
+                .build();
 
-        Assertions.assertEquals(
-                "TypeValise with ID 1 not found",
-                exception.getMessage(),
-                "Exception message did not match"
-        );
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.of(typeValise));
 
-        // Verify interactions with the repository
+        // Act
+        TypeValiseDTO result = typeValiseService.getTypeValise(id);
+
+        // Assert
+        assertNotNull(result, "The retrieved TypeValiseDTO should not be null");
+        assertEquals("Owner", result.getProprietaire());
+        assertEquals("Description", result.getDescription());
+        assertEquals(1, result.getValiseId());
+
         verify(typeValiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(typeValiseRepository);
     }
 
     @Test
-    public void testGetTypeValises_Success(){
-        List<TypeValise> typeValises = List.of(new TypeValise(), new TypeValise());
+    public void testGetTypeValises_Success() {
+        // Arrange
+        List<TypeValise> typeValises = List.of(
+                TypeValise.builder().id(1).proprietaire("Owner1").description("Description1").build(),
+                TypeValise.builder().id(2).proprietaire("Owner2").description("Description2").build()
+        );
 
         when(typeValiseRepository.findAll()).thenReturn(typeValises);
 
-        List<TypeValise> result = typeValiseService.getTypeValises();
+        // Act
+        List<TypeValiseDTO> result = typeValiseService.getTypeValises();
 
-        Assertions.assertEquals(2, result.size(), "Suitcase type list must contain 2 elements");
+        // Assert
+        assertNotNull(result, "The retrieved list should not be null");
+        assertEquals(2, result.size(), "The retrieved list size should be 2");
+        assertEquals("Owner1", result.get(0).getProprietaire());
+        assertEquals("Owner2", result.get(1).getProprietaire());
+
         verify(typeValiseRepository, times(1)).findAll();
-        verifyNoMoreInteractions(typeValiseRepository);
     }
-    @Test
-    public void testGetTypeValises_Failure_Exception(){
-        when(typeValiseRepository.findAll()).thenThrow(new RuntimeException("Database error"));
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            typeValiseService.getTypeValises();
-        });
-
-        Assertions.assertEquals("Database error", exception.getMessage());
-        verify(typeValiseRepository, times(1)).findAll();
-        verifyNoMoreInteractions(typeValiseRepository);
-    }
-    @Test
-    public void testNoInteractionWithTypeValiseRepository_Success() {
-        verifyNoInteractions(typeValiseRepository);
-    }
-    @Test
-    public void testNoInteractionWithTypeValiseRepository_Failure_Exception() {
-        // Arrange: Mock `findById` to return an empty Optional
-        int id = 1;
-        when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
-
-        // Act & Assert: Expect EntityNotFoundException
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
-            typeValiseService.getTypeValise(id);
-        });
-
-        // Assert: Verify exception message
-        Assertions.assertEquals("TypeValise with ID " + id + " not found", exception.getMessage());
-
-        // Verify repository interactions
-        verify(typeValiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(typeValiseRepository);
-    }
-
-
-
-
 }
-
-

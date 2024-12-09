@@ -1,14 +1,13 @@
 package example.interfaces;
 
-import example.entity.RetourSecurite;
+import example.DTO.RetourSecuriteDTO;
 
 import java.util.List;
 
 public interface IRetourSecuriteService {
-    RetourSecurite createRetourSecurite(RetourSecurite retourSecurite);
-    RetourSecurite updateRetourSecurite(int id, RetourSecurite retourSecurite);
+    RetourSecuriteDTO createRetourSecurite(RetourSecuriteDTO retourSecuriteDTO);
+    RetourSecuriteDTO updateRetourSecurite(int id, RetourSecuriteDTO retourSecuriteDTO);
     void deleteRetourSecurite(int id);
-    RetourSecurite getRetourSecurite(int id);
-    List<RetourSecurite> getAllRetourSecurites();
-
+    RetourSecuriteDTO getRetourSecurite(int id);
+    List<RetourSecuriteDTO> getAllRetourSecurites();
 }

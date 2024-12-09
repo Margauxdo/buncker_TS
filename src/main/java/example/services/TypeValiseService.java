@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.TypeValiseDTO;
 import example.entity.TypeValise;
 import example.entity.Valise;
 import example.interfaces.ITypeValiseService;
@@ -9,8 +10,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TypeValiseService implements ITypeValiseService {
@@ -25,53 +26,65 @@ public class TypeValiseService implements ITypeValiseService {
     }
 
     @Override
-    public TypeValise createTypeValise(TypeValise typeValise) {
-        if (typeValise == null || typeValise.getValise() == null) {
-            throw new IllegalArgumentException("TypeValise or its associated Valise cannot be null");
-        }
+    public TypeValiseDTO createTypeValise(TypeValiseDTO typeValiseDTO) {
+        Valise valise = valiseRepository.findById(typeValiseDTO.getValiseId())
+                .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + typeValiseDTO.getValiseId()));
 
-        // Récupérer une Valise attachée à la session Hibernate
-        Valise managedValise = valiseRepository.findById(typeValise.getValise().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + typeValise.getValise().getId()));
+        TypeValise typeValise = TypeValise.builder()
+                .proprietaire(typeValiseDTO.getProprietaire())
+                .description(typeValiseDTO.getDescription())
+                .valise(valise)
+                .build();
 
-        // Associer la Valise gérée à TypeValise
-        typeValise.setValise(managedValise);
+        TypeValise savedTypeValise = typeValiseRepository.save(typeValise);
 
-        // Sauvegarder TypeValise
-        return typeValiseRepository.save(typeValise);
+        return mapToDTO(savedTypeValise);
     }
 
-
-
     @Override
-    public TypeValise updateTypeValise(int id, TypeValise typeValise) {
-        if (!typeValiseRepository.existsById(id)) {
-            throw new EntityNotFoundException("The suitcase type does not exist");
-        }
-        if (id != typeValise.getId()) {
-            throw new IllegalArgumentException("Suitcase type ID does not match");
-        }
-        return typeValiseRepository.save(typeValise);
+    public TypeValiseDTO updateTypeValise(int id, TypeValiseDTO typeValiseDTO) {
+        TypeValise existingTypeValise = typeValiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("TypeValise with ID " + id + " not found"));
+
+        Valise valise = valiseRepository.findById(typeValiseDTO.getValiseId())
+                .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + typeValiseDTO.getValiseId()));
+
+        existingTypeValise.setProprietaire(typeValiseDTO.getProprietaire());
+        existingTypeValise.setDescription(typeValiseDTO.getDescription());
+        existingTypeValise.setValise(valise);
+
+        TypeValise updatedTypeValise = typeValiseRepository.save(existingTypeValise);
+        return mapToDTO(updatedTypeValise);
     }
 
     @Override
     public void deleteTypeValise(int id) {
+        if (!typeValiseRepository.existsById(id)) {
+            throw new EntityNotFoundException("TypeValise with ID " + id + " not found");
+        }
+        typeValiseRepository.deleteById(id);
+    }
+
+    @Override
+    public TypeValiseDTO getTypeValise(int id) {
         TypeValise typeValise = typeValiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("The suitcase type does not exist"));
-        typeValiseRepository.delete(typeValise);
-    }
-
-
-    @Override
-    public TypeValise getTypeValise(int id) {
-        return typeValiseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("TypeValise with ID " + id + " not found"));
-
+        return mapToDTO(typeValise);
     }
 
     @Override
-    public List<TypeValise> getTypeValises() {
+    public List<TypeValiseDTO> getTypeValises() {
+        return typeValiseRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
-        return typeValiseRepository.findAll();
+    private TypeValiseDTO mapToDTO(TypeValise typeValise) {
+        return TypeValiseDTO.builder()
+                .id(typeValise.getId())
+                .proprietaire(typeValise.getProprietaire())
+                .description(typeValise.getDescription())
+                .valiseId(typeValise.getValise() != null ? typeValise.getValise().getId() : null)
+                .build();
     }
 }

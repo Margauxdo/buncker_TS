@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entity.RetourSecurite;
+import example.DTO.RetourSecuriteDTO;
 import example.interfaces.IRetourSecuriteService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,9 @@ public class RetourSecuriteControllerTest {
     @Test
     public void testViewAllRetourSecurites_Success() {
         // Arrange
-        List<RetourSecurite> retourSecurites = List.of(new RetourSecurite());
+        List<RetourSecuriteDTO> retourSecurites = List.of(
+                RetourSecuriteDTO.builder().id(1).numero(123L).build()
+        );
         when(retourSecuriteService.getAllRetourSecurites()).thenReturn(retourSecurites);
         Model model = new ConcurrentModel();
 
@@ -51,8 +53,7 @@ public class RetourSecuriteControllerTest {
     @Test
     public void testViewRetourSecuriteById_Success() {
         // Arrange
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setId(1);
+        RetourSecuriteDTO retourSecurite = RetourSecuriteDTO.builder().id(1).numero(123L).build();
         when(retourSecuriteService.getRetourSecurite(1)).thenReturn(retourSecurite);
         Model model = new ConcurrentModel();
 
@@ -102,8 +103,7 @@ public class RetourSecuriteControllerTest {
     @Test
     public void testEditRetourSecuriteForm_Success() {
         // Arrange
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setId(1);
+        RetourSecuriteDTO retourSecurite = RetourSecuriteDTO.builder().id(1).numero(123L).build();
         when(retourSecuriteService.getRetourSecurite(1)).thenReturn(retourSecurite);
         Model model = new ConcurrentModel();
 

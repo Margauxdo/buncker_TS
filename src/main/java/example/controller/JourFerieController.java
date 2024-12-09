@@ -1,6 +1,6 @@
 package example.controller;
 
-import example.entity.JourFerie;
+import example.DTO.JourFerieDTO;
 import example.interfaces.IJourFerieService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -25,51 +25,54 @@ public class JourFerieController {
 
     @GetMapping("/list")
     public String viewJFDateList(Model model) {
-        // Récupérer tous les jours fériés depuis le service
-        List<JourFerie> jourFeries = jourFerieService.getJourFeries();
-        model.addAttribute("jourFeries", jourFeries); // Correspondance avec la vue
+        List<JourFerieDTO> jourFeries = jourFerieService.getJourFeries();
+        model.addAttribute("jourFeries", jourFeries);
         return "joursFeries/JF_list";
     }
 
-
     @GetMapping("/view/{id}")
     public String viewJFById(@PathVariable int id, Model model) {
-        JourFerie jourFerie = jourFerieService.getJourFerie(id);
+        JourFerieDTO jourFerie = jourFerieService.getJourFerie(id);
         model.addAttribute("jourFerie", jourFerie);
         return "joursFeries/JF_details";
     }
 
-
-
-
     @GetMapping("/create")
     public String createJourFerieForm(Model model) {
-        model.addAttribute("jourFerie", new JourFerie());
-        return "jourFeries/JF_create"; // Match Thymeleaf template path
+        model.addAttribute("jourFerie", new JourFerieDTO());
+        return "joursFeries/JF_create";
     }
 
     @PostMapping("/create")
     public String createJourFerieThymeleaf(
-            @Valid @ModelAttribute("jourFerie") JourFerie jourFerie,
-            BindingResult result, // Correct parameter
+            @Valid @ModelAttribute("jourFerie") JourFerieDTO jourFerieDTO,
+            BindingResult result,
             Model model) {
         if (result.hasErrors()) {
             model.addAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
-            return "jourFeries/JF_create"; // Assurez-vous que ce chemin est correct
+            return "joursFeries/JF_create";
         }
         try {
-            boolean exists = jourFerieService.getAllDateFerie().contains(jourFerie.getDate());
-            if (exists) {
+            if (jourFerieService.existsByDate(jourFerieDTO.getDate())) {
                 model.addAttribute("errorMessage", "Un jour férié avec cette date existe déjà.");
-                return "jourFeries/JF_create";
+                return "joursFeries/JF_create";
             }
-            jourFerieService.persistJourFerie(jourFerie);
+            jourFerieService.saveJourFerie(jourFerieDTO);
             return "redirect:/jourferies/list";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Une erreur inattendue s'est produite.");
-            return "jourFeries/JF_create";
+            return "joursFeries/JF_create";
         }
     }
 
-
+    @PostMapping("/delete/{id}")
+    public String deleteJourFerie(@PathVariable int id, Model model) {
+        try {
+            jourFerieService.deleteJourFerie(id);
+            return "redirect:/jourferies/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la suppression : " + e.getMessage());
+            return "joursFeries/JF_list";
+        }
+    }
 }

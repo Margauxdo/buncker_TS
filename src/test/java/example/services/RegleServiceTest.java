@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.RegleDTO;
 import example.entity.Regle;
 import example.exceptions.RegleNotFoundException;
 import example.repositories.RegleRepository;
@@ -30,45 +31,6 @@ public class RegleServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void testCreateRegle_Success() {
-        // Arrange: Create a valid Regle object
-        Regle regle = new Regle();
-        regle.setCoderegle("RULE123"); // Set a valid coderegle to pass validation
-
-        // Mock the repository save behavior
-        when(regleRepository.save(regle)).thenReturn(regle);
-
-        // Act: Call the service method
-        Regle result = regleService.createRegle(regle);
-
-        // Assert: Verify the result and interactions
-        Assertions.assertNotNull(result, "Rule should not be null");
-        Assertions.assertEquals("RULE123", result.getCoderegle(), "Coderegle should match the expected value");
-        verify(regleRepository, times(1)).save(regle);
-        verifyNoMoreInteractions(regleRepository);
-    }
-
-
-
-
-
-
-
-    @Test
-    public void testReadRegle_Success() {
-        int id = 1;
-        Regle regle = new Regle();
-        regle.setId(id);
-        when(regleRepository.findById(id)).thenReturn(Optional.of(regle));
-
-        Regle result = regleService.readRegle(id);
-
-        Assertions.assertNotNull(result, "Rule should not be null");
-        Assertions.assertEquals(id, result.getId(), "Ruler ID should be correct");
-        verify(regleRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(regleRepository);
-    }
 
     @Test
     public void testReadRegle_NotFound_ShouldThrowException() {
@@ -93,7 +55,7 @@ public class RegleServiceTest {
         when(regleRepository.findById(id)).thenReturn(Optional.of(regle));
         when(regleRepository.save(regle)).thenReturn(regle);
 
-        Regle updatedRegle = regleService.updateRegle(id, regle);
+        RegleDTO updatedRegle = regleService.updateRegle(id, new RegleDTO());
 
         Assertions.assertNotNull(updatedRegle, "Updated rule should not be null");
         Assertions.assertEquals(id, updatedRegle.getId(), "Rule ID should be updated");
@@ -110,7 +72,7 @@ public class RegleServiceTest {
         when(regleRepository.findById(id)).thenReturn(Optional.empty());
 
         Exception exception = Assertions.assertThrows(RegleNotFoundException.class, () -> {
-            regleService.updateRegle(id, regle);
+            regleService.updateRegle(id,new RegleDTO());
         });
 
         Assertions.assertEquals("Règle non trouvée avec l'ID 1", exception.getMessage(),
@@ -159,36 +121,63 @@ public class RegleServiceTest {
         verifyNoMoreInteractions(regleRepository);
     }
 
+
+    @Test
+    public void testCreateRegle_Success() {
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("RULE123");
+
+        RegleDTO regleDTO = RegleDTO.builder()
+                .coderegle("RULE123")
+                .build();
+
+        when(regleRepository.save(any(Regle.class))).thenReturn(regle);
+
+        // Act
+        RegleDTO result = regleService.createRegle(regleDTO);
+
+        // Assert
+        Assertions.assertNotNull(result, "La règle ne devrait pas être nulle");
+        Assertions.assertEquals("RULE123", result.getCoderegle(), "Le code règle devrait correspondre");
+        verify(regleRepository, times(1)).save(any(Regle.class));
+    }
+
+    @Test
+    public void testReadRegle_Success() {
+        int id = 1;
+        Regle regle = new Regle();
+        regle.setId(id);
+        regle.setCoderegle("RULE123");
+
+        when(regleRepository.findById(id)).thenReturn(Optional.of(regle));
+
+        RegleDTO result = regleService.readRegle(id);
+
+        Assertions.assertNotNull(result, "La règle ne devrait pas être nulle");
+        Assertions.assertEquals("RULE123", result.getCoderegle(), "Le code règle devrait correspondre");
+        verify(regleRepository, times(1)).findById(id);
+    }
+
     @Test
     public void testReadAllRegles_Success() {
-        // Arrange: Mock the repository to return a list of two `Regle` objects
-        List<Regle> regles = new ArrayList<>();
-
         Regle regle1 = new Regle();
         regle1.setId(1);
-        regle1.setCoderegle("Rule1");
-        regle1.setReglePourSortie("Description1");
+        regle1.setCoderegle("RULE1");
 
         Regle regle2 = new Regle();
         regle2.setId(2);
-        regle2.setCoderegle("Rule2");
-        regle2.setReglePourSortie("Description2");
+        regle2.setCoderegle("RULE2");
 
-        regles.add(regle1);
-        regles.add(regle2);
+        when(regleRepository.findAll()).thenReturn(List.of(regle1, regle2));
 
-        when(regleRepository.findAll()).thenReturn(regles);
+        List<RegleDTO> result = regleService.readAllRegles();
 
-        // Act: Call the service method
-        List<Regle> result = regleService.readAllRegles();
-
-        // Assert: Verify the results
-        Assertions.assertEquals(2, result.size(), "There should be 2 rules");
-        Assertions.assertEquals("Rule1", result.get(0).getCoderegle(), "First rule's code should match");
-        Assertions.assertEquals("Rule2", result.get(1).getCoderegle(), "Second rule's code should match");
-        verify(regleRepository, times(1)).findAll();
-        verifyNoMoreInteractions(regleRepository);
+        Assertions.assertEquals(2, result.size(), "Il devrait y avoir 2 règles");
+        Assertions.assertEquals("RULE1", result.get(0).getCoderegle(), "Le code de la première règle devrait correspondre");
+        Assertions.assertEquals("RULE2", result.get(1).getCoderegle(), "Le code de la deuxième règle devrait correspondre");
     }
+
 
 
 

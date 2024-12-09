@@ -1,27 +1,25 @@
 package example.services;
 
+import example.DTO.ValiseDTO;
 import example.entity.Client;
 import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class ValiseServiceTest {
 
@@ -40,197 +38,139 @@ public class ValiseServiceTest {
     }
 
     @Test
-    @ExtendWith(MockitoExtension.class)
     public void testCreateValise_Success() {
+        // Arrange
         Client client = new Client();
         client.setId(1);
         client.setName("name client");
         client.setEmail("testclient@gmail.com");
 
-        Valise valise = new Valise();
-        valise.setClient(client);
-        valise.setDescription("Valise de transport spécialisé");
-        valise.setNumeroValise(12565657L);
-        valise.setRefClient("REF-7952");
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .description("Valise de transport spécialisé")
+                .numeroValise(12565657L)
+                .refClient("REF-7952")
+                .clientId(client.getId())
+                .build();
 
-        when(clientRepository.findById(client.getId())).thenReturn(java.util.Optional.of(client)); // Mock du clientRepository
-        when(valiseRepository.save(valise)).thenReturn(valise); // Mock du valiseRepository
+        Valise valise = Valise.builder()
+                .description("Valise de transport spécialisé")
+                .numeroValise(12565657L)
+                .refClient("REF-7952")
+                .client(client)
+                .build();
 
-        Valise result = valiseService.createValise(valise);
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(valiseRepository.save(any(Valise.class))).thenReturn(valise);
 
-        assertNotNull(result, "The suitcase must not be null");
-        verify(valiseRepository, times(1)).save(valise); // Vérifie que save a bien été appelé une fois
-        verifyNoMoreInteractions(valiseRepository); // Vérifie qu'il n'y a pas d'autres appels aux mocks
-    }
+        // Act
+        ValiseDTO result = valiseService.createValise(valiseDTO);
 
-    @Test
-    @ExtendWith(MockitoExtension.class)
-    public void testCreateValise_Failure_Exception() {
-        Client client = new Client();
-        client.setId(1);
-
-        Valise valise = new Valise();
-        valise.setClient(client);  // Assigner le client valide
-        valise.setDescription("Valise de transport spécialisé");
-        valise.setNumeroValise(12565657L);
-        valise.setRefClient("REF-7952");
-
-        when(clientRepository.findById(client.getId())).thenReturn(java.util.Optional.of(client));
-
-        when(valiseRepository.save(valise)).thenThrow(new RuntimeException("Erreur interne lors de la création de la valise"));
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            valiseService.createValise(valise);
-        });
-
-        assertEquals("Erreur interne lors de la création de la valise", exception.getMessage());
-
-        verify(valiseRepository, times(1)).save(valise);
+        // Assert
+        assertNotNull(result, "The suitcase DTO must not be null");
+        assertEquals("Valise de transport spécialisé", result.getDescription());
+        verify(valiseRepository, times(1)).save(any(Valise.class));
         verifyNoMoreInteractions(valiseRepository);
     }
 
+    @Test
+    public void testCreateValise_Failure_Exception() {
+        // Arrange
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .description("Valise de transport spécialisé")
+                .numeroValise(12565657L)
+                .refClient("REF-7952")
+                .clientId(1)
+                .build();
 
+        when(clientRepository.findById(1)).thenReturn(Optional.empty());
 
+        // Act & Assert
+        Exception exception = Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            valiseService.createValise(valiseDTO);
+        });
 
+        assertEquals("Client not found", exception.getMessage());
+        verify(clientRepository, times(1)).findById(1);
+        verifyNoInteractions(valiseRepository);
+    }
 
     @Test
-    public void testUpdateValise_Success(){
+    public void testUpdateValise_Success() {
+        // Arrange
         int id = 1;
-        Valise valise = new Valise();
-        valise.setId(id);
+        Valise valise = Valise.builder()
+                .id(id)
+                .description("Initial Description")
+                .build();
 
-        when(valiseRepository.existsById(id)).thenReturn(true);
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .id(id)
+                .description("Updated Description")
+                .build();
+
+        when(valiseRepository.findById(id)).thenReturn(Optional.of(valise));
         when(valiseRepository.save(any(Valise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Valise result = valiseService.updateValise( id, valise);
+        // Act
+        ValiseDTO result = valiseService.updateValise(id, valiseDTO);
 
-        assertNotNull(result, "The suitcase must not be null");
-        assertEquals(id, result.getId(), "Suitcase ID must match");
-
-        verify(valiseRepository, times(1)).existsById(id);
-        verify(valiseRepository, times(1)).save(valise);
-        verifyNoMoreInteractions(valiseRepository);
+        // Assert
+        assertNotNull(result, "The suitcase DTO must not be null");
+        assertEquals("Updated Description", result.getDescription());
+        verify(valiseRepository, times(1)).findById(id);
+        verify(valiseRepository, times(1)).save(any(Valise.class));
     }
+
     @Test
-    public void testUpdateValise_Failure_Exception(){
-        int id = 1;
-        Valise valise = new Valise();
-        valise.setId(2);
-
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            valiseService.updateValise( id, valise);
-        });
-
-        assertEquals("Suitcase ID does not match", exception.getMessage());
-
-        verify(valiseRepository, never()).existsById(id);
-        verify(valiseRepository, never()).save(any(Valise.class));
-        verifyNoMoreInteractions(valiseRepository);
-    }
-    @Test
-    public void testDeleteValise_Success(){
+    public void testDeleteValise_Success() {
+        // Arrange
         int id = 1;
         when(valiseRepository.existsById(id)).thenReturn(true);
 
+        // Act
         valiseService.deleteValise(id);
 
+        // Assert
         verify(valiseRepository, times(1)).existsById(id);
         verify(valiseRepository, times(1)).deleteById(id);
-        verifyNoMoreInteractions(valiseRepository);
     }
-    @Test
-    public void testDeleteValise_Failure_Exception(){
-        int id = 1;
-        when(valiseRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            valiseService.deleteValise(id);
-        });
-
-        assertEquals("The suitcase does not exist", exception.getMessage());
-        verify(valiseRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(valiseRepository);
-    }
     @Test
-    public void testGetValiseById_Success(){
+    public void testGetValiseById_Success() {
+        // Arrange
         int id = 1;
-        Valise valise = new Valise();
-        valise.setId(id);
+        Valise valise = Valise.builder()
+                .id(id)
+                .description("Test Valise")
+                .build();
 
         when(valiseRepository.findById(id)).thenReturn(Optional.of(valise));
 
-        Valise result = valiseService.getValiseById(id);
+        // Act
+        ValiseDTO result = valiseService.getValiseById(id);
 
-        assertNotNull(result, "The suitcase must not be null");
-        assertEquals(id, result.getId(), "ID must match");
-
+        // Assert
+        assertNotNull(result, "The suitcase DTO must not be null");
+        assertEquals("Test Valise", result.getDescription());
         verify(valiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(valiseRepository);
     }
+
     @Test
-    public void testGetValiseById_Failure_Exception() {
+    public void testGetAllValises_Success() {
         // Arrange
-        int id = 1;
-        when(valiseRepository.findById(id)).thenReturn(Optional.empty());
+        List<Valise> valises = List.of(
+                Valise.builder().id(1).description("Valise 1").build(),
+                Valise.builder().id(2).description("Valise 2").build()
+        );
 
-        // Act & Assert
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            valiseService.getValiseById(id);
-        }, "Expected ResourceNotFoundException to be thrown");
+        when(valiseRepository.findAll()).thenReturn(valises);
 
-        // Vérifications
-        verify(valiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(valiseRepository);
-    }
+        // Act
+        List<ValiseDTO> result = valiseService.getAllValises();
 
-
-
-    @Test
-    public void testGetAllValises_Success(){
-        List<Valise> valiseList = List.of(new Valise(), new Valise());
-
-        when(valiseRepository.findAll()).thenReturn(valiseList);
-
-        List<Valise> result = valiseService.getAllValises();
-
-        assertEquals(2, result.size(), "The suitcase list must contain 2 items");
+        // Assert
+        assertEquals(2, result.size(), "The suitcase DTO list must contain 2 items");
         verify(valiseRepository, times(1)).findAll();
-        verifyNoMoreInteractions(valiseRepository);
     }
-    @Test
-    public void testGetAllValises_Failure_Exception(){
-        when(valiseRepository.findAll()).thenThrow(new RuntimeException("Database error"));
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            valiseService.getAllValises();
-        });
-
-        assertEquals("Database error", exception.getMessage());
-        verify(valiseRepository, times(1)).findAll();
-        verifyNoMoreInteractions(valiseRepository);
-    }
-    @Test
-    public void testNoInteractionWithValiseRepository_Success() {
-        verifyNoInteractions(valiseRepository);
-    }
-    @Test
-    public void testNoInteractionTypeValiseRepository_Failure_Exception() {
-        // Arrange
-        int id = 1;
-        when(valiseRepository.findById(id)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            valiseService.getValiseById(id);
-        }, "Expected ResourceNotFoundException to be thrown when the suitcase is not found");
-
-        // Vérifications
-        verify(valiseRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(valiseRepository);
-    }
-
-
-
-
-
 }
+

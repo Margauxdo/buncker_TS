@@ -1,16 +1,21 @@
 package example.interfaces;
 
+import example.DTO.LivreurDTO;
 import example.entity.Livreur;
 
 import java.util.List;
 
 public interface ILivreurService {
-    Livreur createLivreur(Livreur livreur);
-    Livreur updateLivreur(int id, Livreur livreur);
-    void deleteLivreur(int id);
-    Livreur getLivreurById(int id);
-    List<Livreur> getAllLivreurs();
+    LivreurDTO createLivreur(LivreurDTO livreurDTO);
+    LivreurDTO updateLivreur(int id, LivreurDTO livreurDTO);
 
+    Livreur createLivreur(Livreur livreur);
+
+    Livreur updateLivreur(int id, Livreur livreur);
+
+    void deleteLivreur(int id);
+    LivreurDTO getLivreurById(int id);
+    List<LivreurDTO> getAllLivreurs();
 
     void saveLivreur(Livreur livreur);
 }

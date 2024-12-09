@@ -1,5 +1,6 @@
 package example.services;
 
+import example.DTO.MouvementDTO;
 import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
@@ -157,27 +158,26 @@ public class MouvementServiceTest {
         Mouvement mouvement = new Mouvement();
         mouvement.setId(id);
 
-        // Création d'une Valise et d'un Client associés
+        // Create a Valise and Client associated with the Mouvement
         Valise valise = new Valise();
         valise.setId(1);
         Client client = new Client();
         valise.setClient(client);
 
-        mouvement.setValise(valise);  // Associer la Valise au Mouvement
+        mouvement.setValise(valise); // Associate the Valise with the Mouvement
 
-        // Mock du repository pour renvoyer le mouvement
+        // Mock the repository to return the Mouvement
         when(mouvementRepository.findById(id)).thenReturn(Optional.of(mouvement));
 
-        // Appel de la méthode dans le service
-        Mouvement result = mouvementService.getMouvementById(id);
+        // Call the service method
+        MouvementDTO result = mouvementService.getMouvementById(id);
 
-        // Vérifications
-        assertNotNull(result, "Mouvement should not be null");
-        assertEquals(id, result.getId(), "Mouvement ID should match");
-        assertNotNull(result.getValise(), "Mouvement's Valise should not be null");
-        assertNotNull(result.getValise().getClient(), "Mouvement's Valise's Client should not be null");
+        // Assertions
+        assertNotNull(result, "MouvementDTO should not be null");
+        assertEquals(id, result.getId(), "MouvementDTO ID should match");
+        assertNotNull(result.getValiseId(), "MouvementDTO's ValiseId should not be null");
 
-        // Vérification que la méthode du repository a bien été appelée
+        // Verify repository interaction
         verify(mouvementRepository, times(1)).findById(id);
         verifyNoMoreInteractions(mouvementRepository);
     }
@@ -209,7 +209,7 @@ public class MouvementServiceTest {
 
         when(mouvementRepository.findAll()).thenReturn(mouvements);
 
-        List<Mouvement> result = mouvementService.getAllMouvements();
+        List<MouvementDTO> result = mouvementService.getAllMouvements();
 
         assertEquals(2, result.size(), "The list of mouvements should contain 2 elements");
         verify(mouvementRepository, times(1)).findAll();
@@ -220,7 +220,7 @@ public class MouvementServiceTest {
     public void testGetAllMouvements_Failure_Exception() {
         when(mouvementRepository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Mouvement> result = mouvementService.getAllMouvements();
+        List<MouvementDTO> result = mouvementService.getAllMouvements();
 
         Assertions.assertTrue(result.isEmpty(), "The list of mouvements should be empty");
         verify(mouvementRepository, times(1)).findAll();

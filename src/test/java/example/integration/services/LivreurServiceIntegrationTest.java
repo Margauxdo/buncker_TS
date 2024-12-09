@@ -1,5 +1,6 @@
 package example.integration.services;
 
+import example.DTO.LivreurDTO;
 import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
@@ -232,7 +233,7 @@ public class LivreurServiceIntegrationTest {
         assertNotNull(livreurService.getLivreurById(createdLivreur.getId()));
 
         // Act
-        livreurService.deleteLivreur((long) createdLivreur.getId());
+        livreurService.deleteLivreur((int) createdLivreur.getId());
 
         entityManager.flush();
         entityManager.clear();
@@ -292,7 +293,7 @@ public class LivreurServiceIntegrationTest {
         livreurService.createLivreur(livreur);
 
         // Act: Retrieve all livreurs
-        List<Livreur> livreurs = livreurService.getAllLivreurs();
+        List<LivreurDTO> livreurs = livreurService.getAllLivreurs();
 
         // Assert: Verify the expected data
         assertFalse(livreurs.isEmpty(), "The list of livreurs should not be empty");
@@ -337,7 +338,7 @@ public class LivreurServiceIntegrationTest {
         Livreur createdLivreur = livreurService.createLivreur(livreur);
 
         // Act
-        Livreur fetchedLivreur = livreurService.getLivreurById(createdLivreur.getId());
+        LivreurDTO fetchedLivreur = livreurService.getLivreurById(createdLivreur.getId());
 
         // Assert
         assertNotNull(fetchedLivreur);
@@ -348,7 +349,7 @@ public class LivreurServiceIntegrationTest {
     @Test
     void testGetLivreurById_Failure_NotFound() {
         // Act
-        Livreur fetchedLivreur = livreurService.getLivreurById(999);
+        LivreurDTO fetchedLivreur = livreurService.getLivreurById(999);
 
         // Assert
         assertNull(fetchedLivreur);

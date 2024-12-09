@@ -1,22 +1,13 @@
 package example.interfaces;
 
-import example.entity.Regle;
-import example.entity.Valise;
+import example.DTO.ValiseDTO;
 
 import java.util.List;
 
 public interface IValiseService {
-    Valise createValise(Valise valise);  // Laisse uniquement cette ligne
-    Valise updateValise(int id, Valise valise);
+    ValiseDTO createValise(ValiseDTO valiseDTO);
+    ValiseDTO updateValise(int id, ValiseDTO valiseDTO);
     void deleteValise(int id);
-    Valise getValiseById(int id);
-    List<Valise> getAllValises();
-
-    void persistValise(Valise valise);
-
-
-    List<Regle> validateRegles(List<Regle> regleSortie);
-    boolean existsById(int id);
-
-    List<Valise> findAllWithClient();
+    ValiseDTO getValiseById(int id);
+    List<ValiseDTO> getAllValises();
 }

@@ -1,7 +1,6 @@
 package example.controller;
 
-import example.entity.RegleManuelle;
-import example.exceptions.ConflictException;
+import example.DTO.RegleManuelleDTO;
 import example.interfaces.IRegleManuelleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +34,8 @@ public class RegleManuelleControllerTest {
     @Test
     public void testListRegleManuelles_Success() {
         // Arrange
-        List<RegleManuelle> regleManuelles = new ArrayList<>();
-        regleManuelles.add(new RegleManuelle());
+        List<RegleManuelleDTO> regleManuelles = new ArrayList<>();
+        regleManuelles.add(new RegleManuelleDTO());
         when(regleManuelleService.getRegleManuelles()).thenReturn(regleManuelles);
 
         Model model = new ConcurrentModel();
@@ -54,7 +53,7 @@ public class RegleManuelleControllerTest {
     @Test
     public void testViewRegleManuelleById_Success() {
         // Arrange
-        RegleManuelle regleManuelle = new RegleManuelle();
+        RegleManuelleDTO regleManuelle = new RegleManuelleDTO();
         regleManuelle.setId(1);
         when(regleManuelleService.getRegleManuelle(1)).thenReturn(regleManuelle);
 
@@ -69,7 +68,20 @@ public class RegleManuelleControllerTest {
         assertEquals(regleManuelle, model.getAttribute("regleManuelle"));
     }
 
+    // Test : Détails d'une règle manuelle par ID - Non trouvé
+    @Test
+    public void testViewRegleManuelleById_NotFound() {
+        // Arrange
+        when(regleManuelleService.getRegleManuelle(1)).thenReturn(null);
 
+        Model model = new ConcurrentModel();
+
+        // Act
+        String response = regleManuelleController.viewRegleManuelleById(1, model);
+
+        // Assert
+        assertEquals("reglesManuelles/error", response);
+    }
 
     // Test : Formulaire de création d'une règle manuelle
     @Test
@@ -90,7 +102,7 @@ public class RegleManuelleControllerTest {
     @Test
     public void testEditRegleManuelleForm_Success() {
         // Arrange
-        RegleManuelle regleManuelle = new RegleManuelle();
+        RegleManuelleDTO regleManuelle = new RegleManuelleDTO();
         regleManuelle.setId(1);
         when(regleManuelleService.getRegleManuelle(1)).thenReturn(regleManuelle);
 
@@ -145,8 +157,4 @@ public class RegleManuelleControllerTest {
         assertEquals("redirect:/reglesManuelles/error", response);
         verify(regleManuelleService, times(1)).deleteRegleManuelle(1);
     }
-
-
-
-
 }

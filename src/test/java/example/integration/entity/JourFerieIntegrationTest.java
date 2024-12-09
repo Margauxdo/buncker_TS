@@ -1,5 +1,6 @@
-package example.integration.entities;
+package example.integration.entity;
 
+import example.DTO.JourFerieDTO;
 import example.entity.Formule;
 import example.entity.JourFerie;
 import example.entity.Regle;
@@ -68,7 +69,7 @@ public class JourFerieIntegrationTest {
         jourFerie.setDate(new Date());
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            jourFerieService.saveJourFerie(jourFerie);
+            jourFerieService.saveJourFerie(new JourFerieDTO());
         });
 
         assertEquals("A JourFerie must have at least one associated Regle", exception.getMessage());

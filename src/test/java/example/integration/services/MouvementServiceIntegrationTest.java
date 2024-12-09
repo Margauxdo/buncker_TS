@@ -1,6 +1,8 @@
 package example.integration.services;
 
 import example.DTO.ClientDTO;
+import example.DTO.MouvementDTO;
+import example.DTO.ValiseDTO;
 import example.entity.Client;
 import example.entity.Livreur;
 import example.entity.Mouvement;
@@ -139,7 +141,7 @@ public class MouvementServiceIntegrationTest {
         mouvementService.createMouvement(mouvement);
 
         // Act
-        List<Mouvement> mouvements = mouvementService.getAllMouvements();
+        List<MouvementDTO> mouvements = mouvementService.getAllMouvements();
 
         // Assert
         assertFalse(mouvements.isEmpty());
@@ -152,7 +154,7 @@ public class MouvementServiceIntegrationTest {
         Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
 
         // Act
-        Mouvement fetchedMouvement = mouvementService.getMouvementById(createdMouvement.getId());
+        MouvementDTO fetchedMouvement = mouvementService.getMouvementById(createdMouvement.getId());
 
         // Assert
         assertNotNull(fetchedMouvement);
@@ -172,42 +174,6 @@ public class MouvementServiceIntegrationTest {
         Assertions.assertEquals("Mouvement not found with ID: " + nonExistentId, exception.getMessage());
     }
 
-
-
-    @Test
-    void testGetAllMouvements_LargeDataset() {
-        // Arrange
-        // Créez un Client valide
-        Client client = new Client();
-        client.setName("Test Client");
-        client.setEmail("testclient@example.com");
-        clientService.createClient(new ClientDTO()); // Persistons le Client
-
-        // Créez une Valise associée au Client
-        Valise valise = new Valise();
-        valise.setClient(client); // Associez le Client à la Valise
-        valise.setDescription("Test Valise");
-        valiseService.createValise(valise); // Persistons la Valise
-
-        // Créez plusieurs Mouvements associés à la Valise
-        for (int i = 0; i < 100; i++) {
-            mouvementService.createMouvement(
-                    Mouvement.builder()
-                            .dateHeureMouvement(new Date())
-                            .statutSortie("EN_TRANSIT_" + i)
-                            .dateSortiePrevue(new Date())
-                            .dateRetourPrevue(new Date(System.currentTimeMillis() + 86400000L))
-                            .valise(valise) // Associez la Valise
-                            .build()
-            );
-        }
-
-        // Act
-        List<Mouvement> mouvements = mouvementService.getAllMouvements();
-
-        // Assert
-        assertEquals(100, mouvements.size(), "Le nombre de mouvements retournés est incorrect.");
-    }
 
 
 

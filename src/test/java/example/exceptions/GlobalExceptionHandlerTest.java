@@ -1,5 +1,6 @@
 package example.exceptions;
 
+import example.DTO.ErrorResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -13,12 +14,9 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class GlobalExceptionHandlerTest {
@@ -34,32 +32,38 @@ class GlobalExceptionHandlerTest {
     @Test
     void testHandleRegleNotFoundException() {
         // Arrange
-        String errorMessage = "Regle not found";
-        RegleNotFoundException exception = new RegleNotFoundException(errorMessage);
+        String messageErreur = "La règle n'a pas été trouvée.";
+        RegleNotFoundException exception = new RegleNotFoundException(messageErreur);
 
         // Act
-        ResponseEntity<String> response = globalExceptionHandler.handleRegleNotFoundException(exception);
+        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleRegleNotFoundException(exception);
 
         // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertEquals(HttpStatus.NOT_FOUND, reponse.getStatusCode());
+        assertNotNull(reponse.getBody());
+        assertEquals("Rule Not Found", reponse.getBody().getErreur());
+        assertEquals(messageErreur, reponse.getBody().getMessage());
     }
+
 
     @Test
     void testHandleValidationExceptions() {
         // Arrange
         BindException bindException = new BindException(new Object(), "objectName");
-        FieldError fieldError = new FieldError("objectName", "fieldName", "Field error message");
+        FieldError fieldError = new FieldError("objectName", "nomChamp", "Le champ est invalide.");
         bindException.addError(fieldError);
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindException);
 
         // Act
-        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleValidationExceptions(exception);
+        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleValidationExceptions(exception);
 
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Field error message", response.getBody().get("fieldName"));
+        assertEquals(HttpStatus.BAD_REQUEST, reponse.getStatusCode());
+        assertNotNull(reponse.getBody());
+        assertTrue(reponse.getBody().getMessage().contains("nomChamp"));
+        assertTrue(reponse.getBody().getMessage().contains("Le champ est invalide."));
     }
+
 
     @Test
     void testHandleIllegalArgument() {
@@ -68,7 +72,7 @@ class GlobalExceptionHandlerTest {
         IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
 
         // Act
-        ResponseEntity<String> response = globalExceptionHandler.handleIllegalArgument(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleIllegalArgument(exception);
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -80,20 +84,23 @@ class GlobalExceptionHandlerTest {
         // Arrange
         ConstraintViolationException exception = mock(ConstraintViolationException.class);
         ConstraintViolation<?> violation = mock(ConstraintViolation.class);
-        jakarta.validation.Path path = mock(jakarta.validation.Path.class);
+        jakarta.validation.Path chemin = mock(jakarta.validation.Path.class);
 
-        when(path.toString()).thenReturn("fieldName");
-        when(violation.getPropertyPath()).thenReturn(path);
-        when(violation.getMessage()).thenReturn("Field must not be null");
+        when(chemin.toString()).thenReturn("nomChamp");
+        when(violation.getPropertyPath()).thenReturn(chemin);
+        when(violation.getMessage()).thenReturn("Le champ ne doit pas être nul.");
         when(exception.getConstraintViolations()).thenReturn(Set.of(violation));
 
         // Act
-        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleConstraintViolationException(exception);
+        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleConstraintViolationException(exception);
 
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Field must not be null", response.getBody().get("fieldName"));
+        assertEquals(HttpStatus.BAD_REQUEST, reponse.getStatusCode());
+        assertNotNull(reponse.getBody());
+        assertTrue(reponse.getBody().getMessage().contains("nomChamp"));
+        assertTrue(reponse.getBody().getMessage().contains("Le champ ne doit pas être nul."));
     }
+
 
     @Test
     void testHandleAllExceptions() {
@@ -101,7 +108,7 @@ class GlobalExceptionHandlerTest {
         Exception exception = new Exception("Unexpected error");
 
         // Act
-        ResponseEntity<String> response = globalExceptionHandler.handleAllExceptions(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
 
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -111,17 +118,19 @@ class GlobalExceptionHandlerTest {
     @Test
     void testHandleProblemeNotFound() {
         // Arrange
-        String errorMessage = "Probleme not found";
-        ProblemeNotFoundException exception = new ProblemeNotFoundException(errorMessage);
+        String messageErreur = "Le problème n'a pas été trouvé.";
+        ProblemeNotFoundException exception = new ProblemeNotFoundException(messageErreur);
 
         // Act
-        ResponseEntity<String> response = globalExceptionHandler.handleProblemeNotFound(exception);
+        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleProblemeNotFound(exception);
 
         // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Le code HTTP attendu est 404 NOT FOUND.");
-        assertNotNull(response.getBody(), "Le corps de la réponse ne doit pas être null.");
-        assertEquals(errorMessage, response.getBody(), "Le message d'erreur attendu est incorrect.");
+        assertEquals(HttpStatus.NOT_FOUND, reponse.getStatusCode());
+        assertNotNull(reponse.getBody());
+        assertEquals("Problem Not Found", reponse.getBody().getErreur());
+        assertEquals(messageErreur, reponse.getBody().getMessage());
     }
+
 
 
     @Test
@@ -131,7 +140,7 @@ class GlobalExceptionHandlerTest {
         IllegalStateException exception = new IllegalStateException(errorMessage);
 
         // Act
-        ResponseEntity<String> response = globalExceptionHandler.handleIllegalStateException(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleIllegalStateException(exception);
 
         // Assert
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -145,7 +154,7 @@ class GlobalExceptionHandlerTest {
         EntityNotFoundException exception = new EntityNotFoundException(errorMessage);
 
         // Act
-        ResponseEntity<String> response = globalExceptionHandler.handleEntityNotFoundException(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleEntityNotFoundException(exception);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

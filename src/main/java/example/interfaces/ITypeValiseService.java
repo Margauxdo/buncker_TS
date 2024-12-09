@@ -1,14 +1,13 @@
 package example.interfaces;
 
-import example.entity.TypeValise;
+import example.DTO.TypeValiseDTO;
 
 import java.util.List;
 
 public interface ITypeValiseService {
-    TypeValise createTypeValise(TypeValise typeValise);
-    TypeValise updateTypeValise(int id, TypeValise typeValise);
+    TypeValiseDTO createTypeValise(TypeValiseDTO typeValiseDTO);
+    TypeValiseDTO updateTypeValise(int id, TypeValiseDTO typeValiseDTO);
     void deleteTypeValise(int id);
-    TypeValise getTypeValise(int id);
-    List<TypeValise> getTypeValises();
+    TypeValiseDTO getTypeValise(int id);
+    List<TypeValiseDTO> getTypeValises();
 }
-

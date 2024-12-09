@@ -1,5 +1,6 @@
 package example.integration.services;
 
+import example.DTO.ProblemeDTO;
 import example.entity.Client;
 import example.entity.Probleme;
 import example.entity.Valise;
@@ -137,7 +138,7 @@ public class ProblemeServiceIntegrationTest {
         problemeService.createProbleme(probleme);
 
         // Act
-        List<Probleme> problemes = problemeService.getAllProblemes();
+        List<ProblemeDTO> problemes = problemeService.getAllProblemes();
 
         // Assert
         assertFalse(problemes.isEmpty());
@@ -150,7 +151,7 @@ public class ProblemeServiceIntegrationTest {
         Probleme createdProbleme = problemeService.createProbleme(probleme);
 
         // Act
-        Probleme fetchedProbleme = problemeService.getProblemeById(createdProbleme.getId());
+        ProblemeDTO fetchedProbleme = problemeService.getProblemeById(createdProbleme.getId());
 
         // Assert
         assertNotNull(fetchedProbleme);
@@ -160,7 +161,7 @@ public class ProblemeServiceIntegrationTest {
     @Test
     void testGetProblemeById_Failure_NotFound() {
         // Act
-        Probleme fetchedProbleme = problemeService.getProblemeById(999);
+        ProblemeDTO fetchedProbleme = problemeService.getProblemeById(999);
 
         // Assert
         assertNull(fetchedProbleme);
