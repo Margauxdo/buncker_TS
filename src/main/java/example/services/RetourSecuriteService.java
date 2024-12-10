@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,9 +51,13 @@ public class RetourSecuriteService implements IRetourSecuriteService {
             existingRetourSecurite.setMouvement(mouvement);
         }
 
+        List<Client> clients = clientRepository.findAllById(retourSecuriteDTO.getClientIds());
+        existingRetourSecurite.setClients(clients);
+
         RetourSecurite updatedRetourSecurite = retourSecuriteRepository.save(existingRetourSecurite);
         return mapEntityToDto(updatedRetourSecurite);
     }
+
 
     @Override
     public void deleteRetourSecurite(int id) {
@@ -68,12 +73,14 @@ public class RetourSecuriteService implements IRetourSecuriteService {
         return mapEntityToDto(retourSecurite);
     }
 
+
     @Override
     public List<RetourSecuriteDTO> getAllRetourSecurites() {
         return retourSecuriteRepository.findAll().stream()
                 .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
     }
+
 
     private RetourSecurite mapDtoToEntity(RetourSecuriteDTO dto) {
         RetourSecurite retourSecurite = new RetourSecurite();
@@ -93,13 +100,23 @@ public class RetourSecuriteService implements IRetourSecuriteService {
     }
 
     private RetourSecuriteDTO mapEntityToDto(RetourSecurite entity) {
+        // Initialisation explicite de la collection lazy
+        List<Integer> clientIds = entity.getClients() != null ?
+                entity.getClients().stream().map(Client::getId).collect(Collectors.toList()) :
+                new ArrayList<>();
+
         return RetourSecuriteDTO.builder()
                 .id(entity.getId())
                 .numero(entity.getNumero())
                 .datesecurite(entity.getDatesecurite())
                 .cloture(entity.getCloture())
                 .dateCloture(entity.getDateCloture())
+                .clientIds(clientIds) // Assurez-vous que cette liste est initialisée
                 .mouvementId(entity.getMouvement() != null ? entity.getMouvement().getId() : null)
+                .mouvementStatut(entity.getMouvement() != null ? entity.getMouvement().getStatutSortie() : "Non défini")
                 .build();
     }
+
+
+
 }

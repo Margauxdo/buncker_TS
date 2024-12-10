@@ -30,40 +30,58 @@ public class JourFerieService implements IJourFerieService {
                 .regleIds(jourFerie.getRegles() != null
                         ? jourFerie.getRegles().stream().map(Regle::getId).collect(Collectors.toList())
                         : List.of())
+                .regles(jourFerie.getRegles())
                 .build();
     }
+
 
     private JourFerie convertToEntity(JourFerieDTO jourFerieDTO) {
         JourFerie jourFerie = new JourFerie();
         jourFerie.setId(jourFerieDTO.getId());
         jourFerie.setDate(jourFerieDTO.getDate());
-        // Les règles peuvent être ajoutées via un service ou un gestionnaire si nécessaire
+
+        // Exemple : associer les règles par leurs IDs
+        List<Regle> regles = jourFerieDTO.getRegleIds().stream()
+                .map(regleId -> {
+                    Regle regle = new Regle();
+                    regle.setId(regleId);
+                    regle.setJourFerie(jourFerie); // Association bidirectionnelle
+                    return regle;
+                })
+                .collect(Collectors.toList());
+        jourFerie.setRegles(regles);
         return jourFerie;
     }
 
+
     @Override
     public JourFerieDTO getJourFerie(int id) {
+        // Utilisation de la requête avec JOIN FETCH pour éviter LazyInitializationException
         JourFerie jourFerie = jourFerieRepository.findByIdWithRegles(id)
                 .orElseThrow(() -> new EntityNotFoundException("JourFerie not found with ID: " + id));
         return convertToDTO(jourFerie);
     }
 
+
     @Override
     public List<JourFerieDTO> getJourFeries() {
-        return jourFerieRepository.findAll().stream()
+        List<JourFerie> jourFeries = jourFerieRepository.findAllWithRegles();
+        return jourFeries.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public JourFerieDTO saveJourFerie(JourFerieDTO jourFerieDTO) {
-        JourFerie jourFerie = convertToEntity(jourFerieDTO);
-        if (jourFerie.getRegles().isEmpty()) {
-            throw new IllegalStateException("A JourFerie must have at least one associated Regle");
+        if (jourFerieDTO.getRegleIds() == null || jourFerieDTO.getRegleIds().isEmpty()) {
+            throw new IllegalArgumentException("A JourFerie must have at least one associated Regle");
         }
+        JourFerie jourFerie = convertToEntity(jourFerieDTO);
         JourFerie savedJourFerie = jourFerieRepository.save(jourFerie);
         return convertToDTO(savedJourFerie);
     }
+
 
     @Override
     public void deleteJourFerie(int id) {

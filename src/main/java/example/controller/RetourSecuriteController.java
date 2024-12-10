@@ -1,7 +1,11 @@
 package example.controller;
 
 import example.DTO.RetourSecuriteDTO;
+import example.entity.Client;
+import example.entity.Mouvement;
 import example.interfaces.IRetourSecuriteService;
+import example.repositories.ClientRepository;
+import example.repositories.MouvementRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,17 +18,22 @@ import java.util.List;
 public class RetourSecuriteController {
 
     private final IRetourSecuriteService retourSecuriteService;
+    private final ClientRepository clientRepository;
+    private final MouvementRepository mouvementRepository;
 
-    public RetourSecuriteController(IRetourSecuriteService retourSecuriteService) {
+    public RetourSecuriteController(IRetourSecuriteService retourSecuriteService, ClientRepository clientRepository, MouvementRepository mouvementRepository) {
         this.retourSecuriteService = retourSecuriteService;
+        this.clientRepository = clientRepository;
+        this.mouvementRepository = mouvementRepository;
     }
 
     @GetMapping("/list")
     public String viewAllRetourSecurites(Model model) {
         List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
-        model.addAttribute("retourSecurites", retourSecurites);
+        model.addAttribute("retoursSecurite", retourSecurites);
         return "retourSecurites/RS_list";
     }
+
 
     @GetMapping("/view/{id}")
     public String viewRetourSecuriteById(@PathVariable int id, Model model) {
@@ -48,9 +57,14 @@ public class RetourSecuriteController {
     @GetMapping("/edit/{id}")
     public String editRetourSecuriteForm(@PathVariable int id, Model model) {
         RetourSecuriteDTO retourSecurite = retourSecuriteService.getRetourSecurite(id);
+        List<Client> clients = clientRepository.findAll();
+        List<Mouvement> mouvements = mouvementRepository.findAll();
         model.addAttribute("retourSecurite", retourSecurite);
+        model.addAttribute("clients", clients);
+        model.addAttribute("mouvements", mouvements);
         return "retourSecurites/RS_edit";
     }
+
 
     @PostMapping("/edit/{id}")
     public String updateRetourSecurite(@PathVariable int id, @Valid @ModelAttribute("retourSecurite") RetourSecuriteDTO retourSecuriteDTO) {

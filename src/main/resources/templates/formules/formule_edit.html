@@ -75,16 +75,22 @@
     <label for="libelle">Libellé :</label>
     <input type="text" id="libelle" th:field="*{libelle}" required />
 
+
     <label for="formule">Description :</label>
     <input type="text" id="formule" th:field="*{formule}" required />
 
     <!-- Sélection de la règle associée -->
     <label for="regle">Règle associée :</label>
     <select id="regle" th:field="*{regle.id}">
-        <option th:each="regle : ${regles}" th:value="${regle.id}"
+        <option value="" disabled selected th:if="${formule.regle == null}">-- Sélectionnez une règle --</option>
+        <option th:each="regle : ${regles}"
+                th:value="${regle.id}"
                 th:text="${regle.coderegle}"
-                th:selected="${formule.regle != null and formule.regle.id == regle.id}">Sélectionnez une règle</option>
+                th:selected="${formule.regle != null and formule.regle.id == regle.id}">
+        </option>
     </select>
+
+
 
     <div style="text-align: center;">
         <button type="submit">Modifier</button>

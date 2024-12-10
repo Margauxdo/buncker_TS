@@ -1,10 +1,13 @@
 package example.services;
 
 import example.DTO.RegleDTO;
+import example.DTO.ValiseDTO;
 import example.entity.Regle;
+import example.entity.Valise;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.*;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,18 +55,28 @@ public class RegleService implements IRegleService {
 
 
     @Override
-    public RegleDTO getRegleById(int id) {
-        Regle regle = regleRepository.findById(id)
-                .orElseThrow(() -> new RegleNotFoundException("Règle non trouvée avec l'ID " + id));
-        return mapToDTO(regle);
-    }
-
-    @Override
     public List<RegleDTO> getAllRegles() {
-        return regleRepository.findAll().stream()
+        return regleRepository.findAllWithValise().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public RegleDTO getRegleById(int id) {
+        Regle regle = regleRepository.findById(id)
+                .orElseThrow(() -> new RegleNotFoundException("Règle non trouvée avec l'ID " + id));
+
+        // Charger explicitement la relation typeRegle si elle est en LAZY
+        if (regle.getTypeRegle() != null) {
+            Hibernate.initialize(regle.getTypeRegle());
+        }
+
+        return mapToDTO(regle);
+    }
+
+
+
+
 
     @Override
     public void deleteRegle(int id) {
@@ -102,17 +115,22 @@ public class RegleService implements IRegleService {
                 .dateRegle(regle.getDateRegle())
                 .nombreJours(regle.getNombreJours())
                 .calculCalendaire(regle.getCalculCalendaire())
-                .fermeJS1(regle.getFermeJS1())
-                .fermeJS2(regle.getFermeJS2())
-                .fermeJS3(regle.getFermeJS3())
-                .fermeJS4(regle.getFermeJS4())
-                .fermeJS5(regle.getFermeJS5())
-                .fermeJS6(regle.getFermeJS6())
-                .fermeJS7(regle.getFermeJS7())
-                .typeEntree(regle.getTypeEntree())
-                .nbjsmEntree(regle.getNbjsmEntree())
+                .valiseId(regle.getValise() != null ? regle.getValise().getId() : null)
+                .typeRegle(regle.getTypeRegle() != null ? regle.getTypeRegle().getNomTypeRegle() : "N/A") // Inclure typeRegle
                 .build();
     }
+
+
+
+
+    private ValiseDTO mapToValiseDTO(Valise valise) {
+        return ValiseDTO.builder()
+                .id(valise.getId())
+                .numeroValise(valise.getNumeroValise())
+                // Autres champs si nécessaire
+                .build();
+    }
+
 
     private void updateEntityFromDTO(Regle existingRegle, RegleDTO regleDTO) {
         existingRegle.setReglePourSortie(regleDTO.getReglePourSortie());

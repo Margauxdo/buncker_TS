@@ -27,10 +27,13 @@ public class RegleDTO {
     private Boolean fermeJS6;
     private Boolean fermeJS7;
     private String typeEntree;
+    private String typeRegle;
     private Long nbjsmEntree;
     private Integer valiseId;
+    private ValiseDTO valise;
     private Integer typeRegleId;
     private Integer formuleId;
     private Integer jourFerieId;
     private List<Integer> sortieSemaineIds;
 }
+

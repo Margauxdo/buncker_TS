@@ -70,10 +70,11 @@
     <input type="text" id="telephoneAlphapage" th:field="*{telephoneAlphapage}" />
 
     <label for="mouvement">Mouvement :</label>
-    <select id="mouvement" th:field="*{mouvement.id}">
+    <select id="mouvement" th:field="*{mouvementId}">
         <option value="" disabled selected>-- Sélectionnez un Mouvement --</option>
         <option th:each="mouv : ${mouvements}" th:value="${mouv.id}" th:text="${mouv.description}"></option>
     </select>
+
 
     <div style="text-align: center;">
         <button type="submit">Valider</button>

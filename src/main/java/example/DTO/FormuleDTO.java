@@ -1,5 +1,6 @@
 package example.DTO;
 
+import example.entity.Regle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class FormuleDTO {
-    private int id;
+    private Integer id;
     private String libelle;
     private String formule;
-    private int regleId;
+    private Integer regleId;
     private String regleCode;
+    private Regle regle;
+
 }

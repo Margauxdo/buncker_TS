@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,8 +31,9 @@ public class RetourSecurite {
 
     private Date dateCloture;
 
-    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Client> clients;
+    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Client> clients = new ArrayList<>();
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mouvement_id", nullable = true)

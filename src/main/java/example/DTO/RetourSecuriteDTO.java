@@ -20,4 +20,5 @@ public class RetourSecuriteDTO {
     private Date dateCloture;
     private List<Integer> clientIds;
     private Integer mouvementId;
+    private String mouvementStatut;
 }

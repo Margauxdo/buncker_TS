@@ -2,6 +2,7 @@ package example.controller;
 
 import example.DTO.LivreurDTO;
 import example.interfaces.ILivreurService;
+import example.repositories.MouvementRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,8 @@ public class LivreurController {
 
     @Autowired
     private ILivreurService livreurService;
+    @Autowired
+    private MouvementRepository mouvementRepository;
 
     @GetMapping("/list")
     public String listLivreurs(Model model) {
@@ -24,15 +27,18 @@ public class LivreurController {
 
     @GetMapping("/view/{id}")
     public String viewLivreurById(@PathVariable int id, Model model) {
-        model.addAttribute("livreur", livreurService.getLivreurById(id));
+        model.addAttribute("livreur", livreurService.getLivreurById(id)); // Retourne un DTO complet
         return "livreurs/livreur_details";
     }
+
 
     @GetMapping("/create")
     public String createLivreurForm(Model model) {
         model.addAttribute("livreur", new LivreurDTO());
+        model.addAttribute("mouvements", mouvementRepository.findAll()); // Chargez les mouvements depuis le repository
         return "livreurs/livreur_create";
     }
+
 
     @PostMapping("/create")
     public String createLivreur(@Valid @ModelAttribute("livreur") LivreurDTO livreurDTO,
@@ -56,9 +62,15 @@ public class LivreurController {
         if (result.hasErrors()) {
             return "livreurs/livreur_edit";
         }
-        livreurService.updateLivreur(id, livreurDTO);
+        try {
+            livreurService.updateLivreur(id, livreurDTO);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Une erreur s'est produite lors de la mise à jour du livreur.");
+            return "livreurs/error";
+        }
         return "redirect:/livreurs/list";
     }
+
 
     @PostMapping("/delete/{id}")
     public String deleteLivreur(@PathVariable int id, Model model) {

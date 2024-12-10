@@ -1,5 +1,6 @@
 package example.DTO;
 
+import example.entity.Regle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class JourFerieDTO {
     private int id;
     private Date date;
     private List<Integer> regleIds;
+    private List<Regle> regles;
 }
 

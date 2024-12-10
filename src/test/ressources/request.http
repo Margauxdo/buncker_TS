@@ -42,7 +42,7 @@ GET http://localhost:8080/formules/list
 Accept: text/html
 
 ### Voir une formule par ID (GET - Thymeleaf)
-GET http://localhost:8080/formules/view/1
+GET http://localhost:8080/formules/view/7
 Accept: text/html
 
 ### Afficher le formulaire de création de formule (GET - Thymeleaf)
@@ -56,13 +56,12 @@ Content-Type: application/x-www-form-urlencoded
 libelle=Test+Libelle+thymeleaf&formule=Test+Description&regle.id=1
 
 
-
 ### Afficher le formulaire d'édition d'une formule (GET - Thymeleaf)
-GET http://localhost:8080/formules/edit/1
+GET http://localhost:8080/formules/edit/7
 Accept: text/html
 
 ### Modifier une formule existante (POST - Thymeleaf)
-POST http://localhost:8080/formules/edit/1
+POST http://localhost:8080/formules/edit/10
 Content-Type: application/x-www-form-urlencoded
 
 
@@ -289,7 +288,7 @@ Accept: text/html
 
 
 ### Voir une RS par ID (GET - Thymeleaf)
-GET http://localhost:8080/retourSecurite/view/1
+GET http://localhost:8080/retourSecurite/view/2
 Accept: text/html
 
 

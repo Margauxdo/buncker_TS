@@ -39,9 +39,10 @@ public class LivreurService implements ILivreurService {
                 .telephonePortable(livreur.getTelephonePortable())
                 .telephoneKobby(livreur.getTelephoneKobby())
                 .telephoneAlphapage(livreur.getTelephoneAlphapage())
-                .mouvementId(livreur.getMouvement() != null ? livreur.getMouvement().getId() : null)
+                .mouvementStatutSortie(livreur.getMouvement() != null ? livreur.getMouvement().getStatutSortie() : "Aucun mouvement")
                 .build();
     }
+
 
     private Livreur convertToEntity(LivreurDTO livreurDTO) {
         Livreur livreur = new Livreur();
@@ -66,9 +67,12 @@ public class LivreurService implements ILivreurService {
 
     @Override
     public LivreurDTO createLivreur(LivreurDTO livreurDTO) {
-        if (livreurRepository.existsByCodeLivreur(livreurDTO.getCodeLivreur())) {
-            throw new ConflictException("Livreur with this code already exists.");
+        if (livreurDTO.getMouvementId() != null) {
+            Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
+
         }
+
         Livreur livreur = convertToEntity(livreurDTO);
         return convertToDTO(livreurRepository.save(livreur));
     }

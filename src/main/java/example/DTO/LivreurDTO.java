@@ -20,5 +20,7 @@ public class LivreurDTO {
     private String telephoneKobby;
     private String telephoneAlphapage;
     private Integer mouvementId;
+    private String mouvementStatutSortie;
+
 }
 

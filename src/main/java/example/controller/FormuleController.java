@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static example.services.FormuleService.logger;
+
 
 @Controller
 @RequestMapping("/formules")
@@ -42,15 +47,20 @@ public class FormuleController {
 
     @GetMapping("/edit/{id}")
     public String editFormuleForm(@PathVariable int id, Model model) {
-        model.addAttribute("formule", formuleService.getFormuleById(id));
+        model.addAttribute("formule", formuleService.getFormuleById(id)); // Récupération de la formule
         return "formules/formule_edit";
     }
 
+
+
     @PostMapping("/edit/{id}")
     public String updateFormule(@PathVariable int id, @Valid @ModelAttribute("formule") FormuleDTO formuleDTO, Model model) {
+        logger.info("Formule reçue pour mise à jour : {}", formuleDTO);
         formuleService.updateFormule(id, formuleDTO);
         return "redirect:/formules/list";
     }
+
+
 
     @PostMapping("/delete/{id}")
     public String deleteFormule(@PathVariable int id) {

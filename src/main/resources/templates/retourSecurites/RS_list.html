@@ -73,25 +73,32 @@
         <td th:text="${retourSecurite.datesecurite}"></td>
         <td th:text="${retourSecurite.cloture ? 'Oui' : 'Non'}"></td>
         <td th:text="${retourSecurite.dateCloture}"></td>
-        <td th:text="${retourSecurite.mouvement != null ? retourSecurite.mouvement.nom : 'Aucun'}"></td>
-        <td th:text="${retourSecurite.clients.size()}"></td>
+        <td th:text="${retourSecurite.mouvementStatut}"></td>
+
+        <td th:text="${retourSecurite.clientIds != null ? retourSecurite.clientIds.size() : 0}"></td>
+
         <td>
             <!-- Bouton pour Voir -->
-            <form th:action="@{/retoursSecurite/view/{id}(id=${retourSecurite.id})}" method="get" style="display:inline;">
+            <form th:action="@{/retourSecurite/view/{id}(id=${retourSecurite.id})}" method="get" style="display:inline;">
                 <button type="submit" aria-label="Voir le retour sécurité">Voir</button>
             </form>
 
+
+
+
             <!-- Bouton pour Modifier -->
-            <form th:action="@{/retoursSecurite/edit/{id}(id=${retourSecurite.id})}" method="get" style="display:inline;">
+            <form th:action="@{/retourSecurite/edit/{id}(id=${retourSecurite.id})}" method="get" style="display:inline;">
                 <button type="submit" aria-label="Modifier le retour sécurité">Modifier</button>
             </form>
 
+
             <!-- Bouton pour Supprimer -->
-            <form th:action="@{/retoursSecurite/delete/{id}(id=${retourSecurite.id})}" method="post"
+            <form th:action="@{/retourSecurite/delete/{id}(id=${retourSecurite.id})}" method="post"
                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce retour sécurité ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <input type="hidden" name="_method" value="delete"/>
                 <button type="submit" style="color: red;" aria-label="Supprimer le retour sécurité">Supprimer</button>
             </form>
+
         </td>
     </tr>
     </tbody>

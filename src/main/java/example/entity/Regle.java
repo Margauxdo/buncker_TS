@@ -58,9 +58,10 @@ public class Regle {
     private Long nbjsmEntree;
 
     // Relation ManyToOne avec Valise
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cle_valise")
     private Valise valise;
+
 
     // Relation OneToMany avec SortieSemaine
     @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)

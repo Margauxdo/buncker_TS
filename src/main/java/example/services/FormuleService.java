@@ -8,6 +8,7 @@ import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class FormuleService implements IFormuleService {
 
     private final FormuleRepository formuleRepository;
     private final RegleRepository regleRepository;
-    private static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
+    public static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
 
     public FormuleService(FormuleRepository formuleRepository, RegleRepository regleRepository) {
         this.formuleRepository = formuleRepository;
@@ -28,14 +29,18 @@ public class FormuleService implements IFormuleService {
     }
 
     private FormuleDTO convertToDTO(Formule formule) {
+        if (formule.getRegle() != null) {
+            Hibernate.initialize(formule.getRegle());
+        }
         return FormuleDTO.builder()
                 .id(formule.getId())
                 .libelle(formule.getLibelle())
                 .formule(formule.getFormule())
-                .regleId(formule.getRegle() != null ? formule.getRegle().getId() : 0)
                 .regleCode(formule.getRegle() != null ? formule.getRegle().getCoderegle() : "Non défini")
                 .build();
     }
+
+
 
     private Formule convertToEntity(FormuleDTO formuleDTO) {
         Formule formule = new Formule();
@@ -43,13 +48,14 @@ public class FormuleService implements IFormuleService {
         formule.setLibelle(formuleDTO.getLibelle());
         formule.setFormule(formuleDTO.getFormule());
 
-        if (formuleDTO.getRegleId() != 0) {
+        if (formuleDTO.getRegleId() != null) { // Vérifiez si regleId n'est pas null
             Regle regle = regleRepository.findById(formuleDTO.getRegleId())
                     .orElseThrow(() -> new EntityNotFoundException("Règle introuvable pour l'ID " + formuleDTO.getRegleId()));
             formule.setRegle(regle);
         }
         return formule;
     }
+
 
     @Override
     public FormuleDTO createFormule(FormuleDTO formuleDTO) {
@@ -64,7 +70,7 @@ public class FormuleService implements IFormuleService {
                 .map(existingFormule -> {
                     existingFormule.setLibelle(formuleDTO.getLibelle());
                     existingFormule.setFormule(formuleDTO.getFormule());
-                    if (formuleDTO.getRegleId() != 0) {
+                    if (formuleDTO.getRegleId() != null) { // Vérifiez si regleId n'est pas null
                         Regle regle = regleRepository.findById(formuleDTO.getRegleId())
                                 .orElseThrow(() -> new EntityNotFoundException("Règle introuvable pour l'ID " + formuleDTO.getRegleId()));
                         existingFormule.setRegle(regle);
@@ -73,6 +79,7 @@ public class FormuleService implements IFormuleService {
                 })
                 .orElseThrow(() -> new FormuleNotFoundException("Formule introuvable pour l'ID " + id));
     }
+
 
     @Override
     public void deleteFormule(int id) {
@@ -95,4 +102,8 @@ public class FormuleService implements IFormuleService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
+
+
 }

@@ -64,17 +64,17 @@
     <p><strong>Date de Clôture :</strong> <span th:text="${retourSecurite.dateCloture}"></span></p>
 
     <!-- Relation avec Mouvement -->
-    <p><strong>Mouvement :</strong>
-        <span th:text="${retourSecurite.mouvement != null ? retourSecurite.mouvement.nom : 'Aucun'}"></span>
-    </p>
+    <p><strong>Mouvement Statut :</strong> <span th:text="${retourSecurite.mouvementStatut}"></span></p>
+
 
     <!-- Relation avec Clients -->
     <p><strong>Clients associés :</strong></p>
     <ul>
-        <li th:each="client : ${retourSecurite.clients}" th:text="${client.nom}"></li>
+        <li th:each="clientId : ${retourSecurite.clientIds}" th:text="'Client ID: ' + clientId"></li>
     </ul>
 
-    <a th:href="@{/retoursSecurite/list}">Retour à la liste</a>
+
+    <a th:href="@{/retourSecurite/list}">Retour à la liste</a>
 </div>
 
 </body>

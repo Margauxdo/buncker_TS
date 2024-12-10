@@ -15,4 +15,6 @@ public interface IFormuleService {
     FormuleDTO getFormuleById(int id);
 
     List<FormuleDTO> getAllFormules();
+
+
 }

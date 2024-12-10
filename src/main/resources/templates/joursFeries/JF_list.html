@@ -61,17 +61,18 @@
         <td th:text="${jourFerie.id}"></td>
         <td th:text="${#dates.format(jourFerie.date, 'dd/MM/yyyy')}"></td>
         <td>
-            <ul>
-                <li th:each="regle : ${jourFerie.regles}" th:text="${regle.coderegle}"></li>
+            <ul th:if="${jourFerie.regleIds != null}" th:each="regleId : ${jourFerie.regleIds}">
+                <li th:text="${regleId}"></li>
             </ul>
+
         </td>
+
+
         <td>
             <form th:action="@{/jourferies/view/{id}(id=${jourFerie.id})}" method="get">
                 <button type="submit">Détails</button>
             </form>
-            <form th:action="@{/jourferies/update/{id}(id=${jourFerie.id})}" method="get">
-                <button type="submit">Modifier</button>
-            </form>
+
             <form th:action="@{/jourferies/delete/{id}(id=${jourFerie.id})}" method="post"
                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce jour férié ?');">
                 <button type="submit" style="color: red;">Supprimer</button>

@@ -50,8 +50,8 @@
 <!-- Affichage des messages d'erreur -->
 
 
+<form th:action="@{/livreurs/edit/{id}(id=${livreur.id})}" th:object="${livreur}" method="post">
 
-<form th:action="@{/livreurs/edit}" th:object="${livreur}" method="post">
     <label for="codeLivreur">Code Livreur :</label>
     <input type="text" id="codeLivreur" th:field="*{codeLivreur}" required />
 
@@ -77,10 +77,11 @@
     <input type="text" id="telephoneAlphapage" th:field="*{telephoneAlphapage}" />
 
     <label for="mouvement">Mouvement :</label>
-    <select id="mouvement" th:field="*{mouvement.id}">
+    <select id="mouvement" th:field="*{mouvementId}">
         <option value="" disabled selected>-- Sélectionnez un Mouvement --</option>
         <option th:each="mouv : ${mouvements}" th:value="${mouv.id}" th:text="${mouv.description}"></option>
     </select>
+
 
     <div style="text-align: center;">
         <button type="submit">Valider</button>

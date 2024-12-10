@@ -99,8 +99,11 @@
         <td th:text="${regle.fermeJS7}"></td>
         <td th:text="${regle.typeEntree}"></td>
         <td th:text="${regle.nbjsmEntree}"></td>
+
         <td th:text="${regle.valise != null ? regle.valise.id : 'N/A'}"></td>
-        <td th:text="${regle.typeRegle != null ? regle.typeRegle.id : 'N/A'}"></td>
+
+        <td th:text="${regle.typeRegleId != null ? regle.typeRegleId : 'N/A'}"></td>
+
         <td th:text="${regle.formule != null ? regle.formule.id : 'N/A'}"></td>
         <td th:text="${regle.jourFerie != null ? regle.jourFerie.id : 'N/A'}"></td>
 
