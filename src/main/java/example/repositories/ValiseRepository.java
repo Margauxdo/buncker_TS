@@ -19,4 +19,5 @@ public interface ValiseRepository extends JpaRepository<Valise, Integer> {
     @Query("SELECT v FROM Valise v JOIN FETCH v.client")
     List<Valise> findAllWithClient();
 
+
 }

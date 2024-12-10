@@ -36,5 +36,19 @@ public class ClientDTO {
 
     private List<Integer> problemeIds = new ArrayList<>();
     private Integer retourSecuriteId;
+
     private Integer regleId;
+    private List<Integer> regleIds = new ArrayList<>();
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+
 }

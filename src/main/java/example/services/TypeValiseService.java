@@ -87,4 +87,8 @@ public class TypeValiseService implements ITypeValiseService {
                 .valiseId(typeValise.getValise() != null ? typeValise.getValise().getId() : null)
                 .build();
     }
+
+    public List<TypeValise> getAllTypeValises() {
+        return typeValiseRepository.findAll();
+    }
 }

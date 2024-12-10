@@ -6,7 +6,7 @@ Accept: text/html
 
 
 ### Afficher un client par ID (GET - Thymeleaf)
-GET http://localhost:8080/clients/view/1
+GET http://localhost:8080/clients/view/2
 Accept: text/html
 
 ### Afficher le formulaire de création de client (GET - Thymeleaf)
@@ -20,7 +20,7 @@ Content-Type: application/x-www-form-urlencoded
 name=Jules+Dupont&email=jules.d%40example.com&adresse=1+rue+de+Paris&ville=Paris&telephoneExploitation=0123456789
 
 ### Afficher le formulaire de modification d'un client (GET - Thymeleaf)
-GET http://localhost:8080/clients/edit/4
+GET http://localhost:8080/clients/edit/1
 Accept: text/html
 
 ### Modifier un client existant (POST - Thymeleaf)
@@ -448,7 +448,7 @@ Accept: text/html
 
 
 ### Voir une valise par ID (GET - Thymeleaf)
-GET http://localhost:8080/valise/view/12
+GET http://localhost:8080/valise/view/1
 Accept: text/html
 
 
@@ -462,18 +462,18 @@ Accept: text/html
 POST http://localhost:8080/valise/create
 Content-Type: application/x-www-form-urlencoded
 
-description=test+valise&numeroValise=25&client.id=4
+description=test+valise&numeroValise=2&client.id=2
 
 
 ### Afficher le formulaire modification une valise (GET - Thymeleaf)
-GET http://localhost:8080/valise/edit/12
+GET http://localhost:8080/valise/edit/1
 Accept: text/html
 
 ### Modifier une valise existant (POST - Thymeleaf)
-POST http://localhost:8080/valise/edit/12
+POST http://localhost:8080/valise/edit/1
 Content-Type: application/x-www-form-urlencoded
 
-description=test+valise+2&numeroValise=236&client.id=4
+description=test+valise+2&numeroValise=236&client.id=1
 
 
 ###Supprimer une valise

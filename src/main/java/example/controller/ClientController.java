@@ -1,8 +1,13 @@
 package example.controller;
 
-import example.DTO.ClientDTO;
+import example.DTO.*;
 import example.entity.Client;
 import example.interfaces.IClientService;
+import example.services.ProblemeService;
+import example.services.RegleService;
+import example.services.RetourSecuriteService;
+import example.services.ValiseService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +22,14 @@ public class ClientController {
 
     @Autowired
     private IClientService clientService;
+    @Autowired
+    private ValiseService valiseService;
+    @Autowired
+    private ProblemeService problemeService;
+    @Autowired
+    private RetourSecuriteService retourSecuriteService;
+    @Autowired
+    private RegleService regleService;
 
     /**
      * Gestion globale des exceptions pour les erreurs inattendues.
@@ -45,24 +58,49 @@ public class ClientController {
      * Vue Thymeleaf pour voir un client par ID.
      */
     @GetMapping("/view/{id}")
-    public String viewClientById(@PathVariable int id, Model model) {
-        ClientDTO client = clientService.getClientById(id);
-        if (client == null) {
+    public String getClientById(@PathVariable int id, Model model) {
+        try {
+            ClientDTO clientDTO = clientService.getClientById(id);
+            model.addAttribute("client", clientDTO);
+            return "clients/client_detail";
+        } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
             return "clients/error";
         }
-        model.addAttribute("client", client); // Pas besoin de conversion supplémentaire
-        return "clients/client_detail";
     }
+
+
+
 
     /**
      * Formulaire Thymeleaf pour créer un client.
      */
     @GetMapping("/create")
     public String createClientForm(Model model) {
+        // Add a new ClientDTO object
         model.addAttribute("client", new ClientDTO());
+
+        // Populate and log the lists
+        List<ValiseDTO> valises = valiseService.getAllValises();
+        List<ProblemeDTO> problemes = problemeService.getAllProblemes();
+        List<RetourSecuriteDTO> retours = retourSecuriteService.getAllRetourSecurites();
+        List<RegleDTO> regles = regleService.getAllRegles();
+
+        System.out.println("Valises: " + valises);
+        System.out.println("Problemes: " + problemes);
+        System.out.println("Retours: " + retours);
+        System.out.println("Regles: " + regles);
+
+        // Add to model
+        model.addAttribute("valisesList", valises);
+        model.addAttribute("problemsList", problemes);
+        model.addAttribute("retoursList", retours);
+        model.addAttribute("rulesList", regles);
+
         return "clients/client_create";
     }
+
+
 
     /**
      * Création d'un client via formulaire Thymeleaf.
@@ -72,25 +110,50 @@ public class ClientController {
         try {
             clientService.createClient(clientDTO);
             return "redirect:/clients/list";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", "Erreur : " + e.getMessage());
+            return "clients/error";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Erreur lors de la création du client : " + e.getMessage());
+            model.addAttribute("errorMessage", "Erreur inattendue : " + e.getMessage());
             return "clients/error";
         }
     }
+
 
     /**
      * Formulaire Thymeleaf pour modifier un client.
      */
     @GetMapping("/edit/{id}")
-    public String editClientForm(@PathVariable int id, Model model) {
+    public String editClient(@PathVariable int id, Model model) {
         ClientDTO client = clientService.getClientById(id);
-        if (client == null) {
-            model.addAttribute("errorMessage", "Client avec l'ID " + id + " non trouvé.");
-            return "clients/error";
-        }
-        model.addAttribute("client", client); // Pas besoin de conversion supplémentaire
+
+        // Debug logs
+        List<ValiseDTO> valises = valiseService.getAllValises();
+        List<ProblemeDTO> problemes = problemeService.getAllProblemes();
+        List<RetourSecuriteDTO> retours = retourSecuriteService.getAllRetourSecurites();
+        List<RegleDTO> regles = regleService.getAllRegles();
+
+        System.out.println("Valises: " + valises);
+        System.out.println("Problemes: " + problemes);
+        System.out.println("Retours: " + retours);
+        System.out.println("Regles: " + regles);
+
+        // Add to model
+        model.addAttribute("valisesList", valises);
+        model.addAttribute("problemsList", problemes);
+        model.addAttribute("retoursList", retours);
+        model.addAttribute("rulesList", regles);
+        model.addAttribute("client", client);
+
         return "clients/client_edit";
     }
+
+
+
+
+
+
+
 
     /**
      * Modifier un client via formulaire Thymeleaf.

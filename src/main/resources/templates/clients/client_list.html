@@ -60,6 +60,18 @@
         <th>Email</th>
         <th>Téléphone</th>
         <th>Ville</th>
+        <th>Fonction</th>
+        <th>Ramassage 1</th>
+        <th>Ramassage 2</th>
+        <th>Ramassage 3</th>
+        <th>Ramassage 4</th>
+        <th>Ramassage 5</th>
+        <th>Ramassage 6</th>
+        <th>Ramassage 7</th>
+        <td>Envoie par défaut</td>
+        <td>Mémo de retour de sécurité 1</td>
+        <td>Mémo de retour de sécurité 2</td>
+        <td>Type de suivie</td>
         <th>Code Client</th>
         <th>Valises</th>
         <th>Problèmes</th>
@@ -75,6 +87,18 @@
         <td th:text="${client.email}">Email</td>
         <td th:text="${client.telephoneExploitation}">Téléphone</td>
         <td th:text="${client.ville}">Ville</td>
+        <td th:text="${client.personnelEtFonction}">Fonction</td>
+        <td th:text="${client.ramassage1}">Ramassage 1</td>
+        <td th:text="${client.ramassage2}">Ramassage 2</td>
+        <td th:text="${client.ramassage3}">Ramassage 3</td>
+        <td th:text="${client.ramassage4}">Ramassage 4</td>
+        <td th:text="${client.ramassage5}">Ramassage 5</td>
+        <td th:text="${client.ramassage6}">Ramassage 6</td>
+        <td th:text="${client.ramassage7}">Ramassage 7</td>
+        <td th:text="${client.envoiparDefaut}">Envoie par défaut</td>
+        <td th:text="${client.memoRetourSecurite1}">Mémo du retour de sécurité 1</td>
+        <td th:text="${client.memoRetourSecurite2}">Mémo du retour de sécurité 2</td>
+        <td th:text="${client.typeSuivie}">Type de suivie</td>
         <td th:text="${client.codeClient}">Code Client</td>
         <td>
             <ul>
@@ -90,18 +114,20 @@
         <td th:text="${client.regleId != null ? client.regleId : 'N/A'}">Règle</td>
         <td>
             <!-- Bouton pour Voir -->
-            <form th:action="@{/client/view/{id}(id=${client.id})}" method="get" style="display:inline;">
+            <form th:action="@{/clients/view/{id}(id=${client.id})}" method="get" style="display:inline;">
+
                 <button type="submit" aria-label="Voir le client">Voir</button>
             </form>
 
             <!-- Bouton pour Modifier -->
-            <form th:action="@{/client/edit/{id}(id=${client.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Modifier le client">Modifier</button>
+            <form th:action="@{/clients/edit/{id}(id=${client.id})}" method="get" style="display:inline;">
+
+            <button type="submit" aria-label="Modifier le client">Modifier</button>
             </form>
 
             <!-- Bouton pour Supprimer -->
-            <form th:action="@{/client/delete/{id}(id=${client.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?');" style="display:inline;">
+            <form th:action="@{/clients/delete/{id}(id=${client.id})}" method="post" style="display:inline;">
+
                 <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
                 <button type="submit" style="color: red;" aria-label="Supprimer le client">Supprimer</button>
             </form>

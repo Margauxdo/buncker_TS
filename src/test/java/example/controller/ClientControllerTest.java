@@ -33,7 +33,7 @@ public class ClientControllerTest {
     public void testViewClients() {
         when(clientService.getAllClients()).thenReturn(List.of(new ClientDTO()));
 
-        String response = clientController.viewClients(model);
+        String response = clientController.getClientById(1, model);
 
         assertEquals("clients/client_list", response);
         verify(model, times(1)).addAttribute(eq("clients"), any());
@@ -45,7 +45,7 @@ public class ClientControllerTest {
         ClientDTO client = new ClientDTO();
         when(clientService.getClientById(1)).thenReturn(client);
 
-        String response = clientController.viewClientById(1, model);
+        String response = clientController.getClientById(1, model);
 
         assertEquals("clients/client_detail", response);
         verify(model, times(1)).addAttribute("client", client);
@@ -56,7 +56,7 @@ public class ClientControllerTest {
     public void testViewClientById_NotFound() {
         when(clientService.getClientById(1)).thenReturn(null);
 
-        String response = clientController.viewClientById(1, model);
+        String response = clientController.getClientById(1, model);
 
         assertEquals("clients/error", response);
         verify(model, times(1)).addAttribute(eq("errorMessage"), any());

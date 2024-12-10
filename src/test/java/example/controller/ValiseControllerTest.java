@@ -64,30 +64,35 @@ public class ValiseControllerTest {
         Model model = new ConcurrentModel();
 
         // Act
-        String response = valiseController.editValiseForm(1, model);
+        String response = valiseController.updateValise(1, valiseDTO, model);
 
         // Assert
-        assertEquals("valises/valise_edit", response, "Expected view name is 'valises/valise_edit'");
-        assertTrue(model.containsAttribute("valise"), "Model should contain 'valise' attribute");
-        ValiseDTO valiseFromModel = (ValiseDTO) model.getAttribute("valise");
-        assertNotNull(valiseFromModel, "Valise should not be null");
-        assertEquals(valiseDTO.getDescription(), valiseFromModel.getDescription(), "Description should match");
+        assertEquals("redirect:/valise/list", response, "Expected redirect to '/valise/list'");
+        verify(valiseService, times(1)).updateValise(1, valiseDTO);
     }
+
 
     // Test pour afficher le formulaire de modification (erreur)
     @Test
     public void testEditValiseForm_NotFound() {
         // Arrange
-        when(valiseService.getValiseById(1)).thenReturn(null);
+        ValiseDTO valiseDTO = ValiseDTO.builder()
+                .id(1)
+                .description("Test Valise")
+                .build();
+        doThrow(new ResourceNotFoundException("Valise not found")).when(valiseService).updateValise(1, valiseDTO);
 
         Model model = new ConcurrentModel();
 
         // Act
-        String response = valiseController.editValiseForm(1, model);
+        String response = valiseController.updateValise(1, valiseDTO, model);
 
         // Assert
         assertEquals("valises/error", response, "Expected view name is 'valises/error'");
+        assertTrue(model.containsAttribute("errorMessage"), "Model should contain 'errorMessage' attribute");
+        verify(valiseService, times(1)).updateValise(1, valiseDTO);
     }
+
 
     // Test pour supprimer une valise (succès)
     @Test
@@ -142,7 +147,7 @@ public class ValiseControllerTest {
         Model model = new ConcurrentModel();
 
         // Act
-        String response = valiseController.viewValise(1, model);
+        String response = valiseController.getValiseDetails(1, model);
 
         // Assert
         assertEquals("valises/valise_details", response, "Expected view name is 'valises/valise_details'");

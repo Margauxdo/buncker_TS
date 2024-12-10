@@ -109,11 +109,56 @@
     <label for="codeClient">Code Client :</label>
     <input type="text" id="codeClient" th:field="*{codeClient}" />
 
+    <!-- Valises -->
+    <label for="valises">Valises :</label>
+
+    <select id="valises" name="valises" multiple th:field="*{valiseIds}">
+        <option th:each="valise : ${valisesList}" th:value="${valise.id}" th:text="${valise.description}"></option>
+    </select>
+
+
+
+    <!-- Problems -->
+    <label for="problemes">Problemes :</label>
+
+    <select id="problemes" name="problemes" multiple th:field="*{problemeIds}">
+        <option th:each="probleme : ${problemsList}" th:value="${probleme.id}" th:text="${probleme.descriptionProbleme}"></option>
+    </select>
+
+
+
+    <!-- Retour Sécurité -->
+    <label for="retourSecurite">Retour Sécurité :</label>
+
+    <select id="retourSecurite" name="retourSecurite" th:field="*{retourSecuriteId}">
+        <option th:each="retour : ${retoursList}" th:value="${retour.id}" th:text="${retour.numero}"></option>
+    </select>
+
+
+
+    <!-- Rules -->
+    <label for="regles">Regles:</label>
+
+    <select id="regles" name="regles" multiple th:field="*{regleIds}">
+        <option th:each="regle : ${rulesList}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
+    </select>
+
+
+
+
+
+
+
     <div style="text-align: center;">
         <button type="submit">Valider</button>
         <!-- <a th:href="@{/clients/list}"><button type="button">Retour à la liste</button></a> -->
     </div>
-
+    <br>
+    <div style="text-align: center;">
+        <a th:href="@{/clients/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
+    </div>
 </form>
 </body>
 </html>

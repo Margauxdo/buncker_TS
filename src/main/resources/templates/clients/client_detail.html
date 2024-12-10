@@ -64,6 +64,7 @@
     <p><strong>Ville :</strong> <span th:text="${client.ville}"></span></p>
     <p><strong>Fonction :</strong> <span th:text="${client.personnelEtFonction}"></span></p>
 
+
     <h3>Ramassages</h3>
     <p><strong>Ramassage 1 :</strong> <span th:text="${client.ramassage1}"></span></p>
     <p><strong>Ramassage 2 :</strong> <span th:text="${client.ramassage2}"></span></p>
@@ -83,11 +84,25 @@
 
     <h3>Associations</h3>
     <p><strong>Règle associée :</strong>
-        <span th:if="${client.regle != null}" th:text="${client.regle.coderegle}"></span>
-        <span th:if="${client.regle == null}">Aucune règle associée</span>
+        <span th:if="${client.regleId != null}" th:text="'Règle ID: ' + ${client.regleId}"></span>
+        <span th:if="${client.regleId == null}">Aucune règle associée</span>
     </p>
 
-    <p><strong>Retour Sécurité :</strong> <span th:text="${client.retourSecurite}"></span></p>
+
+    <p><strong>Retour Sécurité :</strong>
+        <span th:if="${client.retourSecuriteId != null}" th:text="'Retour Sécurité ID: ' + ${client.retourSecuriteId}"></span>
+        <span th:if="${client.retourSecuriteId == null}">Aucun retour sécurité associé</span>
+    </p>
+
+    <p><strong>Valise :</strong>
+        <span th:if="${client.valiseIds != null}" th:text="'Valise ID: ' + ${client.valiseIds}"></span>
+        <span th:if="${client.valiseIds == null}">Aucune valise associé</span>
+    </p>
+
+    <p><strong>Probleme :</strong>
+        <span th:if="${client.problemeIds!= null}" th:text="'Probleme ID: ' + ${client.problemeIds}"></span>
+        <span th:if="${client.problemeIds == null}">Aucun problemes associé</span>
+    </p>
 
     <div style="text-align: center;">
     <a th:href="@{/clients/list}">

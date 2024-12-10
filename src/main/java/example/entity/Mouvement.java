@@ -59,6 +59,13 @@ public class Mouvement {
         livreurs.remove(livreur);
         livreur.setMouvement(null);
     }
+    public Valise getValise() {
+        return valise;
+    }
+
+    public void setValise(Valise valise) {
+        this.valise = valise;
+    }
 
 
 }

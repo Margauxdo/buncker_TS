@@ -13,4 +13,6 @@ public interface TypeValiseRepository extends JpaRepository<TypeValise, Integer>
 List<TypeValise> findByProprietaire(String proprietaire);
 
 
+
+
 }

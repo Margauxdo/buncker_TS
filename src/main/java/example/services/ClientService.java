@@ -1,11 +1,12 @@
 package example.services;
 
 import example.DTO.ClientDTO;
-import example.entity.Client;
-import example.entity.Probleme;
-import example.entity.Valise;
+import example.DTO.ProblemeDTO;
+import example.entity.*;
 import example.interfaces.IClientService;
 import example.repositories.ClientRepository;
+import example.repositories.RegleRepository;
+import example.repositories.RetourSecuriteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,13 @@ import java.util.stream.Collectors;
 public class ClientService implements IClientService {
 
     private final ClientRepository clientRepository;
+    private final RetourSecuriteRepository retourSecuriteRepository;
+    private final RegleRepository regleRepository;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, RetourSecuriteRepository retourSecuriteRepository, RegleRepository regleRepository) {
         this.clientRepository = clientRepository;
+        this.retourSecuriteRepository = retourSecuriteRepository;
+        this.regleRepository = regleRepository;
     }
 
     // Méthode pour convertir un Client en ClientDTO
@@ -45,7 +50,10 @@ public class ClientService implements IClientService {
         clientDTO.setMemoRetourSecurite2(client.getMemoRetourSecurite2());
         clientDTO.setTypeSuivie(client.getTypeSuivie());
         clientDTO.setCodeClient(client.getCodeClient());
+
+        // Ligne ajoutée pour mapper RetourSecurite
         clientDTO.setRetourSecuriteId(client.getRetourSecurite() != null ? client.getRetourSecurite().getId() : null);
+
         clientDTO.setRegleId(client.getRegle() != null ? client.getRegle().getId() : null);
 
         // Mapper les valises
@@ -54,10 +62,13 @@ public class ClientService implements IClientService {
                 clientDTO.getValiseIds().add(valise.getId());
                 clientDTO.getValisesDescriptions().add(valise.getDescription());
             });
+
         }
+
 
         return clientDTO;
     }
+
 
     // Méthode pour convertir un ClientDTO en Client
     private Client convertToEntity(ClientDTO clientDTO) {
@@ -73,7 +84,6 @@ public class ClientService implements IClientService {
         client.setRamassage2(clientDTO.getRamassage2());
         client.setRamassage3(clientDTO.getRamassage3());
         client.setRamassage4(clientDTO.getRamassage4());
-        client.setRamassage5(clientDTO.getRamassage5());
         client.setRamassage6(clientDTO.getRamassage6());
         client.setRamassage7(clientDTO.getRamassage7());
         client.setEnvoiparDefaut(clientDTO.getEnvoiparDefaut());
@@ -81,14 +91,34 @@ public class ClientService implements IClientService {
         client.setMemoRetourSecurite2(clientDTO.getMemoRetourSecurite2());
         client.setTypeSuivie(clientDTO.getTypeSuivie());
         client.setCodeClient(clientDTO.getCodeClient());
+
+        // Ajouter les relations
+        if (clientDTO.getRetourSecuriteId() != null) {
+            // Charger l'entité associée (utiliser un repository ou service)
+            RetourSecurite retourSecurite = retourSecuriteRepository.findById(clientDTO.getRetourSecuriteId())
+                    .orElseThrow(() -> new EntityNotFoundException("RetourSecurite non trouvé"));
+            client.setRetourSecurite(retourSecurite);
+        }
+
+        if (clientDTO.getRegleId() != null) {
+            Regle regle = regleRepository.findById(clientDTO.getRegleId())
+                    .orElseThrow(() -> new EntityNotFoundException("Règle non trouvée"));
+            client.setRegle(regle);
+        }
+
         return client;
     }
 
+
     @Override
     public void createClient(ClientDTO clientDTO) {
+        if (clientRepository.existsByEmail(clientDTO.getEmail())) {
+            throw new IllegalArgumentException("Email already exists: " + clientDTO.getEmail());
+        }
         Client client = convertToEntity(clientDTO);
         clientRepository.save(client);
     }
+
 
     @Override
     @Transactional

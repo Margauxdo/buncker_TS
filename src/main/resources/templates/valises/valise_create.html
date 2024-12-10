@@ -46,7 +46,6 @@
     <p th:text="${errorMessage}"></p>
 </div>
 
-
 <form th:action="@{/valise/create}" th:object="${valise}" method="post">
     <!-- Champ pour la description -->
     <label for="description">Description :</label>
@@ -56,16 +55,58 @@
     <label for="numeroValise">Numéro de Valise :</label>
     <input type="number" id="numeroValise" th:field="*{numeroValise}" placeholder="Entrez le numéro de valise" required />
 
-    <!-- Relation avec Client -->
-    <label for="client">Client :</label>
-    <select id="client" th:field="*{client}" th:each="client : ${clients}" th:value="${client.id}" th:text="${client.nom}">
-        <option value="" th:text="'Sélectionner un client'"></option>
+    <!-- Champ pour la référence client -->
+    <label for="refClient">Référence Client :</label>
+    <input type="text" id="refClient" th:field="*{refClient}" placeholder="Entrez une référence client" />
+
+    <!-- Champ pour la date de sortie -->
+    <label for="sortie">Date de Sortie :</label>
+    <input type="date" id="sortie" th:field="*{sortie}" th:value="*{#dates.format(sortie, 'yyyy-MM-dd')}" />
+
+    <!-- Champ pour la date du dernier mouvement -->
+    <label for="dateDernierMouvement">Date du Dernier Mouvement :</label>
+    <input type="date" id="dateDernierMouvement" th:field="*{dateDernierMouvement}" th:value="*{#dates.format(dateDernierMouvement, 'yyyy-MM-dd')}" />
+    <!-- Champ pour la date de sortie prévue -->
+    <label for="dateSortiePrevue">Date de Sortie Prévue :</label>
+    <input type="date" id="dateSortiePrevue" th:field="*{dateSortiePrevue}" th:value="*{#dates.format(dateSortiePrevue, 'yyyy-MM-dd')}" />
+
+    <!-- Champ pour la date de retour prévue -->
+    <label for="dateRetourPrevue">Date de Retour Prévue :</label>
+    <input type="date" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" th:value="*{#dates.format(dateRetourPrevue, 'yyyy-MM-dd')}" />
+
+    <!-- Champ pour le numéro du jeu -->
+    <label for="numeroDujeu">Numéro du Jeu :</label>
+    <input type="text" id="numeroDujeu" th:field="*{numeroDujeu}" placeholder="Entrez le numéro du jeu" />
+
+    <!-- Relation avec TypeValise -->
+    <label for="typeValise">Type de Valise :</label>
+    <select id="typeValise" th:field="*{typeValiseId}">
+        <option value="" th:text="'Sélectionner un type de valise'"></option>
+        <option th:each="type : ${typesValise}" th:value="${type.id}" th:text="${type.description}"></option>
     </select>
 
+
+    <!-- Relation avec Client -->
+    <label for="client">Client :</label>
+    <select id="client" th:field="*{clientId}">
+        <option value="" th:text="'Sélectionner un client'"></option>
+        <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name}"></option>
+    </select>
+
+
+    <!-- Liste des mouvements (ajout facultatif si nécessaire) -->
+    <label for="mouvements">Mouvements associés :</label>
+    <textarea id="mouvements" th:field="*{mouvementIds}" placeholder="Liste des mouvements, séparés par des virgules"></textarea>
+
+    <!-- Liste des règles associées (ajout facultatif si nécessaire) -->
+    <label for="regles">Règles associées :</label>
+    <textarea id="regles" th:field="*{regleSortieIds}" placeholder="Liste des règles, séparées par des virgules"></textarea>
+
     <div style="text-align: center;">
-        <button type="submit">Créer</button>
-        <!-- Mis en commentaire parce que redirection doit être géré côté controller, je pensel-->
-        <!-- <a th:href="@{/valise/list}"> <button type="button">Retour à la liste</button> </a> -->
+        <button type="submit">Valider</button>
+        <a th:href="@{/valise/list}">
+            <button type="button">Retour à la liste</button>
+        </a>
     </div>
 </form>
 

@@ -57,8 +57,16 @@ public class Valise {
     private Client client;
 
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise")
-    private List<Mouvement> mouvementList = new ArrayList<>();
+    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Mouvement> mouvements = new ArrayList<>();
+
+    public List<Mouvement> getMouvements() {
+        return mouvements;
+    }
+
+    public void setMouvements(List<Mouvement> mouvements) {
+        this.mouvements = mouvements;
+    }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
     private List<Regle> regleSortie = new ArrayList<>();
