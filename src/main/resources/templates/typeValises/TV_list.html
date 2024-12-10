@@ -65,11 +65,17 @@
     <tbody>
     <!-- Boucle sur la liste des types de valise -->
     <tr th:each="typeValise : ${typeValises}">
+
         <td th:text="${typeValise.id}"></td>
         <td th:text="${typeValise.proprietaire}"></td>
         <td th:text="${typeValise.description}"></td>
+        <td th:text="${typeValise.numeroValise != null ? typeValise.numeroValise : 'Aucune'}"></td>
 
-        <td th:text="${typeValise.valise }"></td>
+
+
+
+
+
 
         <td>
         <form th:action="@{/typeValise/view/{id}(id=${typeValise.id})}" method="get">

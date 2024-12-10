@@ -30,6 +30,7 @@ public class TypeValiseService implements ITypeValiseService {
         Valise valise = valiseRepository.findById(typeValiseDTO.getValiseId())
                 .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + typeValiseDTO.getValiseId()));
 
+
         TypeValise typeValise = TypeValise.builder()
                 .proprietaire(typeValiseDTO.getProprietaire())
                 .description(typeValiseDTO.getDescription())
@@ -56,6 +57,7 @@ public class TypeValiseService implements ITypeValiseService {
         TypeValise updatedTypeValise = typeValiseRepository.save(existingTypeValise);
         return mapToDTO(updatedTypeValise);
     }
+
 
     @Override
     public void deleteTypeValise(int id) {
@@ -85,8 +87,11 @@ public class TypeValiseService implements ITypeValiseService {
                 .proprietaire(typeValise.getProprietaire())
                 .description(typeValise.getDescription())
                 .valiseId(typeValise.getValise() != null ? typeValise.getValise().getId() : null)
+                .numeroValise(typeValise.getValise() != null ? typeValise.getValise().getNumeroValise() : null)
                 .build();
     }
+
+
 
     public List<TypeValise> getAllTypeValises() {
         return typeValiseRepository.findAll();

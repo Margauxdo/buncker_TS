@@ -55,12 +55,13 @@
     <label for="description">Description :</label>
     <input type="text" id="description" th:field="*{description}" placeholder="Entrez la description" required />
 
-    <!-- Champ pour sélectionner une valise -->
+
     <label for="valise">Valise associée :</label>
-    <select id="valise" th:field="*{valise}" required>
+    <select id="valise" th:field="*{valiseId}" required>
         <option value="" th:text="'Sélectionnez une valise'"></option>
         <option th:each="valise : ${valises}" th:value="${valise.id}" th:text="${valise.description}"></option>
     </select>
+
 
 
     <div style="text-align: center;">

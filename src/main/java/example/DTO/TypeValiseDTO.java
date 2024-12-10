@@ -14,4 +14,5 @@ public class TypeValiseDTO {
     private String proprietaire;
     private String description;
     private Integer valiseId;
+    private Long numeroValise;
 }

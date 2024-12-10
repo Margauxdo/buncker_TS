@@ -47,9 +47,10 @@ public class TypeValiseController {
     @GetMapping("/create")
     public String createTypeValiseForm(Model model) {
         model.addAttribute("typeValise", new TypeValiseDTO());
-        model.addAttribute("valises", valiseService.getAllValises());
+        model.addAttribute("valises", valiseService.getAllValises()); // Vérifiez que cette méthode renvoie les valises correctement
         return "typeValises/TV_create";
     }
+
 
     @PostMapping("/create")
     public String createTypeValise(@Valid @ModelAttribute("typeValise") TypeValiseDTO typeValiseDTO, Model model) {
@@ -76,6 +77,7 @@ public class TypeValiseController {
             return "typeValises/error";
         }
     }
+
 
     @PostMapping("/edit/{id}")
     public String editTypeValise(@PathVariable int id, @Valid @ModelAttribute("typeValise") TypeValiseDTO typeValiseDTO, Model model) {
