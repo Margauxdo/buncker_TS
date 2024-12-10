@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -14,13 +12,11 @@
             border-radius: 5px;
             background-color: #f8f9fa;
         }
-
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
         }
-
         input, select {
             width: 100%;
             padding: 8px;
@@ -28,14 +24,12 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-
         button {
             padding: 5px 10px;
             border: 1px solid #ccc;
             background-color: #f8f9fa;
             cursor: pointer;
         }
-
         button:hover {
             background-color: #e2e6ea;
         }
@@ -44,12 +38,7 @@
 <body>
 <h1 style="text-align: center;">Créer un nouveau Retour Sécurité</h1>
 
-<div th:if="${errorMessage}" style="color: red; text-align: center;">
-    <p th:text="${errorMessage}"></p>
-</div>
-
-<form th:action="@{/retoursSecurite/create}" th:object="${retourSecurite}" method="post">
-    <!-- Champs principaux -->
+<form th:action="@{/retourSecurite/create}" th:object="${retourSecurite}" method="post">
     <label for="numero">Numéro :</label>
     <input type="number" id="numero" th:field="*{numero}" required />
 
@@ -62,18 +51,27 @@
         <option value="false">Non</option>
     </select>
 
-    <label for="dateCloture">Date de Clôture :</label>
-    <input type="date" id="dateCloture" th:field="*{dateCloture}" />
+    <label for="mouvementId">Mouvement :</label>
+    <select id="mouvementId" th:field="*{mouvementId}">
+        <option value="" disabled selected>Choisissez un mouvement</option>
+        <option th:each="mouvement : ${mouvements}"
+                th:value="${mouvement.id}"
+                th:text="${mouvement.statutSortie}">
+        </option>
+    </select>
 
-    <!-- Relation avec Mouvement -->
-    <label for="mouvement">Mouvement :</label>
-    <select id="mouvement" th:field="*{mouvement}" th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.nom}">
-        <option value="" th:text="'Aucun'"></option>
+    <label for="clientId">Client :</label>
+    <select id="clientId" th:field="*{clientIds}">
+        <option value="" disabled selected>Choisissez un client</option>
+        <option th:each="client : ${clients}"
+                th:value="${client.id}"
+                th:text="${client.name}">
+        </option>
     </select>
 
     <div style="text-align: center;">
         <button type="submit">Créer</button>
-        <a th:href="@{/retoursSecurite/list}">
+        <a th:href="@{/retourSecurite/list}">
             <button type="button">Retour à la liste</button>
         </a>
     </div>

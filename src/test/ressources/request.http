@@ -302,6 +302,8 @@ Accept: text/html
 POST http://localhost:8080/retourSecurite/create
 Content-Type: application/x-www-form-urlencoded
 
+numero=123&cloture=false&datesecurite=2024-12-10
+
 
 ### Afficher le formulaire modification une regle (GET - Thymeleaf)
 GET http://localhost:8080/retourSecurite/edit/1

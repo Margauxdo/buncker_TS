@@ -30,7 +30,29 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
     @Override
     public RetourSecuriteDTO createRetourSecurite(RetourSecuriteDTO retourSecuriteDTO) {
-        RetourSecurite retourSecurite = mapDtoToEntity(retourSecuriteDTO);
+        RetourSecurite retourSecurite = new RetourSecurite();
+
+        retourSecurite.setNumero(retourSecuriteDTO.getNumero());
+        retourSecurite.setDatesecurite(retourSecuriteDTO.getDatesecurite());
+        retourSecurite.setCloture(retourSecuriteDTO.getCloture());
+        retourSecurite.setDateCloture(retourSecuriteDTO.getDateCloture());
+
+        // Charger l'entité Mouvement
+        if (retourSecuriteDTO.getMouvementId() != null) {
+            Mouvement mouvement = mouvementRepository.findById(retourSecuriteDTO.getMouvementId())
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with id: " + retourSecuriteDTO.getMouvementId()));
+            retourSecurite.setMouvement(mouvement);
+        }
+
+        // Charger les clients associés
+        if (retourSecuriteDTO.getClientIds() != null && !retourSecuriteDTO.getClientIds().isEmpty()) {
+            List<Client> clients = clientRepository.findAllById(retourSecuriteDTO.getClientIds());
+            for (Client client : clients) {
+                client.setRetourSecurite(retourSecurite); // Associer le RetourSecurite au Client
+            }
+            retourSecurite.setClients(clients);
+        }
+
         RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
         return mapEntityToDto(savedRetourSecurite);
     }

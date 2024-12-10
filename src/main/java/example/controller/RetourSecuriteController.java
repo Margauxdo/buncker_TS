@@ -45,8 +45,14 @@ public class RetourSecuriteController {
     @GetMapping("/create")
     public String createRetourSecuriteForm(Model model) {
         model.addAttribute("retourSecurite", new RetourSecuriteDTO());
+        List<Client> clients = clientRepository.findAll();
+        List<Mouvement> mouvements = mouvementRepository.findAll();
+        model.addAttribute("clients", clients);
+        model.addAttribute("mouvements", mouvements);
         return "retourSecurites/RS_create";
     }
+
+
 
     @PostMapping("/create")
     public String createRetourSecurite(@Valid @ModelAttribute("retourSecurite") RetourSecuriteDTO retourSecuriteDTO) {
