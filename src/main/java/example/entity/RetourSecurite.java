@@ -31,8 +31,9 @@ public class RetourSecurite {
 
     private Date dateCloture;
 
-    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Client> clients = new ArrayList<>();
+
 
 
     @ManyToOne(fetch = FetchType.LAZY)

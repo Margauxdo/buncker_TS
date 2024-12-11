@@ -30,53 +30,96 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
     @Override
     public RetourSecuriteDTO createRetourSecurite(RetourSecuriteDTO retourSecuriteDTO) {
+        // Initialize the RetourSecurite entity
         RetourSecurite retourSecurite = new RetourSecurite();
-
         retourSecurite.setNumero(retourSecuriteDTO.getNumero());
         retourSecurite.setDatesecurite(retourSecuriteDTO.getDatesecurite());
         retourSecurite.setCloture(retourSecuriteDTO.getCloture());
         retourSecurite.setDateCloture(retourSecuriteDTO.getDateCloture());
 
-        // Charger l'entité Mouvement
+        // Associate Mouvement if provided
         if (retourSecuriteDTO.getMouvementId() != null) {
             Mouvement mouvement = mouvementRepository.findById(retourSecuriteDTO.getMouvementId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with id: " + retourSecuriteDTO.getMouvementId()));
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + retourSecuriteDTO.getMouvementId()));
             retourSecurite.setMouvement(mouvement);
         }
 
-        // Charger les clients associés
+        // Associate Clients if provided
         if (retourSecuriteDTO.getClientIds() != null && !retourSecuriteDTO.getClientIds().isEmpty()) {
             List<Client> clients = clientRepository.findAllById(retourSecuriteDTO.getClientIds());
-            for (Client client : clients) {
-                client.setRetourSecurite(retourSecurite); // Associer le RetourSecurite au Client
+
+            // Validate client IDs
+            if (clients.size() != retourSecuriteDTO.getClientIds().size()) {
+                List<Integer> invalidIds = retourSecuriteDTO.getClientIds().stream()
+                        .filter(id -> clients.stream().noneMatch(client -> client.getId().equals(id)))
+                        .collect(Collectors.toList());
+                throw new EntityNotFoundException("Les clients suivants n'ont pas été trouvés : " + invalidIds);
             }
+
+            // Establish the relationship
+            for (Client client : clients) {
+                client.setRetourSecurite(retourSecurite); // Bidirectional relationship
+            }
+
             retourSecurite.setClients(clients);
         }
 
+        // Save RetourSecurite with associated Clients
         RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
+
+        // Return the DTO
         return mapEntityToDto(savedRetourSecurite);
     }
 
-    @Override
-    public RetourSecuriteDTO updateRetourSecurite(int id, RetourSecuriteDTO retourSecuriteDTO) {
-        RetourSecurite existingRetourSecurite = retourSecuriteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("RetourSecurite not found with id: " + id));
 
+    @Override
+    public RetourSecuriteDTO updateRetourSecurite(int retourSecuriteId, RetourSecuriteDTO retourSecuriteDTO) {
+        // Fetch the existing RetourSecurite entity
+        RetourSecurite existingRetourSecurite = retourSecuriteRepository.findById(retourSecuriteId)
+                .orElseThrow(() -> new EntityNotFoundException("RetourSecurite not found with id: " + retourSecuriteId));
+
+        // Update basic fields
         existingRetourSecurite.setNumero(retourSecuriteDTO.getNumero());
         existingRetourSecurite.setDatesecurite(retourSecuriteDTO.getDatesecurite());
         existingRetourSecurite.setCloture(retourSecuriteDTO.getCloture());
         existingRetourSecurite.setDateCloture(retourSecuriteDTO.getDateCloture());
 
+        // Update Mouvement association if provided
         if (retourSecuriteDTO.getMouvementId() != null) {
             Mouvement mouvement = mouvementRepository.findById(retourSecuriteDTO.getMouvementId())
                     .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with id: " + retourSecuriteDTO.getMouvementId()));
             existingRetourSecurite.setMouvement(mouvement);
         }
 
-        List<Client> clients = clientRepository.findAllById(retourSecuriteDTO.getClientIds());
-        existingRetourSecurite.setClients(clients);
+        // Update Client associations
+        if (retourSecuriteDTO.getClientIds() != null) {
+            List<Client> newClients = clientRepository.findAllById(retourSecuriteDTO.getClientIds());
 
+            // Ensure all provided client IDs exist
+            if (newClients.size() != retourSecuriteDTO.getClientIds().size()) {
+                List<Integer> invalidIds = retourSecuriteDTO.getClientIds().stream()
+                        .filter(clientId -> newClients.stream().noneMatch(client -> client.getId().equals(clientId)))
+                        .collect(Collectors.toList());
+                throw new EntityNotFoundException("Clients not found for IDs: " + invalidIds);
+            }
+
+            // Detach existing clients
+            for (Client client : existingRetourSecurite.getClients()) {
+                client.setRetourSecurite(null);
+            }
+
+            // Attach new clients
+            for (Client client : newClients) {
+                client.setRetourSecurite(existingRetourSecurite);
+            }
+
+            existingRetourSecurite.setClients(newClients);
+        }
+
+        // Save the updated RetourSecurite
         RetourSecurite updatedRetourSecurite = retourSecuriteRepository.save(existingRetourSecurite);
+
+        // Map the updated entity to a DTO and return
         return mapEntityToDto(updatedRetourSecurite);
     }
 

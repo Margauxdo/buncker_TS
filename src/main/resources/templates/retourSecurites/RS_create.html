@@ -54,20 +54,18 @@
     <label for="mouvementId">Mouvement :</label>
     <select id="mouvementId" th:field="*{mouvementId}">
         <option value="" disabled selected>Choisissez un mouvement</option>
-        <option th:each="mouvement : ${mouvements}"
-                th:value="${mouvement.id}"
-                th:text="${mouvement.statutSortie}">
-        </option>
+        <option th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.statutSortie}"></option>
     </select>
 
+
     <label for="clientId">Client :</label>
-    <select id="clientId" th:field="*{clientIds}">
-        <option value="" disabled selected>Choisissez un client</option>
+    <select id="clientId" th:field="*{clientIds}" multiple>
         <option th:each="client : ${clients}"
                 th:value="${client.id}"
                 th:text="${client.name}">
         </option>
     </select>
+
 
     <div style="text-align: center;">
         <button type="submit">Créer</button>

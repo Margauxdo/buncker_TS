@@ -67,7 +67,7 @@ public class Client {
 
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "retourSecurite_id")
     private RetourSecurite retourSecurite;
 
