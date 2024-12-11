@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,54 +33,22 @@ class SortieSemaineServiceTest {
 
     @Test
     public void testCreateSortieSemaine_Success() {
-        Regle regle = new Regle();
-        regle.setCoderegle("CodeExemple");
+        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
+        sortieSemaineDTO.setDateSortieSemaine(new Date());
+        sortieSemaineDTO.setRegleId(1);
 
-        SortieSemaine semaine = new SortieSemaine();
-        semaine.setRegle(regle);
+        SortieSemaine sortieSemaine = new SortieSemaine();
+        sortieSemaine.setId(1);
 
-        when(sortieSemaineRepository.save(semaine)).thenReturn(semaine);
+        when(sortieSemaineRepository.save(any(SortieSemaine.class))).thenReturn(sortieSemaine);
 
-        SortieSemaineDTO result = sortieSemaineService.createSortieSemaine(new SortieSemaineDTO());
+        SortieSemaineDTO result = sortieSemaineService.createSortieSemaine(sortieSemaineDTO);
 
         assertNotNull(result, "The result must not be null after creation.");
-        verify(sortieSemaineRepository, times(1)).save(semaine);
+        verify(sortieSemaineRepository, times(1)).save(any(SortieSemaine.class));
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
-
-    @Test
-    public void testUpdateSortieSemaine_Success() {
-        int id = 1;
-        SortieSemaine semaine = new SortieSemaine();
-        when(sortieSemaineRepository.existsById(id)).thenReturn(true);
-        when(sortieSemaineRepository.save(semaine)).thenReturn(semaine);
-
-        SortieSemaineDTO result = sortieSemaineService.updateSortieSemaine(id, semaine);
-
-        assertNotNull(result, "Update must return a non-null object.");
-        verify(sortieSemaineRepository, times(1)).existsById(id);
-        verify(sortieSemaineRepository, times(1)).save(semaine);
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
-
-    @Test
-    public void testUpdateSortieSemaine_Failure() {
-        int id = 1;
-        SortieSemaine semaine = new SortieSemaine();
-        when(sortieSemaineRepository.existsById(id)).thenReturn(false);
-
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                        sortieSemaineService.updateSortieSemaine(id, semaine),
-                "An exception is expected when the ID does not exist."
-        );
-
-        assertEquals("Week Output Not Found for ID 1", exception.getMessage(),
-                "Error message should be 'Week Output Not Found for ID 1'.");
-        verify(sortieSemaineRepository, times(1)).existsById(id);
-        verify(sortieSemaineRepository, never()).save(semaine);
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
 
 
 
@@ -177,17 +146,49 @@ class SortieSemaineServiceTest {
     public void testNoInteractionsWithSortieSemaineRepository_Success() {
         verifyNoInteractions(sortieSemaineRepository);
     }
-    @Test
-    public void testNoInteractionsWithSortieSemaineRepository_Failure_Exception() {
-        int id =1;
-        SortieSemaine sortieSemaine =  new SortieSemaine();
-        sortieSemaine.setId(id);
-        try{
-            sortieSemaineService.updateSortieSemaine(id, sortieSemaine);
-        }catch(RuntimeException e){
 
-        }
-        verify(sortieSemaineRepository , times(1)).existsById(id);
+
+
+    @Test
+    public void testUpdateSortieSemaine_Success() {
+        int id = 1;
+        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
+        sortieSemaineDTO.setId(id);
+        sortieSemaineDTO.setDateSortieSemaine(new Date());
+        sortieSemaineDTO.setRegleId(1);
+
+        SortieSemaine existingSortieSemaine = new SortieSemaine();
+        existingSortieSemaine.setId(id);
+
+        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.of(existingSortieSemaine));
+        when(sortieSemaineRepository.save(any(SortieSemaine.class))).thenReturn(existingSortieSemaine);
+
+        SortieSemaineDTO result = sortieSemaineService.updateSortieSemaine(id, sortieSemaineDTO);
+
+        assertNotNull(result, "The result should not be null after a successful update.");
+        verify(sortieSemaineRepository, times(1)).findById(id);
+        verify(sortieSemaineRepository, times(1)).save(any(SortieSemaine.class));
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
+
+    @Test
+    public void testUpdateSortieSemaine_Failure() {
+        int id = 1;
+        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
+        sortieSemaineDTO.setId(id);
+        sortieSemaineDTO.setDateSortieSemaine(new Date());
+
+        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> sortieSemaineService.updateSortieSemaine(id, sortieSemaineDTO),
+                "An exception is expected when the ID does not exist."
+        );
+
+        assertEquals("Week Output Not Found for ID " + id, exception.getMessage(),
+                "The error message should match the expected value.");
+        verify(sortieSemaineRepository, times(1)).findById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
+    }
+
 }

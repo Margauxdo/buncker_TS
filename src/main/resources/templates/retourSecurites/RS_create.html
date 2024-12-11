@@ -59,12 +59,12 @@
 
 
     <label for="clientId">Client :</label>
-    <select id="clientId" th:field="*{clientIds}" multiple>
+    <select id="clientId" th:field="*{clientIds}" multiple required>
         <option th:each="client : ${clients}"
                 th:value="${client.id}"
-                th:text="${client.name}">
-        </option>
+                th:text="${client.name}"></option>
     </select>
+
 
 
     <div style="text-align: center;">

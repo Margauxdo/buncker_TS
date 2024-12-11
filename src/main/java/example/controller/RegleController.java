@@ -17,6 +17,9 @@ public class RegleController {
     @GetMapping("/list")
     public String listRegles(Model model) {
         model.addAttribute("regles", regleService.getAllRegles());
+
+//
+
         return "regles/regle_list";
     }
 

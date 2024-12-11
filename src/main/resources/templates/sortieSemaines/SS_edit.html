@@ -52,17 +52,25 @@
 </head>
 <body>
 <h1 style="text-align: center;">Modifier une Sortie Semaine</h1>
-
+<div th:if="${errorMessage}" style="color: red; text-align: center;">
+    <p th:text="${errorMessage}"></p>
+</div>
 <form th:action="@{/sortieSemaine/edit/{id}(id=${sortieSemaine.id})}" th:object="${sortieSemaine}" method="post">
-    <!-- Champ pour la date de la sortie -->
-    <label for="dateSortieSemaine">Date de la Sortie Semaine :</label>
-    <input type="date" id="dateSortieSemaine" th:field="*{dateSortieSemaine}" required />
 
-    <!-- Relation avec Règle -->
+    <!-- Champ pour la date de la sortie semaine -->
+    <label for="dateSortieSemaine">Date de la Sortie Semaine :</label>
+    <input type="date" id="dateSortieSemaine" th:field="*{dateSortieSemaine}" required/>
+
+    <!-- Liste déroulante pour choisir une règle -->
     <label for="regle">Règle :</label>
-    <select id="regle" th:field="*{regle}" th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.nom}">
-        <option value="" th:text="'Sélectionner une règle'"></option>
+    <select id="regle" th:field="*{regleId}" required>
+
+        <option value="" disabled selected>Sélectionner une règle</option>
+        <option th:each="regle : ${regles}"
+                th:value="${regle.id}"
+                th:text="${regle.coderegle}"></option>
     </select>
+
 
     <div style="text-align: center;">
         <button type="submit">Modifier</button>

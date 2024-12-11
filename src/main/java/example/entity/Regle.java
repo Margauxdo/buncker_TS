@@ -23,12 +23,28 @@ public class Regle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cle_regle")
     private int id;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Column(name = "regle_pour_sortie")
     private String reglePourSortie;
 
+    public String getCoderegle() {
+        return coderegle;
+    }
+
+    public void setCoderegle(String coderegle) {
+        this.coderegle = coderegle;
+    }
+
     @Column(name = "code_regle", unique = true, nullable = false)
     private String coderegle;
+
 
     @Column(name = "date_regle")
     @Temporal(TemporalType.DATE)

@@ -46,13 +46,13 @@
 
 <h1>Liste des Sorties Semaine</h1>
 
-<!-- Message d'erreur s'il y en a -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}"></p>
+<!-- Vérifiez s'il y a des sorties semaine -->
+<div th:if="${#lists.isEmpty(sortiesSemaine)}" style="color: red;">
+    <p>Aucune sortie semaine disponible.</p>
 </div>
 
 <!-- Table pour afficher les sorties semaine -->
-<table>
+<table th:if="${!#lists.isEmpty(sortiesSemaine)}">
     <thead>
     <tr>
         <th>ID</th>
@@ -62,37 +62,30 @@
     </tr>
     </thead>
     <tbody>
-    <!-- Boucle sur la liste des sorties semaine -->
     <tr th:each="sortieSemaine : ${sortiesSemaine}">
         <td th:text="${sortieSemaine.id}"></td>
-        <td th:text="${sortieSemaine.dateSortieSemaine}"></td>
-        <td th:text="${sortieSemaine.regle != null ? sortieSemaine.regle.nom : 'Aucune'}"></td>
+        <td th:text="${#dates.format(sortieSemaine.dateSortieSemaine, 'dd/MM/yyyy')}"></td>
+        <td th:text="${sortieSemaine.regleId != null ? 'Règle ' + sortieSemaine.regleId : 'Aucune'}"></td>
         <td>
-            <!-- Bouton pour Voir -->
             <form th:action="@{/sortieSemaine/view/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Voir la sortie semaine">Voir</button>
+                <button type="submit">Voir</button>
             </form>
-
-            <!-- Bouton pour Modifier -->
             <form th:action="@{/sortieSemaine/edit/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">
-                <button type="submit" aria-label="Modifier la sortie semaine">Modifier</button>
+                <button type="submit">Modifier</button>
             </form>
-
-            <!-- Bouton pour Supprimer -->
-            <form th:action="@{/sortieSemaine/delete/{id}(id=${sortieSemaine.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie semaine ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
-                <button type="submit" style="color: red;" aria-label="Supprimer la sortie semaine">Supprimer</button>
+            <form th:action="@{/sortieSemaine/delete/{id}(id=${sortieSemaine.id})}" method="post" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/>
+                <button type="submit" style="color: red;">Supprimer</button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
 
-<!-- Lien vers la page de création d'une nouvelle sortie semaine -->
+<!-- Bouton pour ajouter une nouvelle Sortie Semaine -->
 <div style="margin-top: 20px;">
-    <a href="/sortieSemaine/create">
-        <button type="button">Créer une nouvelle sortie semaine</button>
+    <a th:href="@{/sortieSemaine/create}">
+        <button type="button">Ajouter une Sortie Semaine</button>
     </a>
 </div>
 

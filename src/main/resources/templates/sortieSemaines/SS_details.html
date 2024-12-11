@@ -58,12 +58,13 @@
 <div class="container">
     <!-- Champs principaux de SortieSemaine -->
     <p><strong>ID :</strong> <span th:text="${sortieSemaine.id}"></span></p>
-    <p><strong>Date de la Sortie :</strong> <span th:text="${sortieSemaine.dateSortieSemaine}"></span></p>
+    <p>Date de la sortie : <span th:text="${sortieSemaine.dateSortieSemaine}"></span></p>
 
     <!-- Relation avec Regle -->
-    <p><strong>Règle associée :</strong>
-        <span th:text="${sortieSemaine.regle != null ? 'Règle présente' : 'Aucune'}"></span>
+    <p>Code de la règle :
+        <span th:text="${sortieSemaine.regleCode}"></span>
     </p>
+
 
     <a th:href="@{/sortieSemaine/list}">Retour à la liste</a>
 </div>

@@ -12,12 +12,17 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class RetourSecuriteService implements IRetourSecuriteService {
+
+    private static final Logger log = LoggerFactory.getLogger(RetourSecuriteService.class);
 
     @Autowired
     private RetourSecuriteRepository retourSecuriteRepository;
@@ -30,25 +35,27 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
     @Override
     public RetourSecuriteDTO createRetourSecurite(RetourSecuriteDTO retourSecuriteDTO) {
-        // Initialize the RetourSecurite entity
+        // Initialisation de l'entité RetourSecurite
         RetourSecurite retourSecurite = new RetourSecurite();
         retourSecurite.setNumero(retourSecuriteDTO.getNumero());
         retourSecurite.setDatesecurite(retourSecuriteDTO.getDatesecurite());
         retourSecurite.setCloture(retourSecuriteDTO.getCloture());
         retourSecurite.setDateCloture(retourSecuriteDTO.getDateCloture());
 
-        // Associate Mouvement if provided
+        // Association avec un Mouvement (si spécifié)
         if (retourSecuriteDTO.getMouvementId() != null) {
             Mouvement mouvement = mouvementRepository.findById(retourSecuriteDTO.getMouvementId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + retourSecuriteDTO.getMouvementId()));
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Mouvement introuvable avec l'ID : " + retourSecuriteDTO.getMouvementId()));
             retourSecurite.setMouvement(mouvement);
         }
 
-        // Associate Clients if provided
+        // Association avec des Clients (si spécifié)
         if (retourSecuriteDTO.getClientIds() != null && !retourSecuriteDTO.getClientIds().isEmpty()) {
+            // Récupérer les clients par leurs IDs
             List<Client> clients = clientRepository.findAllById(retourSecuriteDTO.getClientIds());
 
-            // Validate client IDs
+            // Valider que tous les IDs de clients sont valides
             if (clients.size() != retourSecuriteDTO.getClientIds().size()) {
                 List<Integer> invalidIds = retourSecuriteDTO.getClientIds().stream()
                         .filter(id -> clients.stream().noneMatch(client -> client.getId().equals(id)))
@@ -56,18 +63,18 @@ public class RetourSecuriteService implements IRetourSecuriteService {
                 throw new EntityNotFoundException("Les clients suivants n'ont pas été trouvés : " + invalidIds);
             }
 
-            // Establish the relationship
+            // Réattacher les clients et établir les relations
             for (Client client : clients) {
-                client.setRetourSecurite(retourSecurite); // Bidirectional relationship
+                client.setRetourSecurite(retourSecurite); // Relation bidirectionnelle
             }
 
             retourSecurite.setClients(clients);
         }
 
-        // Save RetourSecurite with associated Clients
+        // Sauvegarder l'entité RetourSecurite (et ses relations)
         RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
 
-        // Return the DTO
+        // Mapper l'entité sauvegardée vers un DTO et le retourner
         return mapEntityToDto(savedRetourSecurite);
     }
 
