@@ -152,7 +152,16 @@ public class ValiseService implements IValiseService {
     }
 
 
-
+    public ValiseDTO convertToDTO(Valise valise) {
+        if (valise == null) {
+            return null;
+        }
+        return ValiseDTO.builder()
+                .id(valise.getId())
+                .description(valise.getDescription())
+                .numeroValise(valise.getNumeroValise())
+                .build();
+    }
 
 
 

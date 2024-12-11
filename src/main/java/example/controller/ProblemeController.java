@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/pb")
 public class ProblemeController {
@@ -21,28 +23,49 @@ public class ProblemeController {
 
     @GetMapping("/list")
     public String viewAllProblemes(Model model) {
-        model.addAttribute("problemes", problemeService.getAllProblemes());
-        return "problemes/pb_list";
+        try {
+            List<ProblemeDTO> problemes = problemeService.getAllProblemes();
+            if (problemes.isEmpty()) {
+                System.out.println("Aucun problème trouvé.");
+            } else {
+                System.out.println("Problèmes trouvés : " + problemes.size());
+            }
+            model.addAttribute("problemes", problemes);
+            return "problemes/pb_list";
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la récupération des problèmes : " + e.getMessage());
+            model.addAttribute("errorMessage", "Erreur lors de la récupération des problèmes.");
+            return "problemes/error";
+        }
     }
+
 
     @GetMapping("/view/{id}")
     public String viewProbleme(@PathVariable int id, Model model) {
         try {
             ProblemeDTO probleme = problemeService.getProblemeById(id);
+            System.out.println("Probleme retrieved: " + probleme);
             model.addAttribute("probleme", probleme);
             return "problemes/pb_details";
         } catch (Exception e) {
+            System.err.println("Error retrieving probleme: " + e.getMessage());
             model.addAttribute("errorMessage", "Problème non trouvé avec l'ID: " + id);
             return "problemes/error";
         }
     }
 
+
+
     @GetMapping("/create")
     public String createProblemeForm(Model model) {
-        model.addAttribute("probleme", new ProblemeDTO());
+        ProblemeDTO problemeDTO = new ProblemeDTO();
+        problemeDTO.setValiseId(null); // Explicitly set default values
+        problemeDTO.setClientId(null);
+        model.addAttribute("probleme", problemeDTO);
         model.addAttribute("valises", valiseService.getAllValises());
         return "problemes/pb_create";
     }
+
 
     @PostMapping("/create")
     public String createProbleme(@Valid @ModelAttribute("probleme") ProblemeDTO problemeDTO, Model model) {

@@ -75,34 +75,34 @@
         <td th:text="${probleme.id}"></td>
         <td th:text="${probleme.descriptionProbleme}"></td>
         <td th:text="${probleme.detailsProbleme}"></td>
-        <td th:text="${probleme.client.name}"></td>
-        <td th:text="${probleme.valise.description}"></td>
-
+        <td th:text="${probleme.clientId != null ? 'Client ID: ' + probleme.clientId : 'Aucun client'}"></td>
+        <td th:text="${probleme.valiseId != null ? 'Valise ID: ' + probleme.valiseId : 'Aucune valise'}"></td>
         <td>
-            <!-- Action Voir -->
-            <form th:action="@{/problemes/view/{id}(id=${probleme.id})}" method="get" style="display:inline;">
+            <form th:action="@{/pb/view/{id}(id=${probleme.id})}" method="get" style="display:inline;">
                 <button type="submit">Voir</button>
             </form>
 
-            <!-- Action Modifier -->
-            <form th:action="@{/problemes/edit/{id}(id=${probleme.id})}" method="get" style="display:inline;">
+
+            <form th:action="@{/pb/edit/{id}(id=${probleme.id})}" method="get" style="display:inline;">
                 <button type="submit">Modifier</button>
             </form>
-
-            <!-- Action Supprimer -->
-            <form th:action="@{/problemes/delete/{id}(id=${probleme.id})}" method="post" style="display:inline;"
+            <form th:action="@{/pb/delete/{id}(id=${probleme.id})}" method="post" style="display:inline;"
                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce problème ?');">
                 <button type="submit" style="color: red;">Supprimer</button>
             </form>
         </td>
     </tr>
+
     </tbody>
 </table>
 
 <!-- Bouton Ajouter un Problème -->
 <div class="add-button">
-    <a th:href="@{/problemes/create}">
+    <a th:href="@{/pb/create}">
         <button type="button">Ajouter un Problème</button>
+    </a>
+    <a href="/">
+        <button type="button">Retour à l'Accueil</button>
     </a>
 </div>
 

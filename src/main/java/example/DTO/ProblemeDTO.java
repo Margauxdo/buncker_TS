@@ -15,4 +15,6 @@ public class ProblemeDTO {
     private String detailsProbleme;
     private Integer valiseId;
     private Integer clientId;
+    private ClientDTO client;
+    private ValiseDTO valise;
 }

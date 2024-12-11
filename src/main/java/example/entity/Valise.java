@@ -54,6 +54,7 @@ public class Valise {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
+    @JsonBackReference
     private Client client;
 
 

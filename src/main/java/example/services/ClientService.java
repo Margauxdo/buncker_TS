@@ -1,7 +1,6 @@
 package example.services;
 
 import example.DTO.ClientDTO;
-import example.DTO.ProblemeDTO;
 import example.entity.*;
 import example.interfaces.IClientService;
 import example.repositories.ClientRepository;
@@ -29,44 +28,31 @@ public class ClientService implements IClientService {
     }
 
     // Méthode pour convertir un Client en ClientDTO
-    private ClientDTO convertToDto(Client client) {
-        ClientDTO clientDTO = new ClientDTO();
-        clientDTO.setId(client.getId());
-        clientDTO.setName(client.getName());
-        clientDTO.setAdresse(client.getAdresse());
-        clientDTO.setEmail(client.getEmail());
-        clientDTO.setTelephoneExploitation(client.getTelephoneExploitation());
-        clientDTO.setVille(client.getVille());
-        clientDTO.setPersonnelEtFonction(client.getPersonnelEtFonction());
-        clientDTO.setRamassage1(client.getRamassage1());
-        clientDTO.setRamassage2(client.getRamassage2());
-        clientDTO.setRamassage3(client.getRamassage3());
-        clientDTO.setRamassage4(client.getRamassage4());
-        clientDTO.setRamassage5(client.getRamassage5());
-        clientDTO.setRamassage6(client.getRamassage6());
-        clientDTO.setRamassage7(client.getRamassage7());
-        clientDTO.setEnvoiparDefaut(client.getEnvoiparDefaut());
-        clientDTO.setMemoRetourSecurite1(client.getMemoRetourSecurite1());
-        clientDTO.setMemoRetourSecurite2(client.getMemoRetourSecurite2());
-        clientDTO.setTypeSuivie(client.getTypeSuivie());
-        clientDTO.setCodeClient(client.getCodeClient());
-
-        // Ligne ajoutée pour mapper RetourSecurite
-        clientDTO.setRetourSecuriteId(client.getRetourSecurite() != null ? client.getRetourSecurite().getId() : null);
-
-        clientDTO.setRegleId(client.getRegle() != null ? client.getRegle().getId() : null);
-
-        // Mapper les valises
-        if (client.getValises() != null) {
-            client.getValises().forEach(valise -> {
-                clientDTO.getValiseIds().add(valise.getId());
-                clientDTO.getValisesDescriptions().add(valise.getDescription());
-            });
-
+    public ClientDTO convertToDTO(Client client) {
+        if (client == null) {
+            return null;
         }
-
-
-        return clientDTO;
+        return ClientDTO.builder()
+                .id(client.getId())
+                .name(client.getName())
+                .adresse(client.getAdresse())
+                .email(client.getEmail())
+                .telephoneExploitation(client.getTelephoneExploitation())
+                .ville(client.getVille())
+                .personnelEtFonction(client.getPersonnelEtFonction())
+                .ramassage1(client.getRamassage1())
+                .ramassage2(client.getRamassage2())
+                .ramassage3(client.getRamassage3())
+                .ramassage4(client.getRamassage4())
+                .ramassage5(client.getRamassage5())
+                .ramassage6(client.getRamassage6())
+                .ramassage7(client.getRamassage7())
+                .envoiparDefaut(client.getEnvoiparDefaut())
+                .memoRetourSecurite1(client.getMemoRetourSecurite1())
+                .memoRetourSecurite2(client.getMemoRetourSecurite2())
+                .typeSuivie(client.getTypeSuivie())
+                .codeClient(client.getCodeClient())
+                .build();
     }
 
 
@@ -84,6 +70,7 @@ public class ClientService implements IClientService {
         client.setRamassage2(clientDTO.getRamassage2());
         client.setRamassage3(clientDTO.getRamassage3());
         client.setRamassage4(clientDTO.getRamassage4());
+        client.setRamassage5(clientDTO.getRamassage5());
         client.setRamassage6(clientDTO.getRamassage6());
         client.setRamassage7(clientDTO.getRamassage7());
         client.setEnvoiparDefaut(clientDTO.getEnvoiparDefaut());
@@ -92,9 +79,8 @@ public class ClientService implements IClientService {
         client.setTypeSuivie(clientDTO.getTypeSuivie());
         client.setCodeClient(clientDTO.getCodeClient());
 
-        // Ajouter les relations
+        // Ajouter RetourSecurite et Regle
         if (clientDTO.getRetourSecuriteId() != null) {
-            // Charger l'entité associée (utiliser un repository ou service)
             RetourSecurite retourSecurite = retourSecuriteRepository.findById(clientDTO.getRetourSecuriteId())
                     .orElseThrow(() -> new EntityNotFoundException("RetourSecurite non trouvé"));
             client.setRetourSecurite(retourSecurite);
@@ -109,16 +95,14 @@ public class ClientService implements IClientService {
         return client;
     }
 
-
     @Override
     public void createClient(ClientDTO clientDTO) {
         if (clientRepository.existsByEmail(clientDTO.getEmail())) {
-            throw new IllegalArgumentException("Email already exists: " + clientDTO.getEmail());
+            throw new IllegalArgumentException("L'email existe déjà : " + clientDTO.getEmail());
         }
         Client client = convertToEntity(clientDTO);
         clientRepository.save(client);
     }
-
 
     @Override
     @Transactional
@@ -126,7 +110,7 @@ public class ClientService implements IClientService {
         Client existingClient = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client non trouvé"));
         Client updatedClient = convertToEntity(clientDTO);
-        updatedClient.setId(existingClient.getId()); // Conservez l'ID
+        updatedClient.setId(existingClient.getId());
         clientRepository.save(updatedClient);
     }
 
@@ -143,20 +127,31 @@ public class ClientService implements IClientService {
     public ClientDTO getClientById(int id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client non trouvé"));
+
+        // Initialiser explicitement les collections
         Hibernate.initialize(client.getValises());
         Hibernate.initialize(client.getProblemes());
-        return convertToDto(client);
+
+        return convertToDTO(client); // Use the correct method name
     }
 
+
+
+    @Transactional
     @Override
     public List<ClientDTO> getAllClients() {
-        return clientRepository.findAll().stream()
-                .map(this::convertToDto) // Utilisation correcte de convertToDto
-                .collect(Collectors.toList());
+        List<Client> clients = clientRepository.findAll();
+        clients.forEach(client -> {
+            Hibernate.initialize(client.getValises());
+            Hibernate.initialize(client.getProblemes());
+        });
+        return clients.stream().map(this::convertToDTO).collect(Collectors.toList()); // Use the correct method name
     }
 
     @Override
     public boolean existsById(int id) {
         return clientRepository.existsById(id);
     }
+
+
 }

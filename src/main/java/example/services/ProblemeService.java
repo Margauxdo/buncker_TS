@@ -1,12 +1,15 @@
 package example.services;
 
+import example.DTO.ClientDTO;
 import example.DTO.ProblemeDTO;
 import example.DTO.ValiseDTO;
+import example.entity.Client;
 import example.entity.Probleme;
 import example.entity.Valise;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IProblemeService;
 import example.repositories.ProblemeRepository;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +20,14 @@ public class ProblemeService implements IProblemeService {
 
     private final ProblemeRepository problemeRepository;
     private final ValiseService valiseService;
+    private final ClientService clientService;
 
-    public ProblemeService(ProblemeRepository problemeRepository, ValiseService valiseService) {
+    public ProblemeService(ProblemeRepository problemeRepository, ValiseService valiseService, ClientService clientService) {
         this.problemeRepository = problemeRepository;
         this.valiseService = valiseService;
+        this.clientService = clientService;
     }
+
 
     @Override
     public Probleme createProbleme(Probleme probleme) {
@@ -97,20 +103,79 @@ public class ProblemeService implements IProblemeService {
     public ProblemeDTO getProblemeById(int id) {
         Probleme probleme = problemeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Problem not found with ID: " + id));
+
+        // Logs pour déboguer le problème
+        System.out.println("Probleme trouvé : " + probleme);
+        if (probleme.getValise() != null) {
+            System.out.println("Valise associée : " + probleme.getValise().getDescription());
+        } else {
+            System.out.println("Aucune valise associée.");
+        }
+        if (probleme.getClient() != null) {
+            System.out.println("Client associé : " + probleme.getClient().getName());
+        } else {
+            System.out.println("Aucun client associé.");
+        }
+
+        // Initialisation explicite pour éviter les erreurs lazy
+        if (probleme.getValise() != null) {
+            Hibernate.initialize(probleme.getValise());
+        }
+        if (probleme.getClient() != null) {
+            Hibernate.initialize(probleme.getClient());
+        }
+
         return convertToDTO(probleme);
     }
 
+
     @Override
     public List<ProblemeDTO> getAllProblemes() {
-        return problemeRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        try {
+            List<Probleme> problemes = problemeRepository.findAll();
+            if (problemes.isEmpty()) {
+                System.out.println("Aucun problème trouvé dans la base de données.");
+            }
+            return problemes.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la récupération des problèmes : " + e.getMessage());
+            throw e;
+        }
     }
+
 
     @Override
     public boolean existsByDescriptionAndDetails(String description, String details) {
         return false;
+    }
+
+    public ClientDTO convertToDTO(Client client) {
+        if (client == null) {
+            return null;
+        }
+        return ClientDTO.builder()
+                .id(client.getId())
+                .name(client.getName())
+                .adresse(client.getAdresse())
+                .email(client.getEmail())
+                .telephoneExploitation(client.getTelephoneExploitation())
+                .ville(client.getVille())
+                .personnelEtFonction(client.getPersonnelEtFonction())
+                .ramassage1(client.getRamassage1())
+                .ramassage2(client.getRamassage2())
+                .ramassage3(client.getRamassage3())
+                .ramassage4(client.getRamassage4())
+                .ramassage5(client.getRamassage5())
+                .ramassage6(client.getRamassage6())
+                .ramassage7(client.getRamassage7())
+                .envoiparDefaut(client.getEnvoiparDefaut())
+                .memoRetourSecurite1(client.getMemoRetourSecurite1())
+                .memoRetourSecurite2(client.getMemoRetourSecurite2())
+                .typeSuivie(client.getTypeSuivie())
+                .codeClient(client.getCodeClient())
+                .build();
     }
 
     private ProblemeDTO convertToDTO(Probleme probleme) {
@@ -119,6 +184,15 @@ public class ProblemeService implements IProblemeService {
                 .descriptionProbleme(probleme.getDescriptionProbleme())
                 .detailsProbleme(probleme.getDetailsProbleme())
                 .valiseId(probleme.getValise() != null ? probleme.getValise().getId() : null)
+                .valise(probleme.getValise() != null ? valiseService.convertToDTO(probleme.getValise()) : null)
+                .clientId(probleme.getClient() != null ? probleme.getClient().getId() : null)
+                .client(probleme.getClient() != null ? clientService.convertToDTO(probleme.getClient()) : null)
                 .build();
     }
+
+
+
+
+
 }
+

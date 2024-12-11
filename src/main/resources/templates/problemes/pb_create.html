@@ -27,8 +27,6 @@
             border-radius: 4px;
         }
 
-
-
         .action-buttons {
             text-align: center;
         }
@@ -48,22 +46,28 @@
     <textarea id="detailsProbleme" th:field="*{detailsProbleme}"></textarea>
 
     <label for="client">Client :</label>
-    <select id="client" th:field="*{client.id}" required>
-        <option value="" disabled selected>-- Sélectionnez un Client --</option>
-        <option th:each="cli : ${clients}" th:value="${cli.id}" th:text="${cli.name}"></option>
+    <select id="client" th:field="*{clientId}" required>
+        <option value="" th:text="'Select a client'"></option>
+        <option th:each="client : ${clients}"
+                th:value="${client.id}"
+                th:text="${client.name} + ' (' + client.email + ')'"></option>
     </select>
 
-    <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valise.id}" required>
-        <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.description}"></option>
+    <label>Valise :</label>
+    <select th:field="*{valiseId}" required>
+        <option value="" th:text="'Select a valise'"></option>
+        <option th:each="valise : ${valises}"
+                th:value="${valise.id}"
+                th:text="${valise.description}"></option>
     </select>
-
 
     <div class="action-buttons">
         <button type="submit">Créer</button>
         <a th:href="@{/problemes/list}">
             <button type="button">Retour à la Liste</button>
+        </a>
+        <a href="/">
+            <button type="button">Retour à l'Accueil</button>
         </a>
     </div>
 </form>

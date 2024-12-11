@@ -63,7 +63,7 @@ public class Client {
     private Set<Valise> valises = new HashSet<>();
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Probleme> problemes = new HashSet<>();
+    private Set<Probleme> problemes;
 
 
 
@@ -78,9 +78,11 @@ public class Client {
 
 
     public void addValise(Valise valise) {
-        
+
     }
 
     public void addProbleme(Probleme probleme) {
     }
+
+
 }

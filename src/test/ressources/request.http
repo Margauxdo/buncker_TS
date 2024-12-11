@@ -176,7 +176,7 @@ GET http://localhost:8080/pb/list
 Accept: text/html
 
 ### Voir un probleme par ID (GET - Thymeleaf)
-GET http://localhost:8080/pb/view/1
+GET http://localhost:8080/pb/view/22
 Accept: text/html
 
 
@@ -191,7 +191,7 @@ Content-Type: application/x-www-form-urlencoded
 
 
 ### Afficher le formulaire modification un probleme (GET - Thymeleaf)
-GET http://localhost:8080/pb/edit/1
+GET http://localhost:8080/pb/edit/22
 Accept: text/html
 
 
