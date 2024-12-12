@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProblemeDTO {
-    private int id;
+    private Integer id;
     private String descriptionProbleme;
     private String detailsProbleme;
     private Integer valiseId;

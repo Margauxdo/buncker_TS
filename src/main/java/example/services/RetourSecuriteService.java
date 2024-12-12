@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,10 +148,25 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
 
     @Override
+    @Transactional
     public List<RetourSecuriteDTO> getAllRetourSecurites() {
-        return retourSecuriteRepository.findAll().stream()
-                .map(this::mapEntityToDto)
-                .collect(Collectors.toList());
+        List<RetourSecuriteDTO> retourSecuriteDTOS = new ArrayList<>();
+        List<RetourSecurite> retourList = retourSecuriteRepository.findAll();
+
+        if (retourList == null) {
+            retourList = new ArrayList<>(); // Initialisation à une liste vide
+        }
+
+        if (retourList.isEmpty()) {
+            System.out.println("La liste des retours est vide.");
+        }
+
+        for (RetourSecurite retourSecurite : retourList) {
+            RetourSecuriteDTO retourSecuriteDTO = mapEntityToDto(retourSecurite);
+            retourSecuriteDTOS.add(retourSecuriteDTO);
+        }
+
+        return retourSecuriteDTOS;
     }
 
 

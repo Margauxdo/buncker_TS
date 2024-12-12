@@ -38,7 +38,7 @@
 </head>
 <body>
 <h1 style="text-align: center;">Créer un Nouveau Problème</h1>
-<form th:action="@{/problemes/create}" th:object="${probleme}" method="post">
+<form th:action="@{/pb/create}" th:object="${probleme}" method="post">
     <label for="descriptionProbleme">Description du Problème :</label>
     <textarea id="descriptionProbleme" th:field="*{descriptionProbleme}" required></textarea>
 
@@ -63,7 +63,7 @@
 
     <div class="action-buttons">
         <button type="submit">Créer</button>
-        <a th:href="@{/problemes/list}">
+        <a th:href="@{/pb/list}">
             <button type="button">Retour à la Liste</button>
         </a>
         <a href="/">

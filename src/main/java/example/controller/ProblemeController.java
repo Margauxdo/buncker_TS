@@ -1,7 +1,10 @@
 package example.controller;
 
+import example.DTO.ClientDTO;
 import example.DTO.ProblemeDTO;
+import example.DTO.RegleDTO;
 import example.interfaces.IProblemeService;
+import example.services.ClientService;
 import example.services.ValiseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+
+import static example.services.FormuleService.logger;
 
 @Controller
 @RequestMapping("/pb")
@@ -20,6 +27,8 @@ public class ProblemeController {
 
     @Autowired
     private ValiseService valiseService;
+    @Autowired
+    private ClientService clientService;
 
     @GetMapping("/list")
     public String viewAllProblemes(Model model) {
@@ -61,8 +70,14 @@ public class ProblemeController {
         ProblemeDTO problemeDTO = new ProblemeDTO();
         problemeDTO.setValiseId(null); // Explicitly set default values
         problemeDTO.setClientId(null);
+
+        List<ClientDTO> clientsDTO = clientService.getAllClients();
+
         model.addAttribute("probleme", problemeDTO);
+        model.addAttribute("clients", clientsDTO);
+
         model.addAttribute("valises", valiseService.getAllValises());
+
         return "problemes/pb_create";
     }
 
@@ -87,6 +102,7 @@ public class ProblemeController {
         }
         model.addAttribute("probleme", probleme);
         model.addAttribute("valises", valiseService.getAllValises());
+        model.addAttribute("clients", clientService.getAllClients());
         return "problemes/pb_edit";
     }
 

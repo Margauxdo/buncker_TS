@@ -25,7 +25,7 @@ public class Valise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "valise_id")
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     @NotNull

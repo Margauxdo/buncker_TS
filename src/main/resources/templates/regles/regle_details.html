@@ -68,8 +68,10 @@
     <p><strong>Valise :</strong> <span th:if="${regle.valise != null}" th:text="${regle.valise.name}"></span>
         <span th:if="${regle.valise == null}">Non associée</span></p>
 
-    <p><strong>Type de Règle :</strong> <span th:if="${regle.typeRegle != null}" th:text="${regle.typeRegle.name}"></span>
-        <span th:if="${regle.typeRegle == null}">Non associée</span></p>
+    <p><strong>Type de Règle :</strong>
+        <span th:if="${regle.typeRegle != null}" th:text="${regle.typeRegle}"></span>
+        <span th:if="${regle.typeRegle == null}">Non associée</span>
+    </p>
 
     <p><strong>Formule :</strong> <span th:if="${regle.formule != null}" th:text="${regle.formule.name}"></span>
         <span th:if="${regle.formule == null}">Non associée</span></p>

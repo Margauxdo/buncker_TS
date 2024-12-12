@@ -76,8 +76,7 @@
         <td th:text="${mouvement.statutSortie}"></td>
         <td th:text="${#dates.format(mouvement.dateSortiePrevue, 'dd/MM/yyyy')}"></td>
         <td th:text="${#dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy')}"></td>
-        <td th:text="${mouvement.valise.description}"></td>
-        <td th:text="${mouvement.valise.numeroValise}"></td>
+        <td th:text="${mouvement.valise?.numeroValise != null ? mouvement.valise.numeroValise : '-'}"></td>
         <td>
             <form th:action="@{/mouvements/view/{id}(id=${mouvement.id})}" method="get" style="display:inline;">
                 <button type="submit">Voir</button>
@@ -92,6 +91,7 @@
         </td>
     </tr>
     </tbody>
+
 </table>
 
 <div class="add-button">

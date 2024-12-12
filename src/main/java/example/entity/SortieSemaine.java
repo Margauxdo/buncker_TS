@@ -21,7 +21,7 @@ public class SortieSemaine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sortieSemaine_id")
-    private int id;
+    private Integer id;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "sortieSemaine_date")

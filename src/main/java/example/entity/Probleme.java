@@ -19,7 +19,7 @@ public class Probleme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "probleme_id")
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "description is required")
    @Column(name = "probleme_description",  nullable = false)

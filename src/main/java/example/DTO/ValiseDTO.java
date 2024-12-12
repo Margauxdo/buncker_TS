@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ValiseDTO {
-    private int id;
+    private Integer id;
     private String description;
     private Long numeroValise;
     private String refClient;

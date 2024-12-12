@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Détails du Problème</title>
+    <title>Détails du Mouvement</title>
     <style>
         .container {
             max-width: 600px;
@@ -27,6 +27,15 @@
             color: #212529;
         }
 
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            color: #495057;
+        }
+
         a {
             display: inline-block;
             text-decoration: none;
@@ -44,26 +53,29 @@
     </style>
 </head>
 <body>
-<h1>Détails du Problème</h1>
+<h1>Détails du Mouvement</h1>
 
 <div class="container">
-    <p><strong>Description :</strong> <span th:text="${probleme.descriptionProbleme}"></span></p>
-    <p><strong>Détails :</strong> <span th:text="${probleme.detailsProbleme}"></span></p>
-    <p><strong>Client :</strong>
-        <span th:if="${probleme.client != null}" th:text="${probleme.client.name}"></span>
-        <span th:if="${probleme.client == null}">Non associé</span>
-    </p>
-    <p><strong>Valise :</strong>
-        <span th:if="${probleme.valise != null}" th:text="${probleme.valise.description}"></span>
-        <span th:if="${probleme.valise == null}">Non associée</span>
-    </p>
+    <p><strong>ID :</strong> <span th:text="${mouvement.id}"></span></p>
+    <p><strong>Date et Heure :</strong> <span th:text="${#dates.format(mouvement.dateHeureMouvement, 'dd/MM/yyyy HH:mm')}"></span></p>
+    <p><strong>Statut de Sortie :</strong> <span th:text="${mouvement.statutSortie}"></span></p>
+    <p><strong>Date de Sortie Prévue :</strong> <span th:text="${#dates.format(mouvement.dateSortiePrevue, 'dd/MM/yyyy')}"></span></p>
+    <p><strong>Date de Retour Prévue :</strong> <span th:text="${#dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy')}"></span></p>
 
+    <p><strong>Livreurs Associés :</strong></p>
+    <ul>
+        <li th:each="livreur : ${mouvement.livreurs}">
+            <span th:text="${livreur.nom}"></span>
+            <span th:text="${livreur.prenom}"></span>
+        </li>
+    </ul>
 
-    <a th:href="@{/pb/list}">Retour à la liste</a>
+    <p><strong>Retours Sécurité Associés :</strong></p>
+    <ul>
+        <li th:each="retour : ${mouvement.retourSecurites}" th:text="${retour.name}"></li>
+    </ul>
 
-    <a href="/">
-        <button type="button">Retour à l'Accueil</button>
-    </a>
+    <a th:href="@{/mouvements/list}">Retour à la liste</a>
 </div>
 
 </body>

@@ -23,8 +23,7 @@ public class TypeValise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "type_valise_id")
-    private int id;
-    ;
+    private Integer id;
 
     @Column(nullable = false)
     @NotNull

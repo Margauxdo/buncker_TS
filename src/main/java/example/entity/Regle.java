@@ -22,25 +22,10 @@ public class Regle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cle_regle")
-    private int id;
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private Integer id;
 
     @Column(name = "regle_pour_sortie")
     private String reglePourSortie;
-
-    public String getCoderegle() {
-        return coderegle;
-    }
-
-    public void setCoderegle(String coderegle) {
-        this.coderegle = coderegle;
-    }
 
     @Column(name = "code_regle", unique = true, nullable = false)
     private String coderegle;
@@ -80,7 +65,7 @@ public class Regle {
 
 
     // Relation OneToMany avec SortieSemaine
-    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<SortieSemaine> sortieSemaine = new ArrayList<>();
 
     // Relation ManyToOne avec TypeRegle
@@ -90,7 +75,7 @@ public class Regle {
 
     // Relation ManyToOne avec Formule
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cle_formule", nullable = true)
+    @JoinColumn(name = "cle_formule")
     private Formule formule;
 
     // Relation ManyToOne avec JourFerie

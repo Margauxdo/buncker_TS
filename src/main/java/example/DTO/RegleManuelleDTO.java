@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class RegleManuelleDTO {
-    private int id; // Identifiant de la règle
+    private Integer id; // Identifiant de la règle
     private String reglePourSortie; // Règle pour sortie
     private String coderegle; // Code de la règle
     private Date dateRegle; // Date de la règle

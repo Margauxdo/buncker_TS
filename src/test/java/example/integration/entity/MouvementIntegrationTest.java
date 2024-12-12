@@ -176,6 +176,7 @@ public class MouvementIntegrationTest {
 
     @Test
     public void testMouvementWithLivreurAndRetourSecurite() {
+
         Client client = new Client();
         client.setName("Test Client");
         client.setEmail("client@test.com");
@@ -198,7 +199,6 @@ public class MouvementIntegrationTest {
 
         Livreur livreur = new Livreur();
         livreur.setNomLivreur("NomLivreur");
-        livreur.setMouvement(mouvement);
         livreurRepository.saveAndFlush(livreur);
 
         mouvement.addLivreur(livreur);
@@ -210,8 +210,8 @@ public class MouvementIntegrationTest {
         mouvement.getRetourSecurites().add(retourSecurite);
         mouvement = mouvementRepository.findById(mouvement.getId()).orElseThrow();
 
-        assertEquals(1, mouvement.getLivreurs().size());
         assertEquals(1, mouvement.getRetourSecurites().size());
+
     }
 
 

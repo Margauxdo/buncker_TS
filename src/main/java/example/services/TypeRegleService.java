@@ -25,8 +25,8 @@ public class TypeRegleService implements ITypeRegleService {
 
     @Override
     public TypeRegleDTO createTypeRegle(TypeRegleDTO typeRegleDTO) {
-        Regle regle = regleRepository.findById(typeRegleDTO.getRegleId())
-                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegleId() + " est introuvable"));
+        Regle regle = regleRepository.findById(typeRegleDTO.getRegle().getId())
+                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegle().getId() + " est introuvable"));
 
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle(typeRegleDTO.getNomTypeRegle())
@@ -44,8 +44,8 @@ public class TypeRegleService implements ITypeRegleService {
         TypeRegle existingTypeRegle = typeRegleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("TypeRegle avec l'ID " + id + " est introuvable"));
 
-        Regle regle = regleRepository.findById(typeRegleDTO.getRegleId())
-                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegleId() + " est introuvable"));
+        Regle regle = regleRepository.findById(typeRegleDTO.getRegle().getId())
+                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegle().getId() + " est introuvable"));
 
         existingTypeRegle.setNomTypeRegle(typeRegleDTO.getNomTypeRegle());
         existingTypeRegle.setRegle(regle);
@@ -80,7 +80,7 @@ public class TypeRegleService implements ITypeRegleService {
         return TypeRegleDTO.builder()
                 .id(typeRegle.getId())
                 .nomTypeRegle(typeRegle.getNomTypeRegle())
-                .regleId(typeRegle.getRegle().getId())
+                .regle(typeRegle.getRegle())
                 .build();
     }
 }

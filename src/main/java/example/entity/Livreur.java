@@ -16,7 +16,7 @@ public class Livreur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "livreur_id")
-    private int id;
+    private Integer id;
 
     private String codeLivreur;
     private String motDePasse;
@@ -32,10 +32,8 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "mouvement_id", nullable = true)
-    private Mouvement mouvement;
-
-
+    private List<Mouvement> mouvements;
 }
 

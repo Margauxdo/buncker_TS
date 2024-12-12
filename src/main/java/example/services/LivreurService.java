@@ -39,7 +39,12 @@ public class LivreurService implements ILivreurService {
                 .telephonePortable(livreur.getTelephonePortable())
                 .telephoneKobby(livreur.getTelephoneKobby())
                 .telephoneAlphapage(livreur.getTelephoneAlphapage())
-                .mouvementStatutSortie(livreur.getMouvement() != null ? livreur.getMouvement().getStatutSortie() : "Aucun mouvement")
+                .mouvementStatutSortie(livreur.getMouvements() != null && !livreur.getMouvements().isEmpty()
+                        ? livreur.getMouvements().stream()
+                        .map(Mouvement::getStatutSortie) // Récupérer le statut de chaque mouvement
+                        .collect(Collectors.joining(", ")) // Joindre les statuts avec une virgule
+                        : "Aucun mouvement")
+
                 .build();
     }
 
@@ -59,7 +64,7 @@ public class LivreurService implements ILivreurService {
         if (livreurDTO.getMouvementId() != null) {
             Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
                     .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
-            livreur.setMouvement(mouvement);
+            livreur.setMouvements((List<Mouvement>) mouvement);
         }
 
         return livreur;

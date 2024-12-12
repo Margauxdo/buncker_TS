@@ -34,31 +34,18 @@ public class Mouvement {
     @Temporal(TemporalType.DATE)
     private Date dateRetourPrevue;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "valise_id", nullable = false)
     private Valise valise;
 
-
-    @OneToMany(mappedBy = "mouvement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JsonBackReference
-    private List<Livreur> livreurs = new ArrayList<>();
+    private Livreur livreur;
 
     @OneToMany
     @JoinColumn(name = "retourSecurite_id")
     private List<RetourSecurite> retourSecurites = new ArrayList<>();
 
-
-
-    public void addLivreur(Livreur livreur) {
-        this.livreurs.add(livreur);
-        livreur.setMouvement(this);
-    }
-
-
-    public void removeLivreur(Livreur livreur) {
-        livreurs.remove(livreur);
-        livreur.setMouvement(null);
-    }
     public Valise getValise() {
         return valise;
     }

@@ -1,10 +1,7 @@
 package example.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +17,7 @@ public class RetourSecurite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     private Long numero;
@@ -31,12 +28,11 @@ public class RetourSecurite {
 
     private Date dateCloture;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Client> clients = new ArrayList<>();
 
-
-
-
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mouvement_id", nullable = true)
     private Mouvement mouvement;

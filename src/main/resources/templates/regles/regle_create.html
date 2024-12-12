@@ -11,45 +11,46 @@
     <label for="coderegle">Code de la Règle :</label>
     <input type="text" id="coderegle" th:field="*{coderegle}" required />
 
-    <!-- Règle pour Sortie -->
     <label for="reglePourSortie">Règle pour Sortie :</label>
     <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
-    <!-- Valise -->
     <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valise.id}" required>
+    <select id="valise" th:field="*{valiseId}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
+        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
     </select>
+
+
     <p th:if="${#lists.isEmpty(valises)}" style="color: red;">Aucune valise disponible</p>
 
-
-    <!-- Type de Règle -->
     <label for="typeRegle">Type de Règle :</label>
     <select id="typeRegle" th:field="*{typeRegle.id}" required>
         <option value="" disabled selected>-- Sélectionnez un Type de Règle --</option>
-        <option th:each="type : ${typesRegle}" th:value="${type.id}" th:text="${type.name}"></option>
+        <option th:each="type : ${typesRegle}" th:value="${type.id}" th:text="${type.nomTypeRegle}"></option>
     </select>
 
-    <!-- Formule -->
     <label for="formule">Formule :</label>
     <select id="formule" th:field="*{formule.id}">
         <option value="" disabled selected>-- Sélectionnez une Formule --</option>
-        <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.name}"></option>
+        <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.libelle}"></option>
     </select>
 
-    <!-- Jour Férié -->
     <label for="jourFerie">Jour Férié :</label>
     <select id="jourFerie" th:field="*{jourFerie.id}">
         <option value="" disabled selected>-- Sélectionnez un Jour Férié --</option>
-        <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.name}"></option>
+        <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.date}"></option>
     </select>
 
+    -->
+    <div style="text-align: center;">
     <button type="submit">Créer</button>
-</form>
+<a th:href="@{/regles/list}">
 <button type="button">Retour à la Liste</button>
+</a>
 <a href="/">
     <button type="button">Retour à l'Accueil</button>
 </a>
+    </div>
+</form>
 </body>
 </html>

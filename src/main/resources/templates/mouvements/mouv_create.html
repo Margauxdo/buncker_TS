@@ -53,14 +53,17 @@
     <input type="date" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" />
 
     <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valise.id}" required>
-        <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.description}"></option>
+    <select id="valise" name="valiseId" th:field="*{valiseId}" required>
+        <option value="" th:text="#{select.default}">Sélectionnez une valise</option>
+        <option th:each="valise : ${valises}"
+                th:value="${valise.id}"
+                th:text="${valise.description}"></option>
     </select>
 
 
-    <label for="livreurs">Livreurs :</label>
-    <select id="livreurs" multiple th:field="*{livreurs}">
+
+    <label for="allLivreurs">Livreurs :</label>
+    <select id="allLivreurs" multiple th:field="*{allLivreurs}">
         <option th:each="livreur : ${allLivreurs}" th:value="${livreur.id}" th:text="${livreur.nomLivreur + ' ' + livreur.prenomLivreur}"></option>
     </select>
 

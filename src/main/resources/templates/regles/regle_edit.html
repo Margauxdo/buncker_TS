@@ -41,53 +41,43 @@
 <body>
 <h1 style="text-align: center;">Modifier une Règle</h1>
 
-<form th:action="@{/regles/edit/{id}(id=${regle.id})}" th:object="${regle}" method="post">
+<form th:action="@{/regles/edit}" th:object="${regle}" method="post">
+    <!-- Code de la Règle -->
+    <label for="coderegle">Code de la Règle :</label>
+    <input type="text" id="coderegle" th:field="*{coderegle}" required />
+
     <label for="reglePourSortie">Règle pour Sortie :</label>
     <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
-    <label for="coderegle">Code Règle :</label>
-    <input type="text" id="coderegle" th:field="*{coderegle}" required />
-
-    <label for="dateRegle">Date de Règle :</label>
-    <input type="date" id="dateRegle" th:field="*{dateRegle}" />
-
-    <label for="nombreJours">Nombre de Jours :</label>
-    <input type="number" id="nombreJours" th:field="*{nombreJours}" />
-
-    <label for="calculCalendaire">Calcul Calendaire :</label>
-    <input type="number" id="calculCalendaire" th:field="*{calculCalendaire}" />
-
-    <label for="typeEntree">Type d'Entrée :</label>
-    <input type="text" id="typeEntree" th:field="*{typeEntree}" />
-
-    <label for="nbjsmEntree">Nombre de JSM Entrée :</label>
-    <input type="number" id="nbjsmEntree" th:field="*{nbjsmEntree}" />
-
     <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valise.id}" required>
+    <select id="valise" th:field="*{valiseId}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
+        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
     </select>
+
+
+    <p th:if="${#lists.isEmpty(valises)}" style="color: red;">Aucune valise disponible</p>
 
     <label for="typeRegle">Type de Règle :</label>
     <select id="typeRegle" th:field="*{typeRegle.id}" required>
         <option value="" disabled selected>-- Sélectionnez un Type de Règle --</option>
-        <option th:each="tr : ${typeRegles}" th:value="${tr.id}" th:text="${tr.name}"></option>
+        <option th:each="type : ${typesRegle}" th:value="${type.id}" th:text="${type.nomTypeRegle}"></option>
     </select>
 
     <label for="formule">Formule :</label>
     <select id="formule" th:field="*{formule.id}">
         <option value="" disabled selected>-- Sélectionnez une Formule --</option>
-        <option th:each="fo : ${formules}" th:value="${fo.id}" th:text="${fo.name}"></option>
+        <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.libelle}"></option>
     </select>
 
     <label for="jourFerie">Jour Férié :</label>
     <select id="jourFerie" th:field="*{jourFerie.id}">
         <option value="" disabled selected>-- Sélectionnez un Jour Férié --</option>
-        <option th:each="jf : ${jourFeries}" th:value="${jf.id}" th:text="${jf.name}"></option>
+        <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.date}"></option>
     </select>
 
-    <div class="actions">
+    -->
+    <div style="text-align: center;">
         <button type="submit">Modifier</button>
         <a th:href="@{/regles/list}">
             <button type="button">Retour à la Liste</button>

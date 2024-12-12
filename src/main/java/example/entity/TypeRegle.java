@@ -19,7 +19,7 @@ public class TypeRegle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "typeRegle_id")
-    private int id;
+    private Integer id;
 
     @Column(name = "typeRegle_name", unique = true, nullable = false)
     private String nomTypeRegle;
@@ -28,7 +28,7 @@ public class TypeRegle {
     @JoinColumn(name = "regle_id", nullable = true)
     private Regle regle;
 
-    public TypeRegle(int id, String type1, Object o) {
+    public TypeRegle(Integer id, String type1, Object o) {
         this.id = id;
         this.nomTypeRegle = nomTypeRegle;
         this.regle = regle;

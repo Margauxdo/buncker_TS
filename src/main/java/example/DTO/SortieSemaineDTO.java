@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class SortieSemaineDTO {
-    private int id;
+    private Integer id;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateSortieSemaine;
 

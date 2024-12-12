@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TypeValiseDTO {
-    private int id;
+    private Integer id;
     private String proprietaire;
     private String description;
     private Integer valiseId;

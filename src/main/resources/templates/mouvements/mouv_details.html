@@ -63,10 +63,10 @@
     <p><strong>Date de Retour Prévue :</strong> <span th:text="${#dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy')}"></span></p>
 
     <p><strong>Livreurs Associés :</strong></p>
-    <ul>
+    <ul> <!-- checker si en virant ça charge la page -->
         <li th:each="livreur : ${mouvement.livreurs}">
-            <span th:text="${livreur.nom}"></span>
-            <span th:text="${livreur.prenom}"></span>
+            <span th:text="${livreur.nomLivreur}"></span>
+            <span th:text="${livreur.prenomLivreur}"></span>
         </li>
     </ul>
 
@@ -77,10 +77,6 @@
     </ul>
 
     <a th:href="@{/mouvements/list}">Retour à la liste</a>
-
-    <a href="/">
-        <button type="button">Retour à l'Accueil</button>
-    </a>
 </div>
 
 </body>

@@ -18,7 +18,7 @@ public class Formule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "formule_id")
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     @NotNull(message = "Libelle cannot be null")

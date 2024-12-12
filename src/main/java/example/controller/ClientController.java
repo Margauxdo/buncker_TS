@@ -100,8 +100,6 @@ public class ClientController {
         return "clients/client_create";
     }
 
-
-
     /**
      * Création d'un client via formulaire Thymeleaf.
      */

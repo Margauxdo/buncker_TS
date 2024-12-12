@@ -9,6 +9,7 @@ import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,10 +32,11 @@ public class MouvementService implements IMouvementService {
     }
 
     @Override
+    @Transactional
     public MouvementDTO getMouvementById(int id) {
-        Mouvement mouvement = mouvementRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + id));
-        return convertToDTO(mouvement);
+        return mouvementRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
     }
 
     @Override
@@ -44,22 +46,35 @@ public class MouvementService implements IMouvementService {
 
     @Override
     public void persistMouvement(Mouvement mouvement) {
-
+        // Optionnel, selon les besoins spécifiques
     }
 
     @Override
     public Optional<Mouvement> findByIdWithValise(Long id) {
-        return Optional.empty();
+        return mouvementRepository.findById(id.intValue()); // Conversion de Long à int
     }
 
     @Override
     public List<Mouvement> getAllMouvementsWithValise() {
-        return List.of();
+        // Exemple fictif, ajoutez la logique selon votre besoin
+        return mouvementRepository.findAll();
     }
 
     @Override
     public MouvementDTO createMouvement(MouvementDTO mouvementDTO) {
         Mouvement mouvement = convertToEntity(mouvementDTO);
+
+        // Vérification des relations
+        if (mouvementDTO.getValiseId() != null) {
+            ValiseDTO valiseDTO = valiseService.getValiseById(mouvementDTO.getValiseId());
+            if (valiseDTO == null) {
+                throw new EntityNotFoundException("Valise introuvable avec l'ID : " + mouvementDTO.getValiseId());
+            }
+            mouvement.setValise(convertToEntity(valiseDTO));
+        } else {
+            mouvement.setValise(null);
+        }
+
         return convertToDTO(mouvementRepository.save(mouvement));
     }
 
@@ -67,7 +82,7 @@ public class MouvementService implements IMouvementService {
     public MouvementDTO updateMouvement(int id, MouvementDTO mouvementDTO) {
         // Récupérer le Mouvement existant
         Mouvement existingMouvement = mouvementRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
 
         // Mettre à jour les champs de Mouvement
         existingMouvement.setDateHeureMouvement(mouvementDTO.getDateHeureMouvement());
@@ -78,46 +93,44 @@ public class MouvementService implements IMouvementService {
         // Vérifier si un ValiseId est fourni et mettre à jour la Valise
         if (mouvementDTO.getValiseId() != null) {
             ValiseDTO valiseDTO = valiseService.getValiseById(mouvementDTO.getValiseId());
-            Valise valise = convertToEntity(valiseDTO); // Convertir ValiseDTO en Valise
-            existingMouvement.setValise(valise);
+            if (valiseDTO == null) {
+                throw new EntityNotFoundException("Valise introuvable avec l'ID : " + mouvementDTO.getValiseId());
+            }
+            existingMouvement.setValise(convertToEntity(valiseDTO));
+        } else {
+            existingMouvement.setValise(null);
         }
 
-        // Sauvegarder les modifications et retourner le DTO
         return convertToDTO(mouvementRepository.save(existingMouvement));
     }
 
-    // Méthode utilitaire pour convertir un ValiseDTO en une entité Valise
-    private Valise convertToEntity(ValiseDTO valiseDTO) {
-        return Valise.builder()
-                .id(valiseDTO.getId())
-                .description(valiseDTO.getDescription())
-                .numeroValise(valiseDTO.getNumeroValise())
-                .build();
-    }
-
-
     @Override
     public Optional<Mouvement> findById(Long id) {
-        return Optional.empty();
+        return mouvementRepository.findById(id.intValue()); // Conversion Long en int
     }
 
     @Override
     public Mouvement createMouvement(Mouvement mouvement) {
-        return null;
+        return mouvementRepository.save(mouvement);
     }
 
     @Override
     public Mouvement updateMouvement(int id, Mouvement mouvement) {
-        return null;
+        if (!mouvementRepository.existsById(id)) {
+            throw new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id);
+        }
+        return mouvementRepository.save(mouvement);
     }
 
     @Override
     public void deleteMouvement(int id) {
         if (!mouvementRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mouvement not found with ID: " + id);
+            throw new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id);
         }
         mouvementRepository.deleteById(id);
     }
+
+    // Méthodes utilitaires
 
     private Mouvement convertToEntity(MouvementDTO dto) {
         Mouvement mouvement = new Mouvement();
@@ -129,14 +142,23 @@ public class MouvementService implements IMouvementService {
 
         if (dto.getValiseId() != null) {
             ValiseDTO valiseDTO = valiseService.getValiseById(dto.getValiseId());
-            Valise valise = convertToEntity(valiseDTO); // Convertir ValiseDTO en Valise
-            mouvement.setValise(valise);
+            if (valiseDTO != null) {
+                mouvement.setValise(convertToEntity(valiseDTO));
+            }
         }
         return mouvement;
     }
 
-
-
+    private Valise convertToEntity(ValiseDTO valiseDTO) {
+        if (valiseDTO == null) {
+            throw new IllegalArgumentException("ValiseDTO ne peut pas être null");
+        }
+        return Valise.builder()
+                .id(valiseDTO.getId())
+                .description(valiseDTO.getDescription())
+                .numeroValise(valiseDTO.getNumeroValise())
+                .build();
+    }
 
     private MouvementDTO convertToDTO(Mouvement mouvement) {
         return MouvementDTO.builder()
@@ -146,6 +168,11 @@ public class MouvementService implements IMouvementService {
                 .dateSortiePrevue(mouvement.getDateSortiePrevue())
                 .dateRetourPrevue(mouvement.getDateRetourPrevue())
                 .valiseId(mouvement.getValise() != null ? mouvement.getValise().getId() : null)
+                .valise(mouvement.getValise() != null ? ValiseDTO.builder()
+                        .id(mouvement.getValise().getId())
+                        .description(mouvement.getValise().getDescription())
+                        .numeroValise(mouvement.getValise().getNumeroValise())
+                        .build() : null)
                 .build();
     }
 }

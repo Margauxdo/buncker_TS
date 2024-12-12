@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class ErrorResponseDTO {
     private String erreur; // Type de l'erreur
     private String message; // Message d'erreur détaillé
-    private int statut; // Code HTTP
+    private Integer statut; // Code HTTP
     private LocalDateTime horodatage; // Horodatage de l'erreur
 
     public ErrorResponseDTO(String erreur, String message, int statut) {

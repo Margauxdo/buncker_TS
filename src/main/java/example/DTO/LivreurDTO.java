@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class LivreurDTO {
-    private int id;
+    private Integer id;
     private String codeLivreur;
     private String motDePasse;
     private String nomLivreur;

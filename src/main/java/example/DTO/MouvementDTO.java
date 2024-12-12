@@ -1,11 +1,11 @@
 package example.DTO;
 
+import example.entity.Livreur;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.security.auth.kerberos.KerberosTicket;
 import java.util.Date;
 import java.util.List;
 
@@ -20,8 +20,8 @@ public class MouvementDTO {
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
     private Integer valiseId;
-    private List<Integer> livreurIds;
-    private List<Integer> retourSecuriteIds;
-
+    private List<Livreur> livreurs;
+    private List<RetourSecuriteDTO> retourSecurites;
+    private ValiseDTO valise;
 
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class RetourSecuriteDTO {
-    private int id;
+    private Integer id;
     private Long numero;
     private Date datesecurite;
     private Boolean cloture;

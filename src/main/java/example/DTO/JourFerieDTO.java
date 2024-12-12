@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class JourFerieDTO {
-    private int id;
+    private Integer id;
     private Date date;
     private List<Integer> regleIds;
     private List<Regle> regles;

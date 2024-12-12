@@ -139,7 +139,7 @@ Accept: text/html
 
 
 ### Voir un mouvement par ID (GET - Thymeleaf)
-GET localhost:8080/mouvements/view/1
+GET localhost:8080/mouvements/view/6
 Accept: text/html
 
 
@@ -154,7 +154,7 @@ Content-Type: application/x-www-form-urlencoded
 
 
 ### Afficher le formulaire modification un mouvement (GET - Thymeleaf)
-GET http://localhost:8080/mouvements/edit/1
+GET http://localhost:8080/mouvements/edit/6
 Accept: text/html
 
 
@@ -165,7 +165,7 @@ Content-Type: application/x-www-form-urlencoded
 
 
 ###Supprimer un mouvement (POST - Thymeleaf)
-POST http://localhost:8080/mouvements/delete/1
+POST http://localhost:8080/mouvements/delete/6
 Accept: text/html
 
 
