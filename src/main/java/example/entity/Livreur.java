@@ -1,5 +1,6 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,8 +33,13 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mouvement_id", nullable = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "livreur")
+    //@JoinColumn(name = "mouvement_id", nullable = true)
+    @JsonIgnore
     private List<Mouvement> mouvements;
+
+    @Getter
+    @Setter
+    private String description;
 }
 

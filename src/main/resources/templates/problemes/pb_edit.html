@@ -15,6 +15,26 @@
             text-align: center;
             margin-top: 20px;
         }
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+
+
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
+            background-color: #f1b0b7;
+        }
 
         form {
             max-width: 600px;
@@ -32,7 +52,7 @@
             font-weight: bold;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -67,6 +87,7 @@
             background-color: #5a6268;
         }
     </style>
+
 </head>
 <body>
 <h1>Modifier un Problème</h1>
@@ -78,7 +99,8 @@
 
     <!-- Détails du problème -->
     <label for="detailsProbleme">Détails du Problème</label>
-    <textarea id="detailsProbleme" th:field="*{detailsProbleme}" placeholder="Entrez les détails" required></textarea>
+    <input type="text" id="detailsProbleme" th:field="*{detailsProbleme}" placeholder="Entrez le detail" required />
+
 
     <!-- Sélection de la valise associée -->
     <label for="valise">Valise</label>
@@ -96,13 +118,15 @@
                 th:selected="${probleme.client != null and probleme.client.id == client.id}">Sélectionnez un client</option>
     </select>
 
-    <div style="text-align: center;">
+    <div style="margin-top: 20px;">
         <button type="submit">Modifier</button>
-        <a th:href="@{/pb/list}" class="button">Retour à la liste</a>
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
+        </a>
+        <a href="/pb/list" th:href="@{/pb/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
+        </a>
     </div>
-    <a href="/">
-        <button type="button">Retour à l'Accueil</button>
-    </a>
 </form>
 
 </body>

@@ -14,8 +14,6 @@ public class FormuleDTO {
     private Integer id;
     private String libelle;
     private String formule;
-    private Integer regleId;
-    private String regleCode;
-    private Regle regle;
-
+    private Integer regleId; // Lien avec la règle via son id
+    private String codeRegle;
 }

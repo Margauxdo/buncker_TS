@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Date;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,16 +67,28 @@ public class SortieSemaineService implements ISortieSemaineService {
         return mapToDTO(updatedSortieSemaine);
     }
 
-
     @Override
     public void deleteSortieSemaine(int id) {
-        // Vérification de l'existence
         if (!sortieSemaineRepository.existsById(id)) {
-            throw new EntityNotFoundException("SortieSemaine not found with ID: " + id);
+            throw new EntityNotFoundException("SortieSemaine not found with id: " + id);
         }
-        // Suppression
         sortieSemaineRepository.deleteById(id);
     }
+
+
+
+    @Override
+    public void deleteSortieSemaine(Integer id) {
+        if (!sortieSemaineRepository.existsById(id)) {
+            throw new EntityNotFoundException("SortieSemaine not found with id: " + id);
+        }
+        sortieSemaineRepository.deleteById(id);
+    }
+
+
+
+
+
 
     @Override
     public SortieSemaineDTO getSortieSemaine(int id) {

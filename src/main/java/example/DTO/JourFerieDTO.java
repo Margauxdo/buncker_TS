@@ -18,5 +18,6 @@ public class JourFerieDTO {
     private Date date;
     private List<Integer> regleIds;
     private List<Regle> regles;
+    private List<String> regleCodes;;
 }
 

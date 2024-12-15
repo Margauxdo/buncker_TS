@@ -19,5 +19,8 @@ public interface MouvementRepository extends JpaRepository<Mouvement, Integer> {
     @Query("SELECT m FROM Mouvement m JOIN FETCH m.valise WHERE m.id = :id")
     Optional<Mouvement> findByIdWithValise(@Param("id") Long id);
 
+    @Query("SELECT m FROM Mouvement m LEFT JOIN FETCH m.retourSecurites WHERE m.id = :id")
+        Optional<Mouvement> findByIdWithRetourSecurites(@Param("id") Integer id);
+
 
 }

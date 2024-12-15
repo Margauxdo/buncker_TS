@@ -6,6 +6,7 @@ import example.entity.Mouvement;
 import example.interfaces.IRetourSecuriteService;
 import example.repositories.ClientRepository;
 import example.repositories.MouvementRepository;
+import example.services.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,19 +21,25 @@ public class RetourSecuriteController {
     private final IRetourSecuriteService retourSecuriteService;
     private final ClientRepository clientRepository;
     private final MouvementRepository mouvementRepository;
+    private final ClientService clientService;
 
-    public RetourSecuriteController(IRetourSecuriteService retourSecuriteService, ClientRepository clientRepository, MouvementRepository mouvementRepository) {
+    public RetourSecuriteController(IRetourSecuriteService retourSecuriteService, ClientRepository clientRepository, MouvementRepository mouvementRepository, ClientService clientService) {
         this.retourSecuriteService = retourSecuriteService;
         this.clientRepository = clientRepository;
         this.mouvementRepository = mouvementRepository;
+        this.clientService = clientService;
     }
 
     @GetMapping("/list")
-    public String viewAllRetourSecurites(Model model) {
+    public String listRetourSecurites(Model model) {
         List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
+        for (RetourSecuriteDTO retour : retourSecurites) {
+            retour.setNombreClients(clientService.getAllClients().size());
+        }
         model.addAttribute("retoursSecurite", retourSecurites);
         return "retourSecurites/RS_list";
     }
+
 
 
     @GetMapping("/view/{id}")

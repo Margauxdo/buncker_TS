@@ -47,15 +47,21 @@ public class ValiseController {
         model.addAttribute("valise", valise);
         return "valises/valise_details";
     }
-
-
     @GetMapping("/create")
-    public String createValiseForm(Model model) {
+    public String createValise(Model model) {
+        //ValiseDTO valise = new ValiseDTO();
         model.addAttribute("valise", new ValiseDTO());
-        model.addAttribute("clients", clientRepository.findAll()); // Ajoutez ici la liste des clients
-        model.addAttribute("typesValise", typeValiseRepository.findAll()); // Ajoutez ici la liste des types de valise
+
+        model.addAttribute("clients", clientRepository.findAll());
+        //model.addAttribute("typesValise", typeValiseRepository.findAll());
+        //model.addAttribute("mouvements", mouvementRepository.findAll());
+        //model.addAttribute("regles", regleRepository.findAll());
         return "valises/valise_create";
+
     }
+
+
+
 
 
     @PostMapping("/create")

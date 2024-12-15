@@ -39,8 +39,10 @@ public class Mouvement {
     private Valise valise;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JsonBackReference
+    @JoinColumn(name = "livreur_livreur_id", nullable = false)
+    //@JsonBackReference
     private Livreur livreur;
+
 
     @OneToMany
     @JoinColumn(name = "retourSecurite_id")

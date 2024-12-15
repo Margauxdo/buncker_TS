@@ -3,10 +3,7 @@ package example.controller;
 import example.DTO.*;
 import example.entity.Client;
 import example.interfaces.IClientService;
-import example.services.ProblemeService;
-import example.services.RegleService;
-import example.services.RetourSecuriteService;
-import example.services.ValiseService;
+import example.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +17,26 @@ import java.util.List;
 @RequestMapping("/clients")
 public class ClientController {
 
-    @Autowired
-    private IClientService clientService;
-    @Autowired
-    private ValiseService valiseService;
-    @Autowired
-    private ProblemeService problemeService;
-    @Autowired
-    private RetourSecuriteService retourSecuriteService;
-    @Autowired
-    private RegleService regleService;
+
+
+
+
+
+    private final ClientService clientService;
+    private final ValiseService valiseService;
+    private final ProblemeService problemeService;
+    private final RetourSecuriteService retourSecuriteService;
+    private final RegleService regleService;
+
+
+    public ClientController(ClientService clientService, ValiseService valiseService
+    , ProblemeService problemeService, RetourSecuriteService retourSecuriteService, RegleService regleService) {
+        this.clientService = clientService;
+        this.valiseService = valiseService;
+        this.problemeService = problemeService;
+        this.retourSecuriteService = retourSecuriteService;
+        this.regleService = regleService;
+    }
 
     /**
      * Gestion globale des exceptions pour les erreurs inattendues.
@@ -49,10 +56,13 @@ public class ClientController {
     @GetMapping("/list")
     public String listClients(Model model) {
         // Obtenir les clients en tant que DTO directement depuis le service
-        List<ClientDTO> clientDTOs = clientService.getAllClients();
-        model.addAttribute("clients", clientDTOs);
+        List<ClientDTO> clients = clientService.getAllClients();
+        model.addAttribute("clients", clients);
         return "clients/client_list";
     }
+
+
+
 
     /**
      * Vue Thymeleaf pour voir un client par ID.

@@ -1,8 +1,11 @@
 package example.controller;
 
 import example.DTO.FormuleDTO;
+import example.DTO.RegleDTO;
+import example.entity.Regle;
 import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
+import example.services.RegleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static example.services.FormuleService.logger;
 
@@ -20,10 +25,15 @@ public class FormuleController {
 
     @Autowired
     private IFormuleService formuleService;
+    @Autowired
+    private RegleService regleService;
 
     @GetMapping("/list")
     public String viewFormuleList(Model model) {
-        model.addAttribute("formules", formuleService.getAllFormules());
+
+        List<FormuleDTO> formules = formuleService.getAllFormules();
+
+        model.addAttribute("formules", formules);
         return "formules/formule_list";
     }
 
@@ -36,20 +46,36 @@ public class FormuleController {
     @GetMapping("/create")
     public String createFormuleForm(Model model) {
         model.addAttribute("formule", new FormuleDTO());
+        model.addAttribute("regles", regleService.getAllRegles());
         return "formules/formule_create";
     }
 
     @PostMapping("/create")
     public String createFormule(@Valid @ModelAttribute("formule") FormuleDTO formuleDTO, Model model) {
-        formuleService.createFormule(formuleDTO);
-        return "redirect:/formules/list";
+        try {
+            formuleService.createFormule(formuleDTO);
+            return "redirect:/formules/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur lors de la création de la formule : " + e.getMessage());
+            model.addAttribute("formule", formuleDTO);
+            model.addAttribute("regles", regleService.getAllRegles()); // Récupérer la liste des règles
+            return "formules/formule_create";
+        }
     }
 
     @GetMapping("/edit/{id}")
     public String editFormuleForm(@PathVariable int id, Model model) {
-        model.addAttribute("formule", formuleService.getFormuleById(id)); // Récupération de la formule
+        // Récupérer la formule à modifier
+        FormuleDTO formuleDTO = formuleService.getFormuleById(id);
+        model.addAttribute("formule", formuleDTO);
+
+        // Ajouter la liste des règles au modèle
+        List<RegleDTO> regles = regleService.getAllRegles();
+        model.addAttribute("regles", regles);
+
         return "formules/formule_edit";
     }
+
 
 
 

@@ -1,5 +1,8 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -56,13 +59,16 @@ public class Client {
 
     private String codeClient;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Valise> valises = new HashSet<>();
+    //@ToString.Exclude
+    @JsonIgnore
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    //@JsonBackReference
+    private Set<Valise> valises ;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Probleme> problemes;
+    //@ToString.Exclude
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Set<Probleme> problemes = new HashSet<>();
 
 
     @ToString.Exclude

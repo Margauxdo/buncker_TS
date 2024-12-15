@@ -2,12 +2,10 @@ package example.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
@@ -46,28 +44,23 @@ public class Valise {
     private Date dateCreation;
     private String numeroDujeu;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_valise_id")
+    @JsonBackReference
     private TypeValise typeValise;
 
 
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    //@ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     @JsonBackReference
     private Client client;
 
 
+    @Setter
+    @Getter
     @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Mouvement> mouvements = new ArrayList<>();
-
-    public List<Mouvement> getMouvements() {
-        return mouvements;
-    }
-
-    public void setMouvements(List<Mouvement> mouvements) {
-        this.mouvements = mouvements;
-    }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
     private List<Regle> regleSortie = new ArrayList<>();

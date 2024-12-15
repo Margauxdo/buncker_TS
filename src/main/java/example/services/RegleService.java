@@ -114,7 +114,7 @@ public class RegleService implements IRegleService {
                 .coderegle(regle.getCoderegle())
                 .dateRegle(regle.getDateRegle())
                 .nombreJours(regle.getNombreJours())
-                .calculCalendaire(regle.getCalculCalendaire() != null ? regle.getCalculCalendaire():1)
+                .calculCalendaire(regle.getCalculCalendaire())
                 .fermeJS1(regle.getFermeJS1())
                 .fermeJS2(regle.getFermeJS2())
                 .fermeJS3(regle.getFermeJS3())
@@ -125,7 +125,7 @@ public class RegleService implements IRegleService {
                 .typeEntree(regle.getTypeEntree())
                 .nbjsmEntree(regle.getNbjsmEntree())
                 .valiseId(regle.getValise() != null ? regle.getValise().getId() : null)
-                .typeRegle(regle.getTypeRegle()) // Inclure typeRegle
+                //.typeRegle(regle.getTypeRegle() != null ? regle.getTypeRegle().getNomTypeRegle() : "N/A") // Inclure typeRegle
                 .build();
     }
 

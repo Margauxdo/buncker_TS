@@ -8,8 +8,10 @@ import example.interfaces.ILivreurService;
 import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,15 +41,12 @@ public class LivreurService implements ILivreurService {
                 .telephonePortable(livreur.getTelephonePortable())
                 .telephoneKobby(livreur.getTelephoneKobby())
                 .telephoneAlphapage(livreur.getTelephoneAlphapage())
-                .mouvementStatutSortie(livreur.getMouvements() != null && !livreur.getMouvements().isEmpty()
-                        ? livreur.getMouvements().stream()
-                        .map(Mouvement::getStatutSortie) // Récupérer le statut de chaque mouvement
-                        .collect(Collectors.joining(", ")) // Joindre les statuts avec une virgule
-                        : "Aucun mouvement")
-
+                .mouvementStatutSortie(livreur.getMouvements() != null ?
+                        livreur.getMouvements().stream()
+                                .map(Mouvement::getStatutSortie)
+                                .collect(Collectors.joining(", ")) : null)
                 .build();
     }
-
 
     private Livreur convertToEntity(LivreurDTO livreurDTO) {
         Livreur livreur = new Livreur();
@@ -64,18 +63,18 @@ public class LivreurService implements ILivreurService {
         if (livreurDTO.getMouvementId() != null) {
             Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
                     .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
-            livreur.setMouvements((List<Mouvement>) mouvement);
+            livreur.setMouvements(List.of(mouvement));
         }
 
         return livreur;
     }
 
     @Override
+    @Transactional
     public LivreurDTO createLivreur(LivreurDTO livreurDTO) {
         if (livreurDTO.getMouvementId() != null) {
-            Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
+            mouvementRepository.findById(livreurDTO.getMouvementId())
                     .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
-
         }
 
         Livreur livreur = convertToEntity(livreurDTO);
@@ -84,12 +83,32 @@ public class LivreurService implements ILivreurService {
 
     @Override
     public LivreurDTO updateLivreur(int id, LivreurDTO livreurDTO) {
-        if (!livreurRepository.existsById(id)) {
-            throw new EntityNotFoundException("Livreur not found with ID " + id);
+        return null;
+    }
+
+    @Transactional
+    public void updateLivreur(Integer id, LivreurDTO livreurDTO) {
+        // Recherche du Livreur existant
+        Livreur existingLivreur = livreurRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Livreur non trouvé"));
+
+        // Mettre à jour les propriétés de l'entité Livreur avec celles du DTO
+        existingLivreur.setNomLivreur(livreurDTO.getNomLivreur());
+        existingLivreur.setPrenomLivreur(livreurDTO.getPrenomLivreur());
+        // Ajoutez toutes les autres propriétés à mettre à jour
+
+        // Vérification et mise à jour du Mouvement si l'ID est présent
+        if (livreurDTO.getMouvementId() != null) {
+            // Vérification de l'existence du Mouvement dans la base de données
+            Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
+                    .orElseThrow(() -> new EntityNotFoundException("Mouvement non trouvé"));
+
+            // Associer le Mouvement au Livreur
+            existingLivreur.setMouvements(List.of(mouvement));
         }
-        Livreur livreur = convertToEntity(livreurDTO);
-        livreur.setId(id);
-        return convertToDTO(livreurRepository.save(livreur));
+
+        // Sauvegarde de l'entité mise à jour
+        livreurRepository.save(existingLivreur);
     }
 
     @Override
@@ -103,6 +122,7 @@ public class LivreurService implements ILivreurService {
     }
 
     @Override
+    @Transactional
     public void deleteLivreur(int id) {
         if (!livreurRepository.existsById(id)) {
             throw new EntityNotFoundException("Livreur not found with ID " + id);
@@ -111,13 +131,16 @@ public class LivreurService implements ILivreurService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LivreurDTO getLivreurById(int id) {
         Livreur livreur = livreurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Livreur not found with ID " + id));
+        Hibernate.initialize(livreur.getMouvements()); // Initialize the collection
         return convertToDTO(livreur);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LivreurDTO> getAllLivreurs() {
         return livreurRepository.findAll().stream()
                 .map(this::convertToDTO)

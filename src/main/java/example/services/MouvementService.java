@@ -1,11 +1,16 @@
 package example.services;
 
+import example.DTO.LivreurDTO;
 import example.DTO.MouvementDTO;
+import example.DTO.RetourSecuriteDTO;
 import example.DTO.ValiseDTO;
+import example.entity.Livreur;
 import example.entity.Mouvement;
 import example.entity.Valise;
 import example.interfaces.IMouvementService;
+import example.repositories.LivreurRepository;
 import example.repositories.MouvementRepository;
+import example.repositories.ValiseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,13 @@ public class MouvementService implements IMouvementService {
 
     @Autowired
     private ValiseService valiseService;
+    @Autowired
+    private LivreurRepository livreurRepository;
+    @Autowired
+    private ValiseRepository valiseRepository;
+    @Autowired
+    private RetourSecuriteService retourSecuriteService;
+
 
     @Override
     public List<MouvementDTO> getAllMouvements() {
@@ -31,13 +43,32 @@ public class MouvementService implements IMouvementService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
-    @Transactional
-    public MouvementDTO getMouvementById(int id) {
-        return mouvementRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
+    public Mouvement createMouvement(Mouvement mouvement) {
+        if (mouvement.getValise() == null) {
+            throw new IllegalArgumentException("La valise ne peut pas être nulle pour un mouvement.");
+        }
+
+        return mouvementRepository.save(mouvement);
     }
+
+
+    public MouvementDTO getMouvementById(int id) {
+        Mouvement mouvement = mouvementRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID: " + id));
+
+        // Récupération des retourSecurites associés
+        List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
+
+        // Conversion en DTO
+        MouvementDTO mouvementDTO = convertToDTO(mouvement);
+        mouvementDTO.setRetourSecurites(retourSecurites); // Assigner les retourSecurites
+
+        return mouvementDTO;
+    }
+
+
 
     @Override
     public boolean existsById(int id) {
@@ -45,119 +76,105 @@ public class MouvementService implements IMouvementService {
     }
 
     @Override
+    public List<Mouvement> getAllMouvementsWithRetourSecurites() {
+        return List.of();
+    }
+
+    @Override
     public void persistMouvement(Mouvement mouvement) {
-        // Optionnel, selon les besoins spécifiques
+
     }
 
     @Override
     public Optional<Mouvement> findByIdWithValise(Long id) {
-        return mouvementRepository.findById(id.intValue()); // Conversion de Long à int
+        return Optional.empty();
     }
 
     @Override
     public List<Mouvement> getAllMouvementsWithValise() {
-        // Exemple fictif, ajoutez la logique selon votre besoin
-        return mouvementRepository.findAll();
+        return List.of();
     }
 
     @Override
     public MouvementDTO createMouvement(MouvementDTO mouvementDTO) {
-        Mouvement mouvement = convertToEntity(mouvementDTO);
+        // Vérifier si la valise existe
+        Valise valise = valiseRepository.findById(mouvementDTO.getValiseId())
+                .orElseThrow(() -> new EntityNotFoundException("Valise introuvable."));
 
-        // Vérification des relations
-        if (mouvementDTO.getValiseId() != null) {
-            ValiseDTO valiseDTO = valiseService.getValiseById(mouvementDTO.getValiseId());
-            if (valiseDTO == null) {
-                throw new EntityNotFoundException("Valise introuvable avec l'ID : " + mouvementDTO.getValiseId());
-            }
-            mouvement.setValise(convertToEntity(valiseDTO));
-        } else {
-            mouvement.setValise(null);
-        }
+        // Vérifier si le livreur existe
+        Livreur livreur = livreurRepository.findById(mouvementDTO.getLivreurId())
+                .orElseThrow(() -> new EntityNotFoundException("Livreur introuvable."));
 
-        return convertToDTO(mouvementRepository.save(mouvement));
+        // Créer l'objet mouvement
+        Mouvement mouvement = new Mouvement();
+        mouvement.setValise(valise);
+        mouvement.setLivreur(livreur);  // Assurez-vous que le livreur est bien défini
+        mouvement.setDateHeureMouvement(mouvementDTO.getDateHeureMouvement());
+        mouvement.setStatutSortie(mouvementDTO.getStatutSortie());
+        mouvement.setDateSortiePrevue(mouvementDTO.getDateSortiePrevue());
+        mouvement.setDateRetourPrevue(mouvementDTO.getDateRetourPrevue());
+
+        // Enregistrer le mouvement dans la base de données
+        Mouvement savedMouvement = mouvementRepository.save(mouvement);
+
+        return convertToDTO(savedMouvement);
     }
 
-    @Override
-    public MouvementDTO updateMouvement(int id, MouvementDTO mouvementDTO) {
-        // Récupérer le Mouvement existant
-        Mouvement existingMouvement = mouvementRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
 
-        // Mettre à jour les champs de Mouvement
+
+    @Override
+    @Transactional
+    public MouvementDTO updateMouvement(int id, MouvementDTO mouvementDTO) {
+        Mouvement existingMouvement = mouvementRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found"));
+
+        // Mise à jour des champs
         existingMouvement.setDateHeureMouvement(mouvementDTO.getDateHeureMouvement());
         existingMouvement.setStatutSortie(mouvementDTO.getStatutSortie());
         existingMouvement.setDateSortiePrevue(mouvementDTO.getDateSortiePrevue());
         existingMouvement.setDateRetourPrevue(mouvementDTO.getDateRetourPrevue());
 
-        // Vérifier si un ValiseId est fourni et mettre à jour la Valise
+        // Récupération et association de la valise
         if (mouvementDTO.getValiseId() != null) {
-            ValiseDTO valiseDTO = valiseService.getValiseById(mouvementDTO.getValiseId());
-            if (valiseDTO == null) {
-                throw new EntityNotFoundException("Valise introuvable avec l'ID : " + mouvementDTO.getValiseId());
-            }
-            existingMouvement.setValise(convertToEntity(valiseDTO));
-        } else {
-            existingMouvement.setValise(null);
+            Valise valise = valiseService.getValiseById(mouvementDTO.getValiseId());
+            existingMouvement.setValise(valise);
         }
 
-        return convertToDTO(mouvementRepository.save(existingMouvement));
-    }
-
-    @Override
-    public Optional<Mouvement> findById(Long id) {
-        return mouvementRepository.findById(id.intValue()); // Conversion Long en int
-    }
-
-    @Override
-    public Mouvement createMouvement(Mouvement mouvement) {
-        return mouvementRepository.save(mouvement);
-    }
-
-    @Override
-    public Mouvement updateMouvement(int id, Mouvement mouvement) {
-        if (!mouvementRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id);
-        }
-        return mouvementRepository.save(mouvement);
-    }
-
-    @Override
-    public void deleteMouvement(int id) {
-        if (!mouvementRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id);
-        }
-        mouvementRepository.deleteById(id);
-    }
-
-    // Méthodes utilitaires
-
-    private Mouvement convertToEntity(MouvementDTO dto) {
-        Mouvement mouvement = new Mouvement();
-        mouvement.setId(dto.getId());
-        mouvement.setDateHeureMouvement(dto.getDateHeureMouvement());
-        mouvement.setStatutSortie(dto.getStatutSortie());
-        mouvement.setDateSortiePrevue(dto.getDateSortiePrevue());
-        mouvement.setDateRetourPrevue(dto.getDateRetourPrevue());
-
-        if (dto.getValiseId() != null) {
-            ValiseDTO valiseDTO = valiseService.getValiseById(dto.getValiseId());
-            if (valiseDTO != null) {
-                mouvement.setValise(convertToEntity(valiseDTO));
-            }
-        }
-        return mouvement;
+        mouvementRepository.save(existingMouvement);
+        return convertToDTO(existingMouvement);
     }
 
     private Valise convertToEntity(ValiseDTO valiseDTO) {
         if (valiseDTO == null) {
-            throw new IllegalArgumentException("ValiseDTO ne peut pas être null");
+            return null;
         }
         return Valise.builder()
                 .id(valiseDTO.getId())
                 .description(valiseDTO.getDescription())
                 .numeroValise(valiseDTO.getNumeroValise())
                 .build();
+    }
+
+
+
+    @Override
+    public Optional<Mouvement> findById(Long id) {
+        return Optional.empty();
+    }
+
+
+
+    @Override
+    public Mouvement updateMouvement(int id, Mouvement mouvement) {
+        return null;
+    }
+
+    @Override
+    public void deleteMouvement(int id) {
+        if (!mouvementRepository.existsById(id)) {
+            throw new EntityNotFoundException("Mouvement not found with ID: " + id);
+        }
+        mouvementRepository.deleteById(id);
     }
 
     private MouvementDTO convertToDTO(Mouvement mouvement) {
@@ -167,12 +184,25 @@ public class MouvementService implements IMouvementService {
                 .statutSortie(mouvement.getStatutSortie())
                 .dateSortiePrevue(mouvement.getDateSortiePrevue())
                 .dateRetourPrevue(mouvement.getDateRetourPrevue())
-                .valiseId(mouvement.getValise() != null ? mouvement.getValise().getId() : null)
-                .valise(mouvement.getValise() != null ? ValiseDTO.builder()
-                        .id(mouvement.getValise().getId())
-                        .description(mouvement.getValise().getDescription())
-                        .numeroValise(mouvement.getValise().getNumeroValise())
-                        .build() : null)
+                .valiseDescription(mouvement.getValise() != null ? mouvement.getValise().getDescription() : "Inconnue")
+                .valiseNumeroValise(mouvement.getValise() != null ? String.valueOf(mouvement.getValise().getNumeroValise()) : "-")
                 .build();
     }
+
+    public Mouvement getMouvementByIdWithRetourSecurites(Integer id) {
+        return mouvementRepository.findByIdWithRetourSecurites(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + id));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }

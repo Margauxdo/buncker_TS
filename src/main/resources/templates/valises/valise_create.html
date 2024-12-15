@@ -19,7 +19,7 @@
             font-weight: bold;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -30,14 +30,24 @@
         button {
             padding: 5px 10px;
             border: 1px solid #ccc;
-            background-color: #f8f9fa;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #e2e6ea;
+
+
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
+            background-color: #f1b0b7;
         }
     </style>
+
 </head>
 <body>
 <h1 style="text-align: center;">Créer une nouvelle Valise</h1>
@@ -96,19 +106,26 @@
 
     <!-- Liste des mouvements (ajout facultatif si nécessaire) -->
     <label for="mouvements">Mouvements associés :</label>
-    <textarea id="mouvements" th:field="*{mouvementIds}" placeholder="Liste des mouvements, séparés par des virgules"></textarea>
+    <select id="mouvements" th:field="*{mouvementIds}">
+        <option value="" th:text="'Sélectionner un mouvement'"></option>
+        <option th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.statutSortie}"></option>
+    </select>
 
     <!-- Liste des règles associées (ajout facultatif si nécessaire) -->
     <label for="regles">Règles associées :</label>
-    <textarea id="regles" th:field="*{regleSortieIds}" placeholder="Liste des règles, séparées par des virgules"></textarea>
+    <select id="regles" th:field="*{regleSortieIds}">
+        <option value="" th:text="'Sélectionner une regle'"></option>
+        <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.codeRegle}"></option>
+    </select>
 
-    <div style="text-align: center;">
+    <div style="margin-top: 20px;">
         <button type="submit">Valider</button>
-        <a th:href="@{/valise/list}">
-            <button type="button">Retour à la liste</button>
+
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
         </a>
-        <a href="/">
-            <button type="button">Retour à l'Accueil</button>
+        <a href="/valise/list" th:href="@{/valise/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
         </a>
     </div>
 </form>

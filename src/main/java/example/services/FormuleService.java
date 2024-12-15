@@ -30,15 +30,22 @@ public class FormuleService implements IFormuleService {
 
     private FormuleDTO convertToDTO(Formule formule) {
         if (formule.getRegle() != null) {
-            Hibernate.initialize(formule.getRegle());
+            return FormuleDTO.builder()
+                    .id(formule.getId())
+                    .libelle(formule.getLibelle())
+                    .formule(formule.getFormule())
+                    .regleId(formule.getRegle().getId())
+                    .codeRegle(formule.getRegle().getCoderegle())
+                    .build();
+        } else {
+            return FormuleDTO.builder()
+                    .id(formule.getId())
+                    .libelle(formule.getLibelle())
+                    .formule(formule.getFormule())
+                    .build();
         }
-        return FormuleDTO.builder()
-                .id(formule.getId())
-                .libelle(formule.getLibelle())
-                .formule(formule.getFormule())
-                .regleCode(formule.getRegle() != null ? formule.getRegle().getCoderegle() : "Non défini")
-                .build();
     }
+
 
 
 
@@ -59,9 +66,21 @@ public class FormuleService implements IFormuleService {
 
     @Override
     public FormuleDTO createFormule(FormuleDTO formuleDTO) {
-        Formule formule = convertToEntity(formuleDTO);
+
+        Regle regle = regleRepository.findById(formuleDTO.getRegleId())
+                .orElseThrow(() -> new RuntimeException("Règle non trouvée avec l'id : " + formuleDTO.getRegleId()));
+
+        Formule formule = new Formule(
+                formuleDTO.getLibelle(),
+                formuleDTO.getFormule(),
+                regle
+        );
+
         Formule savedFormule = formuleRepository.save(formule);
+
         return convertToDTO(savedFormule);
+
+
     }
 
     @Override

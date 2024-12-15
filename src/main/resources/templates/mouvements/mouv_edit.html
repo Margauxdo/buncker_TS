@@ -4,13 +4,46 @@
     <meta charset="UTF-8">
     <title>Modifier un Mouvement</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+
+
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
+            background-color: #f1b0b7;
+        }
+
         form {
             max-width: 600px;
             margin: 20px auto;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #f8f9fa;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         label {
@@ -27,16 +60,34 @@
             border-radius: 4px;
         }
 
-
-
-        .actions {
-            text-align: center;
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
-        .actions button {
-            margin: 0 5px;
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a.button {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        a.button:hover {
+            background-color: #5a6268;
         }
     </style>
+
 </head>
 <body>
 <h1 style="text-align: center;">Modifier un Mouvement</h1>
@@ -54,29 +105,38 @@
     <label for="dateRetourPrevue">Date Retour Prévue :</label>
     <input type="date" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" />
 
-    <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valise.id}" required>
-        <option value="" disabled selected>-- Sélectionnez une Valise --</option>
-        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.name}"></option>
+    <label for="valiseId">Valise :</label>
+    <select id="valiseId" name="valiseId" required>
+        <option value="" disabled selected>Sélectionnez une valise</option>
+        <!-- Remplir avec les valises depuis le backend -->
+        <th:block th:each="valise : ${valises}">
+            <option th:value="${valise.id}" th:text="${valise.description}"></option>
+        </th:block>
     </select>
 
-    <label for="livreurs">Livreurs associés :</label>
-    <select id="livreurs" multiple th:field="*{livreurs}">
-        <option th:each="livreur : ${allLivreurs}" th:value="${livreur.id}" th:text="${livreur.nomLivreur + ' ' + livreur.prenomLivreur}"></option>
+    <label for="livreur">Livreur :</label>
+    <select id="livreur" name="livreurId" th:field="*{livreurId}" required>
+        <option value="" th:text="'Sélectionnez un livreur'"></option>
+        <option th:each="livreur : ${livreurs}"
+                th:value="${livreur.id}"
+                th:text="${livreur.nomLivreur}"></option>
     </select>
+
 
     <label for="retourSecurites">Retours Sécurité associés :</label>
-    <select id="retourSecurites" multiple th:field="*{retourSecurites}">
-        <option th:each="retour : ${allRetourSecurites}" th:value="${retour.id}" th:text="${retour.numero}"></option>
+    <select id="retourSecurites" th:field="*{retourSecurites}">
+        <option th:each="retour : ${allRetourSecurites}" th:value="${retour.id}"
+                th:text="${retour.numero}"></option>
     </select>
 
-    <div class="actions">
+
+    <div style="margin-top: 20px;">
         <button type="submit">Modifier</button>
-        <a th:href="@{/mouvements/list}">
-            <button type="button">Retour à la liste</button>
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
         </a>
-        <a href="/">
-            <button type="button">Retour à l'Accueil</button>
+        <a href="/mouvements/list" th:href="@{/mouvements/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
         </a>
     </div>
 </form>

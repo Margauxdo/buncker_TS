@@ -2,7 +2,6 @@ package example.services;
 
 import example.DTO.ClientDTO;
 import example.DTO.ProblemeDTO;
-import example.DTO.ValiseDTO;
 import example.entity.Client;
 import example.entity.Probleme;
 import example.entity.Valise;
@@ -14,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import example.services.ClientService;  // Assurez-vous que l'import est présent
+
 
 @Service
 public class ProblemeService implements IProblemeService {
@@ -42,7 +43,7 @@ public class ProblemeService implements IProblemeService {
     @Override
     public ProblemeDTO createProbleme(ProblemeDTO problemeDTO) {
         // Récupération de la ValiseDTO
-        ValiseDTO valiseDTO = valiseService.getValiseById(problemeDTO.getValiseId());
+        Valise valiseDTO = valiseService.getValiseById(problemeDTO.getValiseId());
         if (valiseDTO == null) {
             throw new ResourceNotFoundException("Valise not found with ID: " + problemeDTO.getValiseId());
         }
@@ -65,7 +66,7 @@ public class ProblemeService implements IProblemeService {
     }
 
     // Méthode utilitaire pour convertir un ValiseDTO en Valise
-    private Valise convertToEntity(ValiseDTO valiseDTO) {
+    private Valise convertToEntity(Valise valiseDTO) {
         return Valise.builder()
                 .id(valiseDTO.getId())
                 .description(valiseDTO.getDescription())
@@ -189,6 +190,7 @@ public class ProblemeService implements IProblemeService {
                 .client(probleme.getClient() != null ? clientService.convertToDTO(probleme.getClient()) : null)
                 .build();
     }
+
 
 
 

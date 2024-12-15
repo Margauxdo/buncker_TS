@@ -1,9 +1,6 @@
 package example.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +11,8 @@ import java.util.List;
 @Builder
 public class ClientDTO {
     private Integer id;
+    @Setter
+    @Getter
     private String name;
     private String adresse;
     private String email;
@@ -34,22 +33,12 @@ public class ClientDTO {
     private String codeClient;
 
     private List<Integer> valiseIds = new ArrayList<>();
-    private List<String> valisesDescriptions = new ArrayList<>(); // Initialisé pour éviter les NPE
+    private List<String> valisesDescriptions = new ArrayList<>();
 
     private List<Integer> problemeIds = new ArrayList<>();
     private Integer retourSecuriteId;
 
-    private Integer regleId;
-    private List<Integer> regleIds = new ArrayList<>();
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private Integer regleId; // Garder ce champ de type Integer
 
     @Override
     public String toString() {
@@ -59,6 +48,4 @@ public class ClientDTO {
                 ", email='" + email + '\'' +
                 '}';
     }
-
-
 }

@@ -1,13 +1,12 @@
 package example.DTO;
 
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,12 +14,23 @@ import java.util.List;
 @Builder
 public class RetourSecuriteDTO {
     private Integer id;
-    private Long numero;
+    private String numero;
     private Date datesecurite;
     private Boolean cloture;
     private Date dateCloture;
-    @Size(min = 1, message = "Au moins un client doit être sélectionné.")
-    private List<Integer> clientIds;
-    private Integer mouvementId;
     private String mouvementStatut;
+    private Integer nombreClients;  // Ajouter ce champ
+
+
+    // Getters et Setters
+    public Iterable<Integer> getNombreClients() {
+        return Collections.singleton(nombreClients);
+    }
+
+    public void setNombreClients(Integer nombreClients) {
+        this.nombreClients = nombreClients;
+    }
+
+    // Autres getters et setters...
 }
+

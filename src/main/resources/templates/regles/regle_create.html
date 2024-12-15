@@ -3,6 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Créer une Nouvelle Règle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+
+
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
+            background-color: #f1b0b7;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a.button {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        a.button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+
 </head>
 <body>
 <h1>Créer une Nouvelle Règle</h1>
@@ -41,15 +126,15 @@
         <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.date}"></option>
     </select>
 
-    -->
-    <div style="text-align: center;">
-    <button type="submit">Créer</button>
-<a th:href="@{/regles/list}">
-<button type="button">Retour à la Liste</button>
-</a>
-<a href="/">
-    <button type="button">Retour à l'Accueil</button>
-</a>
+
+    <div style="margin-top: 20px;">
+        <button type="submit">Créer</button>
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
+        </a>
+        <a href="/regles/list" th:href="@{/formules/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
+        </a>
     </div>
 </form>
 </body>

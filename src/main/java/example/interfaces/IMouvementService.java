@@ -16,15 +16,18 @@ public interface IMouvementService {
 
     List<Mouvement> getAllMouvementsWithValise();
 
-    MouvementDTO createMouvement(MouvementDTO mouvementDTO);
+
     MouvementDTO updateMouvement(int id, MouvementDTO mouvementDTO);
 
     Optional<Mouvement> findById(Long id);
 
-    Mouvement createMouvement(Mouvement mouvement);
+    Mouvement createMouvement(Mouvement mouvement); // Entity version
+    MouvementDTO createMouvement(MouvementDTO mouvementDTO);
 
     Mouvement updateMouvement(int id, Mouvement mouvement);
 
     void deleteMouvement(int id);
     boolean existsById(int id);
+
+    List<Mouvement> getAllMouvementsWithRetourSecurites();
 }

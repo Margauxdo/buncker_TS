@@ -7,6 +7,7 @@ import example.entity.*;
 import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IValiseService;
 import example.repositories.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,6 +162,11 @@ public class ValiseService implements IValiseService {
                 .description(valise.getDescription())
                 .numeroValise(valise.getNumeroValise())
                 .build();
+    }
+
+    public Valise getValiseById(Integer id) {
+        return valiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Valise not found with ID: " + id));
     }
 
 

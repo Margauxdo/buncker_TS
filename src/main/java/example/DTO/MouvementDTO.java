@@ -1,27 +1,37 @@
 package example.DTO;
 
 import example.entity.Livreur;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MouvementDTO {
     private Integer id;
     private Date dateHeureMouvement;
     private String statutSortie;
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
+    private String description;
+
+    @NotNull(message = "L'ID de la valise est obligatoire")
     private Integer valiseId;
-    private List<Livreur> livreurs;
+
+    @NotNull(message = "L'ID du livreur est obligatoire")
+    private Integer livreurId;
+
+    private String valiseDescription; // Ajout pour afficher la description de la valise
+    private String livreurNom;
+
+    private String valiseNumeroValise;
+    private List<LivreurDTO> livreurs;
     private List<RetourSecuriteDTO> retourSecurites;
-    private ValiseDTO valise;
 
 }
+
+

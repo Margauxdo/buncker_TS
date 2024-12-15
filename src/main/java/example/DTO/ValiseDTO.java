@@ -1,9 +1,6 @@
 package example.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -34,47 +31,26 @@ public class ValiseDTO {
     private List<Integer> mouvementIds;
     private List<Integer> regleSortieIds;
 
+
+    @Setter
+    @Getter
     private String typeValiseDescription;
 
+    @Setter
+    @Getter
     private String clientName;
 
 
+    @Setter
+    @Getter
     private ClientDTO client;
     private List<MouvementDTO> mouvementList;
     private List<RegleDTO> regleSortie;
 
     private List<RegleDTO> regles;
-    public ClientDTO getClient() {
-        return client;
-    }
 
-    public void setClient(ClientDTO client) {
-        this.client = client;
-    }
-
-    public String getClientName() {
-        return clientName;
-    }
-
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
-    }
-
-    public String getTypeValiseDescription() {
-        return typeValiseDescription;
-    }
-
-    public void setTypeValiseDescription(String typeValiseDescription) {
-        this.typeValiseDescription = typeValiseDescription;
-    }
+    @Setter
+    @Getter
     private String typeValise;
-
-    public String getTypeValise() {
-        return typeValise;
-    }
-
-    public void setTypeValise(String typeValise) {
-        this.typeValise = typeValise;
-    }
 
 }

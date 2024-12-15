@@ -91,6 +91,7 @@ Accept: text/html
 POST localhost:8080/jourferies/create
 Content-Type: application/x-www-form-urlencoded
 
+date=2024-10-01&regle.id=1
 
 
 # Section 4 : Thymeleaf pour l'entité livreur
@@ -139,7 +140,7 @@ Accept: text/html
 
 
 ### Voir un mouvement par ID (GET - Thymeleaf)
-GET localhost:8080/mouvements/view/6
+GET localhost:8080/mouvements/view/2
 Accept: text/html
 
 
@@ -151,10 +152,11 @@ Accept: text/html
 POST http://localhost:8080/mouvements/create
 Content-Type: application/x-www-form-urlencoded
 
+dateHeureMouvement=2024-12-12T22:00
 
 
 ### Afficher le formulaire modification un mouvement (GET - Thymeleaf)
-GET http://localhost:8080/mouvements/edit/6
+GET http://localhost:8080/mouvements/edit/1
 Accept: text/html
 
 
@@ -165,7 +167,7 @@ Content-Type: application/x-www-form-urlencoded
 
 
 ###Supprimer un mouvement (POST - Thymeleaf)
-POST http://localhost:8080/mouvements/delete/6
+POST http://localhost:8080/mouvements/delete/2
 Accept: text/html
 
 
@@ -352,7 +354,7 @@ POST http://localhost:8080/sortieSemaine/edit/1
 Content-Type: application/x-www-form-urlencoded
 
 ###Supprimer un SS(POST - Thymeleaf)
-POST http://localhost:8080/sortieSemaine/delete/1
+POST http://localhost:8080/sortieSemaine/delete/3
 Content-Type: application/x-www-form-urlencoded
 
 

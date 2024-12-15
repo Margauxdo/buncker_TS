@@ -20,15 +20,33 @@
         }
 
         input, select {
-            width: 100%;
+            width: 100%; /* Ensure full width */
             padding: 8px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
 
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
+            cursor: pointer;
+        }
 
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
+            background-color: #f1b0b7;
+        }
     </style>
+
 </head>
 <body>
 <h1 style="text-align: center;">Créer un Nouveau Jour Férié</h1>
@@ -36,28 +54,22 @@
     <label for="date">Date :</label>
     <input type="date" id="date" th:field="*{date}" required />
 
-
-
-    <label for="regles">Règles associées :</label>
-    <select id="regles" multiple th:field="*{regles}" required>
-        <!-- Option par défaut pour guider l'utilisateur -->
-        <option value="" disabled selected>-- Sélectionnez une ou plusieurs Règles --</option>
-
-        <!-- Boucle pour afficher les règles disponibles -->
-        <option th:each="regle : ${allRegles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
+    <label for="regles">Règles associées  :</label>
+    <select id="regles"  th:field="*{regleIds}">
+        <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>
 
 
-    <div style="text-align: center;">
+    <div style="margin-top: 20px;">
         <button type="submit">Créer</button>
-        <a th:href="@{/jourferies/list}">
-            <button type="button">Retour à la Liste</button>
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
         </a>
-
-        <a href="/">
-            <button type="button">Retour à l'Accueil</button>
+        <a href="/jourferies/list" th:href="@{/joursferies/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
         </a>
     </div>
 </form>
+
 </body>
 </html>

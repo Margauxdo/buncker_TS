@@ -17,18 +17,16 @@
 
         th {
             background-color: #f8f9fa;
+            color: red;
         }
 
         button {
             padding: 5px 10px;
             margin-right: 5px;
             border: 1px solid #ccc;
-            background-color: #f8f9fa;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
             cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #e2e6ea;
         }
 
         button[type="submit"][style*="color: red;"] {
@@ -38,6 +36,16 @@
         }
 
         button[type="submit"][style*="color: red;"]:hover {
+            background-color: #f1b0b7;
+        }
+
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
             background-color: #f1b0b7;
         }
     </style>
@@ -74,22 +82,19 @@
         <td th:text="${retourSecurite.cloture ? 'Oui' : 'Non'}"></td>
         <td th:text="${retourSecurite.dateCloture}"></td>
         <td th:text="${retourSecurite.mouvementStatut}"></td>
+        <td th:text="${retourSecurite.nombreClients}"></td>
 
-
+        <!-- Actions -->
         <td>
             <!-- Bouton pour Voir -->
             <form th:action="@{/retourSecurite/view/{id}(id=${retourSecurite.id})}" method="get" style="display:inline;">
                 <button type="submit" aria-label="Voir le retour sécurité">Voir</button>
             </form>
 
-
-
-
             <!-- Bouton pour Modifier -->
             <form th:action="@{/retourSecurite/edit/{id}(id=${retourSecurite.id})}" method="get" style="display:inline;">
                 <button type="submit" aria-label="Modifier le retour sécurité">Modifier</button>
             </form>
-
 
             <!-- Bouton pour Supprimer -->
             <form th:action="@{/retourSecurite/delete/{id}(id=${retourSecurite.id})}" method="post"
@@ -97,7 +102,6 @@
                 <input type="hidden" name="_method" value="delete"/>
                 <button type="submit" style="color: red;" aria-label="Supprimer le retour sécurité">Supprimer</button>
             </form>
-
         </td>
     </tr>
     </tbody>
@@ -105,15 +109,13 @@
 
 <!-- Lien vers la page de création d'un nouveau retour sécurité -->
 <div style="margin-top: 20px;">
-    <a th:href="@{/retourSecurite/create}">
-        <button type="button">Créer un nouveau retour sécurité</button>
+    <a href="/retourSecurite/create">
+        <button type="button">Créer une nouvelle règle de sécurité</button>
     </a>
-
-    <a href="/">
-        <button type="button">Retour à l'Accueil</button>
+    <a href="/" th:href="@{/}">
+        <button type="button" class="btn-danger">Retour à l'Accueil</button>
     </a>
 </div>
-
 
 </body>
 </html>

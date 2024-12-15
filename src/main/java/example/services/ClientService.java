@@ -11,6 +11,7 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class ClientService implements IClientService {
     }
 
     // Méthode pour convertir un Client en ClientDTO
-    public ClientDTO convertToDTO(Client client) {
+   /* public ClientDTO convertToDTO(Client client) {
         if (client == null) {
             return null;
         }
@@ -53,7 +54,38 @@ public class ClientService implements IClientService {
                 .typeSuivie(client.getTypeSuivie())
                 .codeClient(client.getCodeClient())
                 .build();
+    }*/
+    ClientDTO convertToDTO(Client client) {
+        return ClientDTO.builder()
+                .id(client.getId())
+                .name(client.getName())
+                .adresse(client.getAdresse())
+                .email(client.getEmail())
+                .telephoneExploitation(client.getTelephoneExploitation())
+                .ville(client.getVille())
+                .personnelEtFonction(client.getPersonnelEtFonction())
+                .ramassage1(client.getRamassage1())
+                .ramassage2(client.getRamassage2())
+                .ramassage3(client.getRamassage3())
+                .ramassage4(client.getRamassage4())
+                .ramassage5(client.getRamassage5())
+                .ramassage6(client.getRamassage6())
+                .ramassage7(client.getRamassage7())
+                .envoiparDefaut(client.getEnvoiparDefaut())
+                .memoRetourSecurite1(client.getMemoRetourSecurite1())
+                .memoRetourSecurite2(client.getMemoRetourSecurite2())
+                .typeSuivie(client.getTypeSuivie())
+                .codeClient(client.getCodeClient())
+                .valiseIds(client.getValises().stream().map(Valise::getId).collect(Collectors.toList()))
+                .valisesDescriptions(client.getValises().stream().map(Valise::getDescription).collect(Collectors.toList()))
+                .problemeIds(client.getProblemes().stream().map(Probleme::getId).collect(Collectors.toList()))
+                .retourSecuriteId(client.getRetourSecurite() != null ? client.getRetourSecurite().getId() : null)
+                .regleId(client.getRegle() != null ? client.getRegle().getId() : null)  // Traitez ici regleId comme un Integer
+                .build();
     }
+
+
+
 
 
     // Méthode pour convertir un ClientDTO en Client
@@ -123,12 +155,14 @@ public class ClientService implements IClientService {
     }
 
     @Transactional
-    @Override
+    //@Override
     public ClientDTO getClientById(int id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client non trouvé"));
 
         // Initialiser explicitement les collections
+        //Hibernate.initialize(client.getValises());
+        //Hibernate.initialize(client.getProblemes());
         Hibernate.initialize(client.getValises());
         Hibernate.initialize(client.getProblemes());
 
@@ -137,16 +171,38 @@ public class ClientService implements IClientService {
 
 
 
-    @Transactional
-    @Override
+    /*@Transactional
+    //@Override
+    public List<ClientDTO> getAllClients() {
+        List<Client> clients = clientRepository.findAll();
+        clients.forEach(client -> {
+            client.getValises().size();
+            client.getProblemes().size();
+        });
+        return clients.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }*/
+
+    /*@Transactional
     public List<ClientDTO> getAllClients() {
         List<Client> clients = clientRepository.findAll();
         clients.forEach(client -> {
             Hibernate.initialize(client.getValises());
             Hibernate.initialize(client.getProblemes());
         });
-        return clients.stream().map(this::convertToDTO).collect(Collectors.toList()); // Use the correct method name
+        return clients.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
+*/
+
+    @Override
+    @Transactional
+    public List<ClientDTO> getAllClients() {
+        List<Client> clients = clientRepository.findAll();
+        // Convertir les entités en DTOs
+        return clients.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public boolean existsById(int id) {

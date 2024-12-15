@@ -1,14 +1,19 @@
 package example.controller;
 
 import example.DTO.LivreurDTO;
+import example.DTO.MouvementDTO;
+import example.entity.Mouvement;
 import example.interfaces.ILivreurService;
 import example.repositories.MouvementRepository;
+import example.services.MouvementService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/livreurs")
@@ -18,6 +23,8 @@ public class LivreurController {
     private ILivreurService livreurService;
     @Autowired
     private MouvementRepository mouvementRepository;
+    @Autowired
+    private MouvementService mouvementService;
 
     @GetMapping("/list")
     public String listLivreurs(Model model) {
@@ -35,9 +42,11 @@ public class LivreurController {
     @GetMapping("/create")
     public String createLivreurForm(Model model) {
         model.addAttribute("livreur", new LivreurDTO());
-        model.addAttribute("mouvements", mouvementRepository.findAll()); // Chargez les mouvements depuis le repository
+        List<Mouvement> mouvements = mouvementService.getAllMouvementsWithRetourSecurites();
+        model.addAttribute("mouvements", mouvements);
         return "livreurs/livreur_create";
     }
+
 
 
     @PostMapping("/create")
@@ -52,9 +61,13 @@ public class LivreurController {
 
     @GetMapping("/edit/{id}")
     public String editLivreurForm(@PathVariable int id, Model model) {
-        model.addAttribute("livreur", livreurService.getLivreurById(id));
+        LivreurDTO livreur = livreurService.getLivreurById(id);
+        List<MouvementDTO> mouvements = mouvementService.getAllMouvements(); // Fetch all movements
+        model.addAttribute("livreur", livreur);
+        model.addAttribute("mouvements", mouvements);
         return "livreurs/livreur_edit";
     }
+
 
     @PostMapping("/edit/{id}")
     public String updateLivreur(@PathVariable int id, @Valid @ModelAttribute("livreur") LivreurDTO livreurDTO,

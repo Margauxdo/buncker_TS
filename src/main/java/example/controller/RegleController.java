@@ -10,6 +10,7 @@ import example.services.ValiseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -73,28 +74,24 @@ public class RegleController {
 
     @GetMapping("/edit/{id}")
     public String editRegle(@PathVariable int id, Model model) {
-        RegleDTO regle = regleService.getRegleById(id);
-        model.addAttribute("regle", new RegleDTO());
-
-        List<FormuleDTO> formules = formuleService.getAllFormules();
-        List<ValiseDTO> valises = valiseService.getAllValises();
-        List<TypeRegleDTO> typesRegle = typeRegleService.getTypeRegles();
-        List<JourFerieDTO> jourFerie = jourFerieService.getJourFeries();
-
-        model.addAttribute("formules", formules != null ? formules : new ArrayList<>());
-        model.addAttribute("valises", valises != null ? valises : new ArrayList<>());
-        model.addAttribute("typesRegle", typesRegle != null ? typesRegle : new ArrayList<>());
-        model.addAttribute("jourFerie", jourFerie != null ? jourFerie : new ArrayList<>());
-
-
-        return "regles/regle_edit";
+        RegleDTO regle = regleService.getRegleById(id); // Récupère la règle à partir du service
+        model.addAttribute("regle", regle);
+        model.addAttribute("valises", valiseService.getAllValises()); // Récupère les valises
+        model.addAttribute("typesRegle", typeRegleService.getTypeRegles()); // Récupère les types de règle
+        model.addAttribute("formules", formuleService.getAllFormules()); // Récupère les formules
+        model.addAttribute("joursFeries", jourFerieService.getJourFeries()); // Récupère les jours fériés
+        return "regles/regle_edit"; // Retourne la vue pour la modification de la règle
     }
 
     @PostMapping("/edit/{id}")
-    public String updateRegle(@PathVariable int id, @ModelAttribute RegleDTO regleDTO) {
-        regleService.updateRegle(id, regleDTO);
-        return "redirect:/regles/list";
+    public String updateRegle(@PathVariable int id, @ModelAttribute("regle") RegleDTO regleDTO, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "regles/regle_edit"; // Retourne à la vue de modification si des erreurs sont détectées
+        }
+        regleService.updateRegle(id, regleDTO); // Met à jour la règle
+        return "redirect:/regles/list"; // Redirige vers la liste des règles après la modification
     }
+
 
     @PostMapping("/delete/{id}")
     public String deleteRegle(@PathVariable int id) {

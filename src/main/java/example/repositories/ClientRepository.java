@@ -2,6 +2,7 @@ package example.repositories;
 
 import example.DTO.ClientDTO;
 import example.entity.Client;
+import example.entity.Mouvement;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,9 +20,16 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     List<Client> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
     @EntityGraph(attributePaths = {"valises", "problemes"})
     List<Client> findAll();
 
+    @Query("SELECT m FROM Mouvement m JOIN FETCH m.valise")
+    List<Mouvement> findAllWithValise();
+
+
+    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.problemes WHERE c.id = :id")
+    Optional<Client> findByIdWithProblemes(@Param("id") Integer id);
 
 
     @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises WHERE c.id = :id")
@@ -29,6 +37,7 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
 
     @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises LEFT JOIN FETCH c.problemes WHERE c.id = :id")
     Optional<Client> findClientWithRelationsById(@Param("id") int id);
+
 
 
 }

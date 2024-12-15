@@ -82,7 +82,7 @@ public class JourFerieControllerTest {
         Model model = new ConcurrentModel();
 
         // Act
-        String response = jourFerieController.createJourFerieThymeleaf(jourFerieDTO, bindingResult, model);
+        String response = jourFerieController.createJourFerie(jourFerieDTO, bindingResult, model);
 
         // Assert
         assertEquals("joursFeries/JF_create", response);

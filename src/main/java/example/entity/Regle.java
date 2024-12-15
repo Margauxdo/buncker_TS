@@ -27,6 +27,8 @@ public class Regle {
     @Column(name = "regle_pour_sortie")
     private String reglePourSortie;
 
+    @Setter
+    @Getter
     @Column(name = "code_regle", unique = true, nullable = false)
     private String coderegle;
 
@@ -80,7 +82,7 @@ public class Regle {
 
     // Relation ManyToOne avec JourFerie
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cle_jour_ferie")
+    @JoinColumn(name = "jour_ferie_id")
     private JourFerie jourFerie;
 
     public void setSomeProperty(String someValue) {
