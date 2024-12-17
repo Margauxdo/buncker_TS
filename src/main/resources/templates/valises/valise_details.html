@@ -95,19 +95,6 @@
         <span th:text="${valise.typeValiseDescription != null ? valise.typeValiseDescription : 'Non défini'}"></span>
     </p>
 
-
-    <!-- Relation avec Client -->
-    <p><strong>Client :</strong>
-    <div th:if="${valise.client}">
-        <span th:text="${valise.client.name}"></span>
-    </div>
-    <div th:unless="${valise.client}">
-        Non défini
-    </div>
-
-
-    </p>
-
     <!-- Relation avec MouvementList -->
     <p><strong>Mouvements associés :</strong></p>
     <ul>
@@ -118,14 +105,14 @@
     <!-- Relation avec RegleSortie -->
     <p><strong>Règles associées :</strong></p>
     <ul>
-        <li th:each="regle : ${valise.regles}">
+        <li th:each="regle : ${valise.reglesSortie}">
             <p><strong>Code :</strong> <span th:text="${regle.coderegle}"></span></p>
             <p><strong>Date :</strong> <span th:text="${#dates.format(regle.dateRegle, 'yyyy-MM-dd')}"></span></p>
             <p><strong>Nombre de jours :</strong> <span th:text="${regle.nombreJours}"></span></p>
             <p><strong>Type d'entrée :</strong> <span th:text="${regle.typeEntree}"></span></p>
-            <!-- Add other fields as needed -->
         </li>
     </ul>
+
 
 
 

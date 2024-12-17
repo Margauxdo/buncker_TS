@@ -3,6 +3,7 @@ package example.DTO;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
 public class ValiseDTO {
     private Integer id;
     private String description;
-    private Long numeroValise;
+    private Integer numeroValise;
     private String refClient;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date sortie;
@@ -26,31 +27,22 @@ public class ValiseDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateCreation;
     private String numeroDujeu;
+
+
     private Integer typeValiseId;
-    private Integer clientId;
-    private List<Integer> mouvementIds;
-    private List<Integer> regleSortieIds;
-
-
-    @Setter
-    @Getter
     private String typeValiseDescription;
 
-    @Setter
     @Getter
-    private String clientName;
-
-
     @Setter
-    @Getter
-    private ClientDTO client;
-    private List<MouvementDTO> mouvementList;
-    private List<RegleDTO> regleSortie;
+    private List<MouvementDTO> mouvementList = new ArrayList<>();
 
-    private List<RegleDTO> regles;
+    private List<Integer> mouvementIds;
+    private List<Integer> regleSortieIds;
+    private List<RegleDTO> reglesSortie; // Liste des règles, non plus les ID
 
-    @Setter
-    @Getter
-    private String typeValise;
+
+
+    private Integer clientId;
+
 
 }

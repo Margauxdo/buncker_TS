@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title>Modifier un Client</title>
     <style>
-
-
         form {
             max-width: 800px;
             margin: 20px auto;
@@ -46,8 +44,6 @@
             background-color: #f1b0b7;
         }
 
-
-
         h1 {
             text-align: center;
             color: #343a40;
@@ -58,7 +54,6 @@
 <h1>Modifier un Client</h1>
 
 <form th:action="@{/clients/edit/{id}(id=${client.id})}" th:object="${client}" method="post">
-
 
     <!-- Nom -->
     <label for="name">Nom :</label>
@@ -119,58 +114,39 @@
     <label for="codeClient">Code Client :</label>
     <input type="text" id="codeClient" th:field="*{codeClient}" />
 
-    <!-- Valises -->
-    <label for="valises">Valises :</label>
-
-    <select id="valises" name="valises" multiple th:field="*{valiseIds}">
+    <!-- Sélectionner une Valise -->
+    <label for="valises">Valise :</label>
+    <select id="valises" name="valises" th:field="*{valiseIds}">
         <option th:each="valise : ${valisesList}" th:value="${valise.id}" th:text="${valise.description}"></option>
     </select>
 
-
-
-    <!-- Problems -->
-    <label for="problemes">Problemes :</label>
-
-    <select id="problemes" name="problemes" multiple th:field="*{problemeIds}">
+    <!-- Sélectionner un Problème -->
+    <label for="problemes">Problème :</label>
+    <select id="problemes" name="problemes" th:field="*{problemeId}">
         <option th:each="probleme : ${problemsList}" th:value="${probleme.id}" th:text="${probleme.descriptionProbleme}"></option>
     </select>
 
-
-
-    <!-- Retour Sécurité -->
+    <!-- Sélectionner un Retour Sécurité -->
     <label for="retourSecurite">Retour Sécurité :</label>
-
-    <select id="retourSecurite" name="retourSecurite" th:field="*{retourSecuriteId}">
+    <select id="retourSecurite" name="retourSecurite" th:field="*{retourSecuriteIds}">
         <option th:each="retour : ${retoursList}" th:value="${retour.id}" th:text="${retour.numero}"></option>
     </select>
 
-
-
-    <!-- Rules -->
-    <label for="regles">Regles:</label>
-
-    <select id="regles" name="regles" multiple th:field="*{regleIds}">
+    <!-- Sélectionner une Règle -->
+    <label for="regles">Règle :</label>
+    <select id="regles" name="regles" th:field="*{regleId}">
         <option th:each="regle : ${rulesList}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>
 
-
-
-
-
-
-
-
-
-        <div style="margin-top: 20px;">
-            <button type="submit">Valider</button>
-            <a href="/" th:href="@{/}">
-                <button type="button" class="btn-danger">Retour à l'Accueil</button>
-            </a>
-            <a href="/clients/list" th:href="@{/clients/list}">
-                <button type="button" class="btn-danger">Retour à la Liste</button>
-            </a>
-        </div>
+    <div style="margin-top: 20px;">
+        <button type="submit">Valider</button>
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
+        </a>
+        <a href="/clients/list" th:href="@{/clients/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
+        </a>
+    </div>
 </form>
 </body>
 </html>
-

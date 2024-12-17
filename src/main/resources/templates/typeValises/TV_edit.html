@@ -95,9 +95,6 @@
   <input type="text" th:field="*{proprietaire}" placeholder="Propriétaire" required />
 
   <input th:field="*{description}" placeholder="Description"/>
-  <select th:field="*{valiseId}">
-    <option th:each="valise : ${valises}" th:value="${valise.id}" th:text="${valise.description}"></option>
-  </select>
 
 
 

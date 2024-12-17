@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "probleme")
 @Data
@@ -34,11 +37,10 @@ public class Probleme {
     private Valise valise;
 
 
-    //@ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = true)
-    @JsonBackReference
-    private Client client;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "probleme", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Client> clients= new ArrayList<Client>();
 
 
 }

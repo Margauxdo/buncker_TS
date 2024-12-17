@@ -58,7 +58,7 @@ public class LivreurServiceIntegrationTest {
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV123")
                 .motDePasse("password")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement)
                 .build();
     }
 
@@ -89,7 +89,7 @@ public class LivreurServiceIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV001")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement)
                 .build();
 
         // Act
@@ -99,9 +99,9 @@ public class LivreurServiceIntegrationTest {
         assertNotNull(createdLivreur.getId());
         assertEquals(livreur.getNomLivreur(), createdLivreur.getNomLivreur());
         assertEquals(livreur.getCodeLivreur(), createdLivreur.getCodeLivreur());
-        assertNotNull(createdLivreur.getMouvement());
-        assertEquals(mouvement.getId(), createdLivreur.getMouvement().getId());
-        assertEquals(valise.getId(), createdLivreur.getMouvement().getValise().getId());
+        assertNotNull(createdLivreur.getMouvements());
+        assertEquals(mouvement.getId(), createdLivreur.getMouvements().get(1));
+        assertEquals(valise.getId(), createdLivreur.getMouvements().get(1).getId());
     }
 
 
@@ -133,7 +133,7 @@ public class LivreurServiceIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV123")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement)
                 .build();
         livreurService.createLivreur(livreur);
 
@@ -169,7 +169,7 @@ public class LivreurServiceIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV001")
-                .mouvement(mouvement) // Associer le mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associer le mouvement
                 .build();
         Livreur createdLivreur = livreurService.createLivreur(livreur);
 
@@ -182,8 +182,8 @@ public class LivreurServiceIntegrationTest {
         // Assert
         assertNotNull(updatedLivreur);
         assertEquals("Updated Name", updatedLivreur.getNomLivreur());
-        assertNotNull(updatedLivreur.getMouvement());
-        assertEquals(mouvement.getId(), updatedLivreur.getMouvement().getId());
+        assertNotNull(updatedLivreur.getMouvements());
+        assertEquals(mouvement.getId(), updatedLivreur.getMouvements().get(1));
     }
 
 
@@ -226,7 +226,7 @@ public class LivreurServiceIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV123")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement)
                 .build();
         Livreur createdLivreur = livreurService.createLivreur(livreur);
 
@@ -288,7 +288,7 @@ public class LivreurServiceIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV123")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement)
                 .build();
         livreurService.createLivreur(livreur);
 
@@ -333,7 +333,7 @@ public class LivreurServiceIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("John Doe")
                 .codeLivreur("LIV123")
-                .mouvement(mouvement) // Associer un mouvement valide
+                .mouvements((List<Mouvement>) mouvement) // Associer un mouvement valide
                 .build();
         Livreur createdLivreur = livreurService.createLivreur(livreur);
 

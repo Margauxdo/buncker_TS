@@ -102,13 +102,13 @@
 
     <!-- Liste déroulante pour choisir une règle -->
     <label for="regle">Règle :</label>
-    <select id="regle" th:field="*{regleId}" required>
-
+    <select id="regle" th:field="*{regleIds}">
         <option value="" disabled selected>Sélectionner une règle</option>
         <option th:each="regle : ${regles}"
                 th:value="${regle.id}"
                 th:text="${regle.coderegle}"></option>
     </select>
+
 
 
 

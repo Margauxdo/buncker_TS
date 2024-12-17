@@ -74,7 +74,7 @@ public class MouvementRepositoryIntegrationTest {
                 .dateHeureMouvement(new Date())
                 .dateSortiePrevue(new Date())
                 .dateRetourPrevue(new Date())
-                .livreurs(new ArrayList<>()) // Ensure livreurs is initialized
+                .livreur(Livreur.builder().build()) // Ensure livreurs is initialized
                 .build();
 
         // Add Livreurs to the Mouvement
@@ -82,15 +82,15 @@ public class MouvementRepositoryIntegrationTest {
                 .nomLivreur("jean")
                 .build();
 
-        mouvement.addLivreur(livreur); // Add livreur to mouvement
+        //mouvement.(livreur); // Add livreur to mouvement
         mouvement = mouvementRepository.save(mouvement);
 
         // Assertions
         assertNotNull(mouvement.getId(), "Mouvement ID should not be null");
         assertEquals("finished", mouvement.getStatutSortie(), "StatutSortie should match");
-        assertEquals(1, mouvement.getLivreurs().size(), "Mouvement should have one Livreur");
+        assertEquals(1, mouvement.getLivreur().getMouvements(), "Mouvement should have one Livreur");
         assertEquals(valise.getId(), mouvement.getValise().getId(), "Valise ID should match");
-        assertEquals("jean", mouvement.getLivreurs().get(0).getNomLivreur(), "Livreur name should match");
+        assertEquals("jean", mouvement.getLivreur().getMouvements().size(), "Livreur name should match");
     }
 
 

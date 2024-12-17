@@ -6,18 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface JourFerieRepository extends JpaRepository<JourFerie, Integer> {
 
-    @Query("SELECT jf FROM JourFerie jf LEFT JOIN FETCH jf.regles WHERE jf.id = :id")
-    Optional<JourFerie> findByIdWithRegles(@Param("id") int id);
+    // Custom query to find holidays by a specific date
+    @Query("SELECT jf FROM JourFerie jf WHERE jf.date = :date")
+    List<JourFerie> findByDate(@Param("date") Date date);
 
-    @Query("SELECT DISTINCT jf FROM JourFerie jf LEFT JOIN FETCH jf.regles")
-    List<JourFerie> findAllWithRegles();
-
-
-
+    // Check if a holiday exists by a specific date
+    boolean existsByDate(Date date);
 }
+

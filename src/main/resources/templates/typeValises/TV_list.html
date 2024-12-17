@@ -84,7 +84,6 @@
         <th>ID</th>
         <th>Propriétaire</th>
         <th>Description</th>
-        <th>Valise Associée</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -95,7 +94,6 @@
         <td th:text="${typeValise.id}"></td>
         <td th:text="${typeValise.proprietaire}"></td>
         <td th:text="${typeValise.description}"></td>
-        <td th:text="${typeValise.numeroValise != null ? typeValise.numeroValise : 'Aucune'}"></td>
 
 
 
@@ -127,7 +125,7 @@
 <!-- Lien vers la page de création d'un nouveau type de valise -->
 <div style="margin-top: 20px;">
     <a href="/typeValise/create">
-        <button type="button">Créer une nouvelle formule</button>
+        <button type="button">Créer une nouveau type de valise</button>
     </a>
     <a href="/" th:href="@{/}">
         <button type="button" class="btn-danger">Retour à l'Accueil</button>

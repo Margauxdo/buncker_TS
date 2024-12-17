@@ -29,7 +29,7 @@ public class Valise {
     @NotNull
     private String description;
     @NotNull
-    private Long numeroValise;
+    private Integer numeroValise;
     private String refClient;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -46,29 +46,26 @@ public class Valise {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_valise_id")
-    @JsonBackReference
+    @JsonIgnore
+    @ToString.Exclude
     private TypeValise typeValise;
 
-
-    //@ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "client_id", nullable = false)
     @JsonBackReference
     private Client client;
 
 
-    @Setter
-    @Getter
-    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, fetch = FetchType.LAZY)  // , fetch = FetchType.LAZY , orphanRemoval = true
+    @JsonManagedReference
+    @ToString.Exclude
     private List<Mouvement> mouvements = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "valise", fetch = FetchType.EAGER)
-    private List<Regle> regleSortie = new ArrayList<>();
-
-
-    @Override
-    public String toString() {
-        return "Valise{id=" + id + ", description='" + description + "'}";
-    }
+    @ManyToOne  // , fetch = FetchType.EAGER    , cascade = CascadeType.ALL,
+    @JsonBackReference
+    @JoinColumn(name = "cle_regle")
+    @ToString.Exclude
+    private Regle reglesSortie ;
 
 }

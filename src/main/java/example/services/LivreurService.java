@@ -30,85 +30,41 @@ public class LivreurService implements ILivreurService {
         this.mouvementRepository = mouvementRepository;
     }
 
-    private LivreurDTO convertToDTO(Livreur livreur) {
-        return LivreurDTO.builder()
-                .id(livreur.getId())
-                .codeLivreur(livreur.getCodeLivreur())
-                .motDePasse(livreur.getMotDePasse())
-                .nomLivreur(livreur.getNomLivreur())
-                .prenomLivreur(livreur.getPrenomLivreur())
-                .numeroCartePro(livreur.getNumeroCartePro())
-                .telephonePortable(livreur.getTelephonePortable())
-                .telephoneKobby(livreur.getTelephoneKobby())
-                .telephoneAlphapage(livreur.getTelephoneAlphapage())
-                .mouvementStatutSortie(livreur.getMouvements() != null ?
-                        livreur.getMouvements().stream()
-                                .map(Mouvement::getStatutSortie)
-                                .collect(Collectors.joining(", ")) : null)
-                .build();
-    }
-
-    private Livreur convertToEntity(LivreurDTO livreurDTO) {
-        Livreur livreur = new Livreur();
-        livreur.setId(livreurDTO.getId());
-        livreur.setCodeLivreur(livreurDTO.getCodeLivreur());
-        livreur.setMotDePasse(livreurDTO.getMotDePasse());
-        livreur.setNomLivreur(livreurDTO.getNomLivreur());
-        livreur.setPrenomLivreur(livreurDTO.getPrenomLivreur());
-        livreur.setNumeroCartePro(livreurDTO.getNumeroCartePro());
-        livreur.setTelephonePortable(livreurDTO.getTelephonePortable());
-        livreur.setTelephoneKobby(livreurDTO.getTelephoneKobby());
-        livreur.setTelephoneAlphapage(livreurDTO.getTelephoneAlphapage());
-
-        if (livreurDTO.getMouvementId() != null) {
-            Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
-            livreur.setMouvements(List.of(mouvement));
-        }
-
-        return livreur;
-    }
-
     @Override
     @Transactional
     public LivreurDTO createLivreur(LivreurDTO livreurDTO) {
-        if (livreurDTO.getMouvementId() != null) {
-            mouvementRepository.findById(livreurDTO.getMouvementId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement not found with ID " + livreurDTO.getMouvementId()));
-        }
+        Livreur livreur = mapToEntity(livreurDTO);
 
-        Livreur livreur = convertToEntity(livreurDTO);
-        return convertToDTO(livreurRepository.save(livreur));
+        // Sauvegarde de l'entité
+        Livreur savedLivreur = livreurRepository.save(livreur);
+
+        return mapToDTO(savedLivreur);
     }
 
     @Override
-    public LivreurDTO updateLivreur(int id, LivreurDTO livreurDTO) {
-        return null;
-    }
-
     @Transactional
-    public void updateLivreur(Integer id, LivreurDTO livreurDTO) {
-        // Recherche du Livreur existant
+    public LivreurDTO updateLivreur(int id, LivreurDTO livreurDTO) {
         Livreur existingLivreur = livreurRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Livreur non trouvé"));
+                .orElseThrow(() -> new EntityNotFoundException("Livreur introuvable avec l'ID : " + id));
 
-        // Mettre à jour les propriétés de l'entité Livreur avec celles du DTO
+        // Mise à jour des champs
+        existingLivreur.setCodeLivreur(livreurDTO.getCodeLivreur());
         existingLivreur.setNomLivreur(livreurDTO.getNomLivreur());
         existingLivreur.setPrenomLivreur(livreurDTO.getPrenomLivreur());
-        // Ajoutez toutes les autres propriétés à mettre à jour
+        existingLivreur.setNumeroCartePro(livreurDTO.getNumeroCartePro());
+        existingLivreur.setTelephonePortable(livreurDTO.getTelephonePortable());
+        existingLivreur.setTelephoneKobby(livreurDTO.getTelephoneKobby());
+        existingLivreur.setTelephoneAlphapage(livreurDTO.getTelephoneAlphapage());
+        existingLivreur.setDescription(livreurDTO.getDescription());
 
-        // Vérification et mise à jour du Mouvement si l'ID est présent
-        if (livreurDTO.getMouvementId() != null) {
-            // Vérification de l'existence du Mouvement dans la base de données
-            Mouvement mouvement = mouvementRepository.findById(livreurDTO.getMouvementId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mouvement non trouvé"));
-
-            // Associer le Mouvement au Livreur
-            existingLivreur.setMouvements(List.of(mouvement));
+        // Mise à jour des mouvements associés
+        if (livreurDTO.getMouvementIds() != null) {
+            List<Mouvement> mouvements = mouvementRepository.findAllById(livreurDTO.getMouvementIds());
+            existingLivreur.setMouvements(mouvements);
         }
 
-        // Sauvegarde de l'entité mise à jour
-        livreurRepository.save(existingLivreur);
+        Livreur updatedLivreur = livreurRepository.save(existingLivreur);
+        return mapToDTO(updatedLivreur);
     }
 
     @Override
@@ -125,7 +81,7 @@ public class LivreurService implements ILivreurService {
     @Transactional
     public void deleteLivreur(int id) {
         if (!livreurRepository.existsById(id)) {
-            throw new EntityNotFoundException("Livreur not found with ID " + id);
+            throw new EntityNotFoundException("Livreur introuvable avec l'ID : " + id);
         }
         livreurRepository.deleteById(id);
     }
@@ -134,21 +90,60 @@ public class LivreurService implements ILivreurService {
     @Transactional(readOnly = true)
     public LivreurDTO getLivreurById(int id) {
         Livreur livreur = livreurRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Livreur not found with ID " + id));
-        Hibernate.initialize(livreur.getMouvements()); // Initialize the collection
-        return convertToDTO(livreur);
+                .orElseThrow(() -> new EntityNotFoundException("Livreur introuvable avec l'ID : " + id));
+
+        return mapToDTO(livreur);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<LivreurDTO> getAllLivreurs() {
         return livreurRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void saveLivreur(Livreur livreur) {
 
+    }
+
+    // Méthode de conversion Entité -> DTO
+    private LivreurDTO mapToDTO(Livreur livreur) {
+        return LivreurDTO.builder()
+                .id(livreur.getId())
+                .codeLivreur(livreur.getCodeLivreur())
+                .nomLivreur(livreur.getNomLivreur())
+                .prenomLivreur(livreur.getPrenomLivreur())
+                .numeroCartePro(livreur.getNumeroCartePro())
+                .telephonePortable(livreur.getTelephonePortable())
+                .telephoneKobby(livreur.getTelephoneKobby())
+                .telephoneAlphapage(livreur.getTelephoneAlphapage())
+                .description(livreur.getDescription())
+                .mouvementIds(livreur.getMouvements() != null ? livreur.getMouvements().stream().map(Mouvement::getId).toList() : null)
+                .mouvementStatuts(livreur.getMouvements() != null ? livreur.getMouvements().stream().map(Mouvement::getStatutSortie).toList() : null)
+                .build();
+    }
+
+    // Méthode de conversion DTO -> Entité
+    private Livreur mapToEntity(LivreurDTO livreurDTO) {
+        Livreur livreur = Livreur.builder()
+                .id(livreurDTO.getId())
+                .codeLivreur(livreurDTO.getCodeLivreur())
+                .nomLivreur(livreurDTO.getNomLivreur())
+                .prenomLivreur(livreurDTO.getPrenomLivreur())
+                .numeroCartePro(livreurDTO.getNumeroCartePro())
+                .telephonePortable(livreurDTO.getTelephonePortable())
+                .telephoneKobby(livreurDTO.getTelephoneKobby())
+                .telephoneAlphapage(livreurDTO.getTelephoneAlphapage())
+                .description(livreurDTO.getDescription())
+                .build();
+
+        if (livreurDTO.getMouvementIds() != null) {
+            List<Mouvement> mouvements = mouvementRepository.findAllById(livreurDTO.getMouvementIds());
+            livreur.setMouvements(mouvements);
+        }
+
+        return livreur;
     }
 }

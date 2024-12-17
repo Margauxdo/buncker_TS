@@ -34,11 +34,17 @@ public class RetourSecuriteController {
     public String listRetourSecurites(Model model) {
         List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
         for (RetourSecuriteDTO retour : retourSecurites) {
-            retour.setNombreClients(clientService.getAllClients().size());
+            if (retour.getMouvementStatuts() != null) {
+                String mouvementStatutsString = String.join(", ", retour.getMouvementStatuts());
+                retour.setMouvementStatutsString(mouvementStatutsString);
+            }
+            // Set the nombreClients property
+            retour.setNombreClients(retour.getMouvementStatuts() != null ? retour.getMouvementStatuts().size() : 0);
         }
         model.addAttribute("retoursSecurite", retourSecurites);
         return "retourSecurites/RS_list";
     }
+
 
 
 

@@ -1,10 +1,6 @@
 package example.controller;
 
 import example.DTO.*;
-import example.entity.Livreur;
-import example.entity.Mouvement;
-import example.entity.Valise;
-import example.exceptions.ResourceNotFoundException;
 import example.interfaces.IMouvementService;
 import example.repositories.LivreurRepository;
 import example.services.LivreurService;
@@ -14,11 +10,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
@@ -74,7 +68,7 @@ public class MouvementController {
         // Ajouter les listes et l'objet mouvement au modèle
         model.addAttribute("valises", valises);
         model.addAttribute("livreurs", livreurs);
-        model.addAttribute("mouvement", new MouvementDTO());
+        model.addAttribute("retourSecurite", new RetourSecuriteDTO());
         return "mouvements/mouv_create";
     }
 
@@ -120,7 +114,6 @@ public class MouvementController {
         List<LivreurDTO> livreurs = livreurService.getAllLivreurs();
         List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
 
-        model.addAttribute("mouvement", mouvement);
         model.addAttribute("valises", valises);
         model.addAttribute("livreurs", livreurs);
 

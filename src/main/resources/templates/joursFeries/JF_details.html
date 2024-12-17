@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Créer un Jour Férié</title>
+    <title>Détails du Jour Férié</title>
     <style>
         form {
             max-width: 600px;
@@ -19,13 +19,21 @@
             font-weight: bold;
         }
 
-        input, select {
-            width: 100%; /* Ensure full width */
+        input {
+            width: 100%;
             padding: 8px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+
+            cursor: pointer;
+        }
+
 
         button {
             padding: 5px 10px;
@@ -35,6 +43,8 @@
             color: #ffffff;
             cursor: pointer;
         }
+
+
 
         button[type="button"].btn-danger {
             background-color: #f8d7da;
@@ -46,24 +56,26 @@
             background-color: #f1b0b7;
         }
     </style>
-
 </head>
 <body>
-<h1 style="text-align: center;">Créer un Nouveau Jour Férié</h1>
-<form th:action="@{/jourferies/create}" th:object="${jourFerie}" method="post">
-    <label for="date">Date :</label>
-    <input type="date" id="date" th:field="*{date}" required />
+<h1>Détails du Jour Férié</h1>
+<p>Date : <span th:text="${jourFerie.date}"></span></p>
+<h2>Règles Associées</h2>
+<div class="container">
 
-    <div style="margin-top: 20px;">
-        <button type="submit">Créer</button>
-        <a href="/" th:href="@{/}">
-            <button type="button" class="btn-danger">Retour à l'Accueil</button>
-        </a>
-        <a   href="/jourferies/list" th:href="@{/jourferies/list}">
-            <button type="button" class="btn-danger">Retour à la Liste</button>
-        </a>
-    </div>
-</form>
+
+<div style="margin-top: 20px;">
+    <a href="/" th:href="@{/}">
+        <button type="button" class="btn-danger">Retour à l'Accueil</button>
+    </a>
+    <a href="/jourferies/list" th:href="@{/jourferies/list}">
+        <button type="button" class="btn-danger">Retour à la Liste</button>
+    </a>
+
+</div>
+</div>
 
 </body>
 </html>
+
+

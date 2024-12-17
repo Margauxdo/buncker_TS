@@ -75,9 +75,11 @@
   <div th:if="${#fields.hasErrors('numeroValise')}" style="color: red;">
     <p th:errors="*{numeroValise}"></p>
   </div>
-  <!-- Champ pour la référence client -->
-  <label for="refClient">Référence Client :</label>
-  <input type="text" id="refClient" th:field="*{refClient}" placeholder="Entrez la référence client" />
+  <select id="refClient" th:field="*{clientId}">
+    <option value="" th:text="'Sélectionner un client'"></option>
+    <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name}"></option>
+  </select>
+
 
   <!-- Dates associées -->
   <label for="sortie">Date de Sortie :</label>
@@ -103,20 +105,9 @@
   <label for="typeValise">Type de valise :</label>
   <select id="typeValise" name="typeValiseId" th:field="*{typeValiseId}">
     <option value="" th:text="'Sélectionner un type de valise'"></option>
-    <option th:each="type : ${typesValise}"
-            th:value="${type.id}"
-            th:text="${type.description}"></option>
-  </select>
-
-
-
-  <!-- Relation avec Client -->
-  <label for="client">Client :</label>
-  <select id="client" name="clientId" th:field="*{clientId}">
-    <option value="" th:text="'Sélectionner un client'"></option>
-    <option th:each="client : ${clients}"
-            th:value="${client.id}"
-            th:text="${client.name}"></option>
+    <option th:each="typesValise : ${typesValise}"
+            th:value="${typesValise.id}"
+            th:text="${typesValise.getProprietaire()} + ' - ' + ${typesValise.getDescription()}"></option>
   </select>
 
 

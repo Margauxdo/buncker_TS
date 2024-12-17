@@ -201,7 +201,7 @@ public class MouvementIntegrationTest {
         livreur.setNomLivreur("NomLivreur");
         livreurRepository.saveAndFlush(livreur);
 
-        mouvement.addLivreur(livreur);
+        //mouvement.add(livreur);
         RetourSecurite retourSecurite = new RetourSecurite();
         retourSecurite.setNumero(12345L);
         retourSecurite.setMouvement(mouvement);

@@ -53,7 +53,7 @@ public class TypeRegleServiceIntegrationTest {
         // Arrange
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("Test TypeRegle")
-                .regleId(regle.getId())
+                .nomTypeRegle("test")
                 .build();
 
         // Act
@@ -63,7 +63,7 @@ public class TypeRegleServiceIntegrationTest {
         assertNotNull(savedTypeRegleDTO);
         assertNotNull(savedTypeRegleDTO.getId());
         assertEquals("Test TypeRegle", savedTypeRegleDTO.getNomTypeRegle());
-        assertEquals(regle.getId(), savedTypeRegleDTO.getRegleId());
+        assertEquals(regle.getId(), savedTypeRegleDTO.getNomTypeRegle());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class TypeRegleServiceIntegrationTest {
         // Arrange
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("Invalid TypeRegle")
-                .regleId(999) // ID inexistant
+                .nomTypeRegle("test") // ID inexistant
                 .build();
 
         // Act & Assert
@@ -87,14 +87,14 @@ public class TypeRegleServiceIntegrationTest {
         // Arrange
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("Initial TypeRegle")
-                .regleId(regle.getId())
+
                 .build();
         TypeRegleDTO savedTypeRegleDTO = typeRegleService.createTypeRegle(typeRegleDTO);
 
         TypeRegleDTO updatedDTO = TypeRegleDTO.builder()
                 .id(savedTypeRegleDTO.getId())
                 .nomTypeRegle("Updated TypeRegle")
-                .regleId(regle.getId())
+
                 .build();
 
         // Act
@@ -111,7 +111,6 @@ public class TypeRegleServiceIntegrationTest {
         TypeRegleDTO updatedDTO = TypeRegleDTO.builder()
                 .id(999)
                 .nomTypeRegle("Nonexistent TypeRegle")
-                .regleId(regle.getId())
                 .build();
 
         // Act & Assert
@@ -127,7 +126,6 @@ public class TypeRegleServiceIntegrationTest {
         // Arrange
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("TypeRegle A")
-                .regleId(regle.getId())
                 .build();
         TypeRegleDTO savedTypeRegleDTO = typeRegleService.createTypeRegle(typeRegleDTO);
 
@@ -144,13 +142,11 @@ public class TypeRegleServiceIntegrationTest {
         // Arrange
         TypeRegleDTO typeRegleDTO1 = TypeRegleDTO.builder()
                 .nomTypeRegle("TypeRegle 1")
-                .regleId(regle.getId())
                 .build();
         typeRegleService.createTypeRegle(typeRegleDTO1);
 
         TypeRegleDTO typeRegleDTO2 = TypeRegleDTO.builder()
                 .nomTypeRegle("TypeRegle 2")
-                .regleId(regle.getId())
                 .build();
         typeRegleService.createTypeRegle(typeRegleDTO2);
 
@@ -167,7 +163,6 @@ public class TypeRegleServiceIntegrationTest {
         // Arrange
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("Deletable TypeRegle")
-                .regleId(regle.getId())
                 .build();
         TypeRegleDTO savedTypeRegleDTO = typeRegleService.createTypeRegle(typeRegleDTO);
 

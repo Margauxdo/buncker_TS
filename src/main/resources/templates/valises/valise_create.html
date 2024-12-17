@@ -66,8 +66,13 @@
     <input type="number" id="numeroValise" th:field="*{numeroValise}" placeholder="Entrez le numéro de valise" required />
 
     <!-- Champ pour la référence client -->
+
     <label for="refClient">Référence Client :</label>
-    <input type="text" id="refClient" th:field="*{refClient}" placeholder="Entrez une référence client" />
+    <select id="refClient" th:field="*{clientId}">
+        <option value="" th:text="'Sélectionner un client'"></option>
+        <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name}"></option>
+    </select>
+
 
     <!-- Champ pour la date de sortie -->
     <label for="sortie">Date de Sortie :</label>
@@ -84,6 +89,11 @@
     <label for="dateRetourPrevue">Date de Retour Prévue :</label>
     <input type="date" id="dateRetourPrevue" th:field="*{dateRetourPrevue}" th:value="*{#dates.format(dateRetourPrevue, 'yyyy-MM-dd')}" />
 
+    <!-- Champ pour la date de retour prévue -->
+    <label for="dateCreation">Date de Création :</label>
+    <input type="date" id="dateCreation" th:field="*{dateCreation}"  th:value="*{#dates.format(dateCreation, 'yyyy-MM-dd')}" />
+
+
     <!-- Champ pour le numéro du jeu -->
     <label for="numeroDujeu">Numéro du Jeu :</label>
     <input type="text" id="numeroDujeu" th:field="*{numeroDujeu}" placeholder="Entrez le numéro du jeu" />
@@ -92,15 +102,7 @@
     <label for="typeValise">Type de Valise :</label>
     <select id="typeValise" th:field="*{typeValiseId}">
         <option value="" th:text="'Sélectionner un type de valise'"></option>
-        <option th:each="type : ${typesValise}" th:value="${type.id}" th:text="${type.description}"></option>
-    </select>
-
-
-    <!-- Relation avec Client -->
-    <label for="client">Client :</label>
-    <select id="client" th:field="*{clientId}">
-        <option value="" th:text="'Sélectionner un client'"></option>
-        <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name}"></option>
+        <option th:each="typeValise : ${typesValise}" th:value="${typeValise.id}" th:text="${typeValise.getProprietaire()} + ' - ' + ${typeValise.getDescription()}"></option>
     </select>
 
 
@@ -110,6 +112,7 @@
         <option value="" th:text="'Sélectionner un mouvement'"></option>
         <option th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.statutSortie}"></option>
     </select>
+
 
     <!-- Liste des règles associées (ajout facultatif si nécessaire) -->
     <label for="regles">Règles associées :</label>

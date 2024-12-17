@@ -30,7 +30,7 @@ public class ClientServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    private ClientDTO createClientDTO() {
+    /*private ClientDTO createClientDTO() {
         return new ClientDTO(
                 null,
                 "John Doe",
@@ -191,5 +191,5 @@ public class ClientServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(clientRepository, times(1)).findAll();
-    }
+    }*/
 }

@@ -2,6 +2,7 @@ package example.controller;
 
 import example.DTO.JourFerieDTO;
 import example.interfaces.IJourFerieService;
+import example.services.JourFerieService;
 import example.services.RegleService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ import java.util.List;
 public class JourFerieController {
 
     @Autowired
-    private IJourFerieService jourFerieService;
+    private JourFerieService jourFerieService;
 
     private static final Logger logger = LoggerFactory.getLogger(JourFerieController.class);
     @Autowired
@@ -33,17 +34,10 @@ public class JourFerieController {
         return "joursFeries/JF_list";
     }
 
-    @GetMapping("/view/{id}")
-    public String viewJFById(@PathVariable int id, Model model) {
-        JourFerieDTO jourFerie = jourFerieService.getJourFerie(id);
-        model.addAttribute("jourFerie", jourFerie);
-        return "joursFeries/JF_details";
-    }
 
     @GetMapping("/create")
     public String createJourFerieForm(Model model) {
         model.addAttribute("jourFerie", new JourFerieDTO());
-        model.addAttribute("regles", regleService.getAllRegles());
         return "joursFeries/JF_create";
     }
 
@@ -54,7 +48,6 @@ public class JourFerieController {
             BindingResult result,
             Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("regles", regleService.getAllRegles());
             return "joursFeries/JF_create";
         }
         jourFerieService.saveJourFerie(jourFerieDTO);

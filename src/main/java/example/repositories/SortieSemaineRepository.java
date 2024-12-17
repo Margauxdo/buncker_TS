@@ -9,5 +9,13 @@ import java.util.List;
 
 @Repository
 public interface SortieSemaineRepository extends JpaRepository<SortieSemaine, Integer> {
+
+ // Find by the specific date of the sortie semaine
  List<SortieSemaine> findByDateSortieSemaine(Date dateSortieSemaine);
+
+ // Find all sortie semaine records that have associated rules
+ List<SortieSemaine> findByReglesIsNotNull();
+
+ // Custom query to find sortie semaine by rule ID
+ List<SortieSemaine> findByRegles_Id(Integer regleId);
 }

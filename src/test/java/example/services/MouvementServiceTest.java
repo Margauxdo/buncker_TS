@@ -237,14 +237,14 @@ public class MouvementServiceTest {
     @Test
     public void testCreateMouvement_WithLivreurs() {
         Mouvement mouvement = new Mouvement();
-        mouvement.setLivreurs(Collections.singletonList(new Livreur()));
+        mouvement.setLivreur((Livreur) Collections.singletonList(new Livreur()));
 
         when(mouvementRepository.save(any(Mouvement.class))).thenReturn(mouvement);
 
         Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
 
         assertNotNull(createdMouvement);
-        assertEquals(1, createdMouvement.getLivreurs().size());
+        assertEquals(1, createdMouvement.getLivreur().getMouvements());
     }
 
 }

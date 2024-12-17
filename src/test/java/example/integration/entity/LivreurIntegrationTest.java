@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import jakarta.transaction.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,7 +67,9 @@ public class LivreurIntegrationTest {
         livreur.setPrenomLivreur("Paul");
         livreur.setNumeroCartePro("12345");
         livreur.setTelephonePortable("123456789");
-        livreur.setMouvement(mouvement);
+        livreur.setMouvements((List<Mouvement>) mouvement);
+
+
 
         Livreur savedLivreur = livreurRepository.saveAndFlush(livreur);
 
@@ -77,7 +80,7 @@ public class LivreurIntegrationTest {
         assertEquals("Paul", savedLivreur.getPrenomLivreur());
         assertEquals("12345", savedLivreur.getNumeroCartePro());
         assertEquals("123456789", savedLivreur.getTelephonePortable());
-        assertEquals(mouvement.getId(), savedLivreur.getMouvement().getId());
+        assertEquals(mouvement.getId(), savedLivreur.getMouvements().size());
     }
 
 
@@ -105,7 +108,7 @@ public class LivreurIntegrationTest {
         livreur.setPrenomLivreur("Jean");
         livreur.setNumeroCartePro("67890");
         livreur.setTelephonePortable("987654321");
-        livreur.setMouvement(mouvement);
+        livreur.setMouvements((List<Mouvement>) mouvement);
         livreur = livreurRepository.saveAndFlush(livreur);
 
         Optional<Livreur> foundLivreur = livreurRepository.findById(livreur.getId());
@@ -140,7 +143,7 @@ public class LivreurIntegrationTest {
         livreur.setPrenomLivreur("Sophie");
         livreur.setNumeroCartePro("54321");
         livreur.setTelephonePortable("1122334455");
-        livreur.setMouvement(mouvement);
+        livreur.setMouvements((List<Mouvement>) mouvement);
         livreur = livreurRepository.saveAndFlush(livreur);
 
         livreur.setNomLivreur("Lemoine Updated");
@@ -177,7 +180,7 @@ public class LivreurIntegrationTest {
         livreur.setPrenomLivreur("Alice");
         livreur.setNumeroCartePro("98765");
         livreur.setTelephonePortable("6677889900");
-        livreur.setMouvement(mouvement);
+        livreur.setMouvements((List<Mouvement>) mouvement);
         livreur = livreurRepository.saveAndFlush(livreur);
 
         livreurRepository.deleteById(livreur.getId());
@@ -210,11 +213,11 @@ public class LivreurIntegrationTest {
         livreur.setPrenomLivreur("Jean");
         livreur.setNumeroCartePro("67890");
         livreur.setTelephonePortable("987654321");
-        livreur.setMouvement(mouvement);
+        livreur.setMouvements((List<Mouvement>) mouvement);
         livreur = livreurRepository.saveAndFlush(livreur);
 
-        assertEquals(livreur.getMouvement().getId(), mouvement.getId());
-        assertEquals(livreur.getMouvement().getStatutSortie(), "Test Statut");
+        assertEquals(livreur.getMouvements(), mouvement.getId());
+        assertEquals(livreur.getMouvements(), "Test Statut");
     }
 
 

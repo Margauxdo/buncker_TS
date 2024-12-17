@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,8 +15,10 @@ public class ProblemeDTO {
     private Integer id;
     private String descriptionProbleme;
     private String detailsProbleme;
+
     private Integer valiseId;
-    private Integer clientId;
-    private ClientDTO client;
-    private ValiseDTO valise;
+    private String valiseNumero;
+
+    private List<Integer> clientIds;
+    private List<String> clientNoms;
 }

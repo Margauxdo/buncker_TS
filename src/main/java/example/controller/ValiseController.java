@@ -23,8 +23,6 @@ public class ValiseController {
     @Autowired
     private IValiseService valiseService;
     @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
     private TypeValiseRepository typeValiseRepository;
     @Autowired
     private TypeValiseService typeValiseService;
@@ -32,6 +30,8 @@ public class ValiseController {
     private MouvementRepository mouvementRepository;
     @Autowired
     private RegleRepository regleRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
     @GetMapping("/list")
     public String viewValises(Model model) {
@@ -49,18 +49,14 @@ public class ValiseController {
     }
     @GetMapping("/create")
     public String createValise(Model model) {
-        //ValiseDTO valise = new ValiseDTO();
         model.addAttribute("valise", new ValiseDTO());
 
+        model.addAttribute("typesValise", typeValiseRepository.findAll());
+        model.addAttribute("mouvements", mouvementRepository.findAll());
+        model.addAttribute("regles", regleRepository.findAll());
         model.addAttribute("clients", clientRepository.findAll());
-        //model.addAttribute("typesValise", typeValiseRepository.findAll());
-        //model.addAttribute("mouvements", mouvementRepository.findAll());
-        //model.addAttribute("regles", regleRepository.findAll());
         return "valises/valise_create";
-
     }
-
-
 
 
 
@@ -81,22 +77,23 @@ public class ValiseController {
         model.addAttribute("valise", valiseDTO);
 
         // Ajout des listes nécessaires au modèle
-        model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("typesValise", typeValiseRepository.findAll());
         model.addAttribute("mouvements", mouvementRepository.findAll());
         model.addAttribute("regles", regleRepository.findAll());
+        model.addAttribute("clients", clientRepository.findAll());
+
 
         return "valises/valise_edit";
     }
 
-
-
-
-
-
-
     @PostMapping("/edit/{id}")
     public String updateValise(@PathVariable int id, @Valid @ModelAttribute("valise") ValiseDTO valiseDTO, Model model) {
+
+        System.out.println("numeroValise : " + valiseDTO.getNumeroValise());
+        System.out.println("dateCreation : " + valiseDTO.getDateCreation());
+        System.out.println("dateSortiePrevue : " + valiseDTO.getDateSortiePrevue());
+
+
         try {
             valiseService.updateValise(id, valiseDTO);
             return "redirect:/valise/list";

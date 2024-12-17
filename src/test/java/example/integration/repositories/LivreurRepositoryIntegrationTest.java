@@ -77,7 +77,7 @@ public class LivreurRepositoryIntegrationTest {
                 .nomLivreur("Jean Dupont")
                 .prenomLivreur("Jean")
                 .telephonePortable("0123456789")
-                .mouvement(mouvement) // Associate the Mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associate the Mouvement
                 .build();
 
         Livreur savedLivreur = livreurRepository.save(livreur);
@@ -86,9 +86,9 @@ public class LivreurRepositoryIntegrationTest {
         assertNotNull(savedLivreur.getId(), "Livreur ID should not be null after saving.");
         assertEquals("Jean Dupont", savedLivreur.getNomLivreur(), "NomLivreur did not match.");
         assertEquals("Jean", savedLivreur.getPrenomLivreur(), "PrenomLivreur did not match.");
-        assertNotNull(savedLivreur.getMouvement(), "Mouvement should not be null.");
-        assertNotNull(savedLivreur.getMouvement().getValise(), "Valise should not be null.");
-        assertNotNull(savedLivreur.getMouvement().getValise().getClient(), "Client should not be null.");
+        assertNotNull(savedLivreur.getMouvements(), "Mouvement should not be null.");
+        assertNotNull(savedLivreur.getMouvements().get(1), "Valise should not be null.");
+        assertNotNull(savedLivreur.getMouvements().get(1).getLivreur(), "Client should not be null.");
     }
 
 
@@ -122,7 +122,7 @@ public class LivreurRepositoryIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("Paul Martin")
                 .telephonePortable("0987654321")
-                .mouvement(savedMouvement) // Associate the Mouvement with the Livreur
+                .mouvements((List<Mouvement>) savedMouvement) // Associate the Mouvement with the Livreur
                 .build();
         Livreur savedLivreur = livreurRepository.save(livreur);
 
@@ -133,7 +133,7 @@ public class LivreurRepositoryIntegrationTest {
         assertTrue(foundLivreur.isPresent(), "Livreur should be found by ID.");
         assertEquals("Paul Martin", foundLivreur.get().getNomLivreur(), "NomLivreur did not match.");
         assertEquals("0987654321", foundLivreur.get().getTelephonePortable(), "TelephonePortable did not match.");
-        assertEquals(savedMouvement.getId(), foundLivreur.get().getMouvement().getId(), "Associated Mouvement did not match.");
+        assertEquals(savedMouvement.getId(), foundLivreur.get().getMouvements().get(1), "Associated Mouvement did not match.");
     }
 
 
@@ -163,13 +163,13 @@ public class LivreurRepositoryIntegrationTest {
 
         Livreur livreur = Livreur.builder()
                 .nomLivreur("Livreur Mouvement")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement)
                 .build();
         Livreur savedLivreur = livreurRepository.save(livreur);
 
         assertNotNull(savedLivreur.getId(), "Livreur ID should not be null after saving.");
         assertEquals("Livreur Mouvement", savedLivreur.getNomLivreur(), "NomLivreur did not match.");
-        assertEquals(mouvement.getId(), savedLivreur.getMouvement().getId(), "Mouvement ID did not match.");
+        assertEquals(mouvement.getId(), savedLivreur.getMouvements(), "Mouvement ID did not match.");
     }
 
     @Test
@@ -200,11 +200,11 @@ public class LivreurRepositoryIntegrationTest {
         // Create and save Livreurs
         Livreur livreur1 = Livreur.builder()
                 .nomLivreur("Livreur 1")
-                .mouvement(mouvement) // Associate with the required Mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associate with the required Mouvement
                 .build();
         Livreur livreur2 = Livreur.builder()
                 .nomLivreur("Livreur 2")
-                .mouvement(mouvement) // Associate with the same Mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associate with the same Mouvement
                 .build();
 
         livreurRepository.save(livreur1);
@@ -248,7 +248,7 @@ public class LivreurRepositoryIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .codeLivreur("EXIST123")
                 .nomLivreur("Existing Livreur")
-                .mouvement(mouvement) // Associate with the saved Mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associate with the saved Mouvement
                 .build();
         livreur = livreurRepository.save(livreur);
 

@@ -50,7 +50,7 @@ public class TypeRegleServiceTest {
 
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("Type A")
-                .regleId(1)
+                .regle(regle)
                 .build();
 
         // Act
@@ -59,7 +59,7 @@ public class TypeRegleServiceTest {
         // Assert
         assertNotNull(result, "The created TypeRegleDTO should not be null");
         assertEquals("Type A", result.getNomTypeRegle(), "NomTypeRegle should match the input");
-        assertEquals(1, result.getRegleId(), "RegleId should match the input");
+        assertEquals(1, result.getNomTypeRegle(), "RegleId should match the input");
 
         verify(typeRegleRepository, times(1)).save(any(TypeRegle.class));
         verify(regleRepository, times(1)).findById(1);
@@ -72,7 +72,7 @@ public class TypeRegleServiceTest {
 
         TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
                 .nomTypeRegle("Type A")
-                .regleId(1)
+                .regle(new Regle())
                 .build();
 
         // Act & Assert
@@ -105,7 +105,7 @@ public class TypeRegleServiceTest {
         TypeRegleDTO updatedDTO = TypeRegleDTO.builder()
                 .id(id)
                 .nomTypeRegle("Updated Type B")
-                .regleId(2)
+                .regle(regle)
                 .build();
 
         // Act
@@ -114,7 +114,7 @@ public class TypeRegleServiceTest {
         // Assert
         assertNotNull(result, "The updated TypeRegleDTO should not be null");
         assertEquals("Updated Type B", result.getNomTypeRegle(), "NomTypeRegle should be updated");
-        assertEquals(2, result.getRegleId(), "RegleId should match the updated value");
+        assertEquals(2, result.getRegle(), "RegleId should match the updated value");
 
         verify(typeRegleRepository, times(1)).findById(id);
         verify(regleRepository, times(1)).findById(2);

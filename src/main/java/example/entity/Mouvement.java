@@ -2,10 +2,7 @@ package example.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,27 +31,23 @@ public class Mouvement {
     @Temporal(TemporalType.DATE)
     private Date dateRetourPrevue;
 
+    @ToString.Exclude
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "valise_id", nullable = false)
+    @JsonBackReference
     private Valise valise;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "livreur_livreur_id", nullable = false)
-    //@JsonBackReference
+    @ToString.Exclude
+    @ManyToOne//(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "livreur_id", nullable = false)
+    @JsonBackReference
     private Livreur livreur;
 
-
-    @OneToMany
-    @JoinColumn(name = "retourSecurite_id")
-    private List<RetourSecurite> retourSecurites = new ArrayList<>();
-
-    public Valise getValise() {
-        return valise;
-    }
-
-    public void setValise(Valise valise) {
-        this.valise = valise;
-    }
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "retour_securite_id", nullable = false)
+    @JsonBackReference
+    private RetourSecurite retourSecurite ;
 
 
 }

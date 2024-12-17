@@ -14,7 +14,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Table(name = "regle_manuelle")
+//@Table(name = "regle_manuelle")
+@DiscriminatorValue("manuelle")
 public class RegleManuelle extends Regle {
 
     @Column(name = "description_regle")
@@ -22,6 +23,5 @@ public class RegleManuelle extends Regle {
 
     @Column(name = "createur_regle", nullable = false)
     @NotNull
-    private String createurRegle;
-}
+    private String createurRegle;}
 

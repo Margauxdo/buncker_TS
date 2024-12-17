@@ -72,7 +72,7 @@ class GlobalExceptionHandlerTest {
         IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
 
         // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleIllegalArgument(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -122,7 +122,7 @@ class GlobalExceptionHandlerTest {
         ProblemeNotFoundException exception = new ProblemeNotFoundException(messageErreur);
 
         // Act
-        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleProblemeNotFound(exception);
+        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleAllExceptions(exception);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, reponse.getStatusCode());
@@ -140,7 +140,7 @@ class GlobalExceptionHandlerTest {
         IllegalStateException exception = new IllegalStateException(errorMessage);
 
         // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleIllegalStateException(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
 
         // Assert
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -154,7 +154,7 @@ class GlobalExceptionHandlerTest {
         EntityNotFoundException exception = new EntityNotFoundException(errorMessage);
 
         // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleEntityNotFoundException(exception);
+        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

@@ -24,8 +24,6 @@
             cursor: pointer;
         }
 
-
-
         button[type="button"].btn-danger {
             background-color: #f8d7da;
             color: #721c24;
@@ -91,7 +89,7 @@
 <body>
 <h1>Modifier une formule</h1>
 
-<form th:action="@{/formules/edit/{id}(id=${formule.id})}" th:object="${formule}" method="post">
+<form th:action="@{/formules/edit/{id}(id=${formule.cleFormule})}" th:object="${formule}" method="post">
     <label for="libelle">Libellé :</label>
     <input type="text" id="libelle" th:field="*{libelle}" required />
 
@@ -100,22 +98,16 @@
 
     <!-- Sélection de la règle associée -->
     <label for="regle">Code Regle :</label>
-    <select id="regle" th:field="*{regleId}">
+    <select id="regle" th:field="*{regleIds}">
         <option value="" th:text="'Sélectionner un Code Regle'"></option>
         <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>
-
-
-
-
-
 
     <div style="margin-top: 20px;">
         <button type="submit">Modifier</button>
         <a href="/" th:href="@{/}">
             <button type="button" class="btn-danger">Retour à l'Accueil</button>
         </a>
-
     </div>
 </form>
 

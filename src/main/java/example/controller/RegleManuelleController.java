@@ -1,7 +1,6 @@
 package example.controller;
 
 import example.DTO.RegleManuelleDTO;
-import example.entity.RegleManuelle;
 import example.interfaces.IRegleManuelleService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

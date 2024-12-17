@@ -24,7 +24,7 @@
             padding: 5px 10px;
             margin-right: 5px;
             border: 1px solid #ccc;
-            background-color: #0056b3; /* Fond bleu */
+            background-color: #0056b3;
             color: #ffffff;
             cursor: pointer;
         }
@@ -81,8 +81,12 @@
         <td th:text="${retourSecurite.datesecurite}"></td>
         <td th:text="${retourSecurite.cloture ? 'Oui' : 'Non'}"></td>
         <td th:text="${retourSecurite.dateCloture}"></td>
-        <td th:text="${retourSecurite.mouvementStatut}"></td>
+        <td>
+            <!-- Affichage des statuts des mouvements -->
+            <span th:text="${retourSecurite.mouvementStatutsString != null ? retourSecurite.mouvementStatutsString : 'Aucun mouvement'}"></span>
+        </td>
         <td th:text="${retourSecurite.nombreClients}"></td>
+
 
         <!-- Actions -->
         <td>

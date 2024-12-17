@@ -75,12 +75,6 @@
     <p><strong>Propriétaire :</strong> <span th:text="${typeValise.proprietaire}"></span></p>
     <p><strong>Description :</strong> <span th:text="${typeValise.description}"></span></p>
 
-    <!-- Relation avec Valise -->
-    <p><strong>Valise associée :</strong>
-        <span th:text="${typeValise.numeroValise != null ? typeValise.numeroValise : 'Aucune'}"></span>
-    </p>
-
-
     <div style="margin-top: 20px;">
         <a href="/" th:href="@{/}">
             <button type="button" class="btn-danger">Retour à l'Accueil</button>

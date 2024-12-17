@@ -47,7 +47,6 @@ public class TypeValiseController {
     @GetMapping("/create")
     public String createTypeValiseForm(Model model) {
         model.addAttribute("typeValise", new TypeValiseDTO());
-        model.addAttribute("valises", valiseService.getAllValises()); // Vérifiez que cette méthode renvoie les valises correctement
         return "typeValises/TV_create";
     }
 
@@ -59,7 +58,6 @@ public class TypeValiseController {
             return "redirect:/typeValise/list";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("valises", valiseService.getAllValises());
             return "typeValises/TV_create";
         }
     }
@@ -70,7 +68,6 @@ public class TypeValiseController {
         try {
             TypeValiseDTO typeValise = typeValiseService.getTypeValise(id);
             model.addAttribute("typeValise", typeValise);
-            model.addAttribute("valises", valiseService.getAllValises());
             return "typeValises/TV_edit";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -86,7 +83,6 @@ public class TypeValiseController {
             return "redirect:/typeValise/list";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("valises", valiseService.getAllValises());
             return "typeValises/TV_edit";
         }
     }

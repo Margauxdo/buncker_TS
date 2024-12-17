@@ -60,8 +60,6 @@
             cursor: pointer;
         }
 
-
-
         button[type="button"].btn-danger {
             background-color: #f8d7da;
             color: #721c24;
@@ -84,7 +82,6 @@
     <p><strong>Adresse :</strong> <span th:text="${client.adresse}"></span></p>
     <p><strong>Ville :</strong> <span th:text="${client.ville}"></span></p>
     <p><strong>Fonction :</strong> <span th:text="${client.personnelEtFonction}"></span></p>
-
 
     <h3>Ramassages</h3>
     <p><strong>Ramassage 1 :</strong> <span th:text="${client.ramassage1}"></span></p>
@@ -109,20 +106,19 @@
         <span th:if="${client.regleId == null}">Aucune règle associée</span>
     </p>
 
-
     <p><strong>Retour Sécurité :</strong>
-        <span th:if="${client.retourSecuriteId != null}" th:text="'Retour Sécurité ID: ' + ${client.retourSecuriteId}"></span>
-        <span th:if="${client.retourSecuriteId == null}">Aucun retour sécurité associé</span>
+        <span th:if="${client.retourSecuriteIds != null and client.retourSecuriteIds.size() > 0}" th:text="'Retour Sécurité ID(s): ' + ${client.retourSecuriteIds}"></span>
+        <span th:if="${client.retourSecuriteIds == null or client.retourSecuriteIds.size() == 0}">Aucun retour sécurité associé</span>
     </p>
 
     <p><strong>Valise :</strong>
-        <span th:if="${client.valiseIds != null}" th:text="'Valise ID: ' + ${client.valiseIds}"></span>
-        <span th:if="${client.valiseIds == null}">Aucune valise associé</span>
+        <span th:if="${client.valiseIds != null and client.valiseIds.size() > 0}" th:text="'Valise ID(s): ' + ${client.valiseIds}"></span>
+        <span th:if="${client.valiseIds == null or client.valiseIds.size() == 0}">Aucune valise associé</span>
     </p>
 
     <p><strong>Probleme :</strong>
-        <span th:if="${client.problemeIds!= null}" th:text="'Probleme ID: ' + ${client.problemeIds}"></span>
-        <span th:if="${client.problemeIds == null}">Aucun problemes associé</span>
+        <span th:if="${client.problemeIds != null and client.problemeIds.size() > 0}" th:text="'Probleme ID(s): ' + ${client.problemeIds}"></span>
+        <span th:if="${client.problemeIds == null or client.problemeIds.size() == 0}">Aucun problème associé</span>
     </p>
 
     <div style="margin-top: 20px;">

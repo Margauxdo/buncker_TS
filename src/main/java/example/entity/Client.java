@@ -59,35 +59,33 @@ public class Client {
 
     private String codeClient;
 
-    //@ToString.Exclude
-    @JsonIgnore
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    //@JsonBackReference
-    private Set<Valise> valises ;
-
-    //@ToString.Exclude
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private Set<Probleme> problemes = new HashSet<>();
+    private List<Valise> valises;
+
 
 
     @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "retourSecurite_id")
-    private RetourSecurite retourSecurite;
+    @JoinColumn(name="probleme_id")
+    @JsonBackReference
+    private Probleme probleme ;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "regle_id")
+    @ToString.Exclude
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<RetourSecurite> retourSecurites = new ArrayList<>();
+
+
+    @ManyToOne()   // fetch = FetchType.LAZY
+    @JoinColumn(name = "cle_regle")
+    @JsonBackReference
+    @ToString.Exclude
     private Regle regle;
 
 
-    public void addValise(Valise valise) {
-
-    }
-
-    public void addProbleme(Probleme probleme) {
-    }
 
 
 }

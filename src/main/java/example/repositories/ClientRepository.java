@@ -1,9 +1,6 @@
 package example.repositories;
 
-import example.DTO.ClientDTO;
 import example.entity.Client;
-import example.entity.Mouvement;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,29 +12,40 @@ import java.util.Optional;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer> {
 
+    // Recherche par nom
     List<Client> findByName(String name);
 
-    List<Client> findByEmail(String email);
+    // Recherche par email
+    Optional<Client> findByEmail(String email);
 
+    // Vérification d'existence par email
     boolean existsByEmail(String email);
 
-    @EntityGraph(attributePaths = {"valises", "problemes"})
-    List<Client> findAll();
+    // Chargement de tous les clients avec leurs relations associées
+    @Query("SELECT c FROM Client c " +
+            "LEFT JOIN FETCH c.retourSecurites " +
+            "LEFT JOIN FETCH c.regle " +
+            "LEFT JOIN FETCH c.valises " +
+            "LEFT JOIN FETCH c.probleme")
+    List<Client> findAllWithAssociations();
 
-    @Query("SELECT m FROM Mouvement m JOIN FETCH m.valise")
-    List<Mouvement> findAllWithValise();
+    // Recherche par ID avec relations associées
+    @Query("SELECT c FROM Client c " +
+            "LEFT JOIN FETCH c.retourSecurites " +
+            "LEFT JOIN FETCH c.regle " +
+            "LEFT JOIN FETCH c.valises " +
+            "LEFT JOIN FETCH c.probleme " +
+            "WHERE c.id = :id")
+    Optional<Client> findByIdWithAssociations(@Param("id") Integer id);
 
+    // Recherche des clients associés à un problème spécifique
+    List<Client> findByProbleme_Id(Integer problemeId);
 
-    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.problemes WHERE c.id = :id")
-    Optional<Client> findByIdWithProblemes(@Param("id") Integer id);
+    // Recherche des clients associés à une règle spécifique
+    List<Client> findByRegle_Id(Integer regleId);
 
-
-    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises WHERE c.id = :id")
-    Optional<Client> findByIdWithValises(@Param("id") Integer id);
-
-    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises LEFT JOIN FETCH c.problemes WHERE c.id = :id")
-    Optional<Client> findClientWithRelationsById(@Param("id") int id);
-
+    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.retourSecurites WHERE c.id = :id")
+    Optional<Client> findByIdWithRetourSecurites(@Param("id") int id);
 
 
 }

@@ -44,7 +44,7 @@ public class ValiseControllerTest {
         Model model = new ConcurrentModel();
 
         // Act
-        String response = valiseController.createValiseForm(model);
+        String response = valiseController.createValise(model);
 
         // Assert
         assertEquals("valises/valise_create", response, "Expected view name is 'valises/valise_create'");

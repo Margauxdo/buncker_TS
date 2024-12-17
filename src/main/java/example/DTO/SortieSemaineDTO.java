@@ -8,26 +8,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SortieSemaineDTO {
-    private Integer id;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date dateSortieSemaine;
+    private Integer id; // Correspond à cle_sortie_semaine dans l'entité
+    @DateTimeFormat(pattern = "YYYY-mm-dd")
+    private Date dateSortieSemaine; // Date de sortie
 
-    private Integer regleId;
-    private Regle regle;
+    // Liste des IDs des règles associées
+    private List<Integer> regleIds;
 
-    public String getRegleCode() {
-        return regleCode;
-    }
-
-    public void setRegleCode(String regleCode) {
-        this.regleCode = regleCode;
-    }
-
-    private String regleCode;
+    // Liste optionnelle des codes des règles
+    private List<String> regleCodes;
 }

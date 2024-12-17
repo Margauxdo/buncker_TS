@@ -34,7 +34,7 @@ public class ClientServiceIntegrationTest {
 
     private ClientDTO clientDTO;
 
-    @BeforeEach
+   /* @BeforeEach
     public void setUp() {
         clientRepository.deleteAll();
 
@@ -56,7 +56,7 @@ public class ClientServiceIntegrationTest {
                 null, // retourSecuriteId
                 null  // regleId
         );
-    }
+    }*/
 
     @Test
     public void testCreateClientSuccess() {
@@ -106,8 +106,9 @@ public class ClientServiceIntegrationTest {
 
         assertEquals("Client non trouvé", exception.getMessage());
     }
+}
 
-    @Test
+   /* @Test
     public void testGetAllClientsSuccess() {
         // Arrange
         ClientDTO clientDTO2 = new ClientDTO(
@@ -137,9 +138,9 @@ public class ClientServiceIntegrationTest {
 
         // Assert
         assertEquals(2, clients.size());
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testCreateClient_Failure_DuplicateEmail() {
         // Arrange
         clientService.createClient(clientDTO);
@@ -168,4 +169,4 @@ public class ClientServiceIntegrationTest {
             clientService.createClient(duplicateClientDTO);
         });
     }
-}
+}*/

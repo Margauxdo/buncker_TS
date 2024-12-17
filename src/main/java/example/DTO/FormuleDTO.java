@@ -6,14 +6,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class FormuleDTO {
-    private Integer id;
+    private Integer cleFormule;
     private String libelle;
     private String formule;
-    private Integer regleId; // Lien avec la règle via son id
-    private String codeRegle;
+
+
+    private List<Integer> regleIds;
+    private List<String> codeRegles;
 }

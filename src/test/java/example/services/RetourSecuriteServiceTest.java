@@ -47,7 +47,6 @@ public class RetourSecuriteServiceTest {
         int id = 1;
         RetourSecuriteDTO retourSecuriteDTO = new RetourSecuriteDTO();
         retourSecuriteDTO.setId(id);
-        retourSecuriteDTO.setNumero(12345L);
 
         RetourSecurite existingRetourSecurite = new RetourSecurite();
         existingRetourSecurite.setId(id);

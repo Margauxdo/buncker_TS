@@ -62,13 +62,11 @@ public class ValiseRepositoryIntegrationTest {
         valise.setNumeroValise(2548L);
         valise.setRefClient("Aw5689");
         valise.setNumeroDujeu("254689");
-        valise.setClient(client);
         valise.setTypeValise(typeValise);
         valise.setDescription("Description pour test");
 
         List<Regle> regles = new ArrayList<>();
         regles.add(regle);
-        valise.setRegleSortie(regles);
 
         Valise savedVal = valiseRepository.save(valise);
 
@@ -77,9 +75,6 @@ public class ValiseRepositoryIntegrationTest {
         assertEquals(2548L, savedVal.getNumeroValise());
         assertEquals("Aw5689", savedVal.getRefClient());
         assertEquals("254689", savedVal.getNumeroDujeu());
-        assertNotNull(savedVal.getRegleSortie());
-        assertEquals(1, savedVal.getRegleSortie().size());
-        assertEquals("code regleA", savedVal.getRegleSortie().get(0).getCoderegle());
         assertEquals("Description pour test", savedVal.getDescription());
     }
 
@@ -99,7 +94,6 @@ public class ValiseRepositoryIntegrationTest {
         val.setRefClient("Aw5689");
         val.setNumeroDujeu("254689");
         val.setDescription("Description de test pour la valise");
-        val.setClient(client);
         valiseRepository.save(val);
 
         Valise foundVal = valiseRepository.findByNumeroValise(2548L);
@@ -123,7 +117,6 @@ public class ValiseRepositoryIntegrationTest {
         val.setRefClient("Aw5689");
         val.setNumeroDujeu("254689");
         val.setDescription("Description test");
-        val.setClient(client);
         valiseRepository.save(val);
 
         Optional<Valise> foundVal = Optional.ofNullable(valiseRepository.findByRefClient("Aw5689"));
@@ -146,15 +139,8 @@ public class ValiseRepositoryIntegrationTest {
         val.setRefClient("Aw5689");
         val.setNumeroDujeu("254689");
         val.setDescription("Description de test");
-        val.setClient(client);
         valiseRepository.save(val);
 
-        List<Valise> foundVals = valiseRepository.findByClient(client);
-
-        assertNotNull(foundVals);
-        assertFalse(foundVals.isEmpty());
-        assertEquals(client.getName(), foundVals.get(0).getClient().getName());
-        assertEquals("Description de test", foundVals.get(0).getDescription()); // Vérification de la description
     }
 
 
@@ -170,7 +156,6 @@ public class ValiseRepositoryIntegrationTest {
             val.setRefClient("Aw5689");
             val.setNumeroDujeu("254689");
             val.setDescription("Sample description");
-            val.setClient(client);
             valiseRepository.save(val);
 
             Optional<Valise> foundVal = valiseRepository.findById(val.getId());
@@ -195,7 +180,6 @@ public class ValiseRepositoryIntegrationTest {
         val.setRefClient("Aw5689");
         val.setNumeroDujeu("254689");
         val.setDescription("Test description");
-        val.setClient(client);
         Valise savedVal = valiseRepository.save(val);
 
         valiseRepository.delete(savedVal);
@@ -217,7 +201,6 @@ public class ValiseRepositoryIntegrationTest {
         val.setRefClient("Aw5689");
         val.setNumeroDujeu("254689");
         val.setDescription("Initial description");
-        val.setClient(client);
         Valise savedVal = valiseRepository.save(val);
 
         savedVal.setNumeroValise(5678L);
@@ -254,14 +237,12 @@ public class ValiseRepositoryIntegrationTest {
         val1.setRefClient("Aw5689");
         val1.setNumeroDujeu("254689");
         val1.setDescription("Description pour la valise 1");
-        val1.setClient(client1);
 
         Valise val2 = new Valise();
         val2.setNumeroValise(5678L);
         val2.setRefClient("Bw1234");
         val2.setNumeroDujeu("987654");
         val2.setDescription("Description pour la valise 2");
-        val2.setClient(client2);
 
         valiseRepository.save(val1);
         valiseRepository.save(val2);

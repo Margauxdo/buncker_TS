@@ -78,7 +78,6 @@
         <th>Nom</th>
         <th>Prénom</th>
         <th>Code Livreur</th>
-        <th>Mot de passe</th>
         <th>Numéro de carte pro</th>
         <th>Téléphone Portable</th>
         <th>Téléphone Kobby</th>
@@ -94,12 +93,11 @@
         <td th:text="${livreur.nomLivreur}"></td>
         <td th:text="${livreur.prenomLivreur}"></td>
         <td th:text="${livreur.codeLivreur}"></td>
-        <td th:text="${livreur.motDePasse}"></td>
         <td th:text="${livreur.numeroCartePro}"></td>
         <td th:text="${livreur.telephonePortable}"></td>
         <td th:text="${livreur.telephoneKobby}"></td>
         <td th:text="${livreur.telephoneAlphapage}"></td>
-        <td th:text="${livreur.mouvementId}"></td>
+        <td th:text="${livreur.mouvementIds}"></td>
         <td>
             <!-- Action Voir -->
             <form th:action="@{/livreurs/view/{id}(id=${livreur.id})}" method="get" style="display:inline;">

@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -146,7 +147,7 @@ public class LivreurControllerIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("Dupont")
                 .prenomLivreur("Jean")
-                .mouvement(mouvement) // Associate the Mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associate the Mouvement
                 .build();
         livreur = livreurRepository.save(livreur);
 
@@ -155,7 +156,8 @@ public class LivreurControllerIntegrationTest {
                 .id(livreur.getId())
                 .nomLivreur("Martin")
                 .prenomLivreur("Paul")
-                .mouvement(mouvement)
+                .mouvements((List<Mouvement>) mouvement) // Associate the Mouvement
+
                 .build();
 
         // Act & Assert
@@ -201,7 +203,8 @@ public class LivreurControllerIntegrationTest {
         Livreur livreur = Livreur.builder()
                 .nomLivreur("Dupont")
                 .prenomLivreur("Jean")
-                .mouvement(mouvement) // Associate the mouvement
+                .mouvements((List<Mouvement>) mouvement) // Associate the Mouvement
+
                 .build();
         livreur = livreurRepository.save(livreur);
 

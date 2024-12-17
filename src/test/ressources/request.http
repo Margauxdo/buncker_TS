@@ -20,11 +20,11 @@ Content-Type: application/x-www-form-urlencoded
 name=Jules+Dupont&email=jules.d%40example.com&adresse=1+rue+de+Paris&ville=Paris&telephoneExploitation=0123456789
 
 ### Afficher le formulaire de modification d'un client (GET - Thymeleaf)
-GET http://localhost:8080/clients/edit/1
+GET http://localhost:8080/clients/edit/2
 Accept: text/html
 
 ### Modifier un client existant (POST - Thymeleaf)
-POST http://localhost:8080/clients/edit/1
+POST http://localhost:8080/clients/edit/2
 Content-Type: application/x-www-form-urlencoded
 
 name=Jean+Modifié&email=jean.modifie%40example.com&adresse=2+rue+modifiée&ville=Lyon&telephoneExploitation=0123456789
@@ -290,7 +290,7 @@ Accept: text/html
 
 
 ### Voir une RS par ID (GET - Thymeleaf)
-GET http://localhost:8080/retourSecurite/view/2
+GET http://localhost:8080/retourSecurite/view/7
 Accept: text/html
 
 
@@ -309,7 +309,7 @@ numero=123&cloture=false&datesecurite=2024-10-10
 
 
 ### Afficher le formulaire modification une regle (GET - Thymeleaf)
-GET http://localhost:8080/retourSecurite/edit/1
+GET http://localhost:8080/retourSecurite/edit/7
 Accept: text/html
 
 ### Modifier un RS existant (POST - Thymeleaf)
@@ -452,7 +452,7 @@ Accept: text/html
 
 
 ### Voir une valise par ID (GET - Thymeleaf)
-GET http://localhost:8080/valise/view/1
+GET http://localhost:8080/valise/view/5
 Accept: text/html
 
 

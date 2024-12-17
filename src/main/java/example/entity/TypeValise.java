@@ -34,9 +34,4 @@ public class TypeValise {
     @NotNull
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "valise_id", nullable = true)
-    private Valise valise;
-
-
 }

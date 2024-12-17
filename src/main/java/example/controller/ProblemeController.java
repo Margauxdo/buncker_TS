@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-import static example.services.FormuleService.logger;
 
 @Controller
 @RequestMapping("/pb")
@@ -69,7 +68,7 @@ public class ProblemeController {
     public String createProblemeForm(Model model) {
         ProblemeDTO problemeDTO = new ProblemeDTO();
         problemeDTO.setValiseId(null); // Explicitly set default values
-        problemeDTO.setClientId(null);
+        problemeDTO.setClientIds(null);
 
         List<ClientDTO> clientsDTO = clientService.getAllClients();
 

@@ -1,13 +1,11 @@
 package example.DTO;
 
 import example.entity.TypeRegle;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -28,16 +26,17 @@ public class RegleDTO {
     private Boolean fermeJS6;
     private Boolean fermeJS7;
     private String typeEntree;
-    private TypeRegle typeRegle;
     private Long nbjsmEntree;
+
+    // Relations simplifiées
+    private Integer typeRegleId; // ID du TypeRegle associé
+    private Integer formuleId; // ID de la Formule associée
+    private Integer jourFerieId; // ID du JourFerie associé
+    private Integer sortieSemaineId; // ID de SortieSemaine associé
+    private List<Integer> valiseIds; // Liste des IDs des Valises associées
+    private List<Integer> clientIds;
+
+    @Getter
+    @Setter
     private Integer valiseId;
-    private ValiseDTO valise;
-    private Integer typeRegleId;
-    private Integer formuleId;
-    private FormuleDTO formule;
-
-    private Integer jourFerieId;
-    private JourFerieDTO jourFerie;
-    private List<Integer> sortieSemaineIds;
 }
-

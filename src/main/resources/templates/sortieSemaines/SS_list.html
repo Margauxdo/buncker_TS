@@ -91,7 +91,10 @@
     <tr th:each="sortieSemaine : ${sortiesSemaine}">
         <td th:text="${sortieSemaine.id}"></td>
         <td th:text="${#dates.format(sortieSemaine.dateSortieSemaine, 'dd/MM/yyyy')}"></td>
-        <td th:text="${sortieSemaine.regleId != null ? 'Règle ' + sortieSemaine.regleId : 'Aucune'}"></td>
+        <td>
+            <span th:each="codeRegle : ${sortieSemaine.regleCodes}" th:text="'Règle ' + ${codeRegle}"></span>
+        </td>
+
         <td>
             <form th:action="@{/sortieSemaine/view/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">
                 <button type="submit">Voir</button>
@@ -99,6 +102,12 @@
             <form th:action="@{/sortieSemaine/edit/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">
                 <button type="submit">Modifier</button>
             </form>
+            <form th:action="@{/sortieSemaine/delete/{id}(id=${sortieSemaine.id})}" method="post" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/> <!-- Utilisation du verbe HTTP DELETE -->
+                <button type="submit" style="color: red;" aria-label="Supprimer la ligne">Supprimer</button>
+            </form>
+
+
 
 
 

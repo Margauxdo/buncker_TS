@@ -70,8 +70,8 @@ class ValiseServiceIntegrationTest {
         // Arrange
         ValiseDTO valiseDTO = ValiseDTO.builder()
                 .description("Test Valise")
-                .numeroValise(123456L)
-                .clientId(client.getId())
+                .numeroValise(123456)
+                .refClient("CLI52")
                 .typeValiseId(typeValise.getId())
                 .build();
 
@@ -82,7 +82,7 @@ class ValiseServiceIntegrationTest {
         assertNotNull(savedValise);
         assertNotNull(savedValise.getId());
         assertEquals("Test Valise", savedValise.getDescription());
-        assertEquals(client.getId(), savedValise.getClientId());
+        assertEquals(client.getId(), savedValise.getRefClient());
         assertEquals(typeValise.getId(), savedValise.getTypeValiseId());
     }
 
@@ -91,9 +91,9 @@ class ValiseServiceIntegrationTest {
         // Arrange
         Valise valise = Valise.builder()
                 .description("Test Valise")
-                .numeroValise(123456L)
+                .numeroValise(123456)
                 .dateCreation(new Date())
-                .client(client)
+                .refClient("CLI56")
                 .typeValise(typeValise)
                 .build();
         valise = valiseRepository.save(valise);
@@ -120,8 +120,8 @@ class ValiseServiceIntegrationTest {
 
         ValiseDTO valiseDTO = ValiseDTO.builder()
                 .description("Valise avec règles")
-                .numeroValise(789012L)
-                .clientId(client.getId())
+                .numeroValise(789012)
+                .refClient("256LI")
                 .typeValiseId(typeValise.getId())
                 .regleSortieIds(regleIds)
                 .build();
@@ -154,9 +154,9 @@ class ValiseServiceIntegrationTest {
         // Arrange
         Valise valise = Valise.builder()
                 .description("Test Valise")
-                .numeroValise(123456L)
+                .numeroValise(123456)
                 .dateCreation(new Date())
-                .client(client)
+                .refClient("refA")
                 .typeValise(typeValise)
                 .build();
         valise = valiseRepository.save(valise);
@@ -165,7 +165,7 @@ class ValiseServiceIntegrationTest {
                 .id(valise.getId())
                 .description("Updated Description")
                 .numeroValise(valise.getNumeroValise())
-                .clientId(client.getId())
+                .refClient("CLI53")
                 .typeValiseId(typeValise.getId())
                 .build();
 
@@ -181,9 +181,9 @@ class ValiseServiceIntegrationTest {
     void testDeleteValise_Success() {
         Valise valise = Valise.builder()
                 .description("Test Valise")
-                .numeroValise(123456L)
+                .numeroValise(123456)
                 .dateCreation(new Date())
-                .client(client)
+                .refClient("CLI52")
                 .typeValise(typeValise)
                 .build();
         valise = valiseRepository.save(valise);
@@ -211,7 +211,7 @@ class ValiseServiceIntegrationTest {
         // Arrange
         ValiseDTO valiseDTO = ValiseDTO.builder()
                 .description("Valise sans client")
-                .numeroValise(123456L)
+                .numeroValise(123456)
                 .build();
 
         // Act & Assert
@@ -229,16 +229,16 @@ class ValiseServiceIntegrationTest {
     void testGetAllValises() {
         Valise valise1 = Valise.builder()
                 .description("Valise 1")
-                .numeroValise(111111L)
-                .client(client)
+                .numeroValise(111111)
+                .refClient("CLI52")
                 .typeValise(typeValise)
                 .build();
         valiseRepository.save(valise1);
 
         Valise valise2 = Valise.builder()
                 .description("Valise 2")
-                .numeroValise(222222L)
-                .client(client)
+                .numeroValise(222222)
+                .refClient("CLI25")
                 .typeValise(typeValise)
                 .build();
         valiseRepository.save(valise2);

@@ -1,5 +1,7 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "retourSecurite")
+@Table(name = "retour_securite")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +18,7 @@ import java.util.List;
 public class RetourSecurite {
 
     @Id
+    @JoinColumn(name = "retour_securite_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -29,18 +32,17 @@ public class RetourSecurite {
     private Date dateCloture;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
-    private List<Client> clients = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    @JsonBackReference
+    private Client client;
 
     @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mouvement_id", nullable = true)
-    private Mouvement mouvement;
+    @OneToMany(mappedBy = "retourSecurite", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Mouvement> mouvements = new ArrayList<>();
 
-    public void addClient(Client client) {
-        clients.add(client);
-        client.setRetourSecurite(this);
-    }
+
 
 }
 

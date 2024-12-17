@@ -1,15 +1,14 @@
 package example.interfaces;
 
 import example.DTO.ClientDTO;
-import example.entity.Client;
 
 import java.util.List;
 
 public interface IClientService {
 
-    void createClient(ClientDTO clientDTO);
+    ClientDTO createClient(ClientDTO clientDTO);
 
-    void updateClient(Integer id, ClientDTO clientDTO);
+    ClientDTO updateClient(Integer id, ClientDTO clientDTO);
 
     void deleteClient(int id);
 

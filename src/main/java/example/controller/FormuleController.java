@@ -16,12 +16,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static example.services.FormuleService.logger;
 
 
 @Controller
 @RequestMapping("/formules")
 public class FormuleController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FormuleController.class); // Ajout du logger
+
 
     @Autowired
     private IFormuleService formuleService;

@@ -44,7 +44,7 @@ public class TypeRegleController {
     @GetMapping("/create")
     public String createTypeRegleForm(Model model) {
         model.addAttribute("typeRegle", new TypeRegleDTO());
-        model.addAttribute("regles", regleRepository.findAll());
+        model.addAttribute("regles", regleRepository.findAll());  // Assurez-vous que toutes les règles sont disponibles
         return "typeRegles/TR_create";
     }
 

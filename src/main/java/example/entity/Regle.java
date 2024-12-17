@@ -1,5 +1,7 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import jakarta.persistence.*;
@@ -10,28 +12,28 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
+//@ToString
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Inheritance(strategy = InheritanceType.JOINED)
+//@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "regle")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "regle", discriminatorType = DiscriminatorType.STRING)
+
 public class Regle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cle_regle")
+    @Column(name = "regle_id")
     private Integer id;
 
     @Column(name = "regle_pour_sortie")
     private String reglePourSortie;
 
-    @Setter
-    @Getter
-    @Column(name = "code_regle", unique = true, nullable = false)
+    @Column( nullable = false)
     private String coderegle;
-
 
     @Column(name = "date_regle")
     @Temporal(TemporalType.DATE)
@@ -42,6 +44,7 @@ public class Regle {
 
     @Column(name = "calcul_calendaire")
     private Integer calculCalendaire =1;
+
     public void setCalculCalendaire(Integer calculCalendaire) {
         this.calculCalendaire = calculCalendaire != null ? calculCalendaire : 1; // Valeur par défaut
     }
@@ -60,47 +63,40 @@ public class Regle {
     @Column(name = "nb_jsm_entree")
     private Long nbjsmEntree;
 
-    // Relation ManyToOne avec Valise
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cle_valise")
-    private Valise valise;
+    @OneToMany(mappedBy = "regle")
+    @JsonManagedReference
+    @ToString.Exclude
+    private List<Client> clients = new ArrayList<>();
 
+    // Relation ManyToOne avec Valise
+    @OneToMany(mappedBy = "reglesSortie", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Valise> valises = new ArrayList<>();
 
     // Relation OneToMany avec SortieSemaine
-    @OneToMany(mappedBy = "regle", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private List<SortieSemaine> sortieSemaine = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.ALL)   // , fetch = FetchType.EAGER, orphanRemoval = true()  //  fetch = FetchType.LAZY
+    @JoinColumn(name = "cle_sortie_semaine")
+    @JsonBackReference
+    @ToString.Exclude
+    private SortieSemaine sortieSemaine;
 
     // Relation ManyToOne avec TypeRegle
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cle_type_regle")
+    @ManyToOne()  //  fetch = FetchType.LAZY
+    @JoinColumn(name = "type_regle_id", nullable = false)
+    @JsonBackReference
+    @ToString.Exclude
     private TypeRegle typeRegle;
 
     // Relation ManyToOne avec Formule
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cle_formule")
+    @ManyToOne()    //  fetch = FetchType.LAZY
+    @JoinColumn(name = "formule_id", nullable = true)
+    @JsonBackReference
+    @ToString.Exclude
     private Formule formule;
 
     // Relation ManyToOne avec JourFerie
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jour_ferie_id")
     private JourFerie jourFerie;
-
-    public void setSomeProperty(String someValue) {
-    }
-
-    public void setSomeField(String someValue) {
-    }
-
-    @Override
-    public String toString() {
-        return "Regle{" +
-                "id=" + id +
-                ", reglePourSortie='" + reglePourSortie + '\'' +
-                ", coderegle='" + coderegle + '\'' +
-                ", dateRegle=" + dateRegle +
-                ", nombreJours=" + nombreJours +
-                ", calculCalendaire=" + calculCalendaire +
-                '}';
-    }
 
 }

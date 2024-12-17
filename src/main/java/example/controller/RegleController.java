@@ -2,6 +2,7 @@ package example.controller;
 
 import example.DTO.*;
 import example.entity.Formule;
+import example.entity.RegleManuelle;
 import example.interfaces.IRegleService;
 import example.services.FormuleService;
 import example.services.JourFerieService;
@@ -48,26 +49,20 @@ public class RegleController {
         return "regles/regle_details";
     }
 
+
     @GetMapping("/create")
-    public String createRegleForm(Model model) {
+    public String showCreateForm(Model model) {
         model.addAttribute("regle", new RegleDTO());
-
-        List<FormuleDTO> formules = formuleService.getAllFormules();
-        List<ValiseDTO> valises = valiseService.getAllValises();
-        List<TypeRegleDTO> typesRegle = typeRegleService.getTypeRegles();
-        List<JourFerieDTO> jourFerie = jourFerieService.getJourFeries();
-
-        model.addAttribute("formules", formules != null ? formules : new ArrayList<>());
-        model.addAttribute("valises", valises != null ? valises : new ArrayList<>());
-        model.addAttribute("typesRegle", typesRegle != null ? typesRegle : new ArrayList<>());
-        model.addAttribute("jourFerie", jourFerie != null ? jourFerie : new ArrayList<>());
-
-        return "regles/regle_create";
+        model.addAttribute("valises", valiseService.getAllValises());
+        model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
+        model.addAttribute("formules", formuleService.getAllFormules());
+        model.addAttribute("joursFeries", jourFerieService.getJourFeries());
+        return "regles/regle_create"; // Chemin du template
     }
 
-
     @PostMapping("/create")
-    public String createRegle(@ModelAttribute RegleDTO regleDTO) {
+    public String createRegle(@ModelAttribute("regle") RegleDTO regleDTO) {
+        // Logique pour sauvegarder la règle manuelle
         regleService.createRegle(regleDTO);
         return "redirect:/regles/list";
     }
@@ -98,4 +93,18 @@ public class RegleController {
         regleService.deleteRegle(id);
         return "redirect:/regles/list";
     }
+
+    @GetMapping("/createManuelle")
+    public String createRegleManuelleForm(Model model) {
+        model.addAttribute("regleManuelle", new RegleManuelle());
+        return "/regles/RM_create"; // Renvoie la vue pour créer une règle manuelle
+    }
+
+    // Méthode POST pour enregistrer la règle manuelle
+    @PostMapping("/createManuelle")
+    public String createRegleManuelle(@ModelAttribute("regleManuelle") RegleManuelle regleManuelle) {
+        regleService.saveRegleManuelle(regleManuelle); // Sauvegarde la règle manuelle
+        return "redirect:/regles/list";  // Redirige vers la liste des règles
+    }
+
 }

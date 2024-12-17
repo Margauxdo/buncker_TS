@@ -21,89 +21,69 @@ public class FormuleService implements IFormuleService {
 
     private final FormuleRepository formuleRepository;
     private final RegleRepository regleRepository;
-    public static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
 
     public FormuleService(FormuleRepository formuleRepository, RegleRepository regleRepository) {
         this.formuleRepository = formuleRepository;
         this.regleRepository = regleRepository;
     }
 
+    // Conversion Entité -> DTO
     private FormuleDTO convertToDTO(Formule formule) {
-        if (formule.getRegle() != null) {
-            return FormuleDTO.builder()
-                    .id(formule.getId())
-                    .libelle(formule.getLibelle())
-                    .formule(formule.getFormule())
-                    .regleId(formule.getRegle().getId())
-                    .codeRegle(formule.getRegle().getCoderegle())
-                    .build();
-        } else {
-            return FormuleDTO.builder()
-                    .id(formule.getId())
-                    .libelle(formule.getLibelle())
-                    .formule(formule.getFormule())
-                    .build();
-        }
+        return FormuleDTO.builder()
+                .cleFormule(formule.getId())
+                .libelle(formule.getLibelle())
+                .formule(formule.getFormule())
+                .regleIds(formule.getRegles().stream().map(Regle::getId).toList())
+                .codeRegles(formule.getRegles().stream().map(Regle::getCoderegle).toList())
+                .build();
     }
 
-
-
-
+    // Conversion DTO -> Entité
     private Formule convertToEntity(FormuleDTO formuleDTO) {
-        Formule formule = new Formule();
-        formule.setId(formuleDTO.getId());
-        formule.setLibelle(formuleDTO.getLibelle());
-        formule.setFormule(formuleDTO.getFormule());
+        Formule formule = Formule.builder()
+                .id(formuleDTO.getCleFormule())
+                .libelle(formuleDTO.getLibelle())
+                .formule(formuleDTO.getFormule())
+                .build();
 
-        if (formuleDTO.getRegleId() != null) { // Vérifiez si regleId n'est pas null
-            Regle regle = regleRepository.findById(formuleDTO.getRegleId())
-                    .orElseThrow(() -> new EntityNotFoundException("Règle introuvable pour l'ID " + formuleDTO.getRegleId()));
-            formule.setRegle(regle);
+        if (formuleDTO.getRegleIds() != null) {
+            List<Regle> regles = regleRepository.findAllById(formuleDTO.getRegleIds());
+            formule.setRegles(regles);
         }
+
         return formule;
     }
 
-
     @Override
     public FormuleDTO createFormule(FormuleDTO formuleDTO) {
-
-        Regle regle = regleRepository.findById(formuleDTO.getRegleId())
-                .orElseThrow(() -> new RuntimeException("Règle non trouvée avec l'id : " + formuleDTO.getRegleId()));
-
-        Formule formule = new Formule(
-                formuleDTO.getLibelle(),
-                formuleDTO.getFormule(),
-                regle
-        );
-
+        Formule formule = convertToEntity(formuleDTO);
         Formule savedFormule = formuleRepository.save(formule);
-
         return convertToDTO(savedFormule);
-
-
     }
 
     @Override
     public FormuleDTO updateFormule(int id, FormuleDTO formuleDTO) {
-        return formuleRepository.findById(id)
-                .map(existingFormule -> {
-                    existingFormule.setLibelle(formuleDTO.getLibelle());
-                    existingFormule.setFormule(formuleDTO.getFormule());
-                    if (formuleDTO.getRegleId() != null) { // Vérifiez si regleId n'est pas null
-                        Regle regle = regleRepository.findById(formuleDTO.getRegleId())
-                                .orElseThrow(() -> new EntityNotFoundException("Règle introuvable pour l'ID " + formuleDTO.getRegleId()));
-                        existingFormule.setRegle(regle);
-                    }
-                    return convertToDTO(formuleRepository.save(existingFormule));
-                })
-                .orElseThrow(() -> new FormuleNotFoundException("Formule introuvable pour l'ID " + id));
-    }
+        Formule existingFormule = formuleRepository.findById(id)
+                .orElseThrow(() -> new FormuleNotFoundException("Formule introuvable avec l'ID : " + id));
 
+        // Mise à jour des champs simples
+        existingFormule.setLibelle(formuleDTO.getLibelle());
+        existingFormule.setFormule(formuleDTO.getFormule());
+
+        // Mise à jour des règles associées
+        if (formuleDTO.getRegleIds() != null) {
+            List<Regle> regles = regleRepository.findAllById(formuleDTO.getRegleIds());
+            existingFormule.setRegles(regles);
+        }
+
+        Formule updatedFormule = formuleRepository.save(existingFormule);
+        return convertToDTO(updatedFormule);
+    }
 
     @Override
     public void deleteFormule(int id) {
         if (!formuleRepository.existsById(id)) {
-            throw new FormuleNotFoundException("Formule introuvable pour l'ID " + id);
+            throw new FormuleNotFoundException("Formule introuvable avec l'ID : " + id);
         }
         formuleRepository.deleteById(id);
     }
@@ -111,7 +91,7 @@ public class FormuleService implements IFormuleService {
     @Override
     public FormuleDTO getFormuleById(int id) {
         Formule formule = formuleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Formule introuvable pour l'ID " + id));
+                .orElseThrow(() -> new FormuleNotFoundException("Formule introuvable avec l'ID : " + id));
         return convertToDTO(formule);
     }
 
@@ -121,8 +101,4 @@ public class FormuleService implements IFormuleService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
-
-
-
 }

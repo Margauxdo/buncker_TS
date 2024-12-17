@@ -76,7 +76,9 @@
     <p><strong>Téléphone Portable :</strong> <span th:text="${livreur.telephonePortable}"></span></p>
     <p><strong>Téléphone Kobby :</strong> <span th:text="${livreur.telephoneKobby}"></span></p>
     <p><strong>Téléphone Alphapage :</strong> <span th:text="${livreur.telephoneAlphapage}"></span></p>
-    <p><strong>Mouvement :</strong> <span th:text="${livreur.mouvementId != null ? 'Statut: ' + livreur.mouvementId : 'Aucun mouvement'}"></span></p>
+    <p><strong>Mouvement :</strong>
+        <span th:each="mouvementId : ${livreur.mouvementIds}" th:text="'Statut: ' + ${mouvementId}"></span>
+    </p>
 
 
 

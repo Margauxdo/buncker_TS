@@ -15,16 +15,15 @@
             text-align: center;
             margin-top: 20px;
         }
+
         button {
             padding: 5px 10px;
             margin-right: 5px;
             border: 1px solid #ccc;
-            background-color: #0056b3; /* Fond bleu */
+            background-color: #0056b3;
             color: #ffffff;
             cursor: pointer;
         }
-
-
 
         button[type="button"].btn-danger {
             background-color: #f8d7da;
@@ -60,34 +59,10 @@
             border-radius: 4px;
         }
 
-        button {
-            padding: 10px 20px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
         button:hover {
             background-color: #0056b3;
         }
-
-        a.button {
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        a.button:hover {
-            background-color: #5a6268;
-        }
     </style>
-
 </head>
 <body>
 <h1>Créer une Nouvelle Règle</h1>
@@ -104,8 +79,6 @@
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
     </select>
-
-
     <p th:if="${#lists.isEmpty(valises)}" style="color: red;">Aucune valise disponible</p>
 
     <label for="typeRegle">Type de Règle :</label>
@@ -126,13 +99,12 @@
         <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.date}"></option>
     </select>
 
-
     <div style="margin-top: 20px;">
         <button type="submit">Créer</button>
         <a href="/" th:href="@{/}">
             <button type="button" class="btn-danger">Retour à l'Accueil</button>
         </a>
-        <a href="/regles/list" th:href="@{/formules/list}">
+        <a href="/regles/list" th:href="@{/regles/list}">
             <button type="button" class="btn-danger">Retour à la Liste</button>
         </a>
     </div>

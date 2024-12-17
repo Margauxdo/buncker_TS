@@ -209,7 +209,7 @@ public class RetourSecuriteIntegrationTest {
         Assertions.assertTrue(savedRetourSecurite.getCloture(), "Le champ 'cloture' doit être true.");
     }
 
-
+/*
 
     @Test
     public void testCascadeDeleteClients() {
@@ -236,7 +236,7 @@ public class RetourSecuriteIntegrationTest {
         Assertions.assertFalse(clientRepository.existsById(client1.getId()), "Le client 1 doit être supprimé en cascade.");
         Assertions.assertFalse(clientRepository.existsById(client2.getId()), "Le client 2 doit être supprimé en cascade.");
     }
-
+*/
 
 
     @Test

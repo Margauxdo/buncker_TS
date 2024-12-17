@@ -47,10 +47,10 @@ public class FormuleServiceIntegrationTest {
 
     private FormuleDTO convertToDTO(Formule formule) {
         return FormuleDTO.builder()
-                .id(formule.getId())
+                .cleFormule(1)
                 .libelle(formule.getLibelle())
                 .formule(formule.getFormule())
-                .regleId(formule.getRegle() != null ? formule.getRegle().getId() : 0)
+                .regleIds(List.of(1))
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class FormuleServiceIntegrationTest {
         Formule formule = Formule.builder()
                 .libelle("libellé 1")
                 .formule("formule standard")
-                .regle(regle)
+                .regle(List.of(regle))
                 .build();
 
         FormuleDTO formuleDTO = convertToDTO(formule);
@@ -74,10 +74,10 @@ public class FormuleServiceIntegrationTest {
 
         // Assert
         assertNotNull(savedFormule);
-        assertNotNull(savedFormule.getId());
+        assertNotNull(savedFormule.getFormule());
         assertEquals("libellé 1", savedFormule.getLibelle());
         assertEquals("formule standard", savedFormule.getFormule());
-        assertEquals(regle.getId(), savedFormule.getRegleId());
+        assertEquals(regle.getId(), savedFormule.getRegleIds());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class FormuleServiceIntegrationTest {
         Formule formule = Formule.builder()
                 .libelle("libellé 1")
                 .formule("formule standard")
-                .regle(regle)
+                .regle(List.of(regle))
                 .build();
 
         FormuleDTO formuleDTO = convertToDTO(formule);
@@ -99,14 +99,14 @@ public class FormuleServiceIntegrationTest {
         // Act
         savedFormule.setLibelle("libelle 25");
         savedFormule.setFormule("formule avancée");
-        FormuleDTO updatedFormule = formuleService.updateFormule(savedFormule.getId(), savedFormule);
+        FormuleDTO updatedFormule = formuleService.updateFormule(savedFormule.getCleFormule(), savedFormule);
 
         // Assert
         assertNotNull(updatedFormule);
-        assertEquals(savedFormule.getId(), updatedFormule.getId());
+        assertEquals(savedFormule.getCleFormule(), updatedFormule.getCleFormule());
         assertEquals("libelle 25", updatedFormule.getLibelle());
         assertEquals("formule avancée", updatedFormule.getFormule());
-        assertEquals(regle.getId(), updatedFormule.getRegleId());
+        assertEquals(regle.getId(), updatedFormule.getRegleIds());
     }
 
     @Test
@@ -119,21 +119,21 @@ public class FormuleServiceIntegrationTest {
         Formule formule = Formule.builder()
                 .libelle("libellé 1")
                 .formule("formule standard")
-                .regle(regle)
+                .regle(List.of(Regle.builder().coderegle("CODE123").build()))
                 .build();
 
         FormuleDTO formuleDTO = convertToDTO(formule);
         FormuleDTO savedFormule = formuleService.createFormule(formuleDTO);
 
         // Act
-        FormuleDTO formuleById = formuleService.getFormuleById(savedFormule.getId());
+        FormuleDTO formuleById = formuleService.getFormuleById(savedFormule.getCleFormule());
 
         // Assert
         assertNotNull(formuleById);
-        assertEquals(savedFormule.getId(), formuleById.getId());
+        assertEquals(savedFormule.getCleFormule(), formuleById.getCleFormule());
         assertEquals("libellé 1", formuleById.getLibelle());
         assertEquals("formule standard", formuleById.getFormule());
-        assertEquals(regle.getId(), formuleById.getRegleId());
+        assertEquals(regle.getId(), formuleById.getRegleIds());
     }
 
     @Test
@@ -173,21 +173,21 @@ public class FormuleServiceIntegrationTest {
         Formule formule = Formule.builder()
                 .libelle("Libellé Test")
                 .formule("Description Test")
-                .regle(regle)
+                .regle(List.of(regle))
                 .build();
 
         FormuleDTO formuleDTO = convertToDTO(formule);
         FormuleDTO savedFormule = formuleService.createFormule(formuleDTO);
 
         // Ensure the formule exists before deletion
-        assertNotNull(formuleService.getFormuleById(savedFormule.getId()), "Formule should exist before deletion");
+        assertNotNull(formuleService.getFormuleById(savedFormule.getCleFormule()));
 
         // Act
-        formuleService.deleteFormule(savedFormule.getId());
+        formuleService.deleteFormule(savedFormule.getCleFormule());
 
         // Assert
         Assertions.assertThrows(EntityNotFoundException.class, () -> {
-            formuleService.getFormuleById(savedFormule.getId());
+            formuleService.getFormuleById(savedFormule.getCleFormule());
         }, "Formule should be deleted and not retrievable");
     }
 }

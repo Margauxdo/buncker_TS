@@ -107,7 +107,7 @@
 -->
     <!-- Sélection de la règle associée -->
     <label for="regle">Code Regle :</label>
-    <select id="regle" th:field="*{regleId}">
+    <select id="regle" th:field="*{regleIds}">
         <option value="" th:text="'Sélectionner un Code Regle'"></option>
         <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>

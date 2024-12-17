@@ -30,14 +30,24 @@
         button {
             padding: 5px 10px;
             border: 1px solid #ccc;
-            background-color: #f8f9fa;
+            background-color: #0056b3; /* Fond bleu */
+            color: #ffffff;
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #e2e6ea;
+
+
+        button[type="button"].btn-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        button[type="button"].btn-danger:hover {
+            background-color: #f1b0b7;
         }
     </style>
+
 </head>
 <body>
 <h1 style="text-align: center;">Créer un nouveau Type de Règle</h1>
@@ -53,19 +63,21 @@
 
     <!-- Relation avec Règle -->
     <label for="regle">Règle :</label>
-    <select id="regle" th:field="*{regle.id}" required>
+    <select id="regle" th:field="*{regleIds}" required>
         <option value="" th:text="'Sélectionner une règle'"></option>
         <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>
 
 
-    <div style="text-align: center;">
-        <button type="submit">Créer</button>
-        <a th:href="@{/typeRegle/list}">
-            <button type="button">Retour à la liste</button>
+
+    <div style="margin-top: 20px;">
+        <button type="submit">Valider</button>
+
+        <a href="/" th:href="@{/}">
+            <button type="button" class="btn-danger">Retour à l'Accueil</button>
         </a>
-        <a href="/">
-            <button type="button">Retour à l'Accueil</button>
+        <a href="/typeRegle/list" th:href="@{/typeRegle/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
         </a>
     </div>
 </form>

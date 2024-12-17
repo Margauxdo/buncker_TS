@@ -1,10 +1,8 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,25 +16,17 @@ import java.util.List;
 public class TypeRegle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "typeRegle_id")
+    @Column(name = "type_regle_id")
     private Integer id;
 
-    @Column(name = "typeRegle_name", unique = true, nullable = false)
+    @Column(nullable = false)
     private String nomTypeRegle;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "regle_id", nullable = true)
-    private Regle regle;
+    @OneToMany(mappedBy = "typeRegle", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @ToString.Exclude
+    private List<Regle> regles = new ArrayList<>();
 
-    public TypeRegle(Integer id, String type1, Object o) {
-        this.id = id;
-        this.nomTypeRegle = nomTypeRegle;
-        this.regle = regle;
-    }
-
-
-    public TypeRegle(String type1, Object o) {
-    }
 }
 
 

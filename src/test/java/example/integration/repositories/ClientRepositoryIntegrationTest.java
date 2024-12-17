@@ -150,11 +150,11 @@ public class ClientRepositoryIntegrationTest {
         // Vérification des relations avec des requêtes distinctes
         clients.forEach(client -> {
             // Chargement des valises pour chaque client
-            List<Valise> valises = client.getValises();
+            List<Valise> valises = (List<Valise>) client.getValises();
             assertNotNull(valises, "Les valises du client ne doivent pas être null");
 
             // Chargement des problèmes pour chaque client
-            List<Probleme> problemes = client.getProblemes();
+            List<Probleme> problemes = (List<Probleme>) client.getProblemes();
             assertNotNull(problemes, "Les problèmes du client ne doivent pas être null");
 
             // Affichage des données pour vérification

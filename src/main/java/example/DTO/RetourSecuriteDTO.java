@@ -1,12 +1,11 @@
 package example.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -14,23 +13,27 @@ import java.util.Date;
 @Builder
 public class RetourSecuriteDTO {
     private Integer id;
-    private String numero;
-    private Date datesecurite;
-    private Boolean cloture;
-    private Date dateCloture;
+    private Long numero; // Correspond au numéro unique du retour sécurité
+    private Date datesecurite; // Date de sécurité
+    private Boolean cloture; // Indique si le retour est clôturé
+    private Date dateCloture; // Date de clôture du retour
+
+    // Relation avec Client
+    private Integer clientId; // ID du client associé
+
+    private String clientNom; // Optionnel : nom du client associé
+
+    // Relation avec Mouvement
+    private List<Integer> mouvementIds; // Liste des IDs des mouvements associés
+    private List<String> mouvementStatuts;
+
+    @Getter
+    @Setter
     private String mouvementStatut;
-    private Integer nombreClients;  // Ajouter ce champ
+    private Integer nombreClients;
 
 
-    // Getters et Setters
-    public Iterable<Integer> getNombreClients() {
-        return Collections.singleton(nombreClients);
-    }
-
-    public void setNombreClients(Integer nombreClients) {
-        this.nombreClients = nombreClients;
-    }
-
-    // Autres getters et setters...
+    @Getter
+    @Setter
+    private String mouvementStatutsString;
 }
-

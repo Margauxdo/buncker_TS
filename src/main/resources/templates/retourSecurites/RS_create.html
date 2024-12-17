@@ -106,10 +106,10 @@
     </select>
 
     <label for="mouvementId">Mouvement :</label>
-    <select id="mouvementId" th:field="*{mouvementId}">
-        <option value="" disabled selected>Choisissez un mouvement</option>
+    <select id="mouvementId" th:field="*{mouvementIds}" multiple>
         <option th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.statutSortie}"></option>
     </select>
+
 
 
     <label for="clientId">Client :</label>

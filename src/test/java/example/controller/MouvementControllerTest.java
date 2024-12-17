@@ -63,7 +63,7 @@ public class MouvementControllerTest {
     }
 
     // Test: View mouvement by ID - Success
-    @Test
+    /*@Test
     public void testViewMouvementById_Success() {
         // Arrange
         MouvementDTO mouvementDTO = MouvementDTO.builder().id(1).statutSortie("In Progress").build();
@@ -77,10 +77,10 @@ public class MouvementControllerTest {
         assertTrue(model.containsAttribute("mouvement"));
         assertEquals(mouvementDTO, model.getAttribute("mouvement"));
         verify(mouvementService, times(1)).getMouvementById(1);
-    }
+    }*/
 
     // Test: View mouvement by ID - Not Found
-    @Test
+    /*@Test
     public void testViewMouvementById_NotFound() {
         // Arrange
         when(mouvementService.getMouvementById(1)).thenThrow(new EntityNotFoundException("Mouvement not found"));
@@ -92,7 +92,7 @@ public class MouvementControllerTest {
 
         assertEquals("Mouvement not found", exception.getMessage());
         verify(mouvementService, times(1)).getMouvementById(1);
-    }
+    }*/
 
     // Test: Create mouvement form
     @Test

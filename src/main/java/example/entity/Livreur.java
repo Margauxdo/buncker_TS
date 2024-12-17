@@ -33,9 +33,10 @@ public class Livreur {
 
     private String telephoneAlphapage;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "livreur")
+    @ToString.Exclude
+    @OneToMany(mappedBy = "livreur", cascade = CascadeType.ALL, orphanRemoval = true)
     //@JoinColumn(name = "mouvement_id", nullable = true)
-    @JsonIgnore
+    @JsonManagedReference
     private List<Mouvement> mouvements;
 
     @Getter

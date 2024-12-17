@@ -7,13 +7,12 @@ import java.util.List;
 
 public interface ISortieSemaineService {
     SortieSemaineDTO createSortieSemaine(SortieSemaineDTO sortieSemaineDTO);
-    SortieSemaineDTO updateSortieSemaine(int id, SortieSemaineDTO sortieSemaineDTO);
-    void deleteSortieSemaine(int id);
-
-
+    SortieSemaineDTO updateSortieSemaine(Integer id, SortieSemaineDTO sortieSemaineDTO);
     void deleteSortieSemaine(Integer id);
+;
 
-    SortieSemaineDTO getSortieSemaine(int id);
+    SortieSemaineDTO getSortieSemaine(Integer id);
+
 
     SortieSemaine findById(Long id);
 

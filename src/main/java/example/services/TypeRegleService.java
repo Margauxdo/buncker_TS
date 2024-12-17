@@ -3,6 +3,7 @@ package example.services;
 import example.DTO.TypeRegleDTO;
 import example.entity.Regle;
 import example.entity.TypeRegle;
+import example.exceptions.ResourceNotFoundException;
 import example.interfaces.ITypeRegleService;
 import example.repositories.RegleRepository;
 import example.repositories.TypeRegleRepository;
@@ -23,35 +24,46 @@ public class TypeRegleService implements ITypeRegleService {
     @Autowired
     private RegleRepository regleRepository;
 
-    @Override
+    @Transactional
     public TypeRegleDTO createTypeRegle(TypeRegleDTO typeRegleDTO) {
-        Regle regle = regleRepository.findById(typeRegleDTO.getRegle().getId())
-                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegle().getId() + " est introuvable"));
+        // Crée l'objet TypeRegle à partir du DTO
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle(typeRegleDTO.getNomTypeRegle());
 
-        TypeRegle typeRegle = TypeRegle.builder()
-                .nomTypeRegle(typeRegleDTO.getNomTypeRegle())
-                .regle(regle)
-                .build();
+        // Récupère les règles associées en fonction des IDs envoyés
+        if (typeRegleDTO.getRegleIds() != null && !typeRegleDTO.getRegleIds().isEmpty()) {
+            List<Regle> regles = regleRepository.findAllById(typeRegleDTO.getRegleIds());
+            typeRegle.setRegles(regles);
+        }
 
+        // Sauvegarde du TypeRegle avec les règles associées
         TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
 
-        return mapToDTO(savedTypeRegle);
+        return mapToDTO(savedTypeRegle);  // Conversion vers le DTO pour la réponse
     }
 
     @Override
-    @Transactional
     public TypeRegleDTO updateTypeRegle(int id, TypeRegleDTO typeRegleDTO) {
-        TypeRegle existingTypeRegle = typeRegleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("TypeRegle avec l'ID " + id + " est introuvable"));
+        return null;
+    }
 
-        Regle regle = regleRepository.findById(typeRegleDTO.getRegle().getId())
-                .orElseThrow(() -> new EntityNotFoundException("La règle associée avec l'ID " + typeRegleDTO.getRegle().getId() + " est introuvable"));
+    @Transactional
+    public TypeRegleDTO updateTypeRegle(Integer id, TypeRegleDTO typeRegleDTO) {
+        TypeRegle typeRegle = typeRegleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("TypeRegle not found with ID: " + id));
 
-        existingTypeRegle.setNomTypeRegle(typeRegleDTO.getNomTypeRegle());
-        existingTypeRegle.setRegle(regle);
+        typeRegle.setNomTypeRegle(typeRegleDTO.getNomTypeRegle());
 
-        TypeRegle updatedTypeRegle = typeRegleRepository.save(existingTypeRegle);
-        return mapToDTO(updatedTypeRegle);
+        // Mise à jour des règles associées
+        if (typeRegleDTO.getRegleIds() != null && !typeRegleDTO.getRegleIds().isEmpty()) {
+            List<Regle> regles = regleRepository.findAllById(typeRegleDTO.getRegleIds());
+            typeRegle.setRegles(regles);
+        }
+
+        // Enregistrement du TypeRegle mis à jour
+        TypeRegle updatedTypeRegle = typeRegleRepository.save(typeRegle);
+
+        return mapToDTO(updatedTypeRegle);  // Retourner le DTO mis à jour
     }
 
     @Override
@@ -76,11 +88,33 @@ public class TypeRegleService implements ITypeRegleService {
                 .collect(Collectors.toList());
     }
 
+    // Méthode pour convertir une entité TypeRegle vers un DTO
     private TypeRegleDTO mapToDTO(TypeRegle typeRegle) {
-        return TypeRegleDTO.builder()
-                .id(typeRegle.getId())
-                .nomTypeRegle(typeRegle.getNomTypeRegle())
-                .regle(typeRegle.getRegle())
+        TypeRegleDTO typeRegleDTO = new TypeRegleDTO();
+        typeRegleDTO.setId(typeRegle.getId());
+        typeRegleDTO.setNomTypeRegle(typeRegle.getNomTypeRegle());
+
+        // Associe les IDs des règles au DTO
+        List<Integer> regleIds = typeRegle.getRegles().stream()
+                .map(Regle::getId)
+                .collect(Collectors.toList());
+        typeRegleDTO.setRegleIds(regleIds);
+
+        return typeRegleDTO;
+    }
+
+    // Méthode pour convertir un DTO vers une entité TypeRegle
+    private TypeRegle mapToEntity(TypeRegleDTO typeRegleDTO) {
+        TypeRegle typeRegle = TypeRegle.builder()
+                .id(typeRegleDTO.getId())
+                .nomTypeRegle(typeRegleDTO.getNomTypeRegle())
                 .build();
+
+        if (typeRegleDTO.getRegleIds() != null) {
+            List<Regle> regles = regleRepository.findAllById(typeRegleDTO.getRegleIds());
+            typeRegle.setRegles(regles);
+        }
+
+        return typeRegle;
     }
 }

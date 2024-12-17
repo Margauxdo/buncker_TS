@@ -47,7 +47,6 @@ public class RetourSecuriteServiceIntegrationTest {
             Date dateSecurite = dateTimeFormat.parse("2024-10-28");
 
             retourSecuriteDTO = RetourSecuriteDTO.builder()
-                    .numero(12345L)
                     .dateCloture(dateCloture)
                     .datesecurite(dateSecurite)
                     .cloture(true)
@@ -62,7 +61,6 @@ public class RetourSecuriteServiceIntegrationTest {
     @Test
     public void testCreateRetourSecurite_Success() {
         RetourSecuriteDTO newRS = RetourSecuriteDTO.builder()
-                .numero(123456L)
                 .cloture(false)
                 .build();
 
@@ -76,7 +74,6 @@ public class RetourSecuriteServiceIntegrationTest {
 
     @Test
     public void testUpdateRetourSecurite_Success() {
-        retourSecuriteDTO.setNumero(54321L);
         retourSecuriteDTO.setCloture(false);
 
         RetourSecuriteDTO updatedRS = retourSecuriteService.updateRetourSecurite(retourSecuriteDTO.getId(), retourSecuriteDTO);
@@ -88,7 +85,7 @@ public class RetourSecuriteServiceIntegrationTest {
 
     @Test
     public void testUpdateRetourSecurite_Failure_EntityNotFound() {
-        RetourSecuriteDTO nonExistentRS = RetourSecuriteDTO.builder().numero(99999L).build();
+        RetourSecuriteDTO nonExistentRS = RetourSecuriteDTO.builder().build();
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             retourSecuriteService.updateRetourSecurite(9999, nonExistentRS);
@@ -122,7 +119,7 @@ public class RetourSecuriteServiceIntegrationTest {
 
     @Test
     public void testGetAllRetourSecurites() {
-        retourSecuriteService.createRetourSecurite(RetourSecuriteDTO.builder().numero(54321L).build());
+        retourSecuriteService.createRetourSecurite(RetourSecuriteDTO.builder().build());
 
         List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
 

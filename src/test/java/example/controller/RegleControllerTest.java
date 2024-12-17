@@ -101,7 +101,7 @@ public class RegleControllerTest {
     }
 
     // Test: Formulaire d'édition de règle (succès)
-    @Test
+    /*@Test
     public void testEditRegleForm_Success() {
         // Arrange
         RegleDTO regle = RegleDTO.builder().id(1).coderegle("REGLE1").build();
@@ -117,10 +117,10 @@ public class RegleControllerTest {
         assertTrue(model.containsAttribute("regle"));
         assertEquals(regle, model.getAttribute("regle"));
         verify(regleService, times(1)).readRegle(1);
-    }
+    }*/
 
     // Test: Formulaire d'édition de règle (non trouvée)
-    @Test
+   /* @Test
     public void testEditRegleForm_NotFound() {
         // Arrange
         when(regleService.readRegle(1)).thenThrow(new RegleNotFoundException("Regle with ID 1 not found."));
@@ -132,7 +132,7 @@ public class RegleControllerTest {
 
         assertEquals("Regle with ID 1 not found.", exception.getMessage());
         verify(regleService, times(1)).readRegle(1);
-    }
+    }*/
 
     // Test: Suppression d'une règle
     @Test

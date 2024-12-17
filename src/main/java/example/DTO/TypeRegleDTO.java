@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,5 +15,7 @@ import lombok.NoArgsConstructor;
 public class TypeRegleDTO {
     private Integer id;
     private String nomTypeRegle;
-    private Regle regle;
+    private List<Integer> regleIds;
+
+    private List<String> regleNoms;
 }

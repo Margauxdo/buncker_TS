@@ -1,13 +1,13 @@
 package example.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "sortieSemaine")
@@ -17,22 +17,18 @@ import java.util.Date;
 @Builder
 public class SortieSemaine {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sortieSemaine_id")
     private Integer id;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "sortieSemaine_date")
     private Date dateSortieSemaine;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "sortieSemaine", fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Regle> regles = new ArrayList<>();
 
-
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "regle_id", nullable = false)
-    @NotNull
-    private Regle regle;
 
 }

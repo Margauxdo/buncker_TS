@@ -17,20 +17,19 @@ public class MouvementDTO {
     private String statutSortie;
     private Date dateSortiePrevue;
     private Date dateRetourPrevue;
-    private String description;
+    //private String description;
 
-    @NotNull(message = "L'ID de la valise est obligatoire")
+
+
     private Integer valiseId;
+    private String valiseDescription;
 
-    @NotNull(message = "L'ID du livreur est obligatoire")
+    // Relations avec Livreur
     private Integer livreurId;
-
-    private String valiseDescription; // Ajout pour afficher la description de la valise
     private String livreurNom;
 
-    private String valiseNumeroValise;
-    private List<LivreurDTO> livreurs;
-    private List<RetourSecuriteDTO> retourSecurites;
+    // Relation avec RetourSecurite
+    private Integer retourSecuriteId;
 
 }
 

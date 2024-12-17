@@ -24,9 +24,6 @@ public class JourFerie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "jourFerie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Regle> regles = new ArrayList<>();
-
 
 
     @Column(name = "Date", nullable = false)

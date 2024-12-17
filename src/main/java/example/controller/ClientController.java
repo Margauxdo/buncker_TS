@@ -17,11 +17,6 @@ import java.util.List;
 @RequestMapping("/clients")
 public class ClientController {
 
-
-
-
-
-
     private final ClientService clientService;
     private final ValiseService valiseService;
     private final ProblemeService problemeService;
@@ -128,14 +123,11 @@ public class ClientController {
     }
 
 
-    /**
-     * Formulaire Thymeleaf pour modifier un client.
-     */
+
     @GetMapping("/edit/{id}")
     public String editClient(@PathVariable int id, Model model) {
         ClientDTO client = clientService.getClientById(id);
 
-        // Debug logs
         List<ValiseDTO> valises = valiseService.getAllValises();
         List<ProblemeDTO> problemes = problemeService.getAllProblemes();
         List<RetourSecuriteDTO> retours = retourSecuriteService.getAllRetourSecurites();
@@ -146,15 +138,17 @@ public class ClientController {
         System.out.println("Retours: " + retours);
         System.out.println("Regles: " + regles);
 
-        // Add to model
-        model.addAttribute("valisesList", valises);
-        model.addAttribute("problemsList", problemes);
-        model.addAttribute("retoursList", retours);
-        model.addAttribute("rulesList", regles);
         model.addAttribute("client", client);
+
+        // Populer les listes avec des objets Valise, Probleme, RetourSecurite, et Regle
+        model.addAttribute("valisesList", valiseService.getAllValises());
+        model.addAttribute("problemsList", problemeService.getAllProblemes());
+        model.addAttribute("retoursList", retourSecuriteService.getAllRetourSecurites());
+        model.addAttribute("rulesList", regleService.getAllRegles());
 
         return "clients/client_edit";
     }
+
 
 
 

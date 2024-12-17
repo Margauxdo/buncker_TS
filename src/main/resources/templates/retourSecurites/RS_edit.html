@@ -111,7 +111,7 @@
 
     <!-- Liste déroulante pour Mouvement -->
     <label for="mouvementId">Mouvement :</label>
-    <select id="mouvementId" th:field="*{mouvementId}">
+    <select id="mouvementId" th:field="*{mouvementIds}">
         <option th:each="mouvement : ${mouvements}"
                 th:value="${mouvement.id}"
                 th:text="${mouvement.statutSortie}">
@@ -120,11 +120,10 @@
 
     <!-- Liste déroulante pour Client -->
     <label for="clientId">Client :</label>
-    <select id="clientId" th:field="*{clientIds}">
+    <select id="clientId" th:field="*{clientIds}" multiple required>
         <option th:each="client : ${clients}"
                 th:value="${client.id}"
-                th:text="${client.name}">
-        </option>
+                th:text="${client.name}"></option>
     </select>
 
 

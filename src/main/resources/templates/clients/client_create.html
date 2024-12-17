@@ -119,7 +119,7 @@
     <!-- Problems -->
     <label for="problemes">Problemes :</label>
 
-    <select id="problemes" name="problemes"  th:field="*{problemeIds}">
+    <select id="problemes" name="problemes"  th:field="*{problemeId}">
         <option th:each="probleme : ${problemsList}" th:value="${probleme.id}" th:text="${probleme.descriptionProbleme}"></option>
     </select>
 
@@ -129,7 +129,7 @@
     <!-- Retour Sécurité -->
     <label for="retourSecurite">Retour Sécurité :</label>
 
-    <select id="retourSecurite" name="retourSecurite" th:field="*{retourSecuriteId}">
+    <select id="retourSecurite" name="retourSecurite" th:field="*{retourSecuriteIds}">
         <option th:each="retour : ${retoursList}" th:value="${retour.id}" th:text="${retour.numero}"></option>
     </select>
 

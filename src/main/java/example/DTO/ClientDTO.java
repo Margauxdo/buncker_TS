@@ -32,20 +32,13 @@ public class ClientDTO {
     private String typeSuivie;
     private String codeClient;
 
-    private List<Integer> valiseIds = new ArrayList<>();
-    private List<String> valisesDescriptions = new ArrayList<>();
+   private Integer problemeId;
 
+    private List<Integer> retourSecuriteIds = new ArrayList<>();
+    private Integer regleId;
+
+    public List<Integer> valiseIds = new ArrayList<>();
     private List<Integer> problemeIds = new ArrayList<>();
     private Integer retourSecuriteId;
 
-    private Integer regleId; // Garder ce champ de type Integer
-
-    @Override
-    public String toString() {
-        return "Client{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }
 }

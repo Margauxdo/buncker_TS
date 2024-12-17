@@ -72,7 +72,7 @@ public class SortieSemaineControllerTest {
         Model model = new ConcurrentModel();
 
         // Act
-        String response = sortieSemaineController.viewSortieSemaineById(1, model);
+        String response = sortieSemaineController.viewSortieSemaine(1, model);
 
         // Assert
         assertEquals("sortieSemaines/SS_details", response);
@@ -91,7 +91,7 @@ public class SortieSemaineControllerTest {
         Model model = new ConcurrentModel();
 
         // Act
-        String response = sortieSemaineController.viewSortieSemaineById(id, model);
+        String response = sortieSemaineController.viewSortieSemaine(id, model);
 
         // Assert
         assertEquals("sortieSemaines/error", response);

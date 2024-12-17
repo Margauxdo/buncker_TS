@@ -24,12 +24,10 @@
             padding: 5px 10px;
             margin-right: 5px;
             border: 1px solid #ccc;
-            background-color: #0056b3; /* Fond bleu */
+            background-color: #0056b3;
             color: #ffffff;
             cursor: pointer;
         }
-
-
 
         button[type="submit"][style*="color: red;"] {
             background-color: #f8d7da;
@@ -39,21 +37,7 @@
 
         button[type="submit"][style*="color: red;"]:hover {
             background-color: #f1b0b7;
-
-
         }
-
-
-        button {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: 1px solid #ccc;
-            background-color: #0056b3; /* Fond bleu */
-            color: #ffffff;
-            cursor: pointer;
-        }
-
-
 
         button[type="button"].btn-danger {
             background-color: #f8d7da;
@@ -90,35 +74,33 @@
     <tbody>
     <!-- Boucle sur la liste des formules -->
     <tr th:each="formule : ${formules}">
-        <td th:text="${formule.id}"></td>
+        <!-- Remplacer formule.id par formule.cleFormule -->
+        <td th:text="${formule.cleFormule}"></td>
         <td th:text="${formule.libelle}"></td>
         <td th:text="${formule.formule}"></td>
-        <td th:text="${formule.codeRegle != null ? formule.codeRegle : 'Aucune règle associée'}"></td>
-
+        <td th:text="${formule.codeRegles != null ? formule.codeRegles : 'Aucune règle associée'}"></td>
 
         <td>
             <!-- Bouton pour Voir -->
-            <form th:action="@{/formules/view/{id}(id=${formule.id})}" method="get" style="display:inline;">
+            <form th:action="@{/formules/view/{id}(id=${formule.cleFormule})}" method="get" style="display:inline;">
                 <button type="submit" aria-label="Voir la formule">Voir</button>
             </form>
 
             <!-- Bouton pour Modifier -->
-            <form th:action="@{/formules/edit/{id}(id=${formule.id})}" method="get" style="display:inline;">
+            <form th:action="@{/formules/edit/{id}(id=${formule.cleFormule})}" method="get" style="display:inline;">
                 <button type="submit" aria-label="Modifier la formule">Modifier</button>
             </form>
 
             <!-- Bouton pour Supprimer -->
-            <form th:action="@{/formules/delete/{id}(id=${formule.id})}" method="post"
+            <form th:action="@{/formules/delete/{id}(id=${formule.cleFormule})}" method="post"
                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formule ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
+                <input type="hidden" name="_method" value="delete"/>
                 <button type="submit" style="color: red;" aria-label="Supprimer la formule">Supprimer</button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
-
-
 
 <div style="margin-top: 20px;">
     <a href="/formules/create">
@@ -127,7 +109,6 @@
     <a href="/" th:href="@{/}">
         <button type="button" class="btn-danger">Retour à l'Accueil</button>
     </a>
-
 </div>
 
 </body>

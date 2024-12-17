@@ -1,12 +1,12 @@
 package example.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "formule")
@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Formule {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "formule_id")
@@ -27,14 +28,10 @@ public class Formule {
     @Column(name = "formule", length = 500)
     private String formule;
 
-    @ManyToOne
-    @JoinColumn(name = "regle_id", nullable = true)
-    private Regle regle;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "formule", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Regle> regles = new ArrayList<>();
 
-    public Formule(String libelle, String description, Regle regle) {
-        this.libelle = libelle;
-        this.formule = description;
-        this.regle = regle;
-    }
 
 }
