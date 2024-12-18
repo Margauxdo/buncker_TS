@@ -128,9 +128,10 @@
             <form th:action="@{/regles/edit/{id}(id=${regle.id})}" method="get" style="display:inline;">
                 <button type="submit">Modifier</button>
             </form>
-            <form th:action="@{/regles/delete/{id}(id=${regle.id})}" method="post" style="display:inline;">
+            <form th:action="@{/regles/delete/{id}(id=${regle.id})}" method="post">
                 <button type="submit" style="color: red;">Supprimer</button>
             </form>
+
 
         </td>
     </tr>

@@ -67,26 +67,68 @@
 <body>
 <h1>Créer une Nouvelle Règle</h1>
 <form th:action="@{/regles/create}" th:object="${regle}" method="post">
-    <!-- Champ pour `coderegle` -->
+
     <label for="coderegle">Code de la Règle :</label>
     <input type="text" id="coderegle" th:field="*{coderegle}" required />
 
-
-    <!-- Champ pour `reglePourSortie` -->
     <label for="reglePourSortie">Règle pour Sortie :</label>
     <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
-    <!-- Exemple de gestion des relations -->
+    <label for="dateRegle">Date de la Règle :</label>
+    <input type="date" id="dateRegle" th:field="*{dateRegle}" />
+
+    <label for="nombreJours">Nombre de Jours :</label>
+    <input type="number" id="nombreJours" th:field="*{nombreJours}" />
+
+    <label for="calculCalendaire">Calcul Calendaire :</label>
+    <input type="number" id="calculCalendaire" th:field="*{calculCalendaire}" />
+
+    <label>Jours Fermés :</label>
+    <label><input type="checkbox" th:field="*{fermeJS1}" /> Fermé JS1</label>
+    <label><input type="checkbox" th:field="*{fermeJS2}" /> Fermé JS2</label>
+    <label><input type="checkbox" th:field="*{fermeJS3}" /> Fermé JS3</label>
+    <label><input type="checkbox" th:field="*{fermeJS4}" /> Fermé JS4</label>
+    <label><input type="checkbox" th:field="*{fermeJS5}" /> Fermé JS5</label>
+    <label><input type="checkbox" th:field="*{fermeJS6}" /> Fermé JS6</label>
+    <label><input type="checkbox" th:field="*{fermeJS7}" /> Fermé JS7</label>
+
+    <label for="typeEntree">Type d'Entrée :</label>
+    <input type="text" id="typeEntree" th:field="*{typeEntree}" />
+
+    <label for="nbjsmEntree">Nombre de Jours/SM Entrée :</label>
+    <input type="number" id="nbjsmEntree" th:field="*{nbjsmEntree}" />
+
+    <label for="valise">Valise :</label>
+    <select id="valise" th:field="*{valiseId}">
+        <option value="" disabled selected>-- Sélectionnez une Valise --</option>
+        <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
+    </select>
+
+
     <label for="typeRegle">Type de Règle :</label>
     <select id="typeRegle" th:field="*{typeRegleId}">
         <option value="" disabled selected>-- Sélectionnez un Type de Règle --</option>
         <option th:each="type : ${typesRegle}" th:value="${type.id}" th:text="${type.nomTypeRegle}"></option>
     </select>
 
-    <!-- Autres relations similaires -->
-    <!-- Ajouter ici les relations pour `formule`, `jourFerie`, etc. -->
+    <label for="formule">Formule :</label>
+    <select id="formule" th:field="*{formuleId}">
+        <option value="" disabled selected>-- Sélectionnez une Formule --</option>
+        <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.libelle}"></option>
+    </select>
 
-    <button type="submit">Créer</button>
+    <label for="jourFerie">Jour Férié :</label>
+    <select id="jourFerie" th:field="*{jourFerieId}">
+        <option value="" disabled selected>-- Sélectionnez un Jour Férié --</option>
+        <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.date}"></option>
+    </select>
+
+    <div style="margin-top: 20px;">
+        <button type="submit">Valider</button>
+        <a href="/regles/list" th:href="@{/regles/list}">
+            <button type="button" class="btn-danger">Retour à la Liste</button>
+        </a>
+    </div>
 </form>
 
 </body>

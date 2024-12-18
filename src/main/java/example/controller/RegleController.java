@@ -2,21 +2,32 @@ package example.controller;
 
 import example.DTO.*;
 import example.entity.Formule;
+import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.services.*;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 @Controller
 @RequestMapping("/regles")
 public class RegleController {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegleController.class);
+
 
     @Autowired
     private IRegleService regleService;
@@ -30,6 +41,10 @@ public class RegleController {
     private JourFerieService jourFerieService;
     @Autowired
     private ClientService clientService;
+
+    public RegleController(RegleService regleService) {
+        this.regleService = regleService;
+    }
 
     @GetMapping("/list")
     public String listRegles(Model model) {
@@ -55,14 +70,17 @@ public class RegleController {
         model.addAttribute("formules", formuleService.getAllFormules());
         model.addAttribute("joursFeries", jourFerieService.getJourFeries());
         model.addAttribute("clients", clientService.getAllClients());
+        model.addAttribute("valises", valiseService.getAllValises()); // Ajout des valises
         return "regles/regle_create";
     }
 
 
 
 
+
     @PostMapping("/create")
     public String createRegle(@ModelAttribute("regle") @Valid RegleDTO regleDTO, BindingResult result, Model model) {
+        logger.info("Création d'une règle avec coderegle : {}", regleDTO.getCoderegle());
         if (result.hasErrors()) {
             model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
             model.addAttribute("formules", formuleService.getAllFormules());
@@ -70,10 +88,10 @@ public class RegleController {
             model.addAttribute("clients", clientService.getAllClients());
             return "regles/regle_create";
         }
-
         regleService.createRegle(regleDTO);
         return "redirect:/regles/list";
     }
+
 
 
 
@@ -101,12 +119,24 @@ public class RegleController {
 
 
     @PostMapping("/delete/{id}")
-    public String deleteRegle(@PathVariable int id) {
-        regleService.deleteRegle(id);
+    public String deleteRegle(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        logger.info("Requête reçue pour supprimer la règle avec ID : {}", id);
+        try {
+            regleService.deleteRegle(id);
+            redirectAttributes.addFlashAttribute("successMessage", "La règle a été supprimée avec succès.");
+            logger.info("La règle avec ID : {} a été supprimée avec succès.", id);
+        } catch (RegleNotFoundException e) {
+            logger.error("Erreur : La règle avec ID : {} n'a pas été trouvée.", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur : La règle n'a pas été trouvée.");
+        } catch (Exception e) {
+            logger.error("Une erreur inattendue s'est produite lors de la suppression de la règle avec ID : {}", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Une erreur est survenue lors de la suppression.");
+        }
         return "redirect:/regles/list";
     }
 
-
-
-
 }
+
+
+
+

@@ -1,6 +1,7 @@
 package example.services;
 
 import example.DTO.RegleDTO;
+import example.controller.RegleController;
 import example.entity.Client;
 import example.entity.Formule;
 import example.entity.Regle;
@@ -9,7 +10,8 @@ import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class RegleService implements IRegleService {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(RegleController.class);
 
     private final RegleRepository regleRepository;
     private final TypeRegleRepository typeRegleRepository;
@@ -41,13 +46,12 @@ public class RegleService implements IRegleService {
     @Transactional
     public Regle createRegle(RegleDTO regleDTO) {
         Regle regle = new Regle();
-        Formule formule = new Formule(); // Fetch Formule based on regleDTO.getFormuleId()
+        regle.setCoderegle(regleDTO.getCoderegle()); // Assurez-vous que cette ligne existe
+        regle.setReglePourSortie(regleDTO.getReglePourSortie());
+        regle.setDateRegle(regleDTO.getDateRegle());
+        regle.setTypeRegle(regleDTO.getTypeRegle());
+        regle.setNombreJours(regleDTO.getNombreJours());
 
-        // Assuming you have a way to find the formule by ID
-        formule.setId(regleDTO.getFormuleId());
-
-        regle.setFormule(formule);
-        // Set other fields from regleDTO as needed
 
         return regleRepository.save(regle);
     }
@@ -72,13 +76,24 @@ public class RegleService implements IRegleService {
         return mapToDTO(regleRepository.save(existingRegle));
     }
 
+    @Transactional
     @Override
-    public void deleteRegle(int id) {
-        if (!regleRepository.existsById(id)) {
+    public void deleteRegle(String id) {
+        logger.info("Vérification de l'existence de la règle avec ID : {}", id);
+        if (!regleRepository.existsById(Integer.valueOf(id))) {
+            logger.warn("La règle avec ID : {} n'existe pas.", id);
             throw new RegleNotFoundException("Règle non trouvée avec l'ID : " + id);
         }
-        regleRepository.deleteById(id);
+        try {
+            logger.info("Suppression de la règle avec ID : {}", id);
+            regleRepository.deleteById(Integer.valueOf(id));
+            logger.info("La règle avec ID : {} a été supprimée avec succès.", id);
+        } catch (Exception e) {
+            logger.error("Erreur lors de la suppression de la règle avec ID : {}", id, e);
+            throw e;
+        }
     }
+
 
     public RegleDTO getRegleById(int id) {
         Regle regle = regleRepository.findById(id)
@@ -95,6 +110,11 @@ public class RegleService implements IRegleService {
         return regleRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteRegle(int id) {
+
     }
 
     private Regle mapToEntity(RegleDTO dto) {
