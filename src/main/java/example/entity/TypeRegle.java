@@ -2,6 +2,8 @@ package example.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -14,20 +16,22 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TypeRegle {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "type_regle_id")
     private Integer id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Le nom du type de règle est obligatoire.")
+    @Column(name = "nom_type_regle", nullable = false)
     private String nomTypeRegle;
 
-    @OneToMany(mappedBy = "typeRegle", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    @ToString.Exclude
-    private List<Regle> regles = new ArrayList<>();
+    @Column(name = "description")
+    private String description;
+
 
 }
+
 
 
 

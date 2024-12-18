@@ -75,14 +75,23 @@
     <tr>
         <th>ID</th>
         <th>Nom</th>
-        <th>Règle Associée</th>
+        <th>Description</th>
+        <th>Action</th>
+
     </tr>
     </thead>
     <tbody>
     <tr th:each="typeRegle : ${typeRegles}">
         <td th:text="${typeRegle.id}"></td>
         <td th:text="${typeRegle.nomTypeRegle}"></td>
-        <td th:text="${typeRegle.regle != null ? typeRegle.regle.coderegle : 'Aucune'}"></td>
+        <td th:text="${typeRegle.description}"></td>
+        <td>
+            <form th:action="@{/typeRegle/delete/{id}(id=${typeRegle.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce type de regle ?');" style="display:inline;">
+                <input type="hidden" name="_method" value="delete"/>
+                <button type="submit" style="color: red;" aria-label="Supprimer le type de regle">Supprimer</button>
+            </form>
+        </td>
     </tr>
     </tbody>
 </table>

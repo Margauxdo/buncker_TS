@@ -4,31 +4,20 @@
     <meta charset="UTF-8">
     <title>Créer un Type de Règle</title>
     <style>
-        form {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+        h1 {
+            text-align: center;
+            margin-top: 20px;
         }
-
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
         button {
             padding: 5px 10px;
+            margin-right: 5px;
             border: 1px solid #ccc;
             background-color: #0056b3; /* Fond bleu */
             color: #ffffff;
@@ -46,41 +35,72 @@
         button[type="button"].btn-danger:hover {
             background-color: #f1b0b7;
         }
-    </style>
 
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a.button {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        a.button:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
 <h1 style="text-align: center;">Créer un nouveau Type de Règle</h1>
 
-<div th:if="${errorMessage}" style="color: red; text-align: center;">
-    <p th:text="${errorMessage}"></p>
-</div>
-
 <form th:action="@{/typeRegle/create}" th:object="${typeRegle}" method="post">
-    <!-- Champ pour le nom du type de règle -->
-    <label for="nomTypeRegle">Nom du Type de Règle :</label>
-    <input type="text" id="nomTypeRegle" th:field="*{nomTypeRegle}" placeholder="Entrez le nom du type de règle" required />
+    <label for="nomTypeRegle">Nom du type de règle :</label>
+    <input type="text" id="nomTypeRegle" th:field="*{nomTypeRegle}" required />
 
-    <!-- Relation avec Règle -->
-    <label for="regle">Règle :</label>
-    <select id="regle" th:field="*{regleIds}" required>
-        <option value="" th:text="'Sélectionner une règle'"></option>
-        <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
-    </select>
-
-
+    <label for="description">Description :</label>
+    <input type="text" id="description" th:field="*{description}" required />
 
     <div style="margin-top: 20px;">
         <button type="submit">Valider</button>
-
-        <a href="/" th:href="@{/}">
-            <button type="button" class="btn-danger">Retour à l'Accueil</button>
-        </a>
-        <a href="/typeRegle/list" th:href="@{/typeRegle/list}">
-            <button type="button" class="btn-danger">Retour à la Liste</button>
-        </a>
     </div>
 </form>
-
 </body>
 </html>

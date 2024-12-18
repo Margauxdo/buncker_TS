@@ -5,12 +5,14 @@ import example.DTO.ProblemeDTO;
 import example.DTO.RegleDTO;
 import example.DTO.ValiseDTO;
 import example.entity.Client;
+import example.entity.Probleme;
 import example.entity.Valise;
 import example.interfaces.IProblemeService;
 import example.repositories.ClientRepository;
 import example.services.ClientService;
 import example.services.ValiseService;
 import jakarta.validation.Valid;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +28,9 @@ import org.slf4j.Logger;
 @Controller
 @RequestMapping("/pb")
 public class ProblemeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProblemeController.class);
+
 
     @Autowired
     private IProblemeService problemeService;
@@ -58,16 +63,9 @@ public class ProblemeController {
 
     @GetMapping("/view/{id}")
     public String viewProbleme(@PathVariable int id, Model model) {
-        try {
-            ProblemeDTO probleme = problemeService.getProblemeById(id);
-            System.out.println("Probleme retrieved: " + probleme);
-            model.addAttribute("probleme", probleme);
-            return "problemes/pb_details";
-        } catch (Exception e) {
-            System.err.println("Error retrieving probleme: " + e.getMessage());
-            model.addAttribute("errorMessage", "Problème non trouvé avec l'ID: " + id);
-            return "problemes/error";
-        }
+        ProblemeDTO probleme = problemeService.getProblemeById(id);
+        model.addAttribute("probleme", probleme);
+        return "problemes/pb_details";
     }
 
 
@@ -92,27 +90,17 @@ public class ProblemeController {
 
 
     @PostMapping("/create")
-    public String createProbleme(@Valid @ModelAttribute("probleme") ProblemeDTO problemeDTO, Model model) {
+    public String createProbleme(@Valid @ModelAttribute("problemeDTO") ProblemeDTO problemeDTO, Model model) {
         try {
-            // Vérifier et récupérer les clients associés
-            if (problemeDTO.getClientIds() != null && !problemeDTO.getClientIds().isEmpty()) {
-                List<Client> clients = clientRepository.findAllById(problemeDTO.getClientIds());
-                if (clients.isEmpty()) {
-                    model.addAttribute("errorMessage", "Aucun client trouvé.");
-                    return "problemes/error";
-                }
-                problemeDTO.setClientNoms(clients.stream().map(Client::getName).collect(Collectors.toList()));
-            }
-
-            // Création du problème avec la valise et les clients
-            problemeService.createProbleme(problemeDTO);
-
-            return "redirect:/pb/list"; // Rediriger vers la liste des problèmes après la création
+            ProblemeDTO probleme = problemeService.createProbleme(problemeDTO);
+            model.addAttribute("successMessage", "Problème créé avec succès");
+            return "redirect:/pb/list";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Erreur lors de la création du problème.");
+            model.addAttribute("errorMessage", "Erreur lors de la création du problème : " + e.getMessage());
             return "problemes/error";
         }
     }
+
 
 
 

@@ -82,7 +82,7 @@ public class Regle {
 
     // Relation ManyToOne avec TypeRegle
     @ManyToOne()  //  fetch = FetchType.LAZY
-    @JoinColumn(name = "type_regle_id", nullable = false)
+    @JoinColumn(name = "type_regle_id", referencedColumnName = "type_regle_id")
     @JsonBackReference
     @ToString.Exclude
     private TypeRegle typeRegle;

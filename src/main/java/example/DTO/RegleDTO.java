@@ -42,6 +42,8 @@ public class RegleDTO {
     @Setter
     private TypeRegle typeRegle;
 
+    private String typeRegleNom;
+
     @Getter
     @Setter
     private Valise valise;

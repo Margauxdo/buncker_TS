@@ -29,8 +29,10 @@ public interface RegleRepository extends JpaRepository<Regle, Integer> {
     @Query("SELECT r FROM Regle r WHERE r.typeRegle.id = :typeRegleId")
     List<Regle> findByTypeRegleId(@Param("typeRegleId") Integer typeRegleId);
 
+    List<Regle> findByCoderegleIn(List<String> coderegles);
 
     @Query("SELECT r FROM Regle r WHERE r.formule.id = :formuleId")
     List<Regle> findByFormuleId(@Param("formuleId") Integer formuleId);
+
 
 }

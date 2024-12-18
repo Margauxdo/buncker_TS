@@ -178,7 +178,7 @@ GET http://localhost:8080/pb/list
 Accept: text/html
 
 ### Voir un probleme par ID (GET - Thymeleaf)
-GET http://localhost:8080/pb/view/22
+GET http://localhost:8080/pb/view/11
 Accept: text/html
 
 

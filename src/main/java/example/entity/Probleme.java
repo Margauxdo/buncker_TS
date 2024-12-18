@@ -33,12 +33,14 @@ public class Probleme {
     private String detailsProbleme;
 
     @ManyToOne
-    @JoinColumn(name = "numero_valise", nullable = true)//not null
+    @JoinColumn(name = "numero_valise")//not null
     private Valise valise;
 
 
+
+
     @ToString.Exclude
-    @OneToMany(mappedBy = "probleme", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "probleme", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Client> clients= new ArrayList<Client>();
 

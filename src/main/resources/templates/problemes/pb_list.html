@@ -89,8 +89,12 @@
         <td th:text="${probleme.id}"></td>
         <td th:text="${probleme.descriptionProbleme}"></td>
         <td th:text="${probleme.detailsProbleme}"></td>
-        <td th:text="${probleme.clientId != null ? 'Client ID: ' + probleme.clientId : 'Aucun client'}"></td>
-        <td th:text="${probleme.valiseId != null ? 'Valise ID: ' + probleme.valiseId : 'Aucune valise'}"></td>
+
+        <td th:text="${probleme.clientIds != null ? 'Client : ' + probleme.clientIds : 'Aucun client'}"></td>
+
+        <td th:text="${probleme.numeroDeValise != null ? 'Valise : ' + probleme.numeroDeValise : 'Aucune valise'}"></td>
+
+        </td>
         <td>
             <form th:action="@{/pb/view/{id}(id=${probleme.id})}" method="get" style="display:inline;">
                 <button type="submit">Voir</button>

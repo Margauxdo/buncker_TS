@@ -36,6 +36,15 @@ public class ValiseService implements IValiseService {
     @Autowired
     private MouvementService mouvementService;
 
+
+    public ValiseService(ValiseRepository valiseRepository) {
+        this.valiseRepository = valiseRepository;
+    }
+
+    public boolean checkIfValiseExists(String numeroValise) {
+        return valiseRepository.existsByNumeroValise(numeroValise);
+    }
+
     @Override
     @Transactional
     public ValiseDTO createValise(ValiseDTO valiseDTO) {
@@ -84,7 +93,7 @@ public class ValiseService implements IValiseService {
 
         // Mise à jour des champs simples
         valise.setDescription(valiseDTO.getDescription());
-        valise.setNumeroValise(valiseDTO.getNumeroValise());
+        valise.setNumeroValise(String.valueOf(valiseDTO.getNumeroValise()));
         valise.setRefClient(valiseDTO.getRefClient());
         valise.setSortie(valiseDTO.getSortie());
         valise.setDateDernierMouvement(valiseDTO.getDateDernierMouvement());
@@ -179,7 +188,7 @@ public class ValiseService implements IValiseService {
         return ValiseDTO.builder()
                 .id(valise.getId())
                 .description(valise.getDescription())
-                .numeroValise(valise.getNumeroValise())
+                .numeroValise(Integer.valueOf(valise.getNumeroValise()))
                 .refClient(valise.getRefClient())
                 .sortie(valise.getSortie())
                 .dateDernierMouvement(valise.getDateDernierMouvement())
@@ -199,7 +208,7 @@ public class ValiseService implements IValiseService {
         Valise valise = Valise.builder()
                 .id(valiseDTO.getId())
                 .description(valiseDTO.getDescription())
-                .numeroValise(valiseDTO.getNumeroValise())
+                .numeroValise(String.valueOf(valiseDTO.getNumeroValise()))
                 .refClient(valiseDTO.getRefClient())
                 .sortie(valiseDTO.getSortie())
                 .dateDernierMouvement(valiseDTO.getDateDernierMouvement())

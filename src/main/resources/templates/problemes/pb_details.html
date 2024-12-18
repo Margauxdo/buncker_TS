@@ -77,7 +77,7 @@
     <p><strong>Valise Associée :</strong></p>
     <ul>
         <li>
-            <span th:text="${probleme.valise?.id ?: 'Non spécifiée'}"></span> -
+            <span th:text="${probleme.valise?.id ?: 'Non spécifiée'}"></span>
             <span th:text="${probleme.valise?.description ?: 'Non spécifiée'}"></span>
         </li>
     </ul>
@@ -85,7 +85,8 @@
     <p><strong>Client Associé :</strong></p>
     <ul>
         <li>
-            <span th:text="${probleme.client?.id ?: 'Non spécifié'}"></span> -
+            <<span th:text="${probleme.client?.id ?: 'Non spécifié'}">ID du client</span>
+
             <span th:text="${probleme.client?.name ?: 'Non spécifié'}"></span>
         </li>
     </ul>

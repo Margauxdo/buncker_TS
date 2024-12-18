@@ -33,7 +33,7 @@ public class FormuleService implements IFormuleService {
                 .id(formule.getId())
                 .libelle(formule.getLibelle())
                 .formule(formule.getFormule())
-                .cleFormule(formule.getId() != null ? "formule-" + formule.getId() : null)  // Example mapping
+                .cleFormule(String.valueOf(formule.getId() != null ? formule.getId() : null))  // Example mapping
                 .regleIds(formule.getRegles().stream().map(Regle::getId).collect(Collectors.toList()))
                 .codeRegles(formule.getRegles().stream().map(Regle::getCoderegle).collect(Collectors.toList()))
                 .build();

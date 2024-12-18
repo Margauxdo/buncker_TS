@@ -49,13 +49,7 @@ public class RegleController {
     }
 
 
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        List<FormuleDTO> formules = formuleService.getAllFormules(); // This should return the FormuleDTO list
-        model.addAttribute("formules", formules);
-        model.addAttribute("regle", new RegleDTO());
-        return "regles/regle_create";
-    }
+
 
     @PostMapping("/create")
     public String createRegle(@ModelAttribute("regle") RegleDTO regleDTO) {

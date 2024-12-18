@@ -93,6 +93,14 @@
 <body>
 <h1 style="text-align: center;">Créer un Nouveau Problème</h1>
 <form th:action="@{/pb/create}" th:object="${probleme}" method="post">
+    <label for="numeroDeValise">Numéro de la Valise :</label>
+    <input type="text" id="numeroDeValise" th:field="*{numeroDeValise}" required />
+
+
+    <!-- Affichage des erreurs -->
+    <div th:if="${#fields.hasErrors('numeroDeValise')}" style="color: red;">
+        <p th:each="err : ${#fields.errors('numeroDeValise')}" th:text="${err}"></p>
+    </div>
     <!-- Description du problème -->
     <label for="descriptionProbleme">Description du Problème</label>
     <input type="text" id="descriptionProbleme" th:field="*{descriptionProbleme}" placeholder="Entrez la description" required />

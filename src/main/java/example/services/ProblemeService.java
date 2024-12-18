@@ -9,7 +9,10 @@ import example.interfaces.IProblemeService;
 import example.repositories.ClientRepository;
 import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProblemeService implements IProblemeService {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(ProblemeService.class);
+
 
     private final ProblemeRepository problemeRepository;
     private final ValiseRepository valiseRepository;
@@ -42,37 +49,33 @@ public class ProblemeService implements IProblemeService {
     }
 
     @Override
+    @Transactional
     public ProblemeDTO createProbleme(ProblemeDTO problemeDTO) {
-        // Vérification que valiseId est non nul
-        if (problemeDTO.getValiseId() == null) {
-            throw new IllegalArgumentException("La valise est requise pour créer un problème.");
-        }
-
-        // Récupérer la valise depuis l'ID
+        // Récupération de la valise
         Valise valise = valiseRepository.findById(problemeDTO.getValiseId())
-                .orElseThrow(() -> new ResourceNotFoundException("Valise introuvable avec l'ID : " + problemeDTO.getValiseId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Valise not found"));
 
-        // Récupérer les clients depuis leurs identifiants (si clientIds est non nul et non vide)
+        // Récupération du client
         List<Client> clients = new ArrayList<>();
-        if (problemeDTO.getClientIds() != null && !problemeDTO.getClientIds().isEmpty()) {
-            clients = clientRepository.findAllById(problemeDTO.getClientIds())
-                    .stream()
-                    .filter(client -> client != null)  // Assurer qu'aucun client n'est null
-                    .collect(Collectors.toList());
+        for (Integer clientId : problemeDTO.getClientIds()) {
+            Client client = clientRepository.findById(clientId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+            clients.add(client);
         }
 
-        // Conversion DTO -> Entité
-        Probleme probleme = mapToEntity(problemeDTO);
-        probleme.setValise(valise);  // Associer la valise au problème
-        probleme.setClients(clients);  // Associer les clients au problème
+        // Création du problème
+        Probleme probleme = new Probleme();
+        probleme.setDescriptionProbleme(problemeDTO.getDescriptionProbleme());
+        probleme.setDetailsProbleme(problemeDTO.getDetailsProbleme());
+        probleme.setValise(valise);
+        probleme.setClients(clients);  // Associer les clients
 
-        // Sauvegarde de l'entité
-        Probleme savedProbleme = problemeRepository.save(probleme);
+        // Sauvegarde du problème
+        problemeRepository.save(probleme);
 
-        // Conversion Entité -> DTO
-        return mapToDTO(savedProbleme);
+        // Retourner le DTO
+        return new ProblemeDTO(probleme);  // Retourner un DTO pour la réponse
     }
-
 
     @Override
     public ProblemeDTO updateProbleme(int id, ProblemeDTO problemeDTO) {
@@ -117,11 +120,15 @@ public class ProblemeService implements IProblemeService {
         return null;
     }
 
+    @Transactional
     @Override
     public ProblemeDTO getProblemeById(int id) {
+        // Récupérer le problème avec ses entités liées
         Probleme probleme = problemeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Problème introuvable avec l'ID : " + id));
-        return mapToDTO(probleme);
+                .orElseThrow(() -> new ResourceNotFoundException("Probleme not found"));
+
+        // La session est toujours ouverte ici, donc la collection 'clients' peut être chargée correctement
+        return new ProblemeDTO(probleme);
     }
 
     @Override
@@ -138,16 +145,20 @@ public class ProblemeService implements IProblemeService {
 
     // Conversion Entité -> DTO
     private ProblemeDTO mapToDTO(Probleme probleme) {
+        List<String> clientNoms = probleme.getClients() != null
+                ? probleme.getClients().stream().map(Client::getName).collect(Collectors.toList())
+                : new ArrayList<>();
+
         return ProblemeDTO.builder()
                 .id(probleme.getId())
                 .descriptionProbleme(probleme.getDescriptionProbleme())
                 .detailsProbleme(probleme.getDetailsProbleme())
                 .valiseId(probleme.getValise() != null ? probleme.getValise().getId() : null)
-                .valiseNumero(String.valueOf(probleme.getValise() != null ? probleme.getValise().getNumeroValise() : null))
-                .clientIds(probleme.getClients() != null ? probleme.getClients().stream().map(Client::getId).toList() : null)
-                .clientNoms(probleme.getClients() != null ? probleme.getClients().stream().map(Client::getName).toList() : null)
+                .numeroDeValise(probleme.getValise() != null ? probleme.getValise().getNumeroValise() : null)
+                .clientNoms(clientNoms)
                 .build();
     }
+
 
     private Probleme mapToEntity(ProblemeDTO problemeDTO) {
         Probleme probleme = new Probleme();
