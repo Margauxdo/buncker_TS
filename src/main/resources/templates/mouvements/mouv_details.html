@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title>Détails du Mouvement</title>
     <style>
-
-
         button {
             padding: 5px 10px;
             margin-right: 5px;
@@ -13,8 +11,6 @@
             background-color: #f8f9fa;
             cursor: pointer;
         }
-
-
 
         button[type="button"].btn-danger {
             background-color: #f8d7da;
@@ -33,6 +29,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             background-color: #f8f9fa;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -63,6 +60,11 @@
         a:hover {
             background-color: #dee2e6;
         }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -83,32 +85,25 @@
         <span th:text="${mouvement.dateRetourPrevue != null ? #dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy') : 'Non disponible'}"></span>
     </p>
 
-    <p><strong>Livreurs Associés :</strong></p>
-    <ul>
-        <li th:each="livreur : ${mouvement.livreurs}">
-            <span th:text="${livreur.nomLivreur}"></span>
-            <span th:text="${livreur.prenomLivreur}"></span>
-        </li>
-    </ul>
+    <p><strong>Livreur Associé :</strong>
+        <span th:text="${mouvement.livreur != null ? mouvement.livreur.nomLivreur + ' ' + mouvement.livreur.prenomLivreur : 'Non disponible'}"></span>
+    </p>
 
     <p><strong>Retours Sécurité Associés :</strong></p>
     <ul>
-        <li th:each="retour : ${mouvement.retourSecurites}">
-            <span th:text="${retour.numero != null ? retour.numero : 'Non disponible'}"></span>
+        <li>
+            <span th:text="${mouvement.retourSecuriteNumero != null ? mouvement.retourSecuriteNumero : 'Non disponible'}"></span>
         </li>
     </ul>
-
-
-
 </div>
-<div style="margin-top: 20px;">
+
+<div class="button-container">
     <a href="/" th:href="@{/}">
-        <button type="button" class="btn-danger">Retour à l'Accueil</button>
+        <button type="button" class="btn-danger" aria-label="Retour à l'accueil">Retour à l'Accueil</button>
     </a>
     <a href="/mouvements/list" th:href="@{/mouvements/list}">
-        <button type="button" class="btn-danger">Retour à la Liste</button>
+        <button type="button" class="btn-danger" aria-label="Retour à la liste des mouvements">Retour à la Liste</button>
     </a>
-
 </div>
 
 </body>

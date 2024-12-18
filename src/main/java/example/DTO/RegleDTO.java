@@ -1,6 +1,8 @@
 package example.DTO;
 
+import example.entity.Formule;
 import example.entity.TypeRegle;
+import example.entity.Valise;
 import lombok.*;
 
 import java.util.Date;
@@ -35,6 +37,20 @@ public class RegleDTO {
     private Integer sortieSemaineId; // ID de SortieSemaine associé
     private List<Integer> valiseIds; // Liste des IDs des Valises associées
     private List<Integer> clientIds;
+
+    @Getter
+    @Setter
+    private TypeRegle typeRegle;
+
+    @Getter
+    @Setter
+    private Valise valise;
+
+    @Getter
+    @Setter
+    private Formule formule;
+
+
 
     @Getter
     @Setter

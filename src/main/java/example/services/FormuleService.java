@@ -30,18 +30,20 @@ public class FormuleService implements IFormuleService {
     // Conversion Entité -> DTO
     private FormuleDTO convertToDTO(Formule formule) {
         return FormuleDTO.builder()
-                .cleFormule(formule.getId())
+                .id(formule.getId())
                 .libelle(formule.getLibelle())
                 .formule(formule.getFormule())
-                .regleIds(formule.getRegles().stream().map(Regle::getId).toList())
-                .codeRegles(formule.getRegles().stream().map(Regle::getCoderegle).toList())
+                .cleFormule(formule.getId() != null ? "formule-" + formule.getId() : null)  // Example mapping
+                .regleIds(formule.getRegles().stream().map(Regle::getId).collect(Collectors.toList()))
+                .codeRegles(formule.getRegles().stream().map(Regle::getCoderegle).collect(Collectors.toList()))
                 .build();
     }
+
 
     // Conversion DTO -> Entité
     private Formule convertToEntity(FormuleDTO formuleDTO) {
         Formule formule = Formule.builder()
-                .id(formuleDTO.getCleFormule())
+                .id(formuleDTO.getId())
                 .libelle(formuleDTO.getLibelle())
                 .formule(formuleDTO.getFormule())
                 .build();

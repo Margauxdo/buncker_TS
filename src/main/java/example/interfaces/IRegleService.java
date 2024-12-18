@@ -1,12 +1,12 @@
 package example.interfaces;
 
 import example.DTO.RegleDTO;
-import example.entity.RegleManuelle;
+import example.entity.Regle;
 
 import java.util.List;
 
 public interface IRegleService {
-    RegleDTO createRegle(RegleDTO regleDTO);
+    Regle createRegle(RegleDTO regleDTO);
 
     RegleDTO readRegle(int id);
 
@@ -16,6 +16,4 @@ public interface IRegleService {
     RegleDTO getRegleById(int id);
     List<RegleDTO> getAllRegles();
     void deleteRegle(int id);
-
-    RegleDTO saveRegleManuelle(RegleManuelle regleManuelle);
 }

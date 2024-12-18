@@ -1,13 +1,14 @@
 package example.services;
 
 import example.DTO.RegleDTO;
+import example.entity.Formule;
 import example.entity.Regle;
-import example.entity.RegleManuelle;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,10 +35,18 @@ public class RegleService implements IRegleService {
         this.sortieSemaineRepository = sortieSemaineRepository;
     }
 
-    @Override
-    public RegleDTO createRegle(RegleDTO regleDTO) {
-        Regle regle = mapToEntity(regleDTO);
-        return mapToDTO(regleRepository.save(regle));
+    @Transactional
+    public Regle createRegle(RegleDTO regleDTO) {
+        Regle regle = new Regle();
+        Formule formule = new Formule(); // Fetch Formule based on regleDTO.getFormuleId()
+
+        // Assuming you have a way to find the formule by ID
+        formule.setId(regleDTO.getFormuleId());
+
+        regle.setFormule(formule);
+        // Set other fields from regleDTO as needed
+
+        return regleRepository.save(regle);
     }
 
     @Override
@@ -190,9 +199,4 @@ public class RegleService implements IRegleService {
         }
     }
 
-
-    public RegleDTO saveRegleManuelle(RegleManuelle regleManuelle) {
-        regleRepository.save(regleManuelle); // Sauvegarde la règle manuelle dans la base de données
-        return null;
-    }
 }

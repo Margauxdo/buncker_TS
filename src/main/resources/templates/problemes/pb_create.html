@@ -103,21 +103,23 @@
 
 
     <label for="client">Client :</label>
-    <select id="client" th:field="*{clientIds}" multiple required>
+    <select id="client" th:field="*{clientIds}">
         <option value="" th:text="'Select a client'"></option>
-        <option th:each="client : ${clients}"
-                th:value="${client.id}"
-                th:text="${client.name} + ' (' + client.email + ')'"></option>
+        <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name} + ' (' + client.email + ')'"></option>
     </select>
+
+
 
 
     <label>Valise :</label>
     <select th:field="*{valiseId}" required>
         <option value="" th:text="'Select a valise'"></option>
-        <option th:each="valise : ${valises}"
-                th:value="${valise.id}"
-                th:text="${valise.description}"></option>
+        <option th:each="valise : ${valises}" th:value="${valise.id}" th:text="${valise.description}"></option>
     </select>
+
+
+
+
 
     <div style="margin-top: 20px;">
         <button type="submit">Créer</button>

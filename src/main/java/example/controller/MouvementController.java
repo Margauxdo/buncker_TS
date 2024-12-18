@@ -61,42 +61,27 @@ public class MouvementController {
 
     @GetMapping("/create")
     public String createMouvementForm(Model model) {
-        // Récupérer les listes des valises et livreurs
         List<ValiseDTO> valises = valiseService.getAllValises();
         List<LivreurDTO> livreurs = livreurService.getAllLivreurs();
+        List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();  // Assurez-vous que cette liste contient des éléments
 
-        // Ajouter les listes et l'objet mouvement au modèle
+        model.addAttribute("mouvement", new MouvementDTO());
         model.addAttribute("valises", valises);
         model.addAttribute("livreurs", livreurs);
-        model.addAttribute("retourSecurite", new RetourSecuriteDTO());
+        model.addAttribute("retourSecurites", retourSecurites);  // Assurez-vous que cette liste est correctement ajoutée
         return "mouvements/mouv_create";
     }
 
 
 
-
-
-    /*@PostMapping("/create")
-    public String createMouvement(@ModelAttribute @Valid MouvementDTO mouvementDTO, BindingResult result, Model model) {
-       try {
-           mouvementService.createMouvement(mouvementDTO);
-           return "redirect:/mouvements/list";
-       }catch (IllegalArgumentException e){
-           model.addAttribute("errorMessage", e.getMessage());
-           model.addAttribute("mouvement", mouvementDTO);
-           return "clients/error";
-       } catch (Exception e) {
-
-           model.addAttribute("errorMessage", "Erreur inattendue : " + e.getMessage());
-           return "clients/error";
-       }
-    }*/
     @PostMapping("/create")
     public String createMouvement(@ModelAttribute("mouvement") @Valid MouvementDTO mouvementDTO,
                                   BindingResult result, Model model) {
         if (result.hasErrors()) {
-            return "mouvements/mouv_create";
+            return "mouvements/mouv_create"; // Retourner le formulaire en cas d'erreurs
         }
+
+        // Appeler la méthode du service pour créer le mouvement
         mouvementService.createMouvement(mouvementDTO);
         return "redirect:/mouvements/list";
     }
@@ -105,22 +90,30 @@ public class MouvementController {
 
 
 
-
-
     @GetMapping("/edit/{id}")
     public String editMouvement(@PathVariable int id, Model model) {
-        MouvementDTO mouvement = mouvementService.getMouvementById(id);
-        List<ValiseDTO> valises = valiseService.getAllValises();
-        List<LivreurDTO> livreurs = livreurService.getAllLivreurs();
-        List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
+        try {
+            MouvementDTO mouvement = mouvementService.getMouvementById(id);
+            List<ValiseDTO> valises = valiseService.getAllValises();
+            List<LivreurDTO> livreurs = livreurService.getAllLivreurs();
+            List<RetourSecuriteDTO> retourSecurites = retourSecuriteService.getAllRetourSecurites();
 
-        model.addAttribute("valises", valises);
-        model.addAttribute("livreurs", livreurs);
+            model.addAttribute("mouvement", mouvement); // Assurez-vous que l'objet est bien passé ici
+            model.addAttribute("valises", valises);
+            model.addAttribute("livreurs", livreurs);
+            model.addAttribute("allRetourSecurites", retourSecurites);
 
-        model.addAttribute("allRetourSecurites", retourSecurites);
-
-        return "mouvements/mouv_edit";
+            return "mouvements/mouv_edit";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "Mouvement non trouvé : " + e.getMessage());
+            return "clients/error";
+        }
     }
+
+
+
+
+
 
     @PostMapping("/edit/{id}")
     public String updateMouvement(@PathVariable int id, @ModelAttribute("mouvement") MouvementDTO mouvementDTO, BindingResult result, Model model) {
@@ -136,17 +129,28 @@ public class MouvementController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteMouvement(@PathVariable int id,Model model) {
+    public String deleteMouvement(@PathVariable int id, Model model) {
         try {
-            mouvementService.deleteMouvement(id);
-            return "redirect:/mouvements/list";
-        }catch (Exception e) {
+            System.out.println("Appel à la méthode de suppression pour le mouvement ID : " + id);
+            mouvementService.deleteMouvement(id); // Suppression du mouvement
+            return "redirect:/mouvements/list"; // Rediriger après la suppression
+        } catch (Exception e) {
+            System.out.println("Erreur de suppression : " + e.getMessage()); // Log des erreurs
             model.addAttribute("errorMessage", e.getMessage());
-            return "clients/error";
+            return "clients/error"; // Retourner une page d'erreur en cas d'échec
         }
-
-
     }
 
 
+
 }
+
+
+
+
+
+
+
+
+
+

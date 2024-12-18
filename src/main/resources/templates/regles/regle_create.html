@@ -75,10 +75,11 @@
     <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
     <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valiseId}" required>
+    <select id="valise" th:field="*{valise.id}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
     </select>
+
     <p th:if="${#lists.isEmpty(valises)}" style="color: red;">Aucune valise disponible</p>
 
     <label for="typeRegle">Type de Règle :</label>
@@ -88,10 +89,11 @@
     </select>
 
     <label for="formule">Formule :</label>
-    <select id="formule" th:field="*{formule.id}">
+    <select id="formule" th:field="*{formuleId}" required>
         <option value="" disabled selected>-- Sélectionnez une Formule --</option>
-        <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.libelle}"></option>
+        <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.name}"></option>
     </select>
+
 
     <label for="jourFerie">Jour Férié :</label>
     <select id="jourFerie" th:field="*{jourFerie.id}">
@@ -101,12 +103,8 @@
 
     <div style="margin-top: 20px;">
         <button type="submit">Créer</button>
-        <a href="/" th:href="@{/}">
-            <button type="button" class="btn-danger">Retour à l'Accueil</button>
-        </a>
-        <a href="/regles/list" th:href="@{/regles/list}">
-            <button type="button" class="btn-danger">Retour à la Liste</button>
-        </a>
+        <a href="/" th:href="@{/}"><button type="button" class="btn-danger">Retour à l'Accueil</button></a>
+        <a href="/regles/list" th:href="@{/regles/list}"><button type="button" class="btn-danger">Retour à la Liste</button></a>
     </div>
 </form>
 </body>

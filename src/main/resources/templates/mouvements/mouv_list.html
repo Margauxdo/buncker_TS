@@ -88,15 +88,17 @@
             <form th:action="@{/mouvements/delete/{id}(id=${mouvement.id})}" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce mouvement ?');">
                 <button type="submit" style="color: red;">Supprimer</button>
             </form>
-        </td>
 
+
+
+        </td>
     </tr>
     </tbody>
 </table>
 
 <div style="margin-top: 20px;">
     <a href="/mouvements/create">
-        <button type="button">Créer une nouvelle formule</button>
+        <button type="button">Créer un nouveau mouvement</button>
     </a>
     <a href="/" th:href="@{/}">
         <button type="button" class="btn-danger">Retour à l'Accueil</button>

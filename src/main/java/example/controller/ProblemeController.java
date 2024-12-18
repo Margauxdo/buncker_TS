@@ -3,7 +3,11 @@ package example.controller;
 import example.DTO.ClientDTO;
 import example.DTO.ProblemeDTO;
 import example.DTO.RegleDTO;
+import example.DTO.ValiseDTO;
+import example.entity.Client;
+import example.entity.Valise;
 import example.interfaces.IProblemeService;
+import example.repositories.ClientRepository;
 import example.services.ClientService;
 import example.services.ValiseService;
 import jakarta.validation.Valid;
@@ -12,7 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
@@ -28,6 +34,8 @@ public class ProblemeController {
     private ValiseService valiseService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private ClientRepository clientRepository;
 
     @GetMapping("/list")
     public String viewAllProblemes(Model model) {
@@ -67,30 +75,46 @@ public class ProblemeController {
     @GetMapping("/create")
     public String createProblemeForm(Model model) {
         ProblemeDTO problemeDTO = new ProblemeDTO();
-        problemeDTO.setValiseId(null); // Explicitly set default values
-        problemeDTO.setClientIds(null);
+        problemeDTO.setValiseId(null); // Initialiser valiseId à null
+        problemeDTO.setClientIds(new ArrayList<>()); // Initialiser clientIds à une liste vide
 
+        // Récupérer tous les clients depuis votre service
         List<ClientDTO> clientsDTO = clientService.getAllClients();
 
-        model.addAttribute("probleme", problemeDTO);
-        model.addAttribute("clients", clientsDTO);
+        model.addAttribute("probleme", problemeDTO); // Ajouter le problème à la vue
+        model.addAttribute("clients", clientsDTO); // Ajouter les clients à la vue
+        model.addAttribute("valises", valiseService.getAllValises()); // Ajouter les valises à la vue
 
-        model.addAttribute("valises", valiseService.getAllValises());
-
-        return "problemes/pb_create";
+        return "problemes/pb_create"; // Retourner le formulaire
     }
+
+
 
 
     @PostMapping("/create")
     public String createProbleme(@Valid @ModelAttribute("probleme") ProblemeDTO problemeDTO, Model model) {
         try {
+            // Vérifier et récupérer les clients associés
+            if (problemeDTO.getClientIds() != null && !problemeDTO.getClientIds().isEmpty()) {
+                List<Client> clients = clientRepository.findAllById(problemeDTO.getClientIds());
+                if (clients.isEmpty()) {
+                    model.addAttribute("errorMessage", "Aucun client trouvé.");
+                    return "problemes/error";
+                }
+                problemeDTO.setClientNoms(clients.stream().map(Client::getName).collect(Collectors.toList()));
+            }
+
+            // Création du problème avec la valise et les clients
             problemeService.createProbleme(problemeDTO);
-            return "redirect:/pb/list";
+
+            return "redirect:/pb/list"; // Rediriger vers la liste des problèmes après la création
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Erreur lors de la création du problème.");
             return "problemes/error";
         }
     }
+
+
 
     @GetMapping("/edit/{id}")
     public String updatedProblemeForm(@PathVariable int id, Model model) {

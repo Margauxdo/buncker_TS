@@ -13,10 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class FormuleDTO {
-    private Integer cleFormule;
+    private Integer id;
     private String libelle;
     private String formule;
-
+    private String cleFormule;
 
     private List<Integer> regleIds;
     private List<String> codeRegles;

@@ -2,7 +2,6 @@ package example.controller;
 
 import example.DTO.*;
 import example.entity.Formule;
-import example.entity.RegleManuelle;
 import example.interfaces.IRegleService;
 import example.services.FormuleService;
 import example.services.JourFerieService;
@@ -52,20 +51,18 @@ public class RegleController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
+        List<FormuleDTO> formules = formuleService.getAllFormules(); // This should return the FormuleDTO list
+        model.addAttribute("formules", formules);
         model.addAttribute("regle", new RegleDTO());
-        model.addAttribute("valises", valiseService.getAllValises());
-        model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
-        model.addAttribute("formules", formuleService.getAllFormules());
-        model.addAttribute("joursFeries", jourFerieService.getJourFeries());
-        return "regles/regle_create"; // Chemin du template
+        return "regles/regle_create";
     }
 
     @PostMapping("/create")
     public String createRegle(@ModelAttribute("regle") RegleDTO regleDTO) {
-        // Logique pour sauvegarder la règle manuelle
         regleService.createRegle(regleDTO);
         return "redirect:/regles/list";
     }
+
 
     @GetMapping("/edit/{id}")
     public String editRegle(@PathVariable int id, Model model) {
@@ -94,17 +91,7 @@ public class RegleController {
         return "redirect:/regles/list";
     }
 
-    @GetMapping("/createManuelle")
-    public String createRegleManuelleForm(Model model) {
-        model.addAttribute("regleManuelle", new RegleManuelle());
-        return "/regles/RM_create"; // Renvoie la vue pour créer une règle manuelle
-    }
 
-    // Méthode POST pour enregistrer la règle manuelle
-    @PostMapping("/createManuelle")
-    public String createRegleManuelle(@ModelAttribute("regleManuelle") RegleManuelle regleManuelle) {
-        regleService.saveRegleManuelle(regleManuelle); // Sauvegarde la règle manuelle
-        return "redirect:/regles/list";  // Redirige vers la liste des règles
-    }
+
 
 }

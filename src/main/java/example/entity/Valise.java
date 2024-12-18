@@ -29,6 +29,7 @@ public class Valise {
     @NotNull
     private String description;
     @NotNull
+    @Column(name = "numero_valise", nullable = false)
     private Integer numeroValise;
     private String refClient;
 

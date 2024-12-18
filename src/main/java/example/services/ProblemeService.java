@@ -11,6 +11,7 @@ import example.repositories.ProblemeRepository;
 import example.repositories.ValiseRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +43,28 @@ public class ProblemeService implements IProblemeService {
 
     @Override
     public ProblemeDTO createProbleme(ProblemeDTO problemeDTO) {
+        // Vérification que valiseId est non nul
+        if (problemeDTO.getValiseId() == null) {
+            throw new IllegalArgumentException("La valise est requise pour créer un problème.");
+        }
+
+        // Récupérer la valise depuis l'ID
+        Valise valise = valiseRepository.findById(problemeDTO.getValiseId())
+                .orElseThrow(() -> new ResourceNotFoundException("Valise introuvable avec l'ID : " + problemeDTO.getValiseId()));
+
+        // Récupérer les clients depuis leurs identifiants (si clientIds est non nul et non vide)
+        List<Client> clients = new ArrayList<>();
+        if (problemeDTO.getClientIds() != null && !problemeDTO.getClientIds().isEmpty()) {
+            clients = clientRepository.findAllById(problemeDTO.getClientIds())
+                    .stream()
+                    .filter(client -> client != null)  // Assurer qu'aucun client n'est null
+                    .collect(Collectors.toList());
+        }
+
         // Conversion DTO -> Entité
         Probleme probleme = mapToEntity(problemeDTO);
+        probleme.setValise(valise);  // Associer la valise au problème
+        probleme.setClients(clients);  // Associer les clients au problème
 
         // Sauvegarde de l'entité
         Probleme savedProbleme = problemeRepository.save(probleme);
@@ -51,6 +72,7 @@ public class ProblemeService implements IProblemeService {
         // Conversion Entité -> DTO
         return mapToDTO(savedProbleme);
     }
+
 
     @Override
     public ProblemeDTO updateProbleme(int id, ProblemeDTO problemeDTO) {
@@ -127,32 +149,32 @@ public class ProblemeService implements IProblemeService {
                 .build();
     }
 
-    // Conversion DTO -> Entité
     private Probleme mapToEntity(ProblemeDTO problemeDTO) {
-        Probleme probleme = Probleme.builder()
-                .id(problemeDTO.getId())
-                .descriptionProbleme(problemeDTO.getDescriptionProbleme())
-                .detailsProbleme(problemeDTO.getDetailsProbleme())
-                .build();
+        Probleme probleme = new Probleme();
+        probleme.setDescriptionProbleme(problemeDTO.getDescriptionProbleme());
+        probleme.setDetailsProbleme(problemeDTO.getDetailsProbleme());
 
-        // Gestion de la relation avec Valise
+        // Associer la valise à partir de son ID
         if (problemeDTO.getValiseId() != null) {
             Valise valise = valiseRepository.findById(problemeDTO.getValiseId())
                     .orElseThrow(() -> new ResourceNotFoundException("Valise introuvable avec l'ID : " + problemeDTO.getValiseId()));
             probleme.setValise(valise);
+        } else {
+            throw new IllegalArgumentException("La valise est obligatoire");
         }
 
-        // Gestion de la relation avec les Clients
-        if (problemeDTO.getClientIds() != null) {
+        // Mappage des clients
+        if (problemeDTO.getClientIds() != null && !problemeDTO.getClientIds().isEmpty()) {
             List<Client> clients = clientRepository.findAllById(problemeDTO.getClientIds());
+            if (clients.isEmpty()) {
+                throw new IllegalArgumentException("Aucun client trouvé pour les IDs fournis.");
+            }
             probleme.setClients(clients);
         }
-        if (problemeDTO.getClientIds() != null) {
-            List<Client> clients = clientRepository.findAllById(problemeDTO.getClientIds());
-            probleme.setClients(clients);
-        }
-
 
         return probleme;
     }
+
+
+
 }

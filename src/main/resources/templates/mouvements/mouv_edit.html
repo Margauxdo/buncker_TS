@@ -108,7 +108,6 @@
     <label for="valiseId">Valise :</label>
     <select id="valiseId" name="valiseId" required>
         <option value="" disabled selected>Sélectionnez une valise</option>
-        <!-- Remplir avec les valises depuis le backend -->
         <th:block th:each="valise : ${valises}">
             <option th:value="${valise.id}" th:text="${valise.description}"></option>
         </th:block>
@@ -122,13 +121,11 @@
                 th:text="${livreur.nomLivreur}"></option>
     </select>
 
-
     <label for="retourSecurites">Retours Sécurité associés :</label>
-    <select id="retourSecurites" th:field="*{retourSecurites}">
+    <select id="retourSecurites" th:field="*{retourSecuriteId}">
         <option th:each="retour : ${allRetourSecurites}" th:value="${retour.id}"
                 th:text="${retour.numero}"></option>
     </select>
-
 
     <div style="margin-top: 20px;">
         <button type="submit">Modifier</button>
@@ -140,6 +137,8 @@
         </a>
     </div>
 </form>
+
+
 
 </body>
 </html>

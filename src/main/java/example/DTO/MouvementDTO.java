@@ -24,11 +24,13 @@ public class MouvementDTO {
     private Integer valiseId;
     private String valiseDescription;
 
-    // Relations avec Livreur
+   private Livreur livreur;
     private Integer livreurId;
     private String livreurNom;
 
-    // Relation avec RetourSecurite
+    private String retourSecuriteNumero;
+
+    private String valiseNumeroValise;
     private Integer retourSecuriteId;
 
 }

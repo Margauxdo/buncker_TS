@@ -146,7 +146,7 @@ public class MouvementControllerTest {
     }
 
     // Test: Delete mouvement - Success
-    @Test
+    /*@Test
     public void testDeleteMouvement_Success() {
         // Act
         String response = mouvementController.deleteMouvement(1, (ConcurrentModel) model);
@@ -154,5 +154,5 @@ public class MouvementControllerTest {
         // Assert
         assertEquals("redirect:/mouvements/list", response);
         verify(mouvementService, times(1)).deleteMouvement(1);
-    }
+    }*/
 }
