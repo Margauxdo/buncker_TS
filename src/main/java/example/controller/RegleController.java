@@ -3,10 +3,8 @@ package example.controller;
 import example.DTO.*;
 import example.entity.Formule;
 import example.interfaces.IRegleService;
-import example.services.FormuleService;
-import example.services.JourFerieService;
-import example.services.TypeRegleService;
-import example.services.ValiseService;
+import example.services.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +28,8 @@ public class RegleController {
     private TypeRegleService typeRegleService;
     @Autowired
     private JourFerieService jourFerieService;
+    @Autowired
+    private ClientService clientService;
 
     @GetMapping("/list")
     public String listRegles(Model model) {
@@ -48,26 +48,47 @@ public class RegleController {
         return "regles/regle_details";
     }
 
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("regle", new RegleDTO());
+        model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
+        model.addAttribute("formules", formuleService.getAllFormules());
+        model.addAttribute("joursFeries", jourFerieService.getJourFeries());
+        model.addAttribute("clients", clientService.getAllClients());
+        return "regles/regle_create";
+    }
+
 
 
 
     @PostMapping("/create")
-    public String createRegle(@ModelAttribute("regle") RegleDTO regleDTO) {
+    public String createRegle(@ModelAttribute("regle") @Valid RegleDTO regleDTO, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
+            model.addAttribute("formules", formuleService.getAllFormules());
+            model.addAttribute("joursFeries", jourFerieService.getJourFeries());
+            model.addAttribute("clients", clientService.getAllClients());
+            return "regles/regle_create";
+        }
+
         regleService.createRegle(regleDTO);
         return "redirect:/regles/list";
     }
 
 
+
     @GetMapping("/edit/{id}")
     public String editRegle(@PathVariable int id, Model model) {
-        RegleDTO regle = regleService.getRegleById(id); // Récupère la règle à partir du service
+        RegleDTO regle = regleService.getRegleById(id); // Récupère la règle
         model.addAttribute("regle", regle);
-        model.addAttribute("valises", valiseService.getAllValises()); // Récupère les valises
-        model.addAttribute("typesRegle", typeRegleService.getTypeRegles()); // Récupère les types de règle
-        model.addAttribute("formules", formuleService.getAllFormules()); // Récupère les formules
-        model.addAttribute("joursFeries", jourFerieService.getJourFeries()); // Récupère les jours fériés
-        return "regles/regle_edit"; // Retourne la vue pour la modification de la règle
+        model.addAttribute("valises", valiseService.getAllValises()); // Liste des valises
+        model.addAttribute("typesRegle", typeRegleService.getTypeRegles()); // Liste des types de règles
+        model.addAttribute("formules", formuleService.getAllFormules()); // Liste des formules
+        model.addAttribute("joursFeries", jourFerieService.getJourFeries()); // Liste des jours fériés
+        return "regles/regle_edit";
     }
+
+
 
     @PostMapping("/edit/{id}")
     public String updateRegle(@PathVariable int id, @ModelAttribute("regle") RegleDTO regleDTO, BindingResult result, Model model) {

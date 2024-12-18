@@ -1,12 +1,15 @@
 package example.services;
 
 import example.DTO.RegleDTO;
+import example.entity.Client;
 import example.entity.Formule;
 import example.entity.Regle;
+import example.entity.Valise;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,12 +80,15 @@ public class RegleService implements IRegleService {
         regleRepository.deleteById(id);
     }
 
-    @Override
     public RegleDTO getRegleById(int id) {
         Regle regle = regleRepository.findById(id)
-                .orElseThrow(() -> new RegleNotFoundException("Règle non trouvée avec l'ID : " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Règle non trouvée"));
         return mapToDTO(regle);
     }
+
+
+
+
 
     @Override
     public List<RegleDTO> getAllRegles() {
@@ -91,74 +97,100 @@ public class RegleService implements IRegleService {
                 .collect(Collectors.toList());
     }
 
-    // Conversion RegleDTO -> Regle
     private Regle mapToEntity(RegleDTO dto) {
-        Regle regle = Regle.builder()
-                .id(dto.getId())
-                .reglePourSortie(dto.getReglePourSortie())
-                .coderegle(dto.getCoderegle())
-                .dateRegle(dto.getDateRegle())
-                .nombreJours(dto.getNombreJours())
-                .calculCalendaire(dto.getCalculCalendaire())
-                .fermeJS1(dto.getFermeJS1())
-                .fermeJS2(dto.getFermeJS2())
-                .fermeJS3(dto.getFermeJS3())
-                .fermeJS4(dto.getFermeJS4())
-                .fermeJS5(dto.getFermeJS5())
-                .fermeJS6(dto.getFermeJS6())
-                .fermeJS7(dto.getFermeJS7())
-                .typeEntree(dto.getTypeEntree())
-                .nbjsmEntree(dto.getNbjsmEntree())
-                .build();
 
-        // Relations
-        if (dto.getTypeRegleId() != null) {
-            regle.setTypeRegle(typeRegleRepository.findById(dto.getTypeRegleId())
-                    .orElseThrow(() -> new EntityNotFoundException("TypeRegle introuvable")));
+        if (dto == null) {
+            return null;
         }
 
+        Regle regle = new Regle();
+
+        regle.setCoderegle(dto.getCoderegle()); // Mapping du champ coderegle
+        regle.setReglePourSortie(dto.getReglePourSortie());
+        regle.setDateRegle(dto.getDateRegle());
+        regle.setNombreJours(dto.getNombreJours() != null ? dto.getNombreJours() : 0);
+        regle.setCalculCalendaire(dto.getCalculCalendaire() != null ? dto.getCalculCalendaire() : 1);
+        regle.setFermeJS1(dto.getFermeJS1() != null ? dto.getFermeJS1() : false);
+        regle.setFermeJS2(dto.getFermeJS2() != null ? dto.getFermeJS2() : false);
+        regle.setFermeJS3(dto.getFermeJS3() != null ? dto.getFermeJS3() : false);
+        regle.setFermeJS4(dto.getFermeJS4() != null ? dto.getFermeJS4() : false);
+        regle.setFermeJS5(dto.getFermeJS5() != null ? dto.getFermeJS5() : false);
+        regle.setFermeJS6(dto.getFermeJS6() != null ? dto.getFermeJS6() : false);
+        regle.setFermeJS7(dto.getFermeJS7() != null ? dto.getFermeJS7() : false);
+        regle.setTypeEntree(dto.getTypeEntree());
+        regle.setNbjsmEntree(dto.getNbjsmEntree());
+
+
+        // Relations
         if (dto.getFormuleId() != null) {
             regle.setFormule(formuleRepository.findById(dto.getFormuleId())
                     .orElseThrow(() -> new EntityNotFoundException("Formule introuvable")));
         }
 
-        if (dto.getJourFerieId() != null) {
-            regle.setJourFerie(jourFerieRepository.findById(dto.getJourFerieId())
-                    .orElseThrow(() -> new EntityNotFoundException("JourFerie introuvable")));
-        }
-
-        if (dto.getSortieSemaineId() != null) {
-            regle.setSortieSemaine(sortieSemaineRepository.findById(dto.getSortieSemaineId())
-                    .orElseThrow(() -> new EntityNotFoundException("SortieSemaine introuvable")));
-        }
-
         return regle;
     }
 
-    // Conversion Regle -> RegleDTO
-    private RegleDTO mapToDTO(Regle regle) {
-        return RegleDTO.builder()
-                .id(regle.getId())
-                .reglePourSortie(regle.getReglePourSortie())
-                .coderegle(regle.getCoderegle())
-                .dateRegle(regle.getDateRegle())
-                .nombreJours(regle.getNombreJours())
-                .calculCalendaire(regle.getCalculCalendaire())
-                .fermeJS1(regle.getFermeJS1())
-                .fermeJS2(regle.getFermeJS2())
-                .fermeJS3(regle.getFermeJS3())
-                .fermeJS4(regle.getFermeJS4())
-                .fermeJS5(regle.getFermeJS5())
-                .fermeJS6(regle.getFermeJS6())
-                .fermeJS7(regle.getFermeJS7())
-                .typeEntree(regle.getTypeEntree())
-                .nbjsmEntree(regle.getNbjsmEntree())
-                .typeRegleId(regle.getTypeRegle() != null ? regle.getTypeRegle().getId() : null)
-                .formuleId(regle.getFormule() != null ? regle.getFormule().getId() : null)
-                .jourFerieId(regle.getJourFerie() != null ? regle.getJourFerie().getId() : null)
-                .sortieSemaineId(regle.getSortieSemaine() != null ? regle.getSortieSemaine().getId() : null)
-                .build();
+
+    public RegleDTO mapToDTO(Regle regle) {
+        if (regle == null) {
+            return null;
+        }
+
+        RegleDTO dto = new RegleDTO();
+
+        // Champs simples
+        dto.setId(regle.getId());
+        dto.setCoderegle(regle.getCoderegle());
+        dto.setReglePourSortie(regle.getReglePourSortie());
+        dto.setDateRegle(regle.getDateRegle());
+        dto.setNombreJours(regle.getNombreJours());
+        dto.setCalculCalendaire(regle.getCalculCalendaire());
+        dto.setFermeJS1(regle.getFermeJS1());
+        dto.setFermeJS2(regle.getFermeJS2());
+        dto.setFermeJS3(regle.getFermeJS3());
+        dto.setFermeJS4(regle.getFermeJS4());
+        dto.setFermeJS5(regle.getFermeJS5());
+        dto.setFermeJS6(regle.getFermeJS6());
+        dto.setFermeJS7(regle.getFermeJS7());
+        dto.setTypeEntree(regle.getTypeEntree());
+        dto.setNbjsmEntree(regle.getNbjsmEntree());
+
+        // Gestion de la relation avec TypeRegle
+        if (regle.getTypeRegle() != null) {
+            dto.setTypeRegleId(regle.getTypeRegle().getId());
+            dto.setTypeRegleNom(regle.getTypeRegle().getNomTypeRegle());
+        }
+
+        // Gestion de la relation avec Formule
+        if (regle.getFormule() != null) {
+            dto.setFormuleId(regle.getFormule().getId());
+            dto.setFormule(regle.getFormule().getLibelle());
+        }
+
+        // Gestion de la relation avec JourFerie
+        if (regle.getJourFerie() != null) {
+            dto.setJourFerieId(regle.getJourFerie().getId());
+            dto.setJourFerieDate(regle.getJourFerie().getDate());
+        }
+
+        // Gestion de la relation avec Valises
+        if (regle.getValises() != null && !regle.getValises().isEmpty()) {
+            dto.setValiseIds(regle.getValises().stream()
+                    .map(Valise::getId)
+                    .collect(Collectors.toList()));
+        }
+
+        // Gestion de la relation avec Clients
+        if (regle.getClients() != null && !regle.getClients().isEmpty()) {
+            dto.setClientIds(regle.getClients().stream()
+                    .map(Client::getId)
+                    .collect(Collectors.toList()));
+        }
+
+        return dto;
     }
+
+
 
     // Mise à jour de l'entité depuis le DTO
     private void updateEntityFromDTO(Regle existingRegle, RegleDTO dto) {
@@ -197,6 +229,7 @@ public class RegleService implements IRegleService {
             existingRegle.setSortieSemaine(sortieSemaineRepository.findById(dto.getSortieSemaineId())
                     .orElseThrow(() -> new EntityNotFoundException("SortieSemaine introuvable")));
         }
+
     }
 
 }

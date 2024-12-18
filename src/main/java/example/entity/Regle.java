@@ -63,13 +63,13 @@ public class Regle {
     @Column(name = "nb_jsm_entree")
     private Long nbjsmEntree;
 
-    @OneToMany(mappedBy = "regle")
+    @OneToMany(mappedBy = "regle", fetch = FetchType.EAGER)
     @JsonManagedReference
     @ToString.Exclude
     private List<Client> clients = new ArrayList<>();
 
     // Relation ManyToOne avec Valise
-    @OneToMany(mappedBy = "reglesSortie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reglesSortie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Valise> valises = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class Regle {
     private Formule formule;
 
     // Relation ManyToOne avec JourFerie
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "jour_ferie_id")
     private JourFerie jourFerie;
 

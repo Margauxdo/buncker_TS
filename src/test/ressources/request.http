@@ -213,7 +213,7 @@ GET http://localhost:8080/regles/list
 Accept: text/html
 
 ### Voir une regle par ID (GET - Thymeleaf)
-GET http://localhost:8080/regles/view/1
+GET http://localhost:8080/regles/view/25
 Accept: text/html
 
 
@@ -229,7 +229,7 @@ Content-Type: application/x-www-form-urlencoded
 
 
 ### Afficher le formulaire modification une regle (GET - Thymeleaf)
-GET http://localhost:8080/regles/edit/1
+GET http://localhost:8080/regles/edit/25
 Accept: text/html
 
 

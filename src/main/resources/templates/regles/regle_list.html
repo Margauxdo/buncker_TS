@@ -119,7 +119,7 @@
         <td th:text="${regle.typeRegleId != null ? regle.typeRegleId : 'N/A'}"></td>
 
         <td th:text="${regle.formule != null ? regle.formuleId : 'N/A'}"></td>
-        <td th:text="${regle.jourFerie != null ? regle.jourFerie.id : 'N/A'}"></td>
+        <td th:text="${regle.jourFerieId != null ? regle.jourFerieId : 'N/A'}"></td>
 
         <td>
             <form th:action="@{/regles/view/{id}(id=${regle.id})}" method="get" style="display:inline;">

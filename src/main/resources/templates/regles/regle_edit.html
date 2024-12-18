@@ -10,56 +10,10 @@
             margin: 0;
             padding: 0;
         }
-
         h1 {
             text-align: center;
             margin-top: 20px;
         }
-        button {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: 1px solid #ccc;
-            background-color: #0056b3; /* Fond bleu */
-            color: #ffffff;
-            cursor: pointer;
-        }
-
-
-
-        button[type="button"].btn-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
-        }
-
-        button[type="button"].btn-danger:hover {
-            background-color: #f1b0b7;
-        }
-
-        form {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
         button {
             padding: 10px 20px;
             margin-right: 10px;
@@ -69,77 +23,95 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
         button:hover {
             background-color: #0056b3;
         }
-
-        a.button {
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            border-radius: 4px;
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
             border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
-        a.button:hover {
-            background-color: #5a6268;
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
-
 </head>
 <body>
-<h1 style="text-align: center;">Modifier une Règle</h1>
-
+<h1>Modifier une Règle</h1>
 <form th:action="@{/regles/edit/{id}(id=${regle.id})}" th:object="${regle}" method="post">
-
-    <!-- Code de la Règle -->
     <label for="coderegle">Code de la Règle :</label>
     <input type="text" id="coderegle" th:field="*{coderegle}" required />
 
     <label for="reglePourSortie">Règle pour Sortie :</label>
     <input type="text" id="reglePourSortie" th:field="*{reglePourSortie}" required />
 
+    <label for="dateRegle">Date de la Règle :</label>
+    <input type="date" id="dateRegle" th:field="*{dateRegle}" />
+
+    <label for="nombreJours">Nombre de Jours :</label>
+    <input type="number" id="nombreJours" th:field="*{nombreJours}" />
+
+    <label for="calculCalendaire">Calcul Calendaire :</label>
+    <input type="number" id="calculCalendaire" th:field="*{calculCalendaire}" />
+
+    <label>Jours Fermés :</label>
+    <label><input type="checkbox" th:field="*{fermeJS1}" /> Fermé JS1</label>
+    <label><input type="checkbox" th:field="*{fermeJS2}" /> Fermé JS2</label>
+    <label><input type="checkbox" th:field="*{fermeJS3}" /> Fermé JS3</label>
+    <label><input type="checkbox" th:field="*{fermeJS4}" /> Fermé JS4</label>
+    <label><input type="checkbox" th:field="*{fermeJS5}" /> Fermé JS5</label>
+    <label><input type="checkbox" th:field="*{fermeJS6}" /> Fermé JS6</label>
+    <label><input type="checkbox" th:field="*{fermeJS7}" /> Fermé JS7</label>
+
+    <label for="typeEntree">Type d'Entrée :</label>
+    <input type="text" id="typeEntree" th:field="*{typeEntree}" />
+
+    <label for="nbjsmEntree">Nombre de Jours/SM Entrée :</label>
+    <input type="number" id="nbjsmEntree" th:field="*{nbjsmEntree}" />
+
     <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valiseId}" required>
+    <select id="valise" th:field="*{valiseId}">
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
     </select>
 
-
-    <p th:if="${#lists.isEmpty(valises)}" style="color: red;">Aucune valise disponible</p>
-
     <label for="typeRegle">Type de Règle :</label>
-    <select id="typeRegle" th:field="*{typeRegle.id}" required>
+    <select id="typeRegle" th:field="*{typeRegleId}">
         <option value="" disabled selected>-- Sélectionnez un Type de Règle --</option>
         <option th:each="type : ${typesRegle}" th:value="${type.id}" th:text="${type.nomTypeRegle}"></option>
     </select>
 
     <label for="formule">Formule :</label>
-    <select id="formule" th:field="*{formule.id}">
+    <select id="formule" th:field="*{formuleId}">
         <option value="" disabled selected>-- Sélectionnez une Formule --</option>
         <option th:each="form : ${formules}" th:value="${form.id}" th:text="${form.libelle}"></option>
     </select>
 
     <label for="jourFerie">Jour Férié :</label>
-    <select id="jourFerie" th:field="*{jourFerie.id}">
+    <select id="jourFerie" th:field="*{jourFerieId}">
         <option value="" disabled selected>-- Sélectionnez un Jour Férié --</option>
         <option th:each="jour : ${joursFeries}" th:value="${jour.id}" th:text="${jour.date}"></option>
     </select>
 
-
-
     <div style="margin-top: 20px;">
         <button type="submit">Modifier</button>
-        <a href="/" th:href="@{/}">
-            <button type="button" class="btn-danger">Retour à l'Accueil</button>
-        </a>
         <a href="/regles/list" th:href="@{/regles/list}">
             <button type="button" class="btn-danger">Retour à la Liste</button>
         </a>
     </div>
 </form>
-
 </body>
 </html>

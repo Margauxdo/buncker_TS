@@ -34,6 +34,8 @@ public class RegleDTO {
     private Integer typeRegleId; // ID du TypeRegle associé
     private Integer formuleId; // ID de la Formule associée
     private Integer jourFerieId; // ID du JourFerie associé
+    @Getter @Setter
+    private Date jourFerieDate;
     private Integer sortieSemaineId; // ID de SortieSemaine associé
     private List<Integer> valiseIds; // Liste des IDs des Valises associées
     private List<Integer> clientIds;
@@ -41,6 +43,7 @@ public class RegleDTO {
     @Getter
     @Setter
     private TypeRegle typeRegle;
+
 
     private String typeRegleNom;
 
@@ -50,11 +53,7 @@ public class RegleDTO {
 
     @Getter
     @Setter
-    private Formule formule;
-
-
-
-    @Getter
-    @Setter
+    private String formule;
+    @Getter @Setter
     private Integer valiseId;
 }

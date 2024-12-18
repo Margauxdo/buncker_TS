@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RegleRepository extends JpaRepository<Regle, Integer> {
@@ -25,6 +26,11 @@ public interface RegleRepository extends JpaRepository<Regle, Integer> {
     List<Regle> findByFormule_Id(Integer formuleId);
 
     // Autres méthodes spécifiques
+
+    @Query("SELECT r FROM Regle r LEFT JOIN FETCH r.jourFerie WHERE r.id = :id")
+    Optional<Regle> findByIdWithJourFerie(@Param("id") int id);
+
+
 
     @Query("SELECT r FROM Regle r WHERE r.typeRegle.id = :typeRegleId")
     List<Regle> findByTypeRegleId(@Param("typeRegleId") Integer typeRegleId);

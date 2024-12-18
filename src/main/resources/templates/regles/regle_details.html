@@ -96,11 +96,16 @@
         <span th:if="${regle.typeRegle == null}">Non associée</span>
     </p>
 
-    <p><strong>Formule :</strong> <span th:if="${regle.formule != null}" th:text="${regle.formule.name}"></span>
-        <span th:if="${regle.formule == null}">Non associée</span></p>
+    <p><strong>Formule :</strong>
+        <span th:if="${regle.formule != null}" th:text="${regle.formule}"></span>
+        <span th:if="${regle.formule == null}">Non associée</span>
+    </p>
 
-    <p><strong>Jour Férié :</strong> <span th:if="${regle.jourFerie != null}" th:text="${regle.jourFerie.name}"></span>
-        <span th:if="${regle.jourFerie == null}">Non associé</span></p>
+
+    <p><strong>Jour Férié :</strong>
+        <span th:if="${regle.jourFerieDate!= null}" th:text="${regle.jourFerieDate}"></span>
+        <span th:if="${regle.jourFerieDate == null}">Non associé</span>
+    </p>
 
 
 </div>
