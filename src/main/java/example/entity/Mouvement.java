@@ -39,7 +39,7 @@ public class Mouvement {
 
     @ToString.Exclude
     @ManyToOne//(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "livreur_id", nullable = false)
+    @JoinColumn(name = "livreur_id")
     @JsonBackReference
     private Livreur livreur;
 

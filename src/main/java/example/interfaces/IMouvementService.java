@@ -30,4 +30,6 @@ public interface IMouvementService {
     boolean existsById(int id);
 
     List<Mouvement> getAllMouvementsWithRetourSecurites();
+
+    List<MouvementDTO> getAllMouvementsDTOWithRetourSecurites();
 }

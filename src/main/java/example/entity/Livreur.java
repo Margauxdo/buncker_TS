@@ -42,5 +42,10 @@ public class Livreur {
     @Getter
     @Setter
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id") // Nom de la colonne dans la base de données
+    private Client client;
+
 }
 

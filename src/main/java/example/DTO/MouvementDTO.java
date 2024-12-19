@@ -32,6 +32,8 @@ public class MouvementDTO {
 
     private String valiseNumeroValise;
     private Integer retourSecuriteId;
+    private String description;
+
 
 }
 

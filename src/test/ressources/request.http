@@ -115,7 +115,7 @@ Content-Type: application/x-www-form-urlencoded
 codeLivreur=256LI&motDePasse=1234&nomLivreur=Marc&prenomLivreur=Jean&numeroCartePro=1234ABC&telephonePortable=0789652569&telephoneKobby=0123456789&telephoneAlphapage=9876543210
 
 ### Afficher le formulaire modification un livreur (GET - Thymeleaf)
-GET localhost:8080/livreurs/edit/2
+GET localhost:8080/livreurs/edit/7
 Accept: text/html
 
 ### Modifier un livreur existant (POST - Thymeleaf)

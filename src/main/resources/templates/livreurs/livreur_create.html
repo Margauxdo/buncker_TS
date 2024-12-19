@@ -119,19 +119,16 @@
     <label for="telephoneAlphapage">Téléphone Alphapage :</label>
     <input type="text" id="telephoneAlphapage" th:field="*{telephoneAlphapage}" />
 
-    <label for="mouvement">Mouvement :</label>
-    <select id="mouvement" th:field="*{mouvementIds}">
-        <option value="" disabled selected>-- Sélectionnez un Mouvement --</option>
-        <option th:each="mouv : ${mouvements}" th:value="${mouv.id}" th:text="${mouv.description}">
 
-        </option>
+
+    <select id="mouvements" name="mouvementIds" th:field="*{mouvementIds}" multiple>
+        <option value="" disabled>-- Sélectionnez des Mouvements --</option>
+        <option th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.statutSortie}"></option>
     </select>
-    <ul th:each="mouv : ${mouvements}">
-        <li th:text="${mouv.description}"></li>
-        <ul th:each="retour : ${mouv.retourSecurites}">
-            <li th:text="${retour.description}"></li>
-        </ul>
-    </ul>
+
+
+
+
 
 
 

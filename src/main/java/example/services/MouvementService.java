@@ -172,12 +172,15 @@ public class MouvementService implements IMouvementService {
     @Override
     @Transactional
     public void deleteMouvement(int id) {
-        // Trouver le mouvement
+        // Trouver l'entité Mouvement à supprimer
         Mouvement mouvement = mouvementRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
 
         // Détacher la Valise associée
-        mouvement.setValise(null);
+        mouvement.setValise(null);  // Détache la Valise de l'entité Mouvement
+
+        // Vous pouvez également détacher d'autres relations si nécessaire
+        mouvement.setRetourSecurite(null); // Si retourSecurite est nullable et doit être supprimé
 
         // Supprimer le Mouvement
         mouvementRepository.delete(mouvement);
@@ -198,6 +201,10 @@ public class MouvementService implements IMouvementService {
         return List.of();
     }
 
+    @Override
+    public List<MouvementDTO> getAllMouvementsDTOWithRetourSecurites() {
+        return List.of();
+    }
     private MouvementDTO mapToDTO(Mouvement mouvement) {
         return MouvementDTO.builder()
                 .id(mouvement.getId())
@@ -205,18 +212,12 @@ public class MouvementService implements IMouvementService {
                 .statutSortie(mouvement.getStatutSortie())
                 .dateSortiePrevue(mouvement.getDateSortiePrevue())
                 .dateRetourPrevue(mouvement.getDateRetourPrevue())
-                // Mapping Valise
-                .valiseId(mouvement.getValise().getId())
-                .valiseDescription(mouvement.getValise().getDescription()) // Assuming there's a getDescription() method
-                .valiseNumeroValise(mouvement.getValise() != null && mouvement.getValise().getNumeroValise() != null
-                        ? mouvement.getValise().getNumeroValise()
-                        : "Non spécifié")
-
-                // Mapping Livreur
-                .livreur(mouvement.getLivreur()) // Ajout de l'objet complet
-                .livreurNom(mouvement.getLivreur().getNomLivreur())
+                .valiseId(mouvement.getValise() != null ? mouvement.getValise().getId() : null)
+                .valiseDescription(mouvement.getValise() != null ? mouvement.getValise().getDescription() : "Non spécifié")
+                .livreurId(mouvement.getLivreur() != null ? mouvement.getLivreur().getId() : null)
+                .livreurNom(mouvement.getLivreur() != null ? mouvement.getLivreur().getNomLivreur() : "Non spécifié")
                 .retourSecuriteId(mouvement.getRetourSecurite() != null ? mouvement.getRetourSecurite().getId() : null)
-                .retourSecuriteNumero(String.valueOf(mouvement.getRetourSecurite() != null ? mouvement.getRetourSecurite().getNumero(): null)) // Assuming getDescription() exists
+                .retourSecuriteNumero(mouvement.getRetourSecurite() != null ? String.valueOf(mouvement.getRetourSecurite().getNumero()) : "Non spécifié")
                 .build();
     }
 

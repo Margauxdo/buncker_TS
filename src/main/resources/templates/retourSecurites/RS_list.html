@@ -69,7 +69,7 @@
         <th>Clôturé</th>
         <th>Date de Clôture</th>
         <th>Mouvement</th>
-        <th>Nombre de Clients</th>
+        <th>Client </th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -83,9 +83,10 @@
         <td th:text="${retourSecurite.dateCloture}"></td>
         <td>
             <!-- Affichage des statuts des mouvements -->
-            <span th:text="${retourSecurite.mouvementStatutsString != null ? retourSecurite.mouvementStatutsString : 'Aucun mouvement'}"></span>
+            <span th:text="${retourSecurite.mouvementIds}"></span>
+            <span th:text="${retourSecurite.mouvementStatuts}"></span>
         </td>
-        <td th:text="${retourSecurite.nombreClients}"></td>
+        <td th:text="${retourSecurite.clientNom}"></td>
 
 
         <!-- Actions -->
