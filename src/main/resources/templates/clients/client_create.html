@@ -106,6 +106,13 @@
     <input type="text" id="memoRetourSecurite2" th:field="*{memoRetourSecurite2}" />
     <br>
 
+    <label for="typeSuivie">Type de Suivi:</label>
+    <input type="text" id="typeSuivie" th:field="*{typeSuivie}" />
+
+    <label for="codeClient">Code Client:</label>
+    <input type="text" id="codeClient" th:field="*{codeClient}" />
+
+
     <!-- Valises -->
     <label for="valises">Valises :</label>
 
@@ -117,11 +124,12 @@
 
 
     <!-- Problems -->
-    <label for="problemes">Problemes :</label>
+    <label for="probleme">Problemes :</label>
 
-    <select id="problemes" name="problemes"  th:field="*{problemeId}">
+    <select id="probleme" name="problemeId" th:field="*{problemeId}">
         <option th:each="probleme : ${problemsList}" th:value="${probleme.id}" th:text="${probleme.descriptionProbleme}"></option>
     </select>
+
 
 
 

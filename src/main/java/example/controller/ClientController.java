@@ -111,6 +111,7 @@ public class ClientController {
     @PostMapping("/create")
     public String createClient(@Valid @ModelAttribute("client") ClientDTO clientDTO, Model model) {
         try {
+            System.out.println("ClientDTO reçu : " + clientDTO);
             clientService.createClient(clientDTO);
             return "redirect:/clients/list";
         } catch (IllegalArgumentException e) {

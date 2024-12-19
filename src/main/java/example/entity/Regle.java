@@ -90,8 +90,8 @@ public class Regle {
     private TypeRegle typeRegle;
 
     // Relation ManyToOne avec Formule
-    @ManyToOne(cascade = CascadeType.MERGE)    //  fetch = FetchType.LAZY
-    @JoinColumn(name = "formule_id", nullable = true)
+    @ManyToOne//(cascade = CascadeType.MERGE)    //  fetch = FetchType.LAZY
+    @JoinColumn(name = "formule_id")
     @JsonBackReference
     @ToString.Exclude
     private Formule formule;

@@ -104,22 +104,15 @@
         <td th:text="${client.ramassage6}">Ramassage 6</td>
         <td th:text="${client.ramassage7}">Ramassage 7</td>
         <td th:text="${client.envoiparDefaut}">Envoie par défaut</td>
-        <td th:text="${client.memoRetourSecurite1}">Mémo du retour de sécurité 1</td>
-        <td th:text="${client.memoRetourSecurite2}">Mémo du retour de sécurité 2</td>
-        <td th:text="${client.typeSuivie}">Type de suivie</td>
+        <td th:text="${client.memoRetourSecurite1}">Mémo Sécurité 1</td>
+        <td th:text="${client.memoRetourSecurite2}">Mémo Sécurité 2</td>
+        <td th:text="${client.typeSuivie}">Type de suivi</td>
         <td th:text="${client.codeClient}">Code Client</td>
-        <td>
-            <ul>
-                <li th:each="id : ${client.valiseIds}" th:text="'Valise ID: ' + ${id}"></li>
-            </ul>
-        </td>
-        <td>
-            <ul>
-                <li th:each="probleme : ${client.problemeIds}" th:text="'Problème ID: ' + ${probleme}"></li>
-            </ul>
-        </td>
-        <td th:text="${client.retourSecuriteIds != null ? client.retourSecuriteIds : 'N/A'}">Retour Sécurité</td>
-        <td th:text="${client.regleId != null ? client.regleId : 'N/A'}">Règle</td>
+        <td th:text="${client.valiseIds}">Valises</td>
+        <td th:text="${client.problemeId}">Problème</td>
+        <td th:text="${client.retourSecuriteIds}">Retours Sécurité</td>
+        <td th:text="${client.regleId}">Règle</td>
+
         <td>
             <!-- Bouton pour Voir -->
             <form th:action="@{/clients/view/{id}(id=${client.id})}" method="get" style="display:inline;">

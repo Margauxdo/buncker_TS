@@ -72,6 +72,10 @@
 
 <div class="container">
     <p><strong>ID :</strong> <span th:text="${mouvement.id}"></span></p>
+    <p><strong>Numéro de Valise :</strong>
+        <span th:text="${mouvement.valiseNumeroValise != null ? mouvement.valiseNumeroValise : 'Non disponible'}"></span>
+    </p>
+
     <p><strong>Date et Heure :</strong>
         <span th:text="${mouvement.dateHeureMouvement != null ? #dates.format(mouvement.dateHeureMouvement, 'dd/MM/yyyy HH:mm') : 'Non disponible'}"></span>
     </p>
@@ -86,8 +90,9 @@
     </p>
 
     <p><strong>Livreur Associé :</strong>
-        <span th:text="${mouvement.livreur != null ? mouvement.livreur.nomLivreur + ' ' + mouvement.livreur.prenomLivreur : 'Non disponible'}"></span>
+        <span th:text="${mouvement.livreurNom != null ? mouvement.livreurNom : 'Non disponible'}"></span>
     </p>
+
 
     <p><strong>Retours Sécurité Associés :</strong></p>
     <ul>

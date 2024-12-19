@@ -1,5 +1,6 @@
 package example.DTO;
 
+import example.entity.Valise;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -44,5 +45,11 @@ public class ValiseDTO {
 
     private Integer clientId;
 
+    // Constructeur qui accepte une entité Valise
+    public ValiseDTO(Valise valise) {
+        this.id = valise.getId();
+        this.numeroValise = Integer.valueOf(valise.getNumeroValise());
+        this.description = valise.getDescription();
+    }
 
 }

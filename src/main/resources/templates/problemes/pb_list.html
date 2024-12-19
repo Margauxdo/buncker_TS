@@ -90,7 +90,7 @@
         <td th:text="${probleme.descriptionProbleme}"></td>
         <td th:text="${probleme.detailsProbleme}"></td>
 
-        <td th:text="${probleme.clientIds != null ? 'Client : ' + probleme.clientIds : 'Aucun client'}"></td>
+        <td th:text="${probleme.clientNoms != null && !probleme.clientNoms.isEmpty() ? 'Clients : ' + probleme.clientNoms : 'Aucun client'}"></td>
 
         <td th:text="${probleme.numeroDeValise != null ? 'Valise : ' + probleme.numeroDeValise : 'Aucune valise'}"></td>
 

@@ -42,10 +42,18 @@ public class LivreurController {
     @GetMapping("/create")
     public String createLivreurForm(Model model) {
         model.addAttribute("livreur", new LivreurDTO());
+
+        // Ajouter la liste des livreurs
+        List<LivreurDTO> livreurs = livreurService.getAllLivreurs();
+        model.addAttribute("livreurs", livreurs);
+
+        // Ajouter les mouvements
         List<Mouvement> mouvements = mouvementService.getAllMouvementsWithRetourSecurites();
         model.addAttribute("mouvements", mouvements);
+
         return "livreurs/livreur_create";
     }
+
 
 
 

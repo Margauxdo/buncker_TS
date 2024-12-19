@@ -55,26 +55,27 @@ public class ProblemeService implements IProblemeService {
         Valise valise = valiseRepository.findById(problemeDTO.getValiseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Valise not found"));
 
-        // Récupération du client
-        List<Client> clients = new ArrayList<>();
-        for (Integer clientId : problemeDTO.getClientIds()) {
-            Client client = clientRepository.findById(clientId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
-            clients.add(client);
-        }
-
-        // Création du problème
+        // Création du problème (avant l'association des clients)
         Probleme probleme = new Probleme();
         probleme.setDescriptionProbleme(problemeDTO.getDescriptionProbleme());
         probleme.setDetailsProbleme(problemeDTO.getDetailsProbleme());
         probleme.setValise(valise);
-        probleme.setClients(clients);  // Associer les clients
+
+        // Récupération et association des clients
+        List<Client> clients = new ArrayList<>();
+        for (Integer clientId : problemeDTO.getClientIds()) {
+            Client client = clientRepository.findById(clientId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+            client.setProbleme(probleme);  // Associer le problème au client
+            clients.add(client);
+        }
+        probleme.setClients(clients);  // Associer les clients au problème
 
         // Sauvegarde du problème
         problemeRepository.save(probleme);
 
-        // Retourner le DTO
-        return new ProblemeDTO(probleme);  // Retourner un DTO pour la réponse
+        // Retourner un DTO pour la réponse
+        return new ProblemeDTO(probleme);
     }
 
     @Override
@@ -127,6 +128,9 @@ public class ProblemeService implements IProblemeService {
         Probleme probleme = problemeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Probleme not found"));
 
+
+        probleme.getValise(); // Charger la valise
+        probleme.getClients().size();
         // La session est toujours ouverte ici, donc la collection 'clients' peut être chargée correctement
         return new ProblemeDTO(probleme);
     }

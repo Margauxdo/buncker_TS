@@ -108,7 +108,7 @@
     <!-- Sélection de la règle associée -->
     <label for="regle">Code Regle :</label>
     <select id="regle" th:field="*{regleIds}">
-        <option value="" th:text="'Sélectionner un Code Regle'"></option>
+        <option value="" th:text="'Sélectionner un Code Règle'"></option>
         <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
     </select>
 
@@ -116,7 +116,8 @@
 
 
 
-<div style="margin-top: 20px;">
+
+    <div style="margin-top: 20px;">
     <button type="submit">Créer</button>
     <a href="/" th:href="@{/}">
         <button type="button" class="btn-danger">Retour à l'Accueil</button>

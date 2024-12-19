@@ -42,7 +42,7 @@ public class Probleme {
     @ToString.Exclude
     @OneToMany(mappedBy = "probleme", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<Client> clients= new ArrayList<Client>();
+    private List<Client> clients= new ArrayList<>();
 
 
 

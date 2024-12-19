@@ -12,12 +12,15 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class FormuleService implements IFormuleService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FormuleService.class);
 
     private final FormuleRepository formuleRepository;
     private final RegleRepository regleRepository;
@@ -48,17 +51,13 @@ public class FormuleService implements IFormuleService {
                 .formule(formuleDTO.getFormule())
                 .build();
 
-        if (formuleDTO.getRegleIds() != null) {
+        if (formuleDTO.getRegleIds() != null && !formuleDTO.getRegleIds().isEmpty()) {
             List<Regle> regles = formuleDTO.getRegleIds().stream()
                     .map(id -> regleRepository.findById(id)
                             .orElseThrow(() -> new EntityNotFoundException("Règle introuvable avec l'ID : " + id)))
                     .collect(Collectors.toList());
 
-            regles.forEach(regle -> {
-                // Réattacher l'entité au contexte
-                Hibernate.initialize(regle);
-            });
-
+            // Ajoutez les règles sans dissocier celles déjà associées
             formule.setRegles(regles);
         }
 
@@ -67,17 +66,25 @@ public class FormuleService implements IFormuleService {
 
 
     @Override
+    @Transactional
     public FormuleDTO createFormule(FormuleDTO formuleDTO) {
         Formule formule = convertToEntity(formuleDTO);
 
-        // Initialisation explicite des règles pour s'assurer qu'elles sont gérées
+        // Logs pour déboguer
+        logger.info("Formule avant sauvegarde : {}", formule);
         if (formule.getRegles() != null) {
             formule.getRegles().forEach(regle -> regle.setFormule(formule));
+
         }
 
         Formule savedFormule = formuleRepository.save(formule);
+        // Logs pour vérifier les associations
+        logger.info("Formule créée : {}", savedFormule);
+        savedFormule.getRegles().forEach(regle -> logger.info("Règle associée : {}", regle));
+
         return convertToDTO(savedFormule);
     }
+
 
 
     @Override
@@ -101,10 +108,18 @@ public class FormuleService implements IFormuleService {
 
     @Override
     public void deleteFormule(int id) {
-        if (!formuleRepository.existsById(id)) {
-            throw new FormuleNotFoundException("Formule introuvable avec l'ID : " + id);
-        }
-        formuleRepository.deleteById(id);
+
+            Formule formule = formuleRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Formule introuvable avec l'ID : " + id));
+
+            // Dissocier les règles associées
+            if (formule.getRegles() != null && !formule.getRegles().isEmpty()) {
+                formule.getRegles().forEach(regle -> regle.setFormule(null));
+            }
+
+            // Supprimer la formule
+            formuleRepository.delete(formule);
+
     }
 
     @Override

@@ -77,19 +77,18 @@
     <p><strong>Valise Associée :</strong></p>
     <ul>
         <li>
-            <span th:text="${probleme.valise?.id ?: 'Non spécifiée'}"></span>
-            <span th:text="${probleme.valise?.description ?: 'Non spécifiée'}"></span>
+            <span th:text="${probleme.valise?.numeroValise ?: 'Non spécifiée'}">Numéro de valise</span>
+            <span th:text="${probleme.valise?.description ?: 'Non spécifiée'}">Description</span>
         </li>
     </ul>
 
-    <p><strong>Client Associé :</strong></p>
+    <p><strong>Clients Associés :</strong></p>
     <ul>
-        <li>
-            <<span th:text="${probleme.client?.id ?: 'Non spécifié'}">ID du client</span>
-
-            <span th:text="${probleme.client?.name ?: 'Non spécifié'}"></span>
+        <li th:each="client : ${probleme.clientNoms}">
+            <span th:text="${client ?: 'Non spécifié'}"></span>
         </li>
     </ul>
+
 
 
 </div>

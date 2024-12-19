@@ -50,6 +50,7 @@ public class Client {
     private String envoiparDefaut;
     private String memoRetourSecurite1;
     private String memoRetourSecurite2;
+    @Column(name = "type_suivi")
     private String typeSuivie;
 
     public Client(
@@ -57,10 +58,12 @@ public class Client {
     }
 
 
+    @Column(name = "code_client")
     private String codeClient;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Valise> valises;
 
@@ -74,9 +77,10 @@ public class Client {
 
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    //@OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<RetourSecurite> retourSecurites = new ArrayList<>();
+    private List<RetourSecurite> retourSecurites ;
 
 
     @ManyToOne()   // fetch = FetchType.LAZY

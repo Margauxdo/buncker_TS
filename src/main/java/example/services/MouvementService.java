@@ -172,15 +172,12 @@ public class MouvementService implements IMouvementService {
     @Override
     @Transactional
     public void deleteMouvement(int id) {
-        // Trouver l'entité Mouvement à supprimer
+        // Trouver le mouvement
         Mouvement mouvement = mouvementRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
 
         // Détacher la Valise associée
-        mouvement.setValise(null);  // Détache la Valise de l'entité Mouvement
-
-        // Vous pouvez également détacher d'autres relations si nécessaire
-        mouvement.setRetourSecurite(null); // Si retourSecurite est nullable et doit être supprimé
+        mouvement.setValise(null);
 
         // Supprimer le Mouvement
         mouvementRepository.delete(mouvement);
@@ -211,11 +208,13 @@ public class MouvementService implements IMouvementService {
                 // Mapping Valise
                 .valiseId(mouvement.getValise().getId())
                 .valiseDescription(mouvement.getValise().getDescription()) // Assuming there's a getDescription() method
-                .valiseNumeroValise(String.valueOf(mouvement.getValise().getNumeroValise())) // Assuming there's a getNumeroValise() method
+                .valiseNumeroValise(mouvement.getValise() != null && mouvement.getValise().getNumeroValise() != null
+                        ? mouvement.getValise().getNumeroValise()
+                        : "Non spécifié")
+
                 // Mapping Livreur
-                .livreurId(mouvement.getLivreur().getId())
-                .livreurNom(mouvement.getLivreur().getNomLivreur()) // Assuming there's a getNomLivreur() method
-                // Mapping RetourSecurite if it exists
+                .livreur(mouvement.getLivreur()) // Ajout de l'objet complet
+                .livreurNom(mouvement.getLivreur().getNomLivreur())
                 .retourSecuriteId(mouvement.getRetourSecurite() != null ? mouvement.getRetourSecurite().getId() : null)
                 .retourSecuriteNumero(String.valueOf(mouvement.getRetourSecurite() != null ? mouvement.getRetourSecurite().getNumero(): null)) // Assuming getDescription() exists
                 .build();

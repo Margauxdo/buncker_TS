@@ -25,5 +25,6 @@ public class LivreurDTO {
 
     private List<Integer> mouvementIds;
     private List<String> mouvementStatuts;
+    private Integer livreurId;
 }
 

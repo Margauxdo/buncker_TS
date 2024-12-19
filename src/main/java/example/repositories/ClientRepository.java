@@ -30,13 +30,8 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     List<Client> findAllWithAssociations();
 
     // Recherche par ID avec relations associées
-    @Query("SELECT c FROM Client c " +
-            "LEFT JOIN FETCH c.retourSecurites " +
-            "LEFT JOIN FETCH c.regle " +
-            "LEFT JOIN FETCH c.valises " +
-            "LEFT JOIN FETCH c.probleme " +
-            "WHERE c.id = :id")
-    Optional<Client> findByIdWithAssociations(@Param("id") Integer id);
+    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.valises LEFT JOIN FETCH c.retourSecurites LEFT JOIN FETCH c.probleme LEFT JOIN FETCH c.regle WHERE c.id = :id")
+    Optional<Client> findByIdWithRelations(@Param("id") Integer id);
 
     // Recherche des clients associés à un problème spécifique
     List<Client> findByProbleme_Id(Integer problemeId);

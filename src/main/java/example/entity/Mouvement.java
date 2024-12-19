@@ -33,7 +33,7 @@ public class Mouvement {
 
     @ToString.Exclude
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "valise_id", nullable = false)
+    @JoinColumn(name = "valise_id", nullable = true)
     @JsonBackReference
     private Valise valise;
 

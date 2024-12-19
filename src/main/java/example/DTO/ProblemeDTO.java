@@ -37,13 +37,18 @@ public class ProblemeDTO {
         this.id = probleme.getId();
         this.descriptionProbleme = probleme.getDescriptionProbleme();
         this.detailsProbleme = probleme.getDetailsProbleme();
+        this.valise = probleme.getValise() != null ? new ValiseDTO(probleme.getValise()) : null;
+
         //this.valiseId = (probleme.getValise() != null) ? probleme.getValise().getId() : null;
         this.clientIds = probleme.getClients() != null
                 ? probleme.getClients().stream().map(Client::getId).collect(Collectors.toList())
                 : new ArrayList<>();
-        this.clientIds = probleme.getClients() != null ? probleme.getClients().stream().map(Client::getId).collect(Collectors.toList()) : new ArrayList<>();
+        this.clientNoms = probleme.getClients() != null
+                ? probleme.getClients().stream().map(Client::getName).collect(Collectors.toList())
+                : new ArrayList<>();
 
         this.numeroDeValise = probleme.getValise() != null ? probleme.getValise().getNumeroValise() : null;
+        //this.valise = probleme.getValise() != null ? new ValiseDTO(probleme.getValise()) : null;
 
     }
 

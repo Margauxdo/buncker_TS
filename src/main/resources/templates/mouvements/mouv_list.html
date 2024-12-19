@@ -63,6 +63,7 @@
         <th>Date Retour Prévue</th>
         <th>Description Valise</th>
         <th>Numéro Valise</th>
+        <th>Livreur</th>
         <th>Actions</th> <!-- Colonne Actions -->
     </tr>
     </thead>
@@ -75,6 +76,7 @@
         <td th:text="${#dates.format(mouvement.dateRetourPrevue, 'dd/MM/yyyy')}"></td>
         <td th:text="${mouvement.valiseDescription != null ? mouvement.valiseDescription : '-'}"></td>
         <td th:text="${mouvement.valiseNumeroValise != null ? mouvement.valiseNumeroValise : '-'}"></td>
+        <td th:text="${mouvement.livreurNom != null ? mouvement.livreurNom : '-'}"></td>
         <td>
             <!-- Bouton Voir -->
             <form th:action="@{/mouvements/view/{id}(id=${mouvement.id})}" method="get" style="display:inline;">

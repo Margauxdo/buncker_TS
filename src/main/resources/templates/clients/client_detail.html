@@ -106,20 +106,11 @@
         <span th:if="${client.regleId == null}">Aucune règle associée</span>
     </p>
 
-    <p><strong>Retour Sécurité :</strong>
-        <span th:if="${client.retourSecuriteIds != null and client.retourSecuriteIds.size() > 0}" th:text="'Retour Sécurité ID(s): ' + ${client.retourSecuriteIds}"></span>
-        <span th:if="${client.retourSecuriteIds == null or client.retourSecuriteIds.size() == 0}">Aucun retour sécurité associé</span>
-    </p>
+    <p>Retours sécurité associés : <span th:text="${client.retourSecuriteIds}">ID Retours Sécurité</span></p>
 
-    <p><strong>Valise :</strong>
-        <span th:if="${client.valiseIds != null and client.valiseIds.size() > 0}" th:text="'Valise ID(s): ' + ${client.valiseIds}"></span>
-        <span th:if="${client.valiseIds == null or client.valiseIds.size() == 0}">Aucune valise associé</span>
-    </p>
+    <p>Valises associées : <span th:text="${client.valiseIds}">ID Valises</span></p>
 
-    <p><strong>Probleme :</strong>
-        <span th:if="${client.problemeIds != null and client.problemeIds.size() > 0}" th:text="'Probleme ID(s): ' + ${client.problemeIds}"></span>
-        <span th:if="${client.problemeIds == null or client.problemeIds.size() == 0}">Aucun problème associé</span>
-    </p>
+    <p>Problème associé : <span th:text="${client.problemeId}">ID Problème</span></p>
 
     <div style="margin-top: 20px;">
         <a href="/" th:href="@{/}">

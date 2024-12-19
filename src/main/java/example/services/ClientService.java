@@ -9,6 +9,7 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,9 +35,6 @@ public class ClientService implements IClientService {
     }
 
     private ClientDTO convertToDTO(Client client) {
-        // Initialisation de la collection chargée paresseusement
-        client.getRetourSecurites().size(); // Force le chargement
-
         return ClientDTO.builder()
                 .id(client.getId())
                 .name(client.getName())
@@ -59,16 +57,16 @@ public class ClientService implements IClientService {
                 .codeClient(client.getCodeClient())
                 .problemeId(client.getProbleme() != null ? client.getProbleme().getId() : null)
                 .retourSecuriteIds(client.getRetourSecurites() != null ?
-                        client.getRetourSecurites().stream().map(RetourSecurite::getId).collect(Collectors.toList()) : null)
+                        client.getRetourSecurites().stream().map(RetourSecurite::getId).collect(Collectors.toList()) : new ArrayList<>())
                 .regleId(client.getRegle() != null ? client.getRegle().getId() : null)
                 .valiseIds(client.getValises() != null ?
-                        client.getValises().stream().map(Valise::getId).collect(Collectors.toList()) : null)
+                        client.getValises().stream().map(Valise::getId).collect(Collectors.toList()) : new ArrayList<>())
                 .build();
     }
 
 
-    // Conversion DTO -> Entité
     private Client convertToEntity(ClientDTO clientDTO) {
+        // Création de l'entité Client à partir des champs simples
         Client client = Client.builder()
                 .id(clientDTO.getId())
                 .name(clientDTO.getName())
@@ -91,31 +89,48 @@ public class ClientService implements IClientService {
                 .codeClient(clientDTO.getCodeClient())
                 .build();
 
-        // Gestion des relations
-        if (clientDTO.getRegleId() != null) {
-            Regle regle = regleRepository.findById(clientDTO.getRegleId())
-                    .orElseThrow(() -> new EntityNotFoundException("Regle introuvable avec l'ID : " + clientDTO.getRegleId()));
-            client.setRegle(regle);
-        }
-
+        // Gestion du problème
         if (clientDTO.getProblemeId() != null) {
             Probleme probleme = problemeRepository.findById(clientDTO.getProblemeId())
-                    .orElseThrow(() -> new EntityNotFoundException("Probleme introuvable avec l'ID : " + clientDTO.getProblemeId()));
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Problème introuvable avec l'ID : " + clientDTO.getProblemeId()));
             client.setProbleme(probleme);
         }
 
-        if (clientDTO.getRetourSecuriteIds() != null) {
-            List<RetourSecurite> retourSecurites = retourSecuriteRepository.findAllById(clientDTO.getRetourSecuriteIds());
-            client.setRetourSecurites(retourSecurites);
+        // Gestion des valises
+        if (clientDTO.getValiseIds() != null && !clientDTO.getValiseIds().isEmpty()) {
+            List<Valise> valises = valiseRepository.findAllById(clientDTO.getValiseIds());
+            if (valises.isEmpty()) {
+                throw new EntityNotFoundException("Aucune valise trouvée pour les IDs fournis : " + clientDTO.getValiseIds());
+            }
+            client.setValises(valises);
+        } else {
+            client.setValises(new ArrayList<>()); // Initialisation par défaut
         }
 
-        if (clientDTO.getValiseIds() != null) {
-            List<Valise> valises = valiseRepository.findAllById(clientDTO.getValiseIds());
-            client.setValises(valises);
+        // Gestion des retours sécurité
+        if (clientDTO.getRetourSecuriteIds() != null && !clientDTO.getRetourSecuriteIds().isEmpty()) {
+            List<RetourSecurite> retourSecurites = retourSecuriteRepository.findAllById(clientDTO.getRetourSecuriteIds());
+            if (retourSecurites.isEmpty()) {
+                throw new EntityNotFoundException("Aucun RetourSecurite trouvé pour les IDs fournis : " + clientDTO.getRetourSecuriteIds());
+            }
+            client.setRetourSecurites(retourSecurites);
+        } else {
+            client.setRetourSecurites(new ArrayList<>()); // Initialisation par défaut
+        }
+
+        // Gestion de la règle (optionnel si nécessaire)
+        if (clientDTO.getRegleId() != null) {
+            Regle regle = regleRepository.findById(clientDTO.getRegleId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Règle introuvable avec l'ID : " + clientDTO.getRegleId()));
+            client.setRegle(regle);
         }
 
         return client;
     }
+
+
 
     @Override
     @Transactional
@@ -202,13 +217,36 @@ public class ClientService implements IClientService {
     public void deleteClient(int id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
+
+        // Dissociation explicite des relations
+        if (client.getValises() != null) {
+            client.getValises().clear();
+        }
+        if (client.getRetourSecurites() != null) {
+            client.getRetourSecurites().clear();
+        }
+        client.setProbleme(null);
+
         clientRepository.delete(client);
     }
+
 
     public ClientDTO getClientById(int id) {
         // Utilisation d'une requête JOIN FETCH pour charger aussi les retours de sécurité
         Client client = clientRepository.findByIdWithRetourSecurites(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
+
+        return convertToDTO(client);
+    }
+
+    @Transactional
+    public ClientDTO getClientById(Integer id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
+
+        // Force le chargement des collections
+        client.getValises().size();
+        client.getRetourSecurites().size();
 
         return convertToDTO(client);
     }

@@ -45,16 +45,14 @@ public class MouvementController {
         try {
             MouvementDTO mouvement = mouvementService.getMouvementById(id);
             model.addAttribute("mouvement", mouvement);
-            model.addAttribute("valises", valiseService.getAllValises());
             return "mouvements/mouv_details";
         } catch (EntityNotFoundException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Mouvement not found: " + e.getMessage());
-            return "redirect:/mouvements/list";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Unexpected error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Mouvement introuvable : " + e.getMessage());
             return "redirect:/mouvements/list";
         }
     }
+
+
 
 
 
