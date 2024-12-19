@@ -83,7 +83,7 @@
     <tr>
         <th>ID</th>
         <th>Date de la Sortie</th>
-        <th>Règle Associée</th>
+        <!--<th>Règle Associée</th>-->
         <th>Actions</th>
     </tr>
     </thead>
@@ -91,9 +91,12 @@
     <tr th:each="sortieSemaine : ${sortiesSemaine}">
         <td th:text="${sortieSemaine.id}"></td>
         <td th:text="${#dates.format(sortieSemaine.dateSortieSemaine, 'dd/MM/yyyy')}"></td>
-        <td>
-            <span th:each="codeRegle : ${sortieSemaine.regleCodes}" th:text="'Règle ' + ${codeRegle}"></span>
-        </td>
+        <!--<td>
+            <span th:each="regleCode : ${sortieSemaine.regleCodes}" th:text="'Code : ' + ${regleCode}"></span>
+        </td>-->
+
+
+
 
         <td>
             <form th:action="@{/sortieSemaine/view/{id}(id=${sortieSemaine.id})}" method="get" style="display:inline;">

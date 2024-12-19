@@ -2,11 +2,14 @@ package example.services;
 
 import example.DTO.TypeValiseDTO;
 import example.entity.TypeValise;
+import example.entity.Valise;
 import example.interfaces.ITypeValiseService;
 import example.repositories.TypeValiseRepository;
+import example.repositories.ValiseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +18,12 @@ import java.util.stream.Collectors;
 public class TypeValiseService implements ITypeValiseService {
 
     private final TypeValiseRepository typeValiseRepository;
+    private final ValiseRepository valiseRepository;
 
     @Autowired
-    public TypeValiseService(TypeValiseRepository typeValiseRepository) {
+    public TypeValiseService(TypeValiseRepository typeValiseRepository, ValiseRepository valiseRepository) {
         this.typeValiseRepository = typeValiseRepository;
+        this.valiseRepository = valiseRepository;
     }
 
     @Override
@@ -53,12 +58,22 @@ public class TypeValiseService implements ITypeValiseService {
     }
 
     @Override
+    @Transactional
     public void deleteTypeValise(int id) {
-        if (!typeValiseRepository.existsById(id)) {
-            throw new EntityNotFoundException("TypeValise with ID " + id + " not found");
+        TypeValise typeValise = typeValiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("TypeValise with ID " + id + " not found"));
+
+        // Découpler toutes les valises associées
+        List<Valise> valises = valiseRepository.findByTypeValise(typeValise);
+        for (Valise valise : valises) {
+            valise.setTypeValise(null);
+            valiseRepository.save(valise);
         }
-        typeValiseRepository.deleteById(id);
+
+        // Supprimer le type de valise
+        typeValiseRepository.delete(typeValise);
     }
+
 
     @Override
     public TypeValiseDTO getTypeValise(int id) {

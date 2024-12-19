@@ -7,16 +7,23 @@ import example.interfaces.IRetourSecuriteService;
 import example.repositories.ClientRepository;
 import example.repositories.MouvementRepository;
 import example.services.ClientService;
+import example.services.RetourSecuriteService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Controller
 @RequestMapping("/retourSecurite")
 public class RetourSecuriteController {
+
+    private static final Logger logger = LoggerFactory.getLogger(RetourSecuriteService.class);
+
 
     private final IRetourSecuriteService retourSecuriteService;
     private final ClientRepository clientRepository;
@@ -69,9 +76,11 @@ public class RetourSecuriteController {
 
     @PostMapping("/create")
     public String createRetourSecurite(@Valid @ModelAttribute("retourSecurite") RetourSecuriteDTO retourSecuriteDTO) {
+        logger.info("Création d'un retour sécurité avec date de clôture : {}", retourSecuriteDTO.getDateCloture());
         retourSecuriteService.createRetourSecurite(retourSecuriteDTO);
         return "redirect:/retourSecurite/list";
     }
+
 
     @GetMapping("/edit/{id}")
     public String editRetourSecuriteForm(@PathVariable int id, Model model) {

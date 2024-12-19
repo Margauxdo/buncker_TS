@@ -110,6 +110,10 @@
         <option value="false">Non</option>
     </select>
 
+    <label for="dateCloture">Date de Clôture :</label>
+    <input type="date" id="dateCloture" th:field="*{dateCloture}" />
+
+
     <label for="mouvementId">Mouvement :</label>
     <select id="mouvementId" th:field="*{mouvementIds}" multiple>
         <option th:each="mouvement : ${mouvements}" th:value="${mouvement.id}" th:text="${mouvement.statutSortie}"></option>

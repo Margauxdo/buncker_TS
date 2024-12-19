@@ -49,19 +49,36 @@ public class FormuleService implements IFormuleService {
                 .build();
 
         if (formuleDTO.getRegleIds() != null) {
-            List<Regle> regles = regleRepository.findAllById(formuleDTO.getRegleIds());
+            List<Regle> regles = formuleDTO.getRegleIds().stream()
+                    .map(id -> regleRepository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException("Règle introuvable avec l'ID : " + id)))
+                    .collect(Collectors.toList());
+
+            regles.forEach(regle -> {
+                // Réattacher l'entité au contexte
+                Hibernate.initialize(regle);
+            });
+
             formule.setRegles(regles);
         }
 
         return formule;
     }
 
+
     @Override
     public FormuleDTO createFormule(FormuleDTO formuleDTO) {
         Formule formule = convertToEntity(formuleDTO);
+
+        // Initialisation explicite des règles pour s'assurer qu'elles sont gérées
+        if (formule.getRegles() != null) {
+            formule.getRegles().forEach(regle -> regle.setFormule(formule));
+        }
+
         Formule savedFormule = formuleRepository.save(formule);
         return convertToDTO(savedFormule);
     }
+
 
     @Override
     public FormuleDTO updateFormule(int id, FormuleDTO formuleDTO) {

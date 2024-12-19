@@ -26,7 +26,7 @@ public class SortieSemaine {
     private Date dateSortieSemaine;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "sortieSemaine", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "sortieSemaine", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Regle> regles = new ArrayList<>();
 

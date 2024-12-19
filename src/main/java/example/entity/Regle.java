@@ -74,8 +74,10 @@ public class Regle {
     private List<Valise> valises = new ArrayList<>();
 
     // Relation OneToMany avec SortieSemaine
-    @ManyToOne(cascade = CascadeType.ALL)   // , fetch = FetchType.EAGER, orphanRemoval = true()  //  fetch = FetchType.LAZY
-    @JoinColumn(name = "cle_sortie_semaine")
+    //@ManyToOne(cascade = CascadeType.ALL)
+    // , fetch = FetchType.EAGER, orphanRemoval = true()  //  fetch = FetchType.LAZY
+    @ManyToOne
+    @JoinColumn(name = "sortieSemaine_id")//"cle_sortie_semaine")
     @JsonBackReference
     @ToString.Exclude
     private SortieSemaine sortieSemaine;
@@ -88,7 +90,7 @@ public class Regle {
     private TypeRegle typeRegle;
 
     // Relation ManyToOne avec Formule
-    @ManyToOne()    //  fetch = FetchType.LAZY
+    @ManyToOne(cascade = CascadeType.MERGE)    //  fetch = FetchType.LAZY
     @JoinColumn(name = "formule_id", nullable = true)
     @JsonBackReference
     @ToString.Exclude

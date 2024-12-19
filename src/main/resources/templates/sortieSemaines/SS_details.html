@@ -74,11 +74,12 @@
     <p><strong>ID :</strong> <span th:text="${sortieSemaine.id}"></span></p>
     <p>Date de la sortie : <span th:text="${sortieSemaine.dateSortieSemaine}"></span></p>
 
-    <!-- Relation avec Regle -->
-    <p>Code de la règle :
-        <span th:text="${sortieSemaine.regleCodes}"></span>
+    <!--<p>Règle associée :</p>
+    <ul>
+        <li th:each="regle : ${sortieSemaine.regleCodes}" th:text="'Code : ' + ${regle}"></li>
+    </ul>-->
 
-    </p>
+
 
 
 </div>

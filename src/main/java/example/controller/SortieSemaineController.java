@@ -11,10 +11,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Controller
 @RequestMapping("/sortieSemaine")
 public class SortieSemaineController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SortieSemaineController.class);
+
 
     @Autowired
     private ISortieSemaineService sortieSemaineService;
@@ -55,9 +61,14 @@ public class SortieSemaineController {
 
     @PostMapping("/create")
     public String createSortieSemaine(@ModelAttribute("sortieSemaine") SortieSemaineDTO sortieSemaineDTO) {
-        sortieSemaineService.createSortieSemaine(sortieSemaineDTO);
+        logger.info("Création d'une SortieSemaine avec les données reçues : {}", sortieSemaineDTO);
+
+        SortieSemaineDTO createdSortieSemaine = sortieSemaineService.createSortieSemaine(sortieSemaineDTO);
+        logger.info("SortieSemaine créée avec succès : {}", createdSortieSemaine);
+
         return "redirect:/sortieSemaine/list";
     }
+
 
     // Formulaire Thymeleaf pour modifier une SortieSemaine
     @GetMapping("/edit/{id}")
