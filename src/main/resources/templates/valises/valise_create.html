@@ -99,11 +99,15 @@
     <input type="text" id="numeroDujeu" th:field="*{numeroDujeu}" placeholder="Entrez le numéro du jeu" />
 
     <!-- Relation avec TypeValise -->
-    <label for="typeValise">Type de Valise :</label>
+    <label for="typeValise">Type de Valise:</label>
     <select id="typeValise" th:field="*{typeValiseId}">
-        <option value="" th:text="'Sélectionner un type de valise'"></option>
-        <option th:each="typeValise : ${typesValise}" th:value="${typeValise.id}" th:text="${typeValise.getProprietaire()} + ' - ' + ${typeValise.getDescription()}"></option>
+        <option th:each="typeValise : ${typeValises}"
+                th:value="${typeValise.id}"
+                th:text="${typeValise.description}">
+        </option>
     </select>
+
+
 
 
     <!-- Liste des mouvements (ajout facultatif si nécessaire) -->

@@ -57,32 +57,43 @@ public class ValiseService implements IValiseService {
     public ValiseDTO createValise(ValiseDTO valiseDTO) {
         Valise valise = mapToEntity(valiseDTO);
 
-        // Vérification et ajout des mouvements (si présents)
-        if (valiseDTO.getMouvementIds() != null) {
-            List<Mouvement> mouvements = mouvementRepository.findAllById(valiseDTO.getMouvementIds());
-            valise.setMouvements(mouvements); // Associe les mouvements à la valise
+        // Vérification et association de TypeValise
+        if (valiseDTO.getTypeValiseId() != null) {
+            TypeValise typeValise = typeValiseRepository.findById(valiseDTO.getTypeValiseId())
+                    .orElseThrow(() -> new ResourceNotFoundException("TypeValise introuvable avec l'ID : " + valiseDTO.getTypeValiseId()));
+            valise.setTypeValise(typeValise);
         } else {
-            valise.setMouvements(new ArrayList<>()); // Initialise une liste vide si aucun mouvement n'est fourni
+            throw new ResourceNotFoundException("TypeValise est requis");
         }
 
+        // Vérification et association des mouvements
+        if (valiseDTO.getMouvementIds() != null && !valiseDTO.getMouvementIds().isEmpty()) {
+            List<Mouvement> mouvements = mouvementRepository.findAllById(valiseDTO.getMouvementIds());
+            if (mouvements.size() != valiseDTO.getMouvementIds().size()) {
+                throw new ResourceNotFoundException("Certains mouvements sont introuvables");
+            }
+            valise.setMouvements(mouvements);
+        } else {
+            valise.setMouvements(new ArrayList<>());
+        }
 
+        // Vérification et association du client
         if (valiseDTO.getClientId() != null) {
             Client client = clientRepository.findById(valiseDTO.getClientId())
                     .orElseThrow(() -> new ResourceNotFoundException("Client introuvable avec l'ID : " + valiseDTO.getClientId()));
-            valise.setClient(client); // Associe correctement le client
+            valise.setClient(client);
         } else {
             throw new ResourceNotFoundException("L'ID du client est requis");
         }
 
+        // Vérification et association des règles de sortie
         if (valiseDTO.getRegleSortieIds() != null && !valiseDTO.getRegleSortieIds().isEmpty()) {
             Regle regle = regleRepository.findById(valiseDTO.getRegleSortieIds().get(0))
                     .orElseThrow(() -> new ResourceNotFoundException("Règle introuvable avec l'ID : " + valiseDTO.getRegleSortieIds().get(0)));
-            valise.setReglesSortie(regle); // Associe la règle à la valise
+            valise.setReglesSortie(regle);
         } else {
             valise.setReglesSortie(null); // Aucune règle associée
         }
-
-
 
         // Sauvegarde de la valise
         Valise savedValise = valiseRepository.save(valise);

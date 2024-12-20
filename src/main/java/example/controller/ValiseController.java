@@ -59,13 +59,15 @@ public class ValiseController {
     @GetMapping("/create")
     public String createValise(Model model) {
         model.addAttribute("valise", new ValiseDTO());
+        model.addAttribute("valises", valiseService.getAllValises());
 
-        model.addAttribute("typesValise", typeValiseRepository.findAll());
+        model.addAttribute("typeValises", typeValiseRepository.findAll()); // Corrigez ici
         model.addAttribute("mouvements", mouvementRepository.findAll());
         model.addAttribute("regles", regleRepository.findAll());
         model.addAttribute("clients", clientRepository.findAll());
         return "valises/valise_create";
     }
+
 
 
 
