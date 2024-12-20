@@ -59,8 +59,15 @@ public class RetourSecuriteController {
     public String viewRetourSecuriteById(@PathVariable int id, Model model) {
         RetourSecuriteDTO retourSecurite = retourSecuriteService.getRetourSecurite(id);
         model.addAttribute("retourSecurite", retourSecurite);
+
+        // Ajout des mouvements dans le modèle
+        List<Mouvement> mouvements = mouvementRepository.findAllByRetourSecuriteId(id);
+        model.addAttribute("mouvements", mouvements);
+
         return "retourSecurites/RS_details";
     }
+
+
 
     @GetMapping("/create")
     public String createRetourSecuriteForm(Model model) {

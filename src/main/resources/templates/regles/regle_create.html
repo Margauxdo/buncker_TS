@@ -98,11 +98,15 @@
     <label for="nbjsmEntree">Nombre de Jours/SM Entrée :</label>
     <input type="number" id="nbjsmEntree" th:field="*{nbjsmEntree}" />
 
-    <label for="valise">Valise :</label>
-    <select id="valise" th:field="*{valiseId}">
+    <select id="valise" th:field="*{valiseId}" required>
         <option value="" disabled selected>-- Sélectionnez une Valise --</option>
         <option th:each="val : ${valises}" th:value="${val.id}" th:text="${val.numeroValise}"></option>
+        <option th:if="${valises == null or valises.isEmpty()}" disabled>
+            Aucune Valise disponible
+        </option>
     </select>
+
+
 
 
     <label for="typeRegle">Type de Règle :</label>

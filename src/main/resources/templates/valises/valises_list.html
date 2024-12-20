@@ -86,6 +86,7 @@
         <td th:text="${valise.description}"></td>
         <td th:text="${valise.numeroValise}"></td>
         <td th:text="${valise.refClient != null ? valise.refClient : 'Non défini'}"></td>
+
         <td th:text="${valise.sortie != null ? valise.sortie : 'Non défini'}"></td>
         <td th:text="${valise.dateDernierMouvement != null ? valise.dateDernierMouvement : 'Non défini'}"></td>
         <td th:text="${valise.dateSortiePrevue != null ? valise.dateSortiePrevue : 'Non défini'}"></td>
@@ -95,25 +96,27 @@
         <td th:text="${valise.typeValiseDescription}"></td>
 
         <td>
-            <!-- Liste des mouvements -->
             <ul>
                 <li th:each="mouvement : ${valise.mouvementList}">
-                    <span th:text="${mouvement.description}"></span> <!-- Affichage de la description -->
+                    <span th:text="${mouvement.statutSortie}"></span>
                 </li>
             </ul>
         </td>
 
+
+
+
+
         <td>
-            <!-- Liste des règles de sortie -->
             <ul>
                 <li th:each="regle : ${valise.reglesSortie}">
-                    <span th:text="${regle.coderegle}"></span> <!-- Affichage du code règle -->
+                    <span th:text="${regle.coderegle}"></span>
                 </li>
             </ul>
         </td>
 
         <td>
-            <!-- Boutons d'action -->
+        <!-- Boutons d'action -->
             <form th:action="@{/valise/view/{id}(id=${valise.id})}" method="get">
                 <button type="submit">Voir</button>
             </form>

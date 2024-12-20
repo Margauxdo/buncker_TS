@@ -48,8 +48,31 @@ public class ValiseDTO {
     // Constructeur qui accepte une entité Valise
     public ValiseDTO(Valise valise) {
         this.id = valise.getId();
-        this.numeroValise = Integer.valueOf(valise.getNumeroValise());
         this.description = valise.getDescription();
+        this.numeroValise = Integer.valueOf(valise.getNumeroValise());
+        this.refClient = valise.getClient() != null ? valise.getClient().getName() : "Non défini";
+        this.clientId = valise.getClient() != null ? valise.getClient().getId() : null;
+        this.sortie = valise.getSortie();
+        this.dateDernierMouvement = valise.getDateDernierMouvement();
+        this.dateSortiePrevue = valise.getDateSortiePrevue();
+        this.dateRetourPrevue = valise.getDateRetourPrevue();
+        this.dateCreation = valise.getDateCreation();
+        this.numeroDujeu = valise.getNumeroDujeu();
+        this.typeValiseId = valise.getTypeValise() != null ? valise.getTypeValise().getId() : null;
+        this.typeValiseDescription = valise.getTypeValise() != null ? valise.getTypeValise().getDescription() : "Non défini";
+        this.mouvementList = valise.getMouvements().stream()
+                .map(mouvement -> MouvementDTO.builder()
+                        .id(mouvement.getId())
+                        .dateHeureMouvement(mouvement.getDateHeureMouvement())
+                        .statutSortie(mouvement.getStatutSortie())
+                        .dateSortiePrevue(mouvement.getDateSortiePrevue())
+                        .dateRetourPrevue(mouvement.getDateRetourPrevue())
+                        .build())
+                .toList();
+        this.regleSortieIds = valise.getReglesSortie() != null
+                ? List.of(valise.getReglesSortie().getId())
+                : null;
     }
+
 
 }

@@ -3,7 +3,6 @@ package example.services;
 import example.DTO.RegleDTO;
 import example.controller.RegleController;
 import example.entity.Client;
-import example.entity.Formule;
 import example.entity.Regle;
 import example.entity.Valise;
 import example.exceptions.RegleNotFoundException;
@@ -29,32 +28,41 @@ public class RegleService implements IRegleService {
     private final FormuleRepository formuleRepository;
     private final JourFerieRepository jourFerieRepository;
     private final SortieSemaineRepository sortieSemaineRepository;
+    private final ValiseRepository valiseRepository;
 
     public RegleService(
             RegleRepository regleRepository,
             TypeRegleRepository typeRegleRepository,
             FormuleRepository formuleRepository,
             JourFerieRepository jourFerieRepository,
-            SortieSemaineRepository sortieSemaineRepository) {
+            SortieSemaineRepository sortieSemaineRepository, ValiseRepository valiseRepository) {
         this.regleRepository = regleRepository;
         this.typeRegleRepository = typeRegleRepository;
         this.formuleRepository = formuleRepository;
         this.jourFerieRepository = jourFerieRepository;
         this.sortieSemaineRepository = sortieSemaineRepository;
+        this.valiseRepository = valiseRepository;
     }
 
-    @Transactional
     public Regle createRegle(RegleDTO regleDTO) {
         Regle regle = new Regle();
-        regle.setCoderegle(regleDTO.getCoderegle()); // Assurez-vous que cette ligne existe
+        regle.setCoderegle(regleDTO.getCoderegle());
         regle.setReglePourSortie(regleDTO.getReglePourSortie());
         regle.setDateRegle(regleDTO.getDateRegle());
-        regle.setTypeRegle(regleDTO.getTypeRegle());
         regle.setNombreJours(regleDTO.getNombreJours());
+        regle.setTypeEntree(regleDTO.getTypeEntree());
+        regle.setNbjsmEntree(regleDTO.getNbjsmEntree());
 
+        if (regleDTO.getValiseId() != null) {
+            Valise valise = valiseRepository.findById(regleDTO.getValiseId())
+                    .orElseThrow(() -> new IllegalArgumentException("Valise introuvable"));
+            regle.setValises(List.of(valise));
+        }
 
-        return regleRepository.save(regle);
+        regleRepository.save(regle);
+        return regle;
     }
+
 
     @Override
     public RegleDTO readRegle(int id) {
@@ -165,46 +173,24 @@ public class RegleService implements IRegleService {
         dto.setDateRegle(regle.getDateRegle());
         dto.setNombreJours(regle.getNombreJours());
         dto.setCalculCalendaire(regle.getCalculCalendaire());
-        dto.setFermeJS1(regle.getFermeJS1());
-        dto.setFermeJS2(regle.getFermeJS2());
-        dto.setFermeJS3(regle.getFermeJS3());
-        dto.setFermeJS4(regle.getFermeJS4());
-        dto.setFermeJS5(regle.getFermeJS5());
-        dto.setFermeJS6(regle.getFermeJS6());
-        dto.setFermeJS7(regle.getFermeJS7());
-        dto.setTypeEntree(regle.getTypeEntree());
-        dto.setNbjsmEntree(regle.getNbjsmEntree());
+        dto.setTypeEntree(regle.getTypeEntree()); // Ajout pour TypeEntree
+        dto.setNbjsmEntree(regle.getNbjsmEntree()); // Ajout pour NbjsmEntree
 
-        // Gestion de la relation avec TypeRegle
+        // Relation avec Valise
+        if (regle.getValises() != null && !regle.getValises().isEmpty()) {
+            dto.setValiseId(regle.getValises().get(0).getId());
+            dto.setValiseNumero(regle.getValises().get(0).getDescription());
+        }
+
+        // Autres relations (TypeRegle, Formule, etc.)
         if (regle.getTypeRegle() != null) {
             dto.setTypeRegleId(regle.getTypeRegle().getId());
             dto.setTypeRegleNom(regle.getTypeRegle().getNomTypeRegle());
         }
 
-        // Gestion de la relation avec Formule
         if (regle.getFormule() != null) {
             dto.setFormuleId(regle.getFormule().getId());
             dto.setFormule(regle.getFormule().getLibelle());
-        }
-
-        // Gestion de la relation avec JourFerie
-        if (regle.getJourFerie() != null) {
-            dto.setJourFerieId(regle.getJourFerie().getId());
-            dto.setJourFerieDate(regle.getJourFerie().getDate());
-        }
-
-        // Gestion de la relation avec Valises
-        if (regle.getValises() != null && !regle.getValises().isEmpty()) {
-            dto.setValiseIds(regle.getValises().stream()
-                    .map(Valise::getId)
-                    .collect(Collectors.toList()));
-        }
-
-        // Gestion de la relation avec Clients
-        if (regle.getClients() != null && !regle.getClients().isEmpty()) {
-            dto.setClientIds(regle.getClients().stream()
-                    .map(Client::getId)
-                    .collect(Collectors.toList()));
         }
 
         return dto;

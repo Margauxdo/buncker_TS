@@ -56,4 +56,11 @@ public class RegleDTO {
     private String formule;
     @Getter @Setter
     private Integer valiseId;
+    private String valiseNumero;
+
+    public RegleDTO(Integer id, String coderegle) {
+        this.id = id;
+        this.coderegle = coderegle;
+    }
+
 }

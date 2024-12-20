@@ -76,20 +76,18 @@
     <p><strong>Date Sécurité :</strong> <span th:text="${retourSecurite.datesecurite}"></span></p>
     <p><strong>Clôturé :</strong> <span th:text="${retourSecurite.cloture ? 'Oui' : 'Non'}"></span></p>
     <p><strong>Date de Clôture :</strong> <span th:text="${retourSecurite.dateCloture}"></span></p>
+    <p><strong>Client :</strong> <span th:text="${retourSecurite.clientNom}"></span></p>
 
     <!-- Relation avec Mouvement -->
-    <p><strong>Mouvement Statut :</strong>
-        <span th:text="${retourSecurite.mouvementStatuts}"></span></p>
+    <strong>Mouvements Associés</strong>
+
+        <p th:each="mouvement : ${mouvements}">
+            <span th:text="'ID: ' + ${mouvement.id}"></span> -
+            <span th:text="'Statut: ' + ${mouvement.statutSortie}"></span>
+        </p>
 
 
-    <!-- Relation avec Clients -->
-    <p><strong>Clients associés :</strong></p>
-    <ul>
-        <!--<li th:each="clientId : ${retourSecurite.clientId}" ></li>-->
-        <li th:each="clientId : ${retourSecurite.clientNom}" ></li>
-
-    </ul>
-
+    <p><strong>Client:</strong> <span th:text="${retourSecurite.clientNom}">Nom du client</span></p>
 
 
 </div>

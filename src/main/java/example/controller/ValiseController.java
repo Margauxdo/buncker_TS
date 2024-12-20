@@ -9,6 +9,8 @@ import example.repositories.RegleRepository;
 import example.repositories.TypeValiseRepository;
 import example.services.TypeValiseService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +21,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/valise")
 public class ValiseController {
+
+    private static final Logger log = LoggerFactory.getLogger(ValiseController.class);
 
     @Autowired
     private IValiseService valiseService;
@@ -34,11 +38,16 @@ public class ValiseController {
     private ClientRepository clientRepository;
 
     @GetMapping("/list")
-    public String viewValises(Model model) {
+    public String listValises(Model model) {
         List<ValiseDTO> valises = valiseService.getAllValises();
+        log.info("Valises récupérées pour la vue : {}", valises);
+        for (ValiseDTO valise : valises) {
+            log.info("Mouvements pour la valise {} : {}", valise.getId(), valise.getMouvementList());
+        }
         model.addAttribute("valises", valises);
         return "valises/valises_list";
     }
+
 
     @GetMapping("/view/{id}")
     public String getValiseDetails(@PathVariable int id, Model model) {

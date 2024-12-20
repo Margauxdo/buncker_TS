@@ -2,7 +2,6 @@ package example.DTO;
 
 import lombok.*;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +31,12 @@ public class RetourSecuriteDTO {
     private String mouvementStatut;
     private Integer nombreClients;
 
+@Getter @Setter
+    private List<Integer> clientIds;
+
 
     @Getter
     @Setter
     private String mouvementStatutsString;
+
 }

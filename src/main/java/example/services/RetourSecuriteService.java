@@ -37,28 +37,33 @@ public class RetourSecuriteService implements IRetourSecuriteService {
     public RetourSecuriteDTO createRetourSecurite(RetourSecuriteDTO retourSecuriteDTO) {
         RetourSecurite retourSecurite = mapDtoToEntity(retourSecuriteDTO);
 
-        // Association avec un client
+        // Association du client
         if (retourSecuriteDTO.getClientId() != null) {
             Client client = clientRepository.findById(retourSecuriteDTO.getClientId())
                     .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + retourSecuriteDTO.getClientId()));
             retourSecurite.setClient(client);
+        } else {
+            throw new IllegalArgumentException("Le client est requis pour créer un Retour Sécurité.");
         }
 
-        // Association avec les mouvements
+        // Association des mouvements (si fournis)
         if (retourSecuriteDTO.getMouvementIds() != null) {
             List<Mouvement> mouvements = mouvementRepository.findAllById(retourSecuriteDTO.getMouvementIds());
             retourSecurite.setMouvements(mouvements);
+            mouvements.forEach(mouvement -> mouvement.setRetourSecurite(retourSecurite)); // Relation bidirectionnelle
         }
 
         // Sauvegarde de l'entité
         RetourSecurite savedRetourSecurite = retourSecuriteRepository.save(retourSecurite);
-
         return mapEntityToDto(savedRetourSecurite);
     }
+
+
 
     @Override
     @Transactional
     public RetourSecuriteDTO updateRetourSecurite(int id, RetourSecuriteDTO retourSecuriteDTO) {
+        // Récupérer l'entité existante
         RetourSecurite existingRetourSecurite = retourSecuriteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RetourSecurite introuvable avec l'ID : " + id));
 
@@ -77,13 +82,32 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
         // Mise à jour des mouvements
         if (retourSecuriteDTO.getMouvementIds() != null) {
-            List<Mouvement> mouvements = mouvementRepository.findAllById(retourSecuriteDTO.getMouvementIds());
-            existingRetourSecurite.setMouvements(mouvements);
+            // Récupérer les mouvements actuels associés au RetourSecurite
+            List<Mouvement> currentMouvements = existingRetourSecurite.getMouvements();
+            List<Mouvement> newMouvements = mouvementRepository.findAllById(retourSecuriteDTO.getMouvementIds());
+
+            // Supprimer les mouvements obsolètes
+            List<Mouvement> mouvementsToRemove = currentMouvements.stream()
+                    .filter(mouvement -> !newMouvements.contains(mouvement))
+                    .collect(Collectors.toList());
+            for (Mouvement mouvementToRemove : mouvementsToRemove) {
+                currentMouvements.remove(mouvementToRemove);
+                mouvementToRemove.setRetourSecurite(null); // Rompre la relation bidirectionnelle
+            }
+
+            // Ajouter les nouveaux mouvements qui ne sont pas encore associés
+            for (Mouvement mouvement : newMouvements) {
+                if (!currentMouvements.contains(mouvement)) {
+                    currentMouvements.add(mouvement);
+                    mouvement.setRetourSecurite(existingRetourSecurite); // Établir la relation bidirectionnelle
+                }
+            }
         }
 
-        // Sauvegarde de l'entité mise à jour
+        // Sauvegarder les modifications dans la base de données
         RetourSecurite updatedRetourSecurite = retourSecuriteRepository.save(existingRetourSecurite);
 
+        // Retourner l'entité mise à jour sous forme de DTO
         return mapEntityToDto(updatedRetourSecurite);
     }
 
@@ -97,9 +121,18 @@ public class RetourSecuriteService implements IRetourSecuriteService {
     @Override
     public RetourSecuriteDTO getRetourSecurite(int id) {
         RetourSecurite retourSecurite = retourSecuriteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("RetourSecurite introuvable avec l'ID : " + id));
-        return mapEntityToDto(retourSecurite);
+                .orElseThrow(() -> new EntityNotFoundException("Retour Sécurité introuvable avec l'ID : " + id));
+
+        return RetourSecuriteDTO.builder()
+                .id(retourSecurite.getId())
+                .numero(retourSecurite.getNumero())
+                .datesecurite(retourSecurite.getDatesecurite())
+                .cloture(retourSecurite.getCloture())
+                .dateCloture(retourSecurite.getDateCloture())
+                .clientNom(retourSecurite.getClient() != null ? retourSecurite.getClient().getName() : "Non spécifié")
+                .build();
     }
+
 
     @Override
     public List<RetourSecuriteDTO> getAllRetourSecurites() {
@@ -131,7 +164,7 @@ public class RetourSecuriteService implements IRetourSecuriteService {
                 .clientId(entity.getClient() != null ? entity.getClient().getId() : null)
                 .clientNom(entity.getClient() != null ? entity.getClient().getName() : null)
                 .mouvementIds(entity.getMouvements().stream().map(Mouvement::getId).toList())
-                .mouvementStatuts(entity.getMouvements().stream().map(Mouvement::getStatutSortie).toList()) // Here we populate mouvementStatuts
+                .mouvementStatuts(entity.getMouvements().stream().map(Mouvement::getStatutSortie).toList())
                 .build();
     }
 

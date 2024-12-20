@@ -41,6 +41,8 @@ public class RegleController {
     private JourFerieService jourFerieService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private RetourSecuriteService retourSecuriteService;
 
     public RegleController(RegleService regleService) {
         this.regleService = regleService;
@@ -57,22 +59,27 @@ public class RegleController {
     }
 
     @GetMapping("/view/{id}")
-    public String viewRegle(@PathVariable int id, Model model) {
-        RegleDTO regle = regleService.getRegleById(id);
-        model.addAttribute("regle", regle);
-        return "regles/regle_details";
+    public String viewRetourSecuriteById(@PathVariable int id, Model model) {
+        RetourSecuriteDTO retourSecurite = retourSecuriteService.getRetourSecurite(id);
+        model.addAttribute("retourSecurite", retourSecurite);
+
+        // Ajouter les mouvements au modèle
+        List<String> mouvements = retourSecurite.getMouvementStatuts();
+        model.addAttribute("mouvements", mouvements);
+
+        return "retourSecurites/RS_details";
     }
+
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("regle", new RegleDTO());
+        model.addAttribute("regleDTO", new RegleDTO());
+        model.addAttribute("valises", valiseService.getAllValises());
         model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
         model.addAttribute("formules", formuleService.getAllFormules());
-        model.addAttribute("joursFeries", jourFerieService.getJourFeries());
-        model.addAttribute("clients", clientService.getAllClients());
-        model.addAttribute("valises", valiseService.getAllValises()); // Ajout des valises
-        return "regles/regle_create";
+        return "regle_create";
     }
+
 
 
 

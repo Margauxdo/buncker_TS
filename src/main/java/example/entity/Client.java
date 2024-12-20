@@ -30,7 +30,11 @@ public class Client {
 
     @Column(nullable = false)
     @NotBlank(message = "Name is required")
+    @Getter@Setter
     private String name;
+
+
+
     private String adresse;
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is required")
@@ -90,6 +94,8 @@ public class Client {
     private Regle regle;
 
 
-
+    public Client(String name) {
+        this.name = name;
+    }
 
 }

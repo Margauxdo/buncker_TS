@@ -118,13 +118,13 @@
         </option>
     </select>
 
+
     <!-- Liste déroulante pour Client -->
-    <label for="clientId">Client :</label>
-    <select id="clientId" th:field="*{clientIds}" multiple required>
-        <option th:each="client : ${clients}"
-                th:value="${client.id}"
-                th:text="${client.name}"></option>
+    <label for="clientIds">Clients :</label>
+    <select id="clientIds" th:field="*{clientIds}" multiple>
+        <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name}"></option>
     </select>
+
 
 
 

@@ -118,7 +118,8 @@
     <label for="regles">Règles associées :</label>
     <select id="regles" th:field="*{regleSortieIds}">
         <option value="" th:text="'Sélectionner une regle'"></option>
-        <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.codeRegle}"></option>
+        <option th:each="regle : ${regles}" th:value="${regle.id}" th:text="${regle.coderegle}"></option>
+
     </select>
 
     <div style="margin-top: 20px;">

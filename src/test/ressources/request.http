@@ -309,7 +309,7 @@ numero=123&cloture=false&datesecurite=2024-10-10
 
 
 ### Afficher le formulaire modification une regle (GET - Thymeleaf)
-GET http://localhost:8080/retourSecurite/edit/7
+GET http://localhost:8080/retourSecurite/edit/14
 Accept: text/html
 
 ### Modifier un RS existant (POST - Thymeleaf)

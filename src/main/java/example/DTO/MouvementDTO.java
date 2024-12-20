@@ -35,6 +35,12 @@ public class MouvementDTO {
     private String description;
 
 
+    public MouvementDTO(Integer id, String statutSortie, Date dateHeureMouvement) {
+        this.id = id;
+        this.statutSortie = statutSortie;
+        this.dateHeureMouvement = dateHeureMouvement;
+    }
+
 }
 
 

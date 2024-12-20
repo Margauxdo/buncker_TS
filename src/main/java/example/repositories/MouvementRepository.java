@@ -19,4 +19,7 @@ public interface MouvementRepository extends JpaRepository<Mouvement, Integer> {
 
     List<Mouvement> findByValiseId(Integer valiseId);
 
+    List<Mouvement> findAllByRetourSecuriteId(int retourSecuriteId);
+
+
 }

@@ -44,7 +44,7 @@ public class Mouvement {
     private Livreur livreur;
 
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne//(cascade = CascadeType.ALL)
     @JoinColumn(name = "retour_securite_id", nullable = true)
     @JsonBackReference
     private RetourSecurite retourSecurite ;

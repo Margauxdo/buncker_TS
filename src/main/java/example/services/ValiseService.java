@@ -1,6 +1,7 @@
 package example.services;
 
 
+import example.DTO.MouvementDTO;
 import example.DTO.RegleDTO;
 import example.DTO.ValiseDTO;
 import example.entity.*;
@@ -15,10 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 @Service
 public class ValiseService implements IValiseService {
+
+    private static final Logger log = LoggerFactory.getLogger(ValiseService.class);
+
 
     @Autowired
     private ValiseRepository valiseRepository;
@@ -53,18 +60,29 @@ public class ValiseService implements IValiseService {
         // Vérification et ajout des mouvements (si présents)
         if (valiseDTO.getMouvementIds() != null) {
             List<Mouvement> mouvements = mouvementRepository.findAllById(valiseDTO.getMouvementIds());
-            valise.setMouvements(mouvements);  // Assurez-vous que la liste est initialisée
+            valise.setMouvements(mouvements); // Associe les mouvements à la valise
         } else {
-            valise.setMouvements(new ArrayList<>());  // Initialisation d'une liste vide si aucun mouvement n'est fourni
+            valise.setMouvements(new ArrayList<>()); // Initialise une liste vide si aucun mouvement n'est fourni
         }
+
 
         if (valiseDTO.getClientId() != null) {
             Client client = clientRepository.findById(valiseDTO.getClientId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Client not found with ID: " + valiseDTO.getClientId()));
-            valise.setClient(client);
+                    .orElseThrow(() -> new ResourceNotFoundException("Client introuvable avec l'ID : " + valiseDTO.getClientId()));
+            valise.setClient(client); // Associe correctement le client
         } else {
-            throw new ResourceNotFoundException("Client ID is required");
+            throw new ResourceNotFoundException("L'ID du client est requis");
         }
+
+        if (valiseDTO.getRegleSortieIds() != null && !valiseDTO.getRegleSortieIds().isEmpty()) {
+            Regle regle = regleRepository.findById(valiseDTO.getRegleSortieIds().get(0))
+                    .orElseThrow(() -> new ResourceNotFoundException("Règle introuvable avec l'ID : " + valiseDTO.getRegleSortieIds().get(0)));
+            valise.setReglesSortie(regle); // Associe la règle à la valise
+        } else {
+            valise.setReglesSortie(null); // Aucune règle associée
+        }
+
+
 
         // Sauvegarde de la valise
         Valise savedValise = valiseRepository.save(valise);
@@ -85,9 +103,8 @@ public class ValiseService implements IValiseService {
 
     }
 
-    @Transactional
-    @Override
     public ValiseDTO updateValise(int id, ValiseDTO valiseDTO) {
+        // Récupération de la valise existante
         Valise valise = valiseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Valise not found with ID: " + id));
 
@@ -109,23 +126,39 @@ public class ValiseService implements IValiseService {
             valise.setTypeValise(typeValise);
         }
 
-        // Mise à jour des mouvements
+        // Gestion des mouvements
         if (valiseDTO.getMouvementIds() != null) {
-            List<Mouvement> mouvements = mouvementRepository.findAllById(valiseDTO.getMouvementIds());
-            valise.setMouvements(mouvements);
+            if (valise.getMouvements() == null) {
+                valise.setMouvements(new ArrayList<>());
+            }
+
+            // Supprimez les anciens mouvements qui ne sont plus présents
+            valise.getMouvements().removeIf(mouvement -> !valiseDTO.getMouvementIds().contains(mouvement.getId()));
+
+            // Ajoutez les nouveaux mouvements
+            for (Integer mouvementId : valiseDTO.getMouvementIds()) {
+                if (valise.getMouvements().stream().noneMatch(m -> m.getId().equals(mouvementId))) {
+                    Mouvement mouvement = mouvementRepository.findById(mouvementId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Mouvement not found with ID: " + mouvementId));
+                    valise.getMouvements().add(mouvement);
+                }
+            }
         }
 
         // Mise à jour des règles de sortie
-        if (valiseDTO.getRegleSortieIds() != null) {
-            List<Regle> regles = regleRepository.findAllById(valiseDTO.getRegleSortieIds());
-            valise.setReglesSortie(regles.isEmpty() ? null : regles.get(0)); // Gérer une seule règle
+        if (valiseDTO.getRegleSortieIds() != null && !valiseDTO.getRegleSortieIds().isEmpty()) {
+            Regle regle = regleRepository.findById(valiseDTO.getRegleSortieIds().get(0))
+                    .orElseThrow(() -> new ResourceNotFoundException("Regle not found with ID: " + valiseDTO.getRegleSortieIds().get(0)));
+            valise.setReglesSortie(regle);
+        } else {
+            valise.setReglesSortie(null);
         }
 
         // Mise à jour du client
         if (valiseDTO.getClientId() != null) {
             Client client = clientRepository.findById(valiseDTO.getClientId())
                     .orElseThrow(() -> new ResourceNotFoundException("Client not found with ID: " + valiseDTO.getClientId()));
-            valise.setClient(client);  // Mise à jour de la référence du client
+            valise.setClient(client);
         } else {
             throw new ResourceNotFoundException("Client ID is required");
         }
@@ -135,6 +168,8 @@ public class ValiseService implements IValiseService {
 
         return mapToDTO(valise);
     }
+
+
 
     @Override
     public ValiseDTO getValiseById(Integer id) {
@@ -164,15 +199,62 @@ public class ValiseService implements IValiseService {
                 .build();
     }
 
-
-
-    @Override
     @Transactional
+    @Override
     public List<ValiseDTO> getAllValises() {
-        return valiseRepository.findAll().stream()
-                .map(this::mapToDTO)
+        List<Valise> valises = valiseRepository.findAll();
+
+        // Log des valises récupérées
+        valises.forEach(v -> {
+            log.info("Valise ID: {}, Mouvements: {}", v.getId(), v.getMouvements());
+        });
+
+        // Conversion des entités en DTOs
+        return valises.stream()
+                .map(v -> {
+                    log.info("Mapping valise: {}", v);
+                    ValiseDTO dto = mapToDTO(v);
+
+                    // Conversion des mouvements
+                    dto.setMouvementList(
+                            v.getMouvements()
+                                    .stream()
+                                    .map(mouvement -> {
+                                        log.info("Mapping mouvement: {}", mouvement);
+                                        return new MouvementDTO(
+                                                mouvement.getId(),
+                                                mouvement.getStatutSortie(),
+                                                mouvement.getDateHeureMouvement()
+                                        );
+                                    })
+                                    .toList()
+                    );
+
+                    // Conversion des règles
+                    dto.setReglesSortie(
+                            v.getReglesSortie() != null
+                                    ? List.of(new RegleDTO(
+                                    v.getReglesSortie().getId(),
+                                    v.getReglesSortie().getCoderegle()))
+                                    : null
+                    );
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
+
+
+
+    public ValiseDTO getValiseByIdWithMouvements(Integer id) {
+        Valise valise = valiseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Valise not found"));
+
+        log.info("Mouvements associés à la valise {} : {}", valise.getId(), valise.getMouvements());
+
+        return mapToDTO(valise);
+    }
+
 
     @Transactional
     @Override
@@ -189,24 +271,37 @@ public class ValiseService implements IValiseService {
                 .id(valise.getId())
                 .description(valise.getDescription())
                 .numeroValise(Integer.valueOf(valise.getNumeroValise()))
-                .refClient(valise.getRefClient())
+                .refClient(valise.getClient() != null ? valise.getClient().getName() : null)
                 .sortie(valise.getSortie())
                 .dateDernierMouvement(valise.getDateDernierMouvement())
                 .dateSortiePrevue(valise.getDateSortiePrevue())
                 .dateRetourPrevue(valise.getDateRetourPrevue())
                 .dateCreation(valise.getDateCreation())
                 .numeroDujeu(valise.getNumeroDujeu())
-                .typeValiseId(valise.getTypeValise() != null ? valise.getTypeValise().getId() : null)
-                .typeValiseDescription(valise.getTypeValise() != null ? valise.getTypeValise().getDescription() : null)
-                .mouvementIds(valise.getMouvements().stream().map(Mouvement::getId).toList())
-                .regleSortieIds(valise.getReglesSortie() != null ? List.of(valise.getReglesSortie().getId()) : null)
+                .mouvementList(
+                        valise.getMouvements().stream().map(mouvement -> {
+                            log.info("Mapping Mouvement ID: {}", mouvement.getId());
+                            return new MouvementDTO(
+                                    mouvement.getId(),
+                                    mouvement.getStatutSortie(),
+                                    mouvement.getDateHeureMouvement()
+                            );
+                        }).toList()
+                )
+                .reglesSortie(
+                        valise.getReglesSortie() != null
+                                ? List.of(new RegleDTO(
+                                valise.getReglesSortie().getId(),
+                                valise.getReglesSortie().getCoderegle()))
+                                : null
+                )
                 .build();
     }
 
     // Conversion ValiseDTO vers Valise
+
     private Valise mapToEntity(ValiseDTO valiseDTO) {
         Valise valise = Valise.builder()
-                .id(valiseDTO.getId())
                 .description(valiseDTO.getDescription())
                 .numeroValise(String.valueOf(valiseDTO.getNumeroValise()))
                 .refClient(valiseDTO.getRefClient())
@@ -218,12 +313,24 @@ public class ValiseService implements IValiseService {
                 .numeroDujeu(valiseDTO.getNumeroDujeu())
                 .build();
 
-        if (valiseDTO.getTypeValiseId() != null) {
-            TypeValise typeValise = typeValiseRepository.findById(valiseDTO.getTypeValiseId())
-                    .orElseThrow(() -> new ResourceNotFoundException("TypeValise not found"));
-            valise.setTypeValise(typeValise);
+        if (valiseDTO.getClientId() != null) {
+            Client client = clientRepository.findById(valiseDTO.getClientId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
+            valise.setClient(client);
         }
 
+        // Associer les mouvements
+        if (valiseDTO.getMouvementIds() != null) {
+            List<Mouvement> mouvements = mouvementRepository.findAllById(valiseDTO.getMouvementIds());
+            valise.setMouvements(mouvements);
+        }
+
+        // Logique similaire pour les règles, types de valise, etc.
         return valise;
+
     }
+
+
+
+
 }
