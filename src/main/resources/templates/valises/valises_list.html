@@ -93,15 +93,19 @@
         <td th:text="${valise.dateCreation != null ? valise.dateCreation : 'Non défini'}"></td>
         <td th:text="${valise.dateRetourPrevue != null ? valise.dateRetourPrevue : 'Non défini'}"></td>
         <td th:text="${valise.numeroDujeu}"></td>
-        <td th:text="${valise.typeValiseDescription}"></td>
+        <td th:text="${valise.typeValiseDescription != null ? valise.typeValiseDescription : 'Non défini'}"></td>
 
-        <td>
-            <ul>
-                <li th:each="mouvement : ${valise.mouvementList}">
-                    <span th:text="${mouvement.statutSortie}"></span>
-                </li>
-            </ul>
-        </td>
+
+        <<td>
+        <ul>
+            <li th:each="mouvement : ${valise.mouvementList}">
+                <span th:text="${mouvement.statutSortie}"></span> -
+                <span th:text="${#dates.format(mouvement.dateHeureMouvement, 'dd-MM-yyyy HH:mm')}"></span>
+            </li>
+        </ul>
+    </td>
+
+
 
 
 
