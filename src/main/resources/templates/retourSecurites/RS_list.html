@@ -102,11 +102,12 @@
             </form>
 
             <!-- Bouton pour Supprimer -->
-            <form th:action="@{/retourSecurite/delete/{id}(id=${retourSecurite.id})}" method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce retour sécurité ?');" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/>
-                <button type="submit" style="color: red;" aria-label="Supprimer le retour sécurité">Supprimer</button>
-            </form>
+            <!--<form th:action="@{/retourSecurite/delete/{id}(id=${retourSecurite.id})}" method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce retour sécurité ?');">
+
+                <button type="submit" style="color: red;">Supprimer</button>
+            </form>-->
+
         </td>
     </tr>
     </tbody>

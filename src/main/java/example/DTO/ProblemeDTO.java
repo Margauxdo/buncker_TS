@@ -27,6 +27,8 @@ public class ProblemeDTO {
 
     private List<Integer> clientIds;
     private List<String> clientNoms;
+    private Integer clientId;
+
 
     @NotBlank(message = "Le numéro de la valise est obligatoire.")
     private String numeroDeValise;

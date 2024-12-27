@@ -82,7 +82,7 @@ public class Client {
 
     @ToString.Exclude
     //@OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<RetourSecurite> retourSecurites ;
 

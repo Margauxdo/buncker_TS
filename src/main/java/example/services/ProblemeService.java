@@ -78,35 +78,41 @@ public class ProblemeService implements IProblemeService {
         return new ProblemeDTO(probleme);
     }
 
+
     @Override
+    @Transactional
     public ProblemeDTO updateProbleme(int id, ProblemeDTO problemeDTO) {
-        // Recherche de l'entité existante
         Probleme existingProbleme = problemeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Problème introuvable avec l'ID : " + id));
 
-        // Mise à jour des champs
+        // Mise à jour des champs simples
         existingProbleme.setDescriptionProbleme(problemeDTO.getDescriptionProbleme());
         existingProbleme.setDetailsProbleme(problemeDTO.getDetailsProbleme());
 
-        // Mise à jour de la valise associée
+        // Mise à jour de la valise
         if (problemeDTO.getValiseId() != null) {
             Valise valise = valiseRepository.findById(problemeDTO.getValiseId())
                     .orElseThrow(() -> new ResourceNotFoundException("Valise introuvable avec l'ID : " + problemeDTO.getValiseId()));
             existingProbleme.setValise(valise);
         }
 
-        // Mise à jour des clients associés
+        // Mise à jour des clients
         if (problemeDTO.getClientIds() != null) {
             List<Client> clients = clientRepository.findAllById(problemeDTO.getClientIds());
+            // Dissocier les anciens clients
+            existingProbleme.getClients().forEach(client -> client.setProbleme(null));
+            // Associer les nouveaux clients
+            clients.forEach(client -> client.setProbleme(existingProbleme));
             existingProbleme.setClients(clients);
         }
 
-        // Sauvegarde des modifications
+        // Sauvegarde de l'entité mise à jour
         Probleme updatedProbleme = problemeRepository.save(existingProbleme);
 
-        // Conversion Entité -> DTO
         return mapToDTO(updatedProbleme);
     }
+
+
 
     @Override
     public void deleteProbleme(int id) {

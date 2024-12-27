@@ -104,18 +104,20 @@
 
     <!-- Sélection de la valise associée -->
     <label for="valise">Valise</label>
-    <select id="valise" th:field="*{valise.id}">
+    <select id="valise" th:field="*{valiseId}">
         <option th:each="valise : ${valises}" th:value="${valise.id}"
                 th:text="${valise.description}"
-                th:selected="${probleme.valise != null and probleme.valise.id == valise.id}">Sélectionnez une valise</option>
+                th:selected="${probleme.valiseId == valise.id}">Sélectionnez une valise</option>
     </select>
 
     <!-- Sélection du client associé (optionnel) -->
-    <label for="client">Client</label>
-    <select id="client" th:field="*{client.id}">
+    <label for="clients">Clients</label>
+    <select id="clients" th:field="*{clientIds}" multiple>
         <option th:each="client : ${clients}" th:value="${client.id}"
                 th:text="${client.name}"
-                th:selected="${probleme.client != null and probleme.client.id == client.id}">Sélectionnez un client</option>
+                th:selected="${probleme.clientIds != null and probleme.clientIds.contains(client.id)}">
+            Sélectionnez un ou plusieurs clients
+        </option>
     </select>
 
     <div style="margin-top: 20px;">

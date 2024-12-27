@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 @Service
 public class RetourSecuriteService implements IRetourSecuriteService {
 
+    private static final Logger logger = LoggerFactory.getLogger(RetourSecuriteService.class);
+
+
     @Autowired
     private RetourSecuriteRepository retourSecuriteRepository;
 
@@ -113,10 +116,16 @@ public class RetourSecuriteService implements IRetourSecuriteService {
 
     @Override
     public void deleteRetourSecurite(int id) {
-        RetourSecurite retourSecurite = retourSecuriteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("RetourSecurite introuvable avec l'ID : " + id));
-        retourSecuriteRepository.delete(retourSecurite);
+        logger.info("Suppression du Retour Sécurité avec l'ID : {}", id);
+        if (!retourSecuriteRepository.existsById(id)){
+            logger.warn("Retour Sécurité introuvable avec l'ID : {}", id);
+            throw new EntityNotFoundException("Retour Sécurité introuvable avec l'ID : " + id);
+        }
+        retourSecuriteRepository.deleteById(id);
+        logger.info("Retour Sécurité supprimé avec succès");
     }
+
+
 
     @Override
     public RetourSecuriteDTO getRetourSecurite(int id) {

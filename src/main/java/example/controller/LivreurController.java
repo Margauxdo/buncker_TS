@@ -56,9 +56,6 @@ public class LivreurController {
     }
 
 
-
-
-
     @PostMapping("/create")
     public String createLivreur(@Valid @ModelAttribute("livreur") LivreurDTO livreurDTO,
                                 BindingResult result, Model model) {
@@ -112,9 +109,10 @@ public class LivreurController {
             livreurService.deleteLivreur(id);
             return "redirect:/livreurs/list";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Une erreur inattendue s'est produite lors de la suppression.");
+            model.addAttribute("errorMessage", "Erreur lors de la suppression du livreur : " + e.getMessage());
             return "livreurs/error";
         }
     }
+
 
 }

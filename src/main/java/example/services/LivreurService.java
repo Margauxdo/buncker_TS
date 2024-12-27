@@ -43,29 +43,35 @@ public class LivreurService implements ILivreurService {
         // Associer les mouvements
         if (livreurDTO.getMouvementIds() != null && !livreurDTO.getMouvementIds().isEmpty()) {
             List<Mouvement> mouvements = mouvementRepository.findAllById(livreurDTO.getMouvementIds());
-            livreur.setMouvements(mouvements); // Associer les mouvements
-            mouvements.forEach(m -> m.setLivreur(livreur)); // Mettre à jour la relation inverse
+
+            mouvements.forEach(m -> {
+                // Si le mouvement est déjà associé à un autre livreur, dissociez-le
+                if (m.getLivreur() != null) {
+                    logger.warn("Le mouvement ID {} est déjà associé au livreur ID {}. Dissociation en cours.", m.getId(), m.getLivreur().getId());
+                    m.setLivreur(null); // Dissocier le mouvement de son livreur actuel
+                }
+                m.setLivreur(livreur); // Associer le mouvement au nouveau livreur
+            });
+
+            livreur.setMouvements(mouvements);
+            mouvementRepository.saveAll(mouvements); // Sauvegarder les changements des mouvements
         }
 
         Livreur savedLivreur = livreurRepository.save(livreur);
+        logger.info("Nouveau livreur créé avec ID: {}", savedLivreur.getId());
         return mapToDTO(savedLivreur);
     }
-
-
 
 
     @Transactional
     public LivreurDTO updateLivreur(int id, LivreurDTO livreurDTO) {
         logger.info("Mise à jour du livreur avec ID: {}", id);
+
+        // Récupérer le livreur existant
         Livreur existingLivreur = livreurRepository.findById(id)
-                .orElseThrow(() -> {
-                    logger.error("Livreur introuvable avec ID: {}", id);
-                    return new EntityNotFoundException("Livreur introuvable avec l'ID : " + id);
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Livreur introuvable avec l'ID : " + id));
 
-        logger.info("Livreur existant trouvé: {}", existingLivreur);
-
-        // Mise à jour des champs
+        // Mise à jour des informations du livreur
         existingLivreur.setCodeLivreur(livreurDTO.getCodeLivreur());
         existingLivreur.setNomLivreur(livreurDTO.getNomLivreur());
         existingLivreur.setPrenomLivreur(livreurDTO.getPrenomLivreur());
@@ -75,20 +81,40 @@ public class LivreurService implements ILivreurService {
         existingLivreur.setTelephoneAlphapage(livreurDTO.getTelephoneAlphapage());
         existingLivreur.setDescription(livreurDTO.getDescription());
 
-        logger.info("Mise à jour des mouvements associés pour le livreur avec ID: {}", id);
-        if (livreurDTO.getMouvementIds() != null) {
-            var mouvements = mouvementRepository.findAllById(livreurDTO.getMouvementIds());
-            existingLivreur.getMouvements().clear();
-            existingLivreur.getMouvements().addAll(mouvements);
-            mouvements.forEach(m -> m.setLivreur(existingLivreur));
+        // Gestion des mouvements associés
+        if (livreurDTO.getMouvementIds() != null && !livreurDTO.getMouvementIds().isEmpty()) {
+            logger.info("Mise à jour des mouvements pour le livreur ID: {}", id);
 
-            logger.info("Mouvements associés mis à jour: {}", mouvements);
+            List<Mouvement> nouveauxMouvements = mouvementRepository.findAllById(livreurDTO.getMouvementIds());
+
+            // Vérifier que chaque mouvement n'est pas déjà associé à un autre livreur
+            for (Mouvement mouvement : nouveauxMouvements) {
+                if (mouvement.getLivreur() != null && !mouvement.getLivreur().equals(existingLivreur)) {
+                    throw new IllegalArgumentException(
+                            "Le mouvement ID " + mouvement.getId() + " est déjà associé au livreur ID " + mouvement.getLivreur().getId()
+                    );
+                }
+            }
+
+            // Supprimer les anciens mouvements
+            existingLivreur.getMouvements().forEach(m -> m.setLivreur(null));
+
+            // Associer les nouveaux mouvements
+            nouveauxMouvements.forEach(m -> m.setLivreur(existingLivreur));
+            existingLivreur.getMouvements().clear();
+            existingLivreur.getMouvements().addAll(nouveauxMouvements);
+        } else {
+            // Si aucun mouvement, dissocier tous les mouvements existants
+            existingLivreur.getMouvements().forEach(m -> m.setLivreur(null));
+            existingLivreur.getMouvements().clear();
         }
 
         Livreur updatedLivreur = livreurRepository.save(existingLivreur);
-        logger.info("Livreur mis à jour: {}", updatedLivreur);
-        return new LivreurDTO(updatedLivreur);
+        logger.info("Livreur mis à jour avec succès: {}", updatedLivreur);
+        return mapToDTO(updatedLivreur);
     }
+
+
     @Override
     public Livreur createLivreur(Livreur livreur) {
         return null;
@@ -102,11 +128,30 @@ public class LivreurService implements ILivreurService {
     @Override
     @Transactional
     public void deleteLivreur(int id) {
-        if (!livreurRepository.existsById(id)) {
-            throw new EntityNotFoundException("Livreur introuvable avec l'ID : " + id);
+        Livreur livreur = livreurRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Livreur introuvable avec l'ID : " + id));
+
+        // Dissocier et supprimer explicitement les mouvements associés
+        if (livreur.getMouvements() != null && !livreur.getMouvements().isEmpty()) {
+            for (Mouvement mouvement : livreur.getMouvements()) {
+                mouvement.setLivreur(null); // Dissocier
+            }
+            mouvementRepository.saveAll(livreur.getMouvements()); // Sauvegarder les changements
+            mouvementRepository.deleteAll(livreur.getMouvements()); // Supprimer
         }
-        livreurRepository.deleteById(id);
+
+        // Supprimer le livreur
+        livreurRepository.delete(livreur);
     }
+
+
+
+
+
+
+
+
+
 
     @Override
     @Transactional(readOnly = true)
