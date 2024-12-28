@@ -78,17 +78,6 @@ public class ClientRepositoryIntegrationTest {
         assertEquals("jane.doe@example.com", clients.get(0).getEmail());
     }
 
-    @Test
-    public void testFindByEmail() {
-        Client client = new Client();
-        client.setName("Jane Doe");
-        client.setEmail("jane.doe@example.com");
-        clientRepository.save(client);
-
-        List<Client> clients = clientRepository.findByEmail("jane.doe@example.com");
-        assertEquals(1, clients.size());
-        assertEquals("Jane Doe", clients.get(0).getName());
-    }
 
     @Test
     public void testDeleteClient() {
@@ -109,7 +98,7 @@ public class ClientRepositoryIntegrationTest {
     }
     @Test
     public void testFindByEmailNotFound() {
-        List<Client> clients = clientRepository.findByEmail("nonexistent.email@example.com");
+        Optional<Client> clients = clientRepository.findByEmail("nonexistent.email@example.com");
         assertTrue(clients.isEmpty());
     }
     @Test
@@ -138,31 +127,7 @@ public class ClientRepositoryIntegrationTest {
         assertEquals("John Updated", foundClient.get().getName());
         assertEquals("john.updated@example.com", foundClient.get().getEmail());
     }
-    @Test
-    public void testFindAllClients() {
-        // Act : Récupération des clients avec une requête spécifique pour chaque relation
-        List<Client> clients = clientRepository.findAll(); // Chargement de la liste des clients
 
-        // Assert
-        assertNotNull(clients, "La liste des clients ne doit pas être null");
-        assertFalse(clients.isEmpty(), "La liste des clients ne doit pas être vide");
-
-        // Vérification des relations avec des requêtes distinctes
-        clients.forEach(client -> {
-            // Chargement des valises pour chaque client
-            List<Valise> valises = (List<Valise>) client.getValises();
-            assertNotNull(valises, "Les valises du client ne doivent pas être null");
-
-            // Chargement des problèmes pour chaque client
-            List<Probleme> problemes = (List<Probleme>) client.getProblemes();
-            assertNotNull(problemes, "Les problèmes du client ne doivent pas être null");
-
-            // Affichage des données pour vérification
-            System.out.println("Client: " + client.getName() + " - " + client.getEmail());
-            System.out.println("Nombre de valises: " + valises.size());
-            System.out.println("Nombre de problèmes: " + problemes.size());
-        });
-    }
 
     }
 

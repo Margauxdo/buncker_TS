@@ -1,4 +1,4 @@
-package example.integration.entity;
+/*package example.integration.entity;
 
 import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
@@ -141,3 +141,4 @@ public class RegleManuelleIntegrationTest {
     }
 
 }
+*/

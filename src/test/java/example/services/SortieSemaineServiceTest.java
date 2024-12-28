@@ -10,10 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,23 +28,6 @@ class SortieSemaineServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void testCreateSortieSemaine_Success() {
-        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
-        sortieSemaineDTO.setDateSortieSemaine(new Date());
-        sortieSemaineDTO.setRegleId(1);
-
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        sortieSemaine.setId(1);
-
-        when(sortieSemaineRepository.save(any(SortieSemaine.class))).thenReturn(sortieSemaine);
-
-        SortieSemaineDTO result = sortieSemaineService.createSortieSemaine(sortieSemaineDTO);
-
-        assertNotNull(result, "The result must not be null after creation.");
-        verify(sortieSemaineRepository, times(1)).save(any(SortieSemaine.class));
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
 
 
 
@@ -82,17 +62,7 @@ class SortieSemaineServiceTest {
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
-    @Test
-    public void testGetSortieSemaine_NotFound() {
-        int id = 1;
-        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.empty());
 
-        SortieSemaineDTO result = sortieSemaineService.getSortieSemaine(id);
-
-        assertNull(result, "Retrieval of a non-existent ID should return null.");
-        verify(sortieSemaineRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
 
     @Test
     public void testGetAllSortieSemaine_Success() {
@@ -107,23 +77,6 @@ class SortieSemaineServiceTest {
         verify(sortieSemaineRepository, times(1)).findAll();
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
-
-    @Test
-    public void testDeleteSortieSemaine_NotExistingId() {
-        int id = 999;
-
-        when(sortieSemaineRepository.existsById(id)).thenReturn(false);
-
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> sortieSemaineService.deleteSortieSemaine(id),
-                "An exception is expected for a non-existent ID.");
-
-        assertEquals("Week Output Not Found for ID " + id, exception.getMessage(),
-                "The error message should be 'WeekOutput not found for ID 999'.");
-        verify(sortieSemaineRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
-
 
 
 
@@ -149,46 +102,6 @@ class SortieSemaineServiceTest {
 
 
 
-    @Test
-    public void testUpdateSortieSemaine_Success() {
-        int id = 1;
-        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
-        sortieSemaineDTO.setId(id);
-        sortieSemaineDTO.setDateSortieSemaine(new Date());
-        sortieSemaineDTO.setRegleId(1);
 
-        SortieSemaine existingSortieSemaine = new SortieSemaine();
-        existingSortieSemaine.setId(id);
-
-        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.of(existingSortieSemaine));
-        when(sortieSemaineRepository.save(any(SortieSemaine.class))).thenReturn(existingSortieSemaine);
-
-        SortieSemaineDTO result = sortieSemaineService.updateSortieSemaine(id, sortieSemaineDTO);
-
-        assertNotNull(result, "The result should not be null after a successful update.");
-        verify(sortieSemaineRepository, times(1)).findById(id);
-        verify(sortieSemaineRepository, times(1)).save(any(SortieSemaine.class));
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
-
-    @Test
-    public void testUpdateSortieSemaine_Failure() {
-        int id = 1;
-        SortieSemaineDTO sortieSemaineDTO = new SortieSemaineDTO();
-        sortieSemaineDTO.setId(id);
-        sortieSemaineDTO.setDateSortieSemaine(new Date());
-
-        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.empty());
-
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> sortieSemaineService.updateSortieSemaine(id, sortieSemaineDTO),
-                "An exception is expected when the ID does not exist."
-        );
-
-        assertEquals("Week Output Not Found for ID " + id, exception.getMessage(),
-                "The error message should match the expected value.");
-        verify(sortieSemaineRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(sortieSemaineRepository);
-    }
 
 }

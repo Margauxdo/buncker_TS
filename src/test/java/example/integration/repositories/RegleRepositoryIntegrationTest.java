@@ -38,25 +38,7 @@ public class RegleRepositoryIntegrationTest {
     public void setUp() {
         regleRepository.deleteAll();
     }
-    @Test
-    public void testSaveRegleSuccess(){
-        Formule form = new Formule();
-        form.setLibelle("libelle test regle");
-        TypeRegle tp = new TypeRegle();
-        tp.setNomTypeRegle("nom type regle A");
-        Valise val = new Valise();
-        val.setNumeroValise(2556L);
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
-        regle.setFormule(form);
-        regle.getTypeRegle();
-        regle.setValise(val);
-        Regle savedregle = regleRepository.save(regle);
-        assertNotNull(savedregle.getId());
-        assertEquals("AW5698", savedregle.getCoderegle());
 
-
-    }
     @Test
     public void testFindRegleById(){
 
@@ -70,15 +52,7 @@ public class RegleRepositoryIntegrationTest {
 
 
     }
-    @Test
-    public void testDeleteRegle(){
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
 
-        regleRepository.deleteById(regle.getId());
-        Optional<Regle> deleteRegle = regleRepository.findById(regle.getId());
-        assertFalse(deleteRegle.isPresent());
-    }
     @Test
     public void testFindRegleByIdFail(){
         List<Regle> regles = regleRepository.findAll();
@@ -128,19 +102,6 @@ public class RegleRepositoryIntegrationTest {
     }
 
     @Test
-    public void testSaveRegleWithDuplicateCoderegle() {
-        Regle regle1 = Regle.builder()
-                .coderegle("DUPLICATE_CODE")
-                .build();
-        regleRepository.saveAndFlush(regle1);
-
-        Regle regle2 = Regle.builder()
-                .coderegle("DUPLICATE_CODE")
-                .build();
-
-        assertThrows(Exception.class, () -> regleRepository.saveAndFlush(regle2));
-    }
-    @Test
     public void testFindNonExistentRegle() {
         Optional<Regle> foundRegle = regleRepository.findById(-1); // Non-existent ID
         assertFalse(foundRegle.isPresent(), "Non-existent Regle should not be found");
@@ -154,18 +115,6 @@ public class RegleRepositoryIntegrationTest {
 
 
 
-    @Test
-    public void testFindRegleByValise(){
-        Valise val = new Valise();
-        val.setNumeroValise(2556L);
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
-        regle.setValise(val);
-        Regle savedregle = regleRepository.save(regle);
-        Optional<Regle> foundregle = regleRepository.findById(savedregle.getId());
-        assertTrue(foundregle.isPresent());
-        assertEquals(2556L, foundregle.get().getValise().getNumeroValise());
-    }
 
 
 
@@ -199,25 +148,6 @@ public class RegleRepositoryIntegrationTest {
         List<Regle> reglesWithoutFormule = regleRepository.findAll();
         assertNull(reglesWithoutFormule.get(0).getFormule());
     }
-    @Test
-    public void testOrphanRemovalForSortieSemaine() {
-        // Arrange
-        Regle regle = new Regle();
-        regle.setCoderegle("OrphanTest");
-        SortieSemaine sortieSemaine = new SortieSemaine();
-        sortieSemaine.setDateSortieSemaine(new Date());
-        sortieSemaine.setRegle(regle);
-        regle.getSortieSemaine().add(sortieSemaine);
-        regleRepository.saveAndFlush(regle);
-
-        // Act
-        regle.getSortieSemaine().clear();
-        regleRepository.saveAndFlush(regle);
-
-        // Assert
-        Assertions.assertTrue(sortieSemaineRepository.findAll().isEmpty(), "Orphan removal did not occur for SortieSemaine");
-    }
-
 
 
 

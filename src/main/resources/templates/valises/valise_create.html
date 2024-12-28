@@ -100,12 +100,13 @@
 
     <!-- Relation avec TypeValise -->
     <label for="typeValise">Type de Valise:</label>
-    <select id="typeValise" th:field="*{typeValiseId}">
+    <select id="typeValise" th:field="*{typeValiseId}" required>
         <option th:each="typeValise : ${typeValises}"
                 th:value="${typeValise.id}"
                 th:text="${typeValise.description}">
         </option>
     </select>
+
 
 
 

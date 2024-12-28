@@ -81,9 +81,9 @@
         <th>Mémo de retour de sécurité 2</th>
         <th>Type de suivie</th>
         <th>Code Client</th>
-        <th>Valises</th>
-        <th>Problèmes</th>
-        <th>Retour Sécurité</th>
+        <th>ID Valises</th>
+        <th>ID Problèmes</th>
+        <th>ID Retour Sécurité</th>
         <th>Règle</th>
         <th>Actions</th>
     </tr>
@@ -108,9 +108,9 @@
         <td th:text="${client.memoRetourSecurite2}">Mémo Sécurité 2</td>
         <td th:text="${client.typeSuivie}">Type de suivi</td>
         <td th:text="${client.codeClient}">Code Client</td>
-        <td th:text="${client.numeroValise}">Liste des valises</td>
-        <td th:text="${client.problemeId}">Problème</td>
-        <td th:text="${client.numeroRetourSecurite}">Liste des retours sécurité</td>
+        <td th:text="${client.valiseIds}"ID des valises </td>
+        <td th:text="${client.problemeId}">ID Problème</td>
+        <td th:text="${client.retourSecuriteIds}">ID des retours sécurité</td>
 
         <td th:text="${client.regleId}">Règle</td>
 
@@ -127,9 +127,13 @@
 
             <!-- Bouton pour Supprimer -->
             <form th:action="@{/clients/delete/{id}(id=${client.id})}" method="post" style="display:inline;">
-                <input type="hidden" name="_method" value="delete"/> <!-- Pour DELETE RESTful -->
                 <button type="submit" style="color: red;" aria-label="Supprimer le client">Supprimer</button>
             </form>
+
+
+
+
+
         </td>
     </tr>
 

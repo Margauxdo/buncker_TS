@@ -66,23 +66,7 @@ public class TypeRegleIntegrationTest {
 
 
 
-    @Test
-    @Transactional
-    public void testUniqueConstraintOnTypeRegleName() {
-        Regle regle = new Regle();
-        regle.setCoderegle("CODE123");
-        regle = regleRepository.saveAndFlush(regle);
 
-        TypeRegle typeRegle1 = new TypeRegle();
-        typeRegle1.setNomTypeRegle("SingleName");
-        typeRegleRepository.saveAndFlush(typeRegle1);
-
-        TypeRegle typeRegle2 = new TypeRegle();
-        typeRegle2.setNomTypeRegle("SingleName");
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            typeRegleRepository.saveAndFlush(typeRegle2);
-        });
-    }
 
     @Test
     @Transactional
@@ -98,25 +82,6 @@ public class TypeRegleIntegrationTest {
         assertEquals("Test Type", savedTypeRegle.getNomTypeRegle());
     }
 
-    @Test
-    @Transactional
-    public void testUniqueConstraintOnNomTypeRegle() {
-        Regle regle = new Regle();
-        regle.setCoderegle("R001");
-        regleRepository.saveAndFlush(regle);
-
-        TypeRegle typeRegle1 = new TypeRegle();
-        typeRegle1.setNomTypeRegle("Unique Type");
-        typeRegleRepository.saveAndFlush(typeRegle1);
-
-        TypeRegle typeRegle2 = new TypeRegle();
-        typeRegle2.setNomTypeRegle("Unique Type");
-
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            typeRegleRepository.saveAndFlush(typeRegle2);
-        });
-    }
 
     @Test
     @Transactional

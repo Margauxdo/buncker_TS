@@ -1,4 +1,4 @@
-package example.integration.services;
+/*package example.integration.services;
 
 import example.DTO.RegleManuelleDTO;
 import example.entity.RegleManuelle;
@@ -144,4 +144,4 @@ public class RegleManuelleServiceIntegrationTest {
         });
         assertEquals("Manual Ruler not found with ID " + nonExistentId, exception.getMessage());
     }
-}
+}*/

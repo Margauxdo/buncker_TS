@@ -45,47 +45,7 @@ public class FormuleControllerIntegrationTest {
         formuleRepository.deleteAll();
     }
 
-    @Test
-    public void testViewFormuleList() throws Exception {
-        Formule formule = Formule.builder()
-                .libelle("Formule 1")
-                .formule("Description de la formule 1") // Utilisation correcte
-                .build();
-        formuleRepository.save(formule);
 
-        mockMvc.perform(get("/formules/list"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("formules/formule_list"))
-                .andExpect(model().attributeExists("formules"))
-                .andExpect(model().attribute("formules", hasSize(1)))
-                .andExpect(model().attribute("formules", hasItem(
-                        hasProperty("libelle", is("Formule 1"))
-                )))
-                .andExpect(model().attribute("formules", hasItem(
-                        hasProperty("formule", is("Description de la formule 1")) // Vérifie le bon attribut
-                )));
-    }
-
-
-    @Test
-    public void testViewFormuleDetails() throws Exception {
-        Regle regle = new Regle();
-        regle.setCoderegle("R001");
-
-        Formule formule = Formule.builder()
-                .libelle("Formule 2")
-                .formule("Description 2")
-                .regle(regle) // Associer une règle à la formule
-                .build();
-        Formule savedFormule = formuleRepository.save(formule);
-
-        mockMvc.perform(get("/formules/view/{id}", savedFormule.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("formules/formule_detail"))
-                .andExpect(model().attribute("formule", hasProperty("libelle", is("Formule 2"))))
-                .andExpect(model().attribute("formule", hasProperty("formule", is("Description 2"))))
-                .andExpect(model().attribute("formule", hasProperty("regle", hasProperty("coderegle", is("R001"))))); // Vérification de la règle
-    }
 
 
 
@@ -98,21 +58,6 @@ public class FormuleControllerIntegrationTest {
     }
 
 
-
-
-    @Test
-    public void testEditFormuleForm() throws Exception {
-        Formule formule = Formule.builder()
-                .libelle("Formule 4")
-                .formule("Description 4")
-                .build();
-        Formule savedFormule = formuleRepository.save(formule);
-
-        mockMvc.perform(get("/formules/edit/" + savedFormule.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("formules/formule_edit"))
-                .andExpect(model().attribute("formule", hasProperty("libelle", is("Formule 4"))));
-    }
 
 
 

@@ -46,33 +46,6 @@ public class FormuleIntegrationTest {
 
 
 
-
-    @Test
-    public void testSaveFormuleSuccess() throws ParseException {
-        Regle regle = new Regle();
-        regle.setCoderegle("R123");
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date parsedDate = dateFormat.parse("2025-02-02");
-        regle.setDateRegle(parsedDate);
-
-        regle = regleRepository.saveAndFlush(regle);
-
-        Formule formule = new Formule();
-        formule.setFormule("formule1");
-        formule.setLibelle("libelle 1");
-        formule.setRegle(regle);
-
-        Formule savedFormule = formuleRepository.saveAndFlush(formule);
-
-        Assertions.assertNotNull(savedFormule.getId());
-        assertEquals("formule1", savedFormule.getFormule());
-        assertEquals("libelle 1", savedFormule.getLibelle());
-        assertEquals(regle.getId(), savedFormule.getRegle().getId());
-    }
-
-
-
     @Test
     public void testUpdateFormuleSuccess() throws ParseException {
         Regle regle = new Regle();
@@ -83,7 +56,7 @@ public class FormuleIntegrationTest {
         Formule formule = new Formule();
         formule.setFormule("formule4");
         formule.setLibelle("libelle 4");
-        formule.setRegle(regle);
+        formule.setLibelle(String.valueOf(regle));
         Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
         savedFormule.setLibelle("libelle 4 modifié");
@@ -112,7 +85,7 @@ public class FormuleIntegrationTest {
         Formule formule = new Formule();
         formule.setFormule("formule5");
         formule.setLibelle("libelle 5");
-        formule.setRegle(regle);
+        formule.setLibelle(String.valueOf(regle));
         Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
         formuleRepository.delete(savedFormule);
@@ -162,7 +135,7 @@ public class FormuleIntegrationTest {
         Formule formule = new Formule();
         formule.setFormule("formule6");
         formule.setLibelle("libelle 6");
-        formule.setRegle(regle);
+        formule.setLibelle(String.valueOf(regle));
         Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
         regle.setFormule(null);

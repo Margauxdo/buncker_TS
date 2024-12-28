@@ -5,6 +5,7 @@ import example.entity.Formule;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.services.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,25 +60,27 @@ public class RegleController {
     }
 
     @GetMapping("/view/{id}")
-    public String viewRetourSecuriteById(@PathVariable int id, Model model) {
-        RetourSecuriteDTO retourSecurite = retourSecuriteService.getRetourSecurite(id);
-        model.addAttribute("retourSecurite", retourSecurite);
+    public String viewRegleById(@PathVariable int id, Model model) {
+        try {
+            RegleDTO regleDTO = regleService.getRegleById(id);
+            model.addAttribute("regle", regleDTO);
+            return "regles/regle_details";
+        }catch (EntityNotFoundException e){
+            model.addAttribute("errorMessage", "Regle avec l'ID " + id + "non trouvé");
+            return "regles/error";
+        }
 
-        // Ajouter les mouvements au modèle
-        List<String> mouvements = retourSecurite.getMouvementStatuts();
-        model.addAttribute("mouvements", mouvements);
-
-        return "retourSecurites/RS_details";
     }
 
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("regleDTO", new RegleDTO());
+        model.addAttribute("regle", new RegleDTO());
         model.addAttribute("valises", valiseService.getAllValises());
         model.addAttribute("typesRegle", typeRegleService.getTypeRegles());
         model.addAttribute("formules", formuleService.getAllFormules());
-        return "regle_create";
+        model.addAttribute("jourFeries", jourFerieService.getJourFeries());
+        return "regles/regle_create";
     }
 
 

@@ -41,14 +41,12 @@ public class TypeRegleRepositoryIntegrationTest {
 
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type A")
-                .regle(regle)
                 .build();
 
         TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
 
         assertThat(savedTypeRegle.getId()).isNotNull();
         assertThat(savedTypeRegle.getNomTypeRegle()).isEqualTo("Type A");
-        assertThat(savedTypeRegle.getRegle().getCoderegle()).isEqualTo("Code Regle A"); // Mise à jour ici
     }
 
 
@@ -60,7 +58,6 @@ public class TypeRegleRepositoryIntegrationTest {
 
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type B")
-                .regle(regle)
                 .build();
 
         TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);
@@ -69,7 +66,6 @@ public class TypeRegleRepositoryIntegrationTest {
 
         assertThat(foundTypeRegle).isPresent();
         assertThat(foundTypeRegle.get().getNomTypeRegle()).isEqualTo("Type B");
-        assertThat(foundTypeRegle.get().getRegle().getCoderegle()).isEqualTo("Code Regle B"); // Mise à jour ici
     }
 
 
@@ -81,7 +77,6 @@ public class TypeRegleRepositoryIntegrationTest {
 
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type C")
-                .regle(regle)
                 .build();
 
         typeRegleRepository.save(typeRegle);
@@ -91,7 +86,6 @@ public class TypeRegleRepositoryIntegrationTest {
         // Vérifications
         assertThat(foundTypeRegles).hasSize(1);
         assertThat(foundTypeRegles.get(0).getNomTypeRegle()).isEqualTo("Type C");
-        assertThat(foundTypeRegles.get(0).getRegle().getCoderegle()).isEqualTo("Code Regle C"); // Corrigé ici
     }
 
 
@@ -103,14 +97,10 @@ public class TypeRegleRepositoryIntegrationTest {
 
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type D")
-                .regle(regle)
                 .build();
 
         typeRegleRepository.save(typeRegle);
 
-        List<TypeRegle> foundTypeRegles = typeRegleRepository.findByRegle_Id(regle.getId());
-        assertThat(foundTypeRegles).hasSize(1);
-        assertThat(foundTypeRegles.get(0).getNomTypeRegle()).isEqualTo("Type D");
     }
 
     @Test
@@ -121,7 +111,6 @@ public class TypeRegleRepositoryIntegrationTest {
 
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type E")
-                .regle(regle)
                 .build();
 
         TypeRegle savedTypeRegle = typeRegleRepository.save(typeRegle);

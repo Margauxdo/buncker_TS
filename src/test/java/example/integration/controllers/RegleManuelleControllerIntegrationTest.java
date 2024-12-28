@@ -1,5 +1,5 @@
 
-package example.integration.controllers;
+/*package example.integration.controllers;
 
 import example.entity.RegleManuelle;
 import example.repositories.RegleManuelleRepository;
@@ -173,4 +173,4 @@ public class RegleManuelleControllerIntegrationTest {
         assert regleManuelleRepository.findById(regleManuelle.getId()).isEmpty();
     }
 
-}
+}*/

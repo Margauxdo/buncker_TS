@@ -213,7 +213,7 @@ GET http://localhost:8080/regles/list
 Accept: text/html
 
 ### Voir une regle par ID (GET - Thymeleaf)
-GET http://localhost:8080/regles/view/25
+GET http://localhost:8080/regles/view/51
 Accept: text/html
 
 
@@ -290,7 +290,7 @@ Accept: text/html
 
 
 ### Voir une RS par ID (GET - Thymeleaf)
-GET http://localhost:8080/retourSecurite/view/7
+GET http://localhost:8080/retourSecurite/view/51
 Accept: text/html
 
 

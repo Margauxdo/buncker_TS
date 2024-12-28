@@ -48,13 +48,13 @@ public class Valise {
 
     private String numeroDujeu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_valise_id" , nullable = false)
     @JsonIgnore
     @ToString.Exclude
     private TypeValise typeValise;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "client_id", nullable = false)
     @JsonBackReference
     private Client client;
@@ -64,8 +64,9 @@ public class Valise {
     @OneToMany(mappedBy = "valise", cascade = CascadeType.ALL, orphanRemoval = true)  // , fetch = FetchType.LAZY , orphanRemoval = true
     @JsonManagedReference
     @ToString.Exclude
-    private List<Mouvement> mouvements = new ArrayList<>();
+    private List<Mouvement> mouvements ;
 
+    @Setter
     @ManyToOne  // , fetch = FetchType.EAGER    , cascade = CascadeType.ALL,
     @JsonBackReference
     @JoinColumn(name = "regle_id")

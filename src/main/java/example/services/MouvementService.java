@@ -169,22 +169,20 @@ public class MouvementService implements IMouvementService {
     }
 
 
-    @Override
     @Transactional
     public void deleteMouvement(int id) {
-        // Trouver l'entité Mouvement à supprimer
         Mouvement mouvement = mouvementRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mouvement introuvable avec l'ID : " + id));
 
-        // Détacher la Valise associée
-        mouvement.setValise(null);  // Détache la Valise de l'entité Mouvement
+        // Dissociez le mouvement de la valise
+        if (mouvement.getValise() != null) {
+            mouvement.getValise().getMouvements().remove(mouvement);
+        }
 
-        // Vous pouvez également détacher d'autres relations si nécessaire
-        mouvement.setRetourSecurite(null); // Si retourSecurite est nullable et doit être supprimé
-
-        // Supprimer le Mouvement
         mouvementRepository.delete(mouvement);
+        System.out.println("Mouvement supprimé avec succès.");
     }
+
 
 
 
@@ -214,6 +212,7 @@ public class MouvementService implements IMouvementService {
                 .dateRetourPrevue(mouvement.getDateRetourPrevue())
                 .valiseId(mouvement.getValise() != null ? mouvement.getValise().getId() : null)
                 .valiseDescription(mouvement.getValise() != null ? mouvement.getValise().getDescription() : "Non spécifié")
+                .valiseNumeroValise(mouvement.getValise() != null ? mouvement.getValise().getNumeroValise() : "Non spécifié")
                 .livreurId(mouvement.getLivreur() != null ? mouvement.getLivreur().getId() : null)
                 .livreurNom(mouvement.getLivreur() != null ? mouvement.getLivreur().getNomLivreur() : "Non spécifié")
                 .retourSecuriteId(mouvement.getRetourSecurite() != null ? mouvement.getRetourSecurite().getId() : null)

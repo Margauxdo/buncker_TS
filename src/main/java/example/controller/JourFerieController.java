@@ -1,7 +1,6 @@
 package example.controller;
 
 import example.DTO.JourFerieDTO;
-import example.interfaces.IJourFerieService;
 import example.services.JourFerieService;
 import example.services.RegleService;
 import jakarta.validation.Valid;
@@ -13,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -28,7 +26,7 @@ public class JourFerieController {
     private RegleService regleService;
 
     @GetMapping("/list")
-    public String viewJFDateList(Model model) {
+    public String viewJFDateList( Model model) {
         List<JourFerieDTO> jourFeries = jourFerieService.getJourFeries();
         model.addAttribute("jourFeries", jourFeries);
         return "joursFeries/JF_list";

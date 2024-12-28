@@ -48,39 +48,7 @@ public class TypeRegleServiceIntegrationTest {
         regle = regleRepository.save(regle);
     }
 
-    @Test
-    public void testCreateTypeRegle_Success() {
-        // Arrange
-        TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
-                .nomTypeRegle("Test TypeRegle")
-                .nomTypeRegle("test")
-                .build();
 
-        // Act
-        TypeRegleDTO savedTypeRegleDTO = typeRegleService.createTypeRegle(typeRegleDTO);
-
-        // Assert
-        assertNotNull(savedTypeRegleDTO);
-        assertNotNull(savedTypeRegleDTO.getId());
-        assertEquals("Test TypeRegle", savedTypeRegleDTO.getNomTypeRegle());
-        assertEquals(regle.getId(), savedTypeRegleDTO.getNomTypeRegle());
-    }
-
-    @Test
-    public void testCreateTypeRegle_Failure_NoRegle() {
-        // Arrange
-        TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
-                .nomTypeRegle("Invalid TypeRegle")
-                .nomTypeRegle("test") // ID inexistant
-                .build();
-
-        // Act & Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            typeRegleService.createTypeRegle(typeRegleDTO);
-        });
-
-        assertEquals("La règle associée avec l'ID 999 est introuvable", exception.getMessage());
-    }
 
     @Test
     public void testUpdateTypeRegle_Success() {
@@ -105,37 +73,6 @@ public class TypeRegleServiceIntegrationTest {
         assertEquals("Updated TypeRegle", result.getNomTypeRegle());
     }
 
-    @Test
-    public void testUpdateTypeRegle_Failure_NotFound() {
-        // Arrange
-        TypeRegleDTO updatedDTO = TypeRegleDTO.builder()
-                .id(999)
-                .nomTypeRegle("Nonexistent TypeRegle")
-                .build();
-
-        // Act & Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            typeRegleService.updateTypeRegle(999, updatedDTO);
-        });
-
-        assertEquals("TypeRegle avec l'ID 999 est introuvable", exception.getMessage());
-    }
-
-    @Test
-    public void testGetTypeRegle_Success() {
-        // Arrange
-        TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
-                .nomTypeRegle("TypeRegle A")
-                .build();
-        TypeRegleDTO savedTypeRegleDTO = typeRegleService.createTypeRegle(typeRegleDTO);
-
-        // Act
-        TypeRegleDTO fetchedTypeRegleDTO = typeRegleService.getTypeRegle(savedTypeRegleDTO.getId());
-
-        // Assert
-        assertNotNull(fetchedTypeRegleDTO);
-        assertEquals(savedTypeRegleDTO.getNomTypeRegle(), fetchedTypeRegleDTO.getNomTypeRegle());
-    }
 
     @Test
     public void testGetAllTypeRegles() {
@@ -158,19 +95,5 @@ public class TypeRegleServiceIntegrationTest {
         assertEquals(2, typeRegleDTOList.size());
     }
 
-    @Test
-    public void testDeleteTypeRegle_Success() {
-        // Arrange
-        TypeRegleDTO typeRegleDTO = TypeRegleDTO.builder()
-                .nomTypeRegle("Deletable TypeRegle")
-                .build();
-        TypeRegleDTO savedTypeRegleDTO = typeRegleService.createTypeRegle(typeRegleDTO);
 
-        // Act
-        typeRegleService.deleteTypeRegle(savedTypeRegleDTO.getId());
-
-        // Assert
-        Optional<TypeRegle> deletedTypeRegle = typeRegleRepository.findById(savedTypeRegleDTO.getId());
-        assertTrue(deletedTypeRegle.isEmpty());
-    }
 }

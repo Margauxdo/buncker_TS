@@ -6,16 +6,22 @@ import example.interfaces.IClientService;
 import example.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
 @RequestMapping("/clients")
 public class ClientController {
+
+    private static final Logger log = LoggerFactory.getLogger(ClientController.class);
+
 
     private final ClientService clientService;
     private final ValiseService valiseService;
@@ -50,11 +56,12 @@ public class ClientController {
      */
     @GetMapping("/list")
     public String listClients(Model model) {
-        // Obtenir les clients en tant que DTO directement depuis le service
         List<ClientDTO> clients = clientService.getAllClients();
+        log.info("Liste des clients après suppression : {}", clients);
         model.addAttribute("clients", clients);
         return "clients/client_list";
     }
+
 
 
 
@@ -177,12 +184,22 @@ public class ClientController {
      */
     @PostMapping("/delete/{id}")
     public String deleteClient(@PathVariable int id, Model model) {
+        log.info("Requête reçue pour supprimer le client avec ID: {}", id);
         try {
             clientService.deleteClient(id);
+            log.info("Client supprimé avec succès.");
             return "redirect:/clients/list";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Erreur lors de la suppression du client : " + e.getMessage());
+            log.error("Erreur lors de la suppression du client: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Erreur lors de la suppression du client: " + e.getMessage());
             return "clients/error";
         }
     }
+
+
+
+
+
+
+
 }

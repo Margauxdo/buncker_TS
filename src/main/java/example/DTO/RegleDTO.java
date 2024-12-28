@@ -20,13 +20,16 @@ public class RegleDTO {
     private Date dateRegle;
     private Integer nombreJours;
     private Integer calculCalendaire = 1;
-    private Boolean fermeJS1;
-    private Boolean fermeJS2;
-    private Boolean fermeJS3;
-    private Boolean fermeJS4;
-    private Boolean fermeJS5;
-    private Boolean fermeJS6;
-    private Boolean fermeJS7;
+    private Boolean fermeJS1 = false;
+    private Boolean fermeJS2 = false;
+    private Boolean fermeJS3 = false;
+    private Boolean fermeJS4 = false;
+    private Boolean fermeJS5 = false;
+    private Boolean fermeJS6 = false;
+    private Boolean fermeJS7 = false;
+
+
+
     private String typeEntree;
     private Long nbjsmEntree;
 

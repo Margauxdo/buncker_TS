@@ -42,11 +42,9 @@ public class ClientService implements IClientService {
     }
 
     private ClientDTO convertToDTO(Client client) {
-        System.out.println("Client ID: " + client.getId());
-        System.out.println("Valises: " + client.getValises());
-        System.out.println("RetourSecurites: " + client.getRetourSecurites());
-       // Hibernate.initialize(client.getValises()); // Charge explicitement les valises
-        //Hibernate.initialize(client.getRetourSecurites()); // Charge explicitement les retours sécurité
+        // Forcer le chargement des relations
+        client.getValises().size(); // Force le chargement des valises
+        client.getRetourSecurites().size(); // Force le chargement des retours sécurité
 
         return ClientDTO.builder()
                 .id(client.getId())
@@ -69,14 +67,10 @@ public class ClientService implements IClientService {
                 .typeSuivie(client.getTypeSuivie())
                 .codeClient(client.getCodeClient())
                 .problemeId(client.getProbleme() != null ? client.getProbleme().getId() : null)
-                .retourSecuriteIds(client.getRetourSecurites() != null ?
-                        client.getRetourSecurites().stream().map(RetourSecurite::getId).collect(Collectors.toList()) : new ArrayList<>())
-                .valiseIds(client.getValises() != null ?
-                        client.getValises().stream().map(Valise::getId).collect(Collectors.toList()) : new ArrayList<>())
-                .numeroRetourSecurite(client.getRetourSecurites() != null ?
-                        client.getRetourSecurites().stream().map(RetourSecurite::getNumero).collect(Collectors.toList()) : new ArrayList<>())
-                .numeroValise(client.getValises() != null ?
-                        client.getValises().stream().map(Valise::getNumeroValise).collect(Collectors.toList()) : new ArrayList<>())
+                .valiseIds(client.getValises().stream().map(Valise::getId).toList())
+                .retourSecuriteIds(client.getRetourSecurites().stream().map(RetourSecurite::getId).toList())
+                .numeroRetourSecurite(client.getRetourSecurites().stream().map(RetourSecurite::getNumero).toList())
+                .numeroValise(client.getValises().stream().map(Valise::getNumeroValise).toList())
                 .build();
     }
 
@@ -123,6 +117,7 @@ public class ClientService implements IClientService {
             client.setValises(new ArrayList<>()); // Initialisation par défaut
         }
 
+
         // Gestion des retours sécurité
         if (clientDTO.getRetourSecuriteIds() != null && !clientDTO.getRetourSecuriteIds().isEmpty()) {
             List<RetourSecurite> retourSecurites = retourSecuriteRepository.findAllById(clientDTO.getRetourSecuriteIds());
@@ -147,16 +142,20 @@ public class ClientService implements IClientService {
 
 
 
-    @Override
     @Transactional
     public ClientDTO createClient(ClientDTO clientDTO) {
+        System.out.println("Valise IDs: " + clientDTO.getValiseIds());
+        System.out.println("Retour Securite IDs: " + clientDTO.getRetourSecuriteIds());
+
         if (clientRepository.existsByEmail(clientDTO.getEmail())) {
             throw new IllegalArgumentException("Un client avec cet email existe déjà : " + clientDTO.getEmail());
         }
+
         Client client = convertToEntity(clientDTO);
         Client savedClient = clientRepository.save(client);
         return convertToDTO(savedClient);
     }
+
 
 
     @Transactional
@@ -229,44 +228,38 @@ public class ClientService implements IClientService {
 
 
 
-    @Override
     @Transactional
     public void deleteClient(int id) {
+        log.info("Début de la suppression du client avec ID: {}", id);
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID: " + id));
+
+        // Vérifiez les valises associées
+        if (client.getValises() != null && !client.getValises().isEmpty()) {
+            log.info("Suppression des valises associées au client ID: {}", id);
+            client.getValises().forEach(valise -> log.info("Suppression de la valise: {}", valise.getId()));
+            client.getValises().clear(); // Dissocie les valises
+        }
+
+        clientRepository.delete(client);
+        log.info("Client supprimé avec succès.");
+    }
+
+
+
+
+    @Transactional
+    public ClientDTO getClientById(int id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
 
-        // Supprimer les mouvements associés à chaque valise
-        if (client.getValises() != null) {
-            client.getValises().forEach(valise -> {
-                if (valise.getMouvements() != null) {
-                    mouvementRepository.deleteAll(valise.getMouvements());
-                }
-            });
-        }
-
-        // Supprimer toutes les valises associées
-        if (client.getValises() != null) {
-            valiseRepository.deleteAll(client.getValises());
-        }
-
-        // Supprimer tous les retours sécurité associés
-        if (client.getRetourSecurites() != null) {
-            retourSecuriteRepository.deleteAll(client.getRetourSecurites());
-        }
-
-        // Supprimer le client
-        clientRepository.delete(client);
-    }
-
-
-
-    public ClientDTO getClientById(int id) {
-        // Utilisation d'une requête JOIN FETCH pour charger aussi les retours de sécurité
-        Client client = clientRepository.findByIdWithRetourSecurites(id)
-                .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
+        // Forcer le chargement des relations
+        client.getValises().size();
+        client.getRetourSecurites().size();
 
         return convertToDTO(client);
     }
+
 
     @Transactional
     public ClientDTO getClientById(Integer id) {
@@ -287,27 +280,13 @@ public class ClientService implements IClientService {
     public List<ClientDTO> getAllClients() {
         List<Client> clients = clientRepository.findAll();
 
+        // Forcer le chargement des relations pour chaque client
         clients.forEach(client -> {
-            String retourSecuriteNumeros = client.getRetourSecurites() != null
-                    ? client.getRetourSecurites().stream()
-                    .map(RetourSecurite::getNumero) // Extraire les numéros
-                    .map(String::valueOf)           // Convertir en String
-                    .collect(Collectors.joining(", ")) // Joindre en une chaîne
-                    : "Non défini";
-
-            String valiseNumeros = client.getValises() != null
-                    ? client.getValises().stream()
-                    .map(Valise::getNumeroValise)  // Extraire les numéros de valise
-                    .collect(Collectors.joining(", ")) // Joindre en une chaîne
-                    : "Non défini";
-
-            log.info("Client ID: {}, RetourSecurite: {}, Valises: {}",
-                    client.getId(),
-                    retourSecuriteNumeros,
-                    valiseNumeros);
+            client.getValises().size();
+            client.getRetourSecurites().size();
         });
 
-        return clients.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return clients.stream().map(this::convertToDTO).toList();
     }
 
 

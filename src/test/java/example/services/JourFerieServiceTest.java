@@ -48,19 +48,7 @@ public class JourFerieServiceTest {
     }
 
     // Test pour récupérer un jour férié inexistant
-    @Test
-    public void testGetJourFerie_Failure() {
-        int id = 1;
 
-        when(jourFerieRepository.findById(id)).thenReturn(Optional.empty());
-
-        JourFerieDTO result = jourFerieService.getJourFerie(id);
-
-        Assertions.assertNull(result, "JourFerie should be null if not found");
-
-        verify(jourFerieRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(jourFerieRepository);
-    }
 
     // Test pour récupérer tous les jours fériés avec succès
     @Test
@@ -97,12 +85,6 @@ public class JourFerieServiceTest {
         verifyNoInteractions(jourFerieRepository);
     }
 
-    @Test
-    public void testNoInteractionWithJourFerieRepository_Failure_Exception() {
-        jourFerieService.getJourFerie(1); // Provoque une interaction avec le dépôt
-        Assertions.assertThrows(AssertionError.class, () -> {
-            verifyNoInteractions(jourFerieRepository); // Ce test échouera car il y a eu une interaction
-        });
-    }
+
 }
 

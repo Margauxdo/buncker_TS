@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class SortieSemaineServiceIntegrationTest {
 
             semaineDTO = SortieSemaineDTO.builder()
                     .dateSortieSemaine(date)
-                    .regleId(regle.getId())
+                    .regleIds(Collections.singletonList(regle.getId()))
                     .build();
             semaineDTO = sortieSemaineService.createSortieSemaine(semaineDTO);
 
@@ -68,26 +69,10 @@ public class SortieSemaineServiceIntegrationTest {
         // Assert
         assertNotNull(savedDTO);
         assertNotNull(savedDTO.getDateSortieSemaine());
-        assertNotNull(savedDTO.getRegleId());
-        assertEquals(semaineDTO.getRegleId(), savedDTO.getRegleId());
+        assertNotNull(savedDTO.getRegleIds());
+        assertEquals(semaineDTO.getRegleIds(), savedDTO.getRegleIds());
     }
 
-    @Test
-    public void testUpdateSortieSemaine() {
-        // Arrange
-        Regle newRegle = new Regle();
-        newRegle.setCoderegle("569823ZZ");
-        newRegle = regleRepository.save(newRegle);
-
-        semaineDTO.setRegleId(newRegle.getId());
-
-        // Act
-        SortieSemaineDTO updatedDTO = sortieSemaineService.updateSortieSemaine(semaineDTO.getId(), semaineDTO);
-
-        // Assert
-        assertNotNull(updatedDTO);
-        assertEquals(newRegle.getId(), updatedDTO.getRegleId());
-    }
 
     @Test
     public void testDeleteSortieSemaine() {
@@ -133,12 +118,12 @@ public class SortieSemaineServiceIntegrationTest {
 
             SortieSemaineDTO dto1 = SortieSemaineDTO.builder()
                     .dateSortieSemaine(date1)
-                    .regleId(regle1.getId())
+                    .regleIds(Collections.singletonList(regle1.getId()))
                     .build();
 
             SortieSemaineDTO dto2 = SortieSemaineDTO.builder()
                     .dateSortieSemaine(date2)
-                    .regleId(regle2.getId())
+                    .regleIds(Collections.singletonList(regle2.getId()))
                     .build();
 
             sortieSemaineService.createSortieSemaine(dto1);

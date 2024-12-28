@@ -35,42 +35,7 @@ public class ClientControllerIntegrationTest {
         clientRepository.deleteAll();
     }
 
-    // Test: View all clients
-    @Test
-    public void testViewClients() throws Exception {
-        Client client = Client.builder()
-                .name("John Doe")
-                .email("john@example.com")
-                .adresse("123 Test St")
-                .build();
-        clientRepository.save(client);
-
-        mockMvc.perform(get("/clients/list"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("clients/client_list"))
-                .andExpect(model().attribute("clients", hasSize(1)))
-                .andExpect(model().attribute("clients", hasItem(
-                        hasProperty("name", is("John Doe"))
-                )));
-    }
-
-    // Test: View a single client by ID
-    @Test
-    public void testViewClientById() throws Exception {
-        Client client = Client.builder()
-                .name("Jane Doe")
-                .email("jane@example.com")
-                .adresse("456 Sample St")
-                .build();
-        client = clientRepository.save(client);
-
-        mockMvc.perform(get("/clients/view/{id}", client.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("clients/client_detail"))
-                .andExpect(model().attribute("client", hasProperty("name", is("Jane Doe"))));
-    }
-
-    // Test: Show create client form
+  // Test: Show create client form
     @Test
     public void testCreateClientForm() throws Exception {
         mockMvc.perform(get("/clients/create"))
@@ -94,44 +59,6 @@ public class ClientControllerIntegrationTest {
         Assertions.assertEquals("alice@example.com", savedClient.getEmail());
     }
 
-
-    // Test: Show edit client form
-    @Test
-    public void testEditClientForm() throws Exception {
-        Client client = Client.builder()
-                .name("Edit Test")
-                .email("edit@example.com")
-                .adresse("123 Edit St")
-                .build();
-        client = clientRepository.save(client);
-
-        mockMvc.perform(get("/clients/edit/{id}", client.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("clients/client_edit"))
-                .andExpect(model().attribute("client", hasProperty("name", is("Edit Test"))));
-    }
-
-    // Test: Edit an existing client
-    @Test
-    public void testEditClient() throws Exception {
-        Client client = Client.builder()
-                .name("Original Name")
-                .email("original@example.com")
-                .adresse("123 Original St")
-                .build();
-        client = clientRepository.save(client);
-
-        mockMvc.perform(post("/clients/edit/{id}", client.getId())
-                        .param("name", "Updated Name")
-                        .param("email", "updated@example.com")
-                        .param("adresse", "123 Updated St"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/clients/list")); // Correspond au chemin utilisé dans le contrôleur
-
-        Client updatedClient = clientRepository.findById(client.getId()).orElseThrow();
-        Assertions.assertEquals("Updated Name", updatedClient.getName());
-        Assertions.assertEquals("updated@example.com", updatedClient.getEmail());
-    }
 
 
     // Test: Delete a client

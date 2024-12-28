@@ -81,6 +81,14 @@ public class ValiseService implements IValiseService {
         } else {
             valise.setReglesSortie(null); // Aucune règle associée
         }
+        if (valiseDTO.getTypeValiseId() != null) {
+            TypeValise typeValise = typeValiseRepository.findById(valiseDTO.getTypeValiseId())
+                    .orElseThrow(() -> new ResourceNotFoundException("TypeValise introuvable avec ID : " + valiseDTO.getTypeValiseId()));
+            valise.setTypeValise(typeValise); // Associe correctement le TypeValise
+        } else {
+            throw new IllegalArgumentException("Le type de valise est requis");
+        }
+
 
 
 
@@ -180,6 +188,15 @@ public class ValiseService implements IValiseService {
         ValiseDTO valiseDTO = new ValiseDTO();
         valiseDTO.setId(valise.getId());
         valiseDTO.setDescription(valise.getDescription());
+        valiseDTO.setNumeroValise(Integer.valueOf(valise.getNumeroValise()));
+        valiseDTO.setRefClient(valise.getRefClient());
+        valiseDTO.setSortie(valise.getSortie());
+        valiseDTO.setDateDernierMouvement(valise.getDateDernierMouvement());
+        valiseDTO.setDateSortiePrevue(valise.getDateSortiePrevue());
+        valiseDTO.setDateRetourPrevue(valise.getDateRetourPrevue());
+        valiseDTO.setDateCreation(valise.getDateCreation());
+        valiseDTO.setNumeroDujeu(valise.getNumeroDujeu());
+        valise.setTypeValise(valise.getTypeValise());
         valiseDTO.setMouvementList(mouvementService.getMouvementsByValiseId(valise.getId()));
 
         // Si valise a une seule règle de sortie (pas une liste)
@@ -187,6 +204,10 @@ public class ValiseService implements IValiseService {
             RegleDTO regleSortieDTO = convertRegleToDTO(valise.getReglesSortie());
             valiseDTO.setReglesSortie(List.of(regleSortieDTO));  // Encapsuler dans une liste
         }
+        if (valise.getClient() != null) {
+            valise.getClient().getName(); // This initializes the lazy-loaded client
+        }
+
 
         return valiseDTO;
     }
@@ -271,7 +292,8 @@ public class ValiseService implements IValiseService {
                 .id(valise.getId())
                 .description(valise.getDescription())
                 .numeroValise(Integer.valueOf(valise.getNumeroValise()))
-                .refClient(valise.getClient() != null ? valise.getClient().getName() : null)
+                .refClient(valise.getClient() != null ? valise.getClient().getName() : "Non défini")
+                .sortie(valise.getSortie())
                 .sortie(valise.getSortie())
                 .dateDernierMouvement(valise.getDateDernierMouvement())
                 .dateSortiePrevue(valise.getDateSortiePrevue())

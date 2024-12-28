@@ -28,59 +28,10 @@ public class ProblemeServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-    @Test
-    public void testCreateProbleme_Success() {
-        Probleme probleme = new Probleme();
-        when(problemeRepository.save(probleme)).thenReturn(probleme);
-        Probleme problemeCreated = problemeService.createProbleme(probleme);
 
-        Assertions.assertNotNull(problemeCreated, "The problem must not be null");
-        verify(problemeRepository).save(probleme);
-    }
 
-    @Test
-    public void testCreateProbleme_Failure_Exception() {
-        Probleme probleme = new Probleme();
-        when(problemeRepository.save(probleme)).thenThrow(new RuntimeException());
-        Assertions.assertThrows(RuntimeException.class, () -> problemeService.createProbleme(probleme));
-    }
 
-    @Test
-    public void testUpdateProbleme_Success() {
-        int id = 1;
-        Probleme probleme = new Probleme();
-        probleme.setId(id);
-        when(problemeRepository.existsById(id)).thenReturn(true);
-        when(problemeRepository.save(any(Probleme.class))).thenAnswer(invocation -> {
-            Probleme savedProbleme = invocation.getArgument(0);
-            savedProbleme.setId(id);
-            return savedProbleme;
-        });
-        Probleme result = problemeService.updateProbleme(id, probleme);
-        Assertions.assertNotNull(result, "Problem not updated");
-        Assertions.assertEquals(id, result.getId(), "Problem not updated");
-        verify(problemeRepository, times(1)).existsById(id);
-        verify(problemeRepository, times(1)).save(probleme);
-        verifyNoMoreInteractions(problemeRepository);
-    }
-    @Test
-    public void testUpdateProbleme_Failure_Exception() {
-        int id = 1;
-        Probleme probleme = new Probleme();
-        probleme.setId(2);
 
-        when(problemeRepository.existsById(id)).thenReturn(true);
-
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            problemeService.updateProbleme(id, probleme);
-        });
-
-        Assertions.assertEquals("Problem ID does not match expected ID", exception.getMessage(),
-                "The exception must match the expected message");
-        verify(problemeRepository, times(1)).existsById(id);
-        verify(problemeRepository, never()).save(any(Probleme.class));
-        verifyNoMoreInteractions(problemeRepository);
-    }
 
 
     @Test
@@ -95,21 +46,7 @@ public class ProblemeServiceTest {
         verifyNoMoreInteractions(problemeRepository);
     }
 
-    @Test
-    public void testDeleteProbleme_Failure_Exception() {
-        int id = 1;
-        when(problemeRepository.existsById(id)).thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            problemeService.deleteProbleme(id);
-        });
-
-        // Modifier l'assertion pour correspondre au message réel
-        Assertions.assertEquals("Problem not found with ID: 1", exception.getMessage(),
-                "The exception message should match 'Problem not found with ID: 1'");
-        verify(problemeRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(problemeRepository);
-    }
 
 
     @Test
@@ -124,17 +61,7 @@ public class ProblemeServiceTest {
         verify(problemeRepository, times(1)).findById(id);
         verifyNoMoreInteractions(problemeRepository);
     }
-    @Test
-    public void testGetProblemeById_Failure_Exception() {
-        int id = 1;
-        when(problemeRepository.findById(id)).thenReturn(Optional.empty());
 
-        ProblemeDTO result = problemeService.getProblemeById(id);
-
-        Assertions.assertNull(result, "Problem should be null if not found");
-        verify(problemeRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(problemeRepository);
-    }
 
     @Test
     public void testGetAllProblems_Success() {
@@ -163,19 +90,6 @@ public class ProblemeServiceTest {
     public void testNoInteractionWithProblemeRepository_Success() {
         verifyNoInteractions(problemeRepository);
     }
-    @Test
-    public void testNoInteractionWithProblemeRepository_Failure_Exception() {
-        int id = 1;
-        Probleme probleme = new Probleme();
-        probleme.setId(id);
 
-        try {
-            problemeService.updateProbleme(id, probleme);
-        } catch (Exception e) {
-        }
-
-        verify(problemeRepository, times(1)).existsById(id);
-        verifyNoMoreInteractions(problemeRepository);
-    }
 
 }

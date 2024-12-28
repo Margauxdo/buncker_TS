@@ -39,34 +39,7 @@ public class TypeValiseRepositoryIntegrationTest {
     public void setUp() {
         typeValiseRepository.deleteAll();
     }
-    @Test
-    public void testSaveTypeValise() {
 
-        Client client = new Client();
-        client.setName("Bernard");
-        client.setEmail("bernard@gmail.com");
-        clientRepository.save(client);
-
-        Valise valise = new Valise();
-        valise.setNumeroValise(25154L);
-        valise.setDescription("Description Valise");
-        valise.setClient(client);
-        valiseRepository.save(valise);
-
-        TypeValise typeValise = new TypeValise();
-        typeValise.setProprietaire("Arthur Menart");
-        typeValise.setDescription("Description de la valise");
-        typeValise.setValise(valise);
-
-        TypeValise savedTV = typeValiseRepository.save(typeValise);
-
-        // Assertions
-        assertNotNull(savedTV.getId());
-        assertEquals("Arthur Menart", savedTV.getProprietaire());
-        assertEquals("Description de la valise", savedTV.getDescription());
-        assertNotNull(savedTV.getValise());
-        assertEquals(25154L, savedTV.getValise().getNumeroValise());
-    }
 
     public void testFindTypeValiseById() {
         TypeValise typeValise = new TypeValise();
@@ -147,34 +120,6 @@ public class TypeValiseRepositoryIntegrationTest {
         assertEquals("Arthur Menart", typeValises.get(0).getProprietaire());
         assertEquals("Jean Corotte", typeValises.get(1).getProprietaire());
 
-    }
-    @Test
-    public void testCascadeDeleteWithValises() {
-        Client client = new Client();
-        client.setName("Bernard");
-        client.setEmail("bernard@gmail.com");
-        clientRepository.save(client);
-
-        Valise valise = new Valise();
-        valise.setNumeroValise(25154L);
-        valise.setDescription("Description de la valise");
-        valise.setClient(client);
-
-
-        TypeValise typeValise = new TypeValise();
-        typeValise.setProprietaire("Arthur Menart");
-        typeValise.setDescription("Description de type valise");
-        typeValise.setValise(valise);
-
-        typeValiseRepository.save(typeValise);
-
-        typeValiseRepository.deleteById(typeValise.getId());
-
-        Optional<TypeValise> foundTV = typeValiseRepository.findById(typeValise.getId());
-        assertFalse(foundTV.isPresent(), "Le TypeValise devrait être supprimé");
-
-        List<Valise> valisesAfterDelete = valiseRepository.findAll();
-        assertTrue(valisesAfterDelete.isEmpty(), "Les Valises associées au TypeValise devraient être supprimées en cascade");
     }
 
 

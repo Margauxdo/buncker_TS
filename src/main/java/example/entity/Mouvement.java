@@ -32,7 +32,7 @@ public class Mouvement {
     private Date dateRetourPrevue;
 
     @ToString.Exclude
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne//(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "valise_id", nullable = true)
     @JsonBackReference
     private Valise valise;

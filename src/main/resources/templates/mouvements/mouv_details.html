@@ -72,6 +72,9 @@
 
 <div class="container">
     <p><strong>ID :</strong> <span th:text="${mouvement.id}"></span></p>
+    <p><strong>Description de la Valise :</strong>
+        <span th:text="${mouvement.valiseDescription != null ? mouvement.valiseDescription : 'Non disponible'}"></span>
+    </p>
     <p><strong>Numéro de Valise :</strong>
         <span th:text="${mouvement.valiseNumeroValise != null ? mouvement.valiseNumeroValise : 'Non disponible'}"></span>
     </p>
@@ -94,12 +97,11 @@
     </p>
 
 
-    <p><strong>Retours Sécurité Associés :</strong></p>
-    <ul>
-        <li>
-            <span th:text="${mouvement.retourSecuriteNumero != null ? mouvement.retourSecuriteNumero : 'Non disponible'}"></span>
-        </li>
+    <p><strong>Détails des Retours Sécurité :</strong></p>
+    <ul th:if="${mouvement.retourSecuriteNumero != null}">
+        <li th:each="retour : ${mouvement.retourSecuriteNumero}" th:text="${retour}"></li>
     </ul>
+
 </div>
 
 <div class="button-container">

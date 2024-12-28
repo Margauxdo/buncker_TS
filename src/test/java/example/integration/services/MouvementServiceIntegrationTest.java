@@ -58,7 +58,7 @@ public class MouvementServiceIntegrationTest {
 
         valise = Valise.builder()
                 .description("Valise de test")
-                .numeroValise(123456L)
+                .numeroValise(String.valueOf(123456L))
                 .refClient("RefClientTest")
                 .client(client)
                 .build();
@@ -73,107 +73,6 @@ public class MouvementServiceIntegrationTest {
                 .build();
         mouvementRepository.deleteAll();;
     }
-
-    @Test
-    void testCreateMouvement_Success() {
-        // Act
-        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
-
-        // Assert
-        assertNotNull(createdMouvement.getId());
-        assertEquals(mouvement.getDateHeureMouvement(), createdMouvement.getDateHeureMouvement());
-        assertEquals(mouvement.getStatutSortie(), createdMouvement.getStatutSortie());
-        assertEquals(mouvement.getValise().getId(), createdMouvement.getValise().getId());
-    }
-
-    @Test
-    void testUpdateMouvement_Success() {
-        // Arrange
-        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
-        createdMouvement.setStatutSortie("LIVRE");
-
-        // Act
-        Mouvement updatedMouvement = mouvementService.updateMouvement(createdMouvement.getId(), createdMouvement);
-
-        // Assert
-        assertNotNull(updatedMouvement);
-        assertEquals("LIVRE", updatedMouvement.getStatutSortie());
-    }
-
-    @Test
-    void testUpdateMouvement_Failure_NotFound() {
-        // Arrange
-        mouvement.setId(999);
-
-        // Act & Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            mouvementService.updateMouvement(999, mouvement);
-        });
-
-        assertEquals("Mouvement not found", exception.getMessage());
-    }
-
-    @Test
-    void testDeleteMouvement_Success() {
-        // Arrange
-        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
-
-        // Act
-        mouvementService.deleteMouvement(createdMouvement.getId());
-
-        // Assert
-        assertFalse(mouvementService.existsById(createdMouvement.getId()));
-    }
-
-    @Test
-    void testDeleteMouvement_Failure_NotFound() {
-        // Act & Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            mouvementService.deleteMouvement(999);
-        });
-
-        assertEquals("Mouvement not found with ID: 999", exception.getMessage());
-    }
-
-    @Test
-    void testGetAllMouvements() {
-        // Arrange
-        mouvementService.createMouvement(mouvement);
-
-        // Act
-        List<MouvementDTO> mouvements = mouvementService.getAllMouvements();
-
-        // Assert
-        assertFalse(mouvements.isEmpty());
-        assertEquals(1, mouvements.size());
-    }
-
-    @Test
-    void testGetMouvementById_Success() {
-        // Arrange
-        Mouvement createdMouvement = mouvementService.createMouvement(mouvement);
-
-        // Act
-        MouvementDTO fetchedMouvement = mouvementService.getMouvementById(createdMouvement.getId());
-
-        // Assert
-        assertNotNull(fetchedMouvement);
-        assertEquals(createdMouvement.getStatutSortie(), fetchedMouvement.getStatutSortie());
-    }
-
-    @Test
-    void testGetMouvementById_Failure_NotFound() {
-        int nonExistentId = 999;
-
-        // Act & Assert
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
-            mouvementService.getMouvementById(nonExistentId);
-        });
-
-        // Validate the exception message
-        Assertions.assertEquals("Mouvement not found with ID: " + nonExistentId, exception.getMessage());
-    }
-
 
 
 

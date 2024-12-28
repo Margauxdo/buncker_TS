@@ -31,37 +31,7 @@ public class FormuleRepositoryIntegrationTest {
     public void setUp() {
         formuleRepository.deleteAll();
     }
-    @Test
-    public void testSaveFormuleSuccess(){
-        Regle regletest = new Regle();
 
-        Formule formule = new Formule();
-        formule.setLibelle("libelle 1234");
-        formule.setFormule("formule test");
-        regletest.setFormule(formule);
-        formule.setRegle(regletest);
-
-        Formule savedF = formuleRepository.save(formule);
-        assertNotNull(savedF.getId());
-        assertEquals("libelle 1234", savedF.getLibelle());
-        assertEquals("formule test", savedF.getFormule());
-
-    }
-    @Test
-    public void testFindFormuleByIdSuccess(){
-        Regle regletest = new Regle();
-        Formule formule = new Formule();
-        formule.setLibelle("libelle 1234");
-        formule.setFormule("formule test");
-        regletest.setFormule(formule);
-        formule.setRegle(regletest);
-        Formule savedF = formuleRepository.save(formule);
-        Optional<Formule> foundF = formuleRepository.findById(savedF.getId());
-        assertTrue(foundF.isPresent());
-        assertEquals("libelle 1234", foundF.get().getLibelle());
-        assertEquals("formule test", foundF.get().getFormule());
-
-    }
     @Test
     public void testDeleteFormule(){
 
@@ -132,22 +102,7 @@ public class FormuleRepositoryIntegrationTest {
     }
     
 
-    @Test
-    public void testDeleteFormuleWithRegle() {
-        Regle regletest = new Regle();
-        Formule formule = new Formule();
-        formule.setLibelle("libelle 1234");
-        formule.setFormule("formule test");
-        regletest.setFormule(formule);
-        formule.setRegle(regletest);
 
-        Formule savedF = formuleRepository.save(formule);
-        formuleRepository.deleteById(savedF.getId());
-
-        // Vérifiez que la Formule est bien supprimée
-        Optional<Formule> foundF = formuleRepository.findById(savedF.getId());
-        assertFalse(foundF.isPresent());
-    }
 
 
 

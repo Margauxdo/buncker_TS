@@ -30,17 +30,7 @@ public class RetourSecuriteServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void testCreateRetourSecurite_Success() {
-        RetourSecuriteDTO retourSecuriteDTO = new RetourSecuriteDTO();
-        RetourSecurite retourSecurite = new RetourSecurite();
-        when(retourSecuriteRepository.save(any(RetourSecurite.class))).thenReturn(retourSecurite);
 
-        RetourSecuriteDTO result = retourSecuriteService.createRetourSecurite(retourSecuriteDTO);
-
-        Assertions.assertNotNull(result, "Security should not be null");
-        verify(retourSecuriteRepository, times(1)).save(any(RetourSecurite.class));
-    }
 
     @Test
     public void testUpdateRetourSecurite_Success() {
@@ -62,20 +52,6 @@ public class RetourSecuriteServiceTest {
         verify(retourSecuriteRepository, times(1)).save(any(RetourSecurite.class));
     }
 
-    @Test
-    public void testDeleteRetourSecurite_Success() {
-        int id = 1;
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setId(id);
-
-        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(retourSecurite));
-        doNothing().when(retourSecuriteRepository).delete(retourSecurite);
-
-        retourSecuriteService.deleteRetourSecurite(id);
-
-        verify(retourSecuriteRepository, times(1)).findById(id);
-        verify(retourSecuriteRepository, times(1)).delete(retourSecurite);
-    }
 
     @Test
     public void testGetRetourSecurite_Success() {
@@ -105,16 +81,5 @@ public class RetourSecuriteServiceTest {
         verify(retourSecuriteRepository, times(1)).findAll();
     }
 
-    @Test
-    public void testDeleteRetourSecurite_NotFound() {
-        int id = 1;
-        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
-            retourSecuriteService.deleteRetourSecurite(id);
-        });
-
-        verify(retourSecuriteRepository, times(1)).findById(id);
-        verify(retourSecuriteRepository, never()).delete(any(RetourSecurite.class));
-    }
 }

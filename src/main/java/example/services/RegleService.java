@@ -2,9 +2,7 @@ package example.services;
 
 import example.DTO.RegleDTO;
 import example.controller.RegleController;
-import example.entity.Client;
-import example.entity.Regle;
-import example.entity.Valise;
+import example.entity.*;
 import example.exceptions.RegleNotFoundException;
 import example.interfaces.IRegleService;
 import example.repositories.*;
@@ -44,25 +42,57 @@ public class RegleService implements IRegleService {
         this.valiseRepository = valiseRepository;
     }
 
+    @Transactional
     public Regle createRegle(RegleDTO regleDTO) {
         Regle regle = new Regle();
+
+        // Initialisation des champs simples
         regle.setCoderegle(regleDTO.getCoderegle());
         regle.setReglePourSortie(regleDTO.getReglePourSortie());
         regle.setDateRegle(regleDTO.getDateRegle());
         regle.setNombreJours(regleDTO.getNombreJours());
         regle.setTypeEntree(regleDTO.getTypeEntree());
         regle.setNbjsmEntree(regleDTO.getNbjsmEntree());
+        regle.setCalculCalendaire(regleDTO.getCalculCalendaire() != null ? regleDTO.getCalculCalendaire() : 1);
+        regle.setFermeJS1(regleDTO.getFermeJS1() != null ? regleDTO.getFermeJS1() : false);
+        regle.setFermeJS2(regleDTO.getFermeJS2() != null ? regleDTO.getFermeJS2() : false);
+        regle.setFermeJS3(regleDTO.getFermeJS3() != null ? regleDTO.getFermeJS3() : false);
+        regle.setFermeJS4(regleDTO.getFermeJS4() != null ? regleDTO.getFermeJS4() : false);
+        regle.setFermeJS5(regleDTO.getFermeJS5() != null ? regleDTO.getFermeJS5() : false);
+        regle.setFermeJS6(regleDTO.getFermeJS6() != null ? regleDTO.getFermeJS6() : false);
+        regle.setFermeJS7(regleDTO.getFermeJS7() != null ? regleDTO.getFermeJS7() : false);
 
+        // Attacher une Valise
         if (regleDTO.getValiseId() != null) {
             Valise valise = valiseRepository.findById(regleDTO.getValiseId())
-                    .orElseThrow(() -> new IllegalArgumentException("Valise introuvable"));
-            regle.setValises(List.of(valise));
+                    .orElseThrow(() -> new IllegalArgumentException("Valise introuvable avec ID : " + regleDTO.getValiseId()));
+            regle.addValise(valise); // Utilisation de la méthode utilitaire
         }
 
-        regleRepository.save(regle);
-        return regle;
-    }
+        // Attacher JourFerie
+        if (regleDTO.getJourFerieId() != null) {
+            JourFerie jourFerie = jourFerieRepository.findById(regleDTO.getJourFerieId())
+                    .orElseThrow(() -> new EntityNotFoundException("JourFerie introuvable avec ID : " + regleDTO.getJourFerieId()));
+            regle.setJourFerie(jourFerie);
+        }
 
+        // Attacher TypeRegle
+        if (regleDTO.getTypeRegleId() != null) {
+            TypeRegle typeRegle = typeRegleRepository.findById(regleDTO.getTypeRegleId())
+                    .orElseThrow(() -> new EntityNotFoundException("TypeRegle introuvable avec ID : " + regleDTO.getTypeRegleId()));
+            regle.setTypeRegle(typeRegle);
+        }
+
+        // Attacher Formule
+        if (regleDTO.getFormuleId() != null) {
+            Formule formule = formuleRepository.findById(regleDTO.getFormuleId())
+                    .orElseThrow(() -> new EntityNotFoundException("Formule introuvable avec ID : " + regleDTO.getFormuleId()));
+            regle.setFormule(formule);
+        }
+
+        // Sauvegarder la règle
+        return regleRepository.save(regle);
+    }
 
     @Override
     public RegleDTO readRegle(int id) {
@@ -76,6 +106,7 @@ public class RegleService implements IRegleService {
 
     @Override
     public RegleDTO updateRegle(int id, RegleDTO regleDTO) {
+
         Regle existingRegle = regleRepository.findById(id)
                 .orElseThrow(() -> new RegleNotFoundException("Règle non trouvée avec l'ID : " + id));
 
@@ -105,7 +136,16 @@ public class RegleService implements IRegleService {
 
     public RegleDTO getRegleById(int id) {
         Regle regle = regleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Règle non trouvée"));
+                .orElseThrow(() -> new EntityNotFoundException("regle introuvable avec ID : " + id));
+        regle.getReglePourSortie();
+        regle.getDateRegle();
+        regle.getNombreJours();
+        regle.getJourFerie();
+        regle.getTypeEntree();
+        regle.getNbjsmEntree();
+        regle.getValises();
+        regle.getJourFerie();
+
         return mapToDTO(regle);
     }
 
@@ -173,6 +213,14 @@ public class RegleService implements IRegleService {
         dto.setDateRegle(regle.getDateRegle());
         dto.setNombreJours(regle.getNombreJours());
         dto.setCalculCalendaire(regle.getCalculCalendaire());
+        dto.setFermeJS1(regle.getFermeJS1() != null ? regle.getFermeJS1() : false);
+        dto.setFermeJS2(regle.getFermeJS2() != null ? regle.getFermeJS2() : false);
+        dto.setFermeJS3(regle.getFermeJS3() != null ? regle.getFermeJS3() : false);
+        dto.setFermeJS4(regle.getFermeJS4() != null ? regle.getFermeJS4() : false);
+        dto.setFermeJS5(regle.getFermeJS5() != null ? regle.getFermeJS5() : false);
+        dto.setFermeJS6(regle.getFermeJS6() != null ? regle.getFermeJS6() : false);
+        dto.setFermeJS7(regle.getFermeJS7() != null ? regle.getFermeJS7() : false);
+
         dto.setTypeEntree(regle.getTypeEntree()); // Ajout pour TypeEntree
         dto.setNbjsmEntree(regle.getNbjsmEntree()); // Ajout pour NbjsmEntree
 
@@ -205,13 +253,14 @@ public class RegleService implements IRegleService {
         existingRegle.setDateRegle(dto.getDateRegle());
         existingRegle.setNombreJours(dto.getNombreJours());
         existingRegle.setCalculCalendaire(dto.getCalculCalendaire());
-        existingRegle.setFermeJS1(dto.getFermeJS1());
-        existingRegle.setFermeJS2(dto.getFermeJS2());
-        existingRegle.setFermeJS3(dto.getFermeJS3());
-        existingRegle.setFermeJS4(dto.getFermeJS4());
-        existingRegle.setFermeJS5(dto.getFermeJS5());
-        existingRegle.setFermeJS6(dto.getFermeJS6());
-        existingRegle.setFermeJS7(dto.getFermeJS7());
+        existingRegle.setFermeJS1(dto.getFermeJS1() != null ? dto.getFermeJS1() : false);
+        existingRegle.setFermeJS2(dto.getFermeJS2() != null ? dto.getFermeJS2() : false);
+        existingRegle.setFermeJS3(dto.getFermeJS3() != null ? dto.getFermeJS3() : false);
+        existingRegle.setFermeJS4(dto.getFermeJS4() != null ? dto.getFermeJS4() : false);
+        existingRegle.setFermeJS5(dto.getFermeJS5() != null ? dto.getFermeJS5() : false);
+        existingRegle.setFermeJS6(dto.getFermeJS6() != null ? dto.getFermeJS6() : false);
+        existingRegle.setFermeJS7(dto.getFermeJS7() != null ? dto.getFermeJS7() : false);
+
         existingRegle.setTypeEntree(dto.getTypeEntree());
         existingRegle.setNbjsmEntree(dto.getNbjsmEntree());
 

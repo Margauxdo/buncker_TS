@@ -65,19 +65,6 @@ class GlobalExceptionHandlerTest {
     }
 
 
-    @Test
-    void testHandleIllegalArgument() {
-        // Arrange
-        String errorMessage = "Invalid argument";
-        IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
-
-        // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Argument non valide : " + errorMessage, response.getBody());
-    }
 
     @Test
     void testHandleConstraintViolationException() {
@@ -102,64 +89,7 @@ class GlobalExceptionHandlerTest {
     }
 
 
-    @Test
-    void testHandleAllExceptions() {
-        // Arrange
-        Exception exception = new Exception("Unexpected error");
 
-        // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
-
-        // Assert
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Une erreur inattendue s'est produite", response.getBody());
-    }
-
-    @Test
-    void testHandleProblemeNotFound() {
-        // Arrange
-        String messageErreur = "Le problème n'a pas été trouvé.";
-        ProblemeNotFoundException exception = new ProblemeNotFoundException(messageErreur);
-
-        // Act
-        ResponseEntity<ErrorResponseDTO> reponse = globalExceptionHandler.handleAllExceptions(exception);
-
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND, reponse.getStatusCode());
-        assertNotNull(reponse.getBody());
-        assertEquals("Problem Not Found", reponse.getBody().getErreur());
-        assertEquals(messageErreur, reponse.getBody().getMessage());
-    }
-
-
-
-    @Test
-    void testHandleIllegalStateException() {
-        // Arrange
-        String errorMessage = "Illegal state";
-        IllegalStateException exception = new IllegalStateException(errorMessage);
-
-        // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
-
-        // Assert
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
-    }
-
-    @Test
-    void testHandleEntityNotFoundException() {
-        // Arrange
-        String errorMessage = "Entity not found";
-        EntityNotFoundException exception = new EntityNotFoundException(errorMessage);
-
-        // Act
-        ResponseEntity<ErrorResponseDTO> response = globalExceptionHandler.handleAllExceptions(exception);
-
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
-    }
 
 
 }

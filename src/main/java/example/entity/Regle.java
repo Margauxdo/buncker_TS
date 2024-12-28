@@ -69,7 +69,7 @@ public class Regle {
     private List<Client> clients = new ArrayList<>();
 
     // Relation ManyToOne avec Valise
-    @OneToMany(mappedBy = "reglesSortie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "reglesSortie", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Valise> valises = new ArrayList<>();
 
@@ -97,8 +97,24 @@ public class Regle {
     private Formule formule;
 
     // Relation ManyToOne avec JourFerie
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jour_ferie_id")
     private JourFerie jourFerie;
+
+    public void addValise(Valise valise) {
+        if (valises == null) {
+            valises = new ArrayList<>();
+        }
+        valises.add(valise);
+        valise.setReglesSortie(this); // Synchronise la relation bidirectionnelle
+    }
+
+    public void removeValise(Valise valise) {
+        if (valises != null) {
+            valises.remove(valise);
+            valise.setReglesSortie(null); // Rompt la relation bidirectionnelle
+        }
+    }
+
 
 }

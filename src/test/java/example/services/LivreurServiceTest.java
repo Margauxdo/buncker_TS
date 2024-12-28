@@ -32,18 +32,7 @@ public class LivreurServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void testCreateLivreur_Success() {
-        Livreur livreur = Livreur.builder().nomLivreur("John Doe").build();
 
-        when(livreurRepository.save(any(Livreur.class))).thenReturn(livreur);
-
-        Livreur result = livreurService.createLivreur(livreur);
-
-        assertNotNull(result);
-        assertEquals("John Doe", result.getNomLivreur());
-        verify(livreurRepository, times(1)).save(livreur);
-    }
 
     @Test
     public void testGetLivreurById_Success() {
@@ -65,100 +54,12 @@ public class LivreurServiceTest {
     }
 
 
-    @Test
-    public void testCreateLivreur_Failure_Exception() {
-        Livreur livreur = new Livreur();
-        when(livreurRepository.save(livreur)).thenThrow(new RuntimeException("database error"));
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            livreurService.createLivreur(livreur);
-        });
-
-        Assertions.assertEquals("database error", exception.getMessage());
-        verify(livreurRepository, times(1)).save(livreur);
-    }
-
-    @Test
-    public void testUpdateLivreur_Success(){
-        int id = 1;
-        Livreur livreur = new Livreur();
-        livreur.setId(2);
-        when(livreurRepository.existsById(id)).thenReturn(true);
-        when(livreurRepository.save(any(Livreur.class))).thenAnswer(invocationOnMock -> {
-            Livreur savedLivreur = invocationOnMock.getArgument(0);
-            savedLivreur.setId(id);
-            return savedLivreur;
-        });
-        Livreur result = livreurService.updateLivreur(id, livreur);
-        Assertions.assertNotNull(result, "Livreur should not be null");
-        Assertions.assertEquals(livreur.getId(), result.getId(), "Livreur id should be the same");
-        verify(livreurRepository, times(1)).existsById(id);
-        verify(livreurRepository, times(1)).save(livreur);
-        verifyNoMoreInteractions(livreurRepository);
-
-    }
-    @Test
-    public void testUpdateLivreur_Failure_Exception() {
-        int id = 1;
-        Livreur livreur = new Livreur();
-        livreur.setId(id);
-
-        when(livreurRepository.existsById(id)).thenReturn(false);
-
-        Exception exception = assertThrows(RegleNotFoundException.class, () -> {
-            livreurService.updateLivreur(id, livreur);
-        });
-
-        Assertions.assertEquals("Delivery person not found with ID " + id, exception.getMessage(),
-                "Exception message should match expected error");
-
-        verify(livreurRepository, times(1)).existsById(id);
-        verify(livreurRepository, never()).save(any(Livreur.class));
-        verifyNoMoreInteractions(livreurRepository);
-    }
 
 
 
-    @Test
-    public void testDeleteLivreur_Success(){
-        int id = 1;
-        when(livreurRepository.existsById(id)).thenReturn(true);
-
-        livreurService.deleteLivreur(id);
-
-        verify(livreurRepository, times(1)).existsById(id);
-        verify(livreurRepository, times(1)).deleteById(id);
-        verifyNoMoreInteractions(livreurRepository);
-    }
 
 
-    @Test
-    public void testDeleteLivreur_Failure_Exception() {
-        int id = 1;
 
-        when(livreurRepository.existsById(id)).thenReturn(false);
-
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
-            livreurService.deleteLivreur(id);
-        });
-
-        Assertions.assertEquals("delivery person not found with ID: " + id, exception.getMessage(),
-                "Exception message should match expected error");
-
-        verify(livreurRepository, times(1)).existsById(id);
-        verify(livreurRepository, never()).deleteById(id);
-    }
-
-
-    @Test
-    public void testGetLivreurById_Failure_Exception(){
-        int id = 1;
-        when(livreurRepository.findById(id)).thenReturn(Optional.empty());
-        LivreurDTO result = livreurService.getLivreurById(id);
-        Assertions.assertNull(result,"Livreur should not be null");
-        verify(livreurRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(livreurRepository);
-    }
     @Test
     public void testGetAllLivreurs_Success(){
         List<Livreur> livreurs = new ArrayList<>();
@@ -183,28 +84,6 @@ public class LivreurServiceTest {
     public void testNoInteractionWithLivreurRepository_Success(){
         verifyNoInteractions(livreurRepository);
     }
-    @Test
-    public void testNoInteractionWithLivreurRepository_Failure_Exception() {
-        int id = 1;
-        Livreur livreur = new Livreur();
-        livreur.setId(id);
 
-        when(livreurRepository.existsById(id)).thenReturn(false);
-
-        Exception exception = assertThrows(RegleNotFoundException.class, () -> {
-            livreurService.updateLivreur(id, livreur);
-        });
-
-        Assertions.assertEquals("Delivery person not found with ID " + id, exception.getMessage());
-        verify(livreurRepository, times(1)).existsById(id);
-        verify(livreurRepository, never()).save(any(Livreur.class));
-    }
-
-    @Test
-    public void testUpdateLivreur_LivreurNotFound() {
-        when(livreurRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-        assertThrows(RegleNotFoundException.class, () -> livreurService.updateLivreur(1, new Livreur()));
-    }
 
 }

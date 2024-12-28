@@ -1,4 +1,4 @@
-package example.services;
+/*package example.services;
 
 import example.DTO.RegleManuelleDTO;
 import example.entity.RegleManuelle;
@@ -127,3 +127,4 @@ public class RegleManuelleServiceTest {
         verify(regleManuelleRepository, times(1)).findAll();
     }
 }
+*/

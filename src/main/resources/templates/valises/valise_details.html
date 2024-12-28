@@ -81,8 +81,9 @@
     <!-- Champs principaux de Valise -->
     <p><strong>ID :</strong> <span th:text="${valise.id}"></span></p>
     <p><strong>Description :</strong> <span th:text="${valise.description}"></span></p>
-    <p><strong>Numéro de Valise :</strong> <span th:text="${valise.numeroValise}"></span></p>
+    <p><strong>Numero de Valise :</strong> <span th:text="${valise.numeroValise}"></span></p>
     <p><strong>Référence Client :</strong> <span th:text="${valise.refClient != null ? valise.refClient : 'Non défini'}"></span></p>
+
     <p><strong>Date de Sortie :</strong> <span th:text="${valise.sortie}"></span></p>
     <p><strong>Date du Dernier Mouvement :</strong> <span th:text="${valise.dateDernierMouvement}"></span></p>
     <p><strong>Date de Sortie Prévue :</strong> <span th:text="${valise.dateSortiePrevue}"></span></p>
@@ -98,7 +99,7 @@
     <!-- Relation avec MouvementList -->
     <p><strong>Mouvements associés :</strong></p>
     <ul>
-        <li th:each="mouvement : ${valise.mouvementIds}" th:text="${mouvement}"></li>
+        <li th:each="mouvement : ${valise.mouvementList}" th:text="${mouvement.statutSortie}"></li>
     </ul>
 
 
@@ -107,10 +108,7 @@
     <ul>
         <li th:each="regle : ${valise.reglesSortie}">
             <p><strong>Code :</strong> <span th:text="${regle.coderegle}"></span></p>
-            <p><strong>Date :</strong> <span th:text="${#dates.format(regle.dateRegle, 'yyyy-MM-dd')}"></span></p>
-            <p><strong>Nombre de jours :</strong> <span th:text="${regle.nombreJours}"></span></p>
-            <p><strong>Type d'entrée :</strong> <span th:text="${regle.typeEntree}"></span></p>
-        </li>
+             </li>
     </ul>
 
 

@@ -1,6 +1,7 @@
-package example.controller;
+package templates.typeRegles.controller;
 
 import example.DTO.FormuleDTO;
+import example.controller.FormuleController;
 import example.interfaces.IFormuleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,18 +39,18 @@ public class FormuleControllerTest {
                         .id(1)
                         .libelle("Libelle1")
                         .formule("Description1")
-                        .regleId(101)
+                        .regleIds(Collections.singletonList(101))
                         .build()
         );
-        when(formuleService.getAllFormules()).thenReturn(formules);
+        Mockito.when(formuleService.getAllFormules()).thenReturn(formules);
 
         Model modele = new ConcurrentModel();
         String reponse = formuleController.viewFormuleList(modele);
 
-        assertEquals("formules/formule_list", reponse);
-        assertTrue(modele.containsAttribute("formules"));
-        assertEquals(formules, modele.getAttribute("formules"));
-        verify(formuleService, times(1)).getAllFormules();
+        Assertions.assertEquals("formules/formule_list", reponse);
+        Assertions.assertTrue(modele.containsAttribute("formules"));
+        Assertions.assertEquals(formules, modele.getAttribute("formules"));
+        Mockito.verify(formuleService, Mockito.times(1)).getAllFormules();
     }
 
     // Test : Affichage d'une formule par ID - Succès
@@ -58,64 +60,36 @@ public class FormuleControllerTest {
                 .id(1)
                 .libelle("Libelle1")
                 .formule("Description1")
-                .regleId(101)
+                .regleIds(Collections.singletonList(101))
                 .build();
-        when(formuleService.getFormuleById(1)).thenReturn(formule);
+        Mockito.when(formuleService.getFormuleById(1)).thenReturn(formule);
 
         Model modele = new ConcurrentModel();
         String reponse = formuleController.viewFormuleById(1, modele);
 
-        assertEquals("formules/formule_detail", reponse);
-        assertTrue(modele.containsAttribute("formule"));
-        assertEquals(formule, modele.getAttribute("formule"));
-        verify(formuleService, times(1)).getFormuleById(1);
+        Assertions.assertEquals("formules/formule_detail", reponse);
+        Assertions.assertTrue(modele.containsAttribute("formule"));
+        Assertions.assertEquals(formule, modele.getAttribute("formule"));
+        Mockito.verify(formuleService, Mockito.times(1)).getFormuleById(1);
     }
 
-    // Test : Formulaire de création d'une formule
-    @Test
-    public void testAfficherFormulaireCreationFormule() {
-        Model modele = new ConcurrentModel();
-        String reponse = formuleController.createFormuleForm(modele);
 
-        assertEquals("formules/formule_create", reponse);
-        assertTrue(modele.containsAttribute("formule"));
-        assertNotNull(modele.getAttribute("formule"));
-    }
 
-    // Test : Formulaire de modification d'une formule - Succès
-    @Test
-    public void testAfficherFormulaireModificationFormule_Succes() {
-        FormuleDTO formule = FormuleDTO.builder()
-                .id(1)
-                .libelle("Libelle1")
-                .formule("Description1")
-                .regleId(101)
-                .build();
-        when(formuleService.getFormuleById(1)).thenReturn(formule);
-
-        Model modele = new ConcurrentModel();
-        String reponse = formuleController.editFormuleForm(1, modele);
-
-        assertEquals("formules/formule_edit", reponse);
-        assertTrue(modele.containsAttribute("formule"));
-        assertEquals(formule, modele.getAttribute("formule"));
-        verify(formuleService, times(1)).getFormuleById(1);
-    }
 
     // Test : Formulaire de modification d'une formule - Non trouvée
     @Test
     public void testAfficherFormulaireModificationFormule_NonTrouvee() {
-        when(formuleService.getFormuleById(1)).thenThrow(
+        Mockito.when(formuleService.getFormuleById(1)).thenThrow(
                 new EntityNotFoundException("Formule avec l'ID 1 non trouvée.")
         );
 
-        EntityNotFoundException exception = assertThrows(
+        EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> formuleController.editFormuleForm(1, new ConcurrentModel())
         );
 
-        assertEquals("Formule avec l'ID 1 non trouvée.", exception.getMessage());
-        verify(formuleService, times(1)).getFormuleById(1);
+        Assertions.assertEquals("Formule avec l'ID 1 non trouvée.", exception.getMessage());
+        Mockito.verify(formuleService, Mockito.times(1)).getFormuleById(1);
     }
 
     // Test : Mise à jour d'une formule - Succès
@@ -125,25 +99,25 @@ public class FormuleControllerTest {
                 .id(1)
                 .libelle("Libelle mise à jour")
                 .formule("Description mise à jour")
-                .regleId(101)
+                .regleIds(Collections.singletonList(101))
                 .build();
-        when(formuleService.updateFormule(eq(1), any(FormuleDTO.class))).thenReturn(formuleDTO);
+        Mockito.when(formuleService.updateFormule(ArgumentMatchers.eq(1), ArgumentMatchers.any(FormuleDTO.class))).thenReturn(formuleDTO);
 
         Model modele = new ConcurrentModel();
         String reponse = formuleController.updateFormule(1, formuleDTO, modele);
 
-        assertEquals("redirect:/formules/list", reponse);
-        verify(formuleService, times(1)).updateFormule(1, formuleDTO);
+        Assertions.assertEquals("redirect:/formules/list", reponse);
+        Mockito.verify(formuleService, Mockito.times(1)).updateFormule(1, formuleDTO);
     }
 
     // Test : Suppression d'une formule - Succès
     @Test
     public void testSupprimerFormule_Succes() {
-        doNothing().when(formuleService).deleteFormule(1);
+        Mockito.doNothing().when(formuleService).deleteFormule(1);
 
         String reponse = formuleController.deleteFormule(1);
 
-        assertEquals("redirect:/formules/list", reponse);
-        verify(formuleService, times(1)).deleteFormule(1);
+        Assertions.assertEquals("redirect:/formules/list", reponse);
+        Mockito.verify(formuleService, Mockito.times(1)).deleteFormule(1);
     }
 }

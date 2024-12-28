@@ -104,13 +104,14 @@
         <td th:text="${regle.dateRegle}"></td>
         <td th:text="${regle.nombreJours}"></td>
         <td th:text="${regle.calculCalendaire}"></td>
-        <td th:text="${regle.fermeJS1}"></td>
-        <td th:text="${regle.fermeJS2}"></td>
-        <td th:text="${regle.fermeJS3}"></td>
-        <td th:text="${regle.fermeJS4}"></td>
-        <td th:text="${regle.fermeJS5}"></td>
-        <td th:text="${regle.fermeJS6}"></td>
-        <td th:text="${regle.fermeJS7}"></td>
+        <td th:text="${regle.fermeJS1 != null && regle.fermeJS1 ? 'Oui' : 'Non'}"></td>
+        <td th:text="${regle.fermeJS2 != null && regle.fermeJS2 ? 'Oui' : 'Non'}"></td>
+        <td th:text="${regle.fermeJS3 != null && regle.fermeJS3 ? 'Oui' : 'Non'}"></td>
+        <td th:text="${regle.fermeJS4 != null && regle.fermeJS4 ? 'Oui' : 'Non'}"></td>
+        <td th:text="${regle.fermeJS5 != null && regle.fermeJS5 ? 'Oui' : 'Non'}"></td>
+        <td th:text="${regle.fermeJS6 != null && regle.fermeJS6 ? 'Oui' : 'Non'}"></td>
+        <td th:text="${regle.fermeJS7 != null && regle.fermeJS7 ? 'Oui' : 'Non'}"></td>
+
         <td th:text="${regle.typeEntree}"></td>
         <td th:if="${regle.valiseNumero != null}" th:text="${regle.valiseNumero}"></td>
         <td th:if="${regle.valiseNumero == null}">N/A</td>
@@ -118,7 +119,9 @@
         <td th:text="${regle.typeRegleId != null ? regle.typeRegleId : 'N/A'}"></td>
 
         <td th:text="${regle.formule != null ? regle.formuleId : 'N/A'}"></td>
-        <td th:text="${regle.jourFerieId != null ? regle.jourFerieId : 'N/A'}"></td>
+        <td th:if="${regle.jourFerieDate != null}" th:text="#dates.format(regle.jourFerieDate, 'dd/MM/yyyy')"></td>
+        <td th:if="${regle.jourFerieDate == null}">N/A</td>
+
 
         <td>
             <form th:action="@{/regles/view/{id}(id=${regle.id})}" method="get" style="display:inline;">
@@ -127,9 +130,9 @@
             <form th:action="@{/regles/edit/{id}(id=${regle.id})}" method="get" style="display:inline;">
                 <button type="submit">Modifier</button>
             </form>
-            <form th:action="@{/regles/delete/{id}(id=${regle.id})}" method="post">
+           <!-- <form th:action="@{/regles/delete/{id}(id=${regle.id})}" method="post">
                 <button type="submit" style="color: red;">Supprimer</button>
-            </form>
+            </form> --->
 
 
         </td>

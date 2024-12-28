@@ -88,16 +88,16 @@
     <p><strong>Type Entrée :</strong> <span th:text="${regle.typeEntree}"></span></p>
     <p><strong>Nombre JSM Entrée :</strong> <span th:text="${regle.nbjsmEntree}"></span></p>
 
-    <p><strong>Valise :</strong> <span th:if="${regle.valise != null}" th:text="${regle.valise.name}"></span>
+    <p><strong>Valise :</strong> <span th:if="${regle.valise != null}" th:text="${regle.valiseNumero}"></span>
         <span th:if="${regle.valise == null}">Non associée</span></p>
 
     <p><strong>Type de Règle :</strong>
-        <span th:if="${regle.typeRegle != null}" th:text="${regle.typeRegle}"></span>
-        <span th:if="${regle.typeRegle == null}">Non associée</span>
+        <span th:if="${regle.typeRegleId != null}" th:text="${regle.typeRegleId}"></span>
+        <span th:if="${regle.typeRegleId == null}">Non associée</span>
     </p>
 
     <p><strong>Formule :</strong>
-        <span th:if="${regle.formule != null}" th:text="${regle.formule}"></span>
+        <span th:if="${regle.formule != null}" th:text="${regle.formuleId}"></span>
         <span th:if="${regle.formule == null}">Non associée</span>
     </p>
 
