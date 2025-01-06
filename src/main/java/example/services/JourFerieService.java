@@ -58,13 +58,23 @@ public class JourFerieService implements IJourFerieService {
     }
 
     @Override
+    @Transactional
     public void deleteJourFerie(int id) {
         // Vérification de l'existence de l'entité
-        if (!jourFerieRepository.existsById(id)) {
-            throw new EntityNotFoundException("JourFerie introuvable avec l'ID : " + id);
+        JourFerie jourFerie = jourFerieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("JourFerie introuvable avec l'ID : " + id));
+
+        // Dissocier les règles liées avant suppression
+        List<Regle> regles = regleRepository.findByJourFerieId(id);
+        for (Regle regle : regles) {
+            regle.setJourFerie(null); // Dissocier le jour férié
         }
-        jourFerieRepository.deleteById(id);
+        regleRepository.saveAll(regles); // Sauvegarder les modifications des règles
+
+        // Supprimer le jour férié
+        jourFerieRepository.delete(jourFerie);
     }
+
 
     @Override
     public List<Date> getAllDateFerie() {

@@ -27,6 +27,8 @@ public interface RegleRepository extends JpaRepository<Regle, Integer> {
 
     // Autres méthodes spécifiques
 
+    List<Regle> findByJourFerieId(Integer jourFerieId);
+
     @Query("SELECT r FROM Regle r LEFT JOIN FETCH r.jourFerie WHERE r.id = :id")
     Optional<Regle> findByIdWithJourFerie(@Param("id") int id);
 

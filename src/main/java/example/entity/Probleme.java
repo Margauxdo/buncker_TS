@@ -33,7 +33,7 @@ public class Probleme {
     private String detailsProbleme;
 
     @ManyToOne
-    @JoinColumn(name = "numero_valise")//not null
+    @JoinColumn(name = "numero_valise", nullable = true)//not null
     private Valise valise;
 
 

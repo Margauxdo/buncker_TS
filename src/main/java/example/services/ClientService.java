@@ -160,6 +160,10 @@ public class ClientService implements IClientService {
 
     @Transactional
     public ClientDTO updateClient(Integer id, ClientDTO clientDTO) {
+
+        log.info("Mise à jour du client avec ID: {}" ,id);
+
+
         // Récupérer l'entité existante
         Client existingClient = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
@@ -186,7 +190,7 @@ public class ClientService implements IClientService {
 
         // Mise à jour des relations
         // Mise à jour des valises
-        if (clientDTO.getValiseIds() != null) {
+        /**if (clientDTO.getValiseIds() != null) {
             List<Valise> existingValises = existingClient.getValises();
             List<Valise> newValises = valiseRepository.findAllById(clientDTO.getValiseIds());
 
@@ -218,7 +222,7 @@ public class ClientService implements IClientService {
                 }
             });
         }
-
+**/
         // Sauvegarder l'entité client mise à jour
         Client updatedClient = clientRepository.save(existingClient);
 
@@ -226,27 +230,50 @@ public class ClientService implements IClientService {
         return convertToDTO(updatedClient);
     }
 
-
-
+    @Override
     @Transactional
     public void deleteClient(int id) {
-        log.info("Début de la suppression du client avec ID: {}", id);
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID: " + id));
+        log.info("Requête reçue pour supprimer le client avec ID: {}", id);
 
-        // Vérifiez les valises associées
+        // Récupérer le client
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
+
+        // 1. Supprimer les valises associées
         if (client.getValises() != null && !client.getValises().isEmpty()) {
-            log.info("Suppression des valises associées au client ID: {}", id);
-            client.getValises().forEach(valise -> log.info("Suppression de la valise: {}", valise.getId()));
-            client.getValises().clear(); // Dissocie les valises
+            log.info("Suppression des valises associées au client.");
+            valiseRepository.deleteAll(client.getValises());
         }
 
+        // 2. Dissocier les mouvements et supprimer les retours sécurité
+        if (client.getRetourSecurites() != null && !client.getRetourSecurites().isEmpty()) {
+            log.info("Dissociation des mouvements avant suppression des retours sécurité.");
+            client.getRetourSecurites().forEach(retourSecurite -> {
+                // Dissocier les mouvements
+                List<Mouvement> mouvements = mouvementRepository.findByRetourSecurite_Id(retourSecurite.getId());
+                mouvements.forEach(mouvement -> mouvement.setRetourSecurite(null));
+                mouvementRepository.saveAll(mouvements); // Sauvegarder les modifications
+            });
+            retourSecuriteRepository.deleteAll(client.getRetourSecurites()); // Supprimer les retours sécurité
+        }
+
+        // 3. Supprimer le problème associé
+        if (client.getProbleme() != null) {
+            log.info("Suppression du problème associé au client.");
+            problemeRepository.delete(client.getProbleme());
+        }
+
+        // 4. Supprimer la règle associée
+        if (client.getRegle() != null) {
+            log.info("Suppression de la règle associée au client.");
+            regleRepository.delete(client.getRegle());
+        }
+
+        // 5. Supprimer le client
+        log.info("Suppression du client avec ID: {}", id);
         clientRepository.delete(client);
-        log.info("Client supprimé avec succès.");
+        log.info("Client avec ID: {} supprimé avec succès.", id);
     }
-
-
-
 
     @Transactional
     public ClientDTO getClientById(int id) {

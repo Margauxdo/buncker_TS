@@ -7,6 +7,7 @@ import example.exceptions.FormuleNotFoundException;
 import example.interfaces.IFormuleService;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
+import example.repositories.ValiseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -24,10 +25,12 @@ public class FormuleService implements IFormuleService {
 
     private final FormuleRepository formuleRepository;
     private final RegleRepository regleRepository;
+    private final ValiseRepository valiseRepository;
 
-    public FormuleService(FormuleRepository formuleRepository, RegleRepository regleRepository) {
+    public FormuleService(FormuleRepository formuleRepository, RegleRepository regleRepository, ValiseRepository valiseRepository) {
         this.formuleRepository = formuleRepository;
         this.regleRepository = regleRepository;
+        this.valiseRepository = valiseRepository;
     }
 
     // Conversion Entité -> DTO
@@ -107,20 +110,28 @@ public class FormuleService implements IFormuleService {
     }
 
     @Override
+    @Transactional
     public void deleteFormule(int id) {
+        logger.info("Suppression de la formule avec ID : {}", id);
 
-            Formule formule = formuleRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Formule introuvable avec l'ID : " + id));
+        Formule formule = formuleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Formule introuvable avec l'ID : " + id));
 
-            // Dissocier les règles associées
-            if (formule.getRegles() != null && !formule.getRegles().isEmpty()) {
-                formule.getRegles().forEach(regle -> regle.setFormule(null));
+        // Dissocier les règles associées
+        if (formule.getRegles() != null && !formule.getRegles().isEmpty()) {
+            for (Regle regle : formule.getRegles()) {
+                logger.info("Dissociation de la règle (ID: {}) de la formule", regle.getId());
+                regle.setFormule(null); // Dissocier la formule de la règle
+                regleRepository.save(regle); // Sauvegarder la règle mise à jour
             }
+        }
 
-            // Supprimer la formule
-            formuleRepository.delete(formule);
-
+        // Supprimer la formule après la dissociation
+        logger.info("Suppression de la formule (ID: {}) en cours...", id);
+        formuleRepository.delete(formule);
+        logger.info("Formule (ID: {}) supprimée avec succès", id);
     }
+
 
     @Override
     public FormuleDTO getFormuleById(int id) {

@@ -61,18 +61,25 @@ public class TypeValiseService implements ITypeValiseService {
     @Transactional
     public void deleteTypeValise(int id) {
         TypeValise typeValise = typeValiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("TypeValise with ID " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("TypeValise avec l'ID " + id + " introuvable"));
 
-        // Découpler toutes les valises associées
+        // Dissocier les Valises associées
         List<Valise> valises = valiseRepository.findByTypeValise(typeValise);
         for (Valise valise : valises) {
-            valise.setTypeValise(null);
-            valiseRepository.save(valise);
+            valise.setTypeValise(null); // Dissocie le TypeValise
+            valiseRepository.save(valise); // Sauvegarde la modification
         }
 
-        // Supprimer le type de valise
+        // Supprimer le TypeValise
         typeValiseRepository.delete(typeValise);
     }
+
+
+
+
+
+
+
 
 
     @Override

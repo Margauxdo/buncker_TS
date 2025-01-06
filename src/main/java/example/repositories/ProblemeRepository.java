@@ -3,6 +3,7 @@ package example.repositories;
 import example.entity.Probleme;
 import example.entity.Valise;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,5 +25,20 @@ public interface ProblemeRepository extends JpaRepository<Probleme, Integer> {
     // Rechercher tous les problèmes liés à un client par son ID
     @Query("SELECT p FROM Probleme p JOIN p.clients c WHERE c.id = :clientId")
     List<Probleme> findByClientId(@Param("clientId") int clientId);
+
+
+    @Modifying
+    @Query("UPDATE Probleme p SET p.valise = NULL WHERE p.valise.id = :valiseId")
+    void dissociateValise(@Param("valiseId") Integer valiseId);
+
+
+    @Modifying
+    @Query("DELETE FROM Probleme p WHERE p.valise.id = :valiseId")
+    void deleteByValiseId(@Param("valiseId") Integer valiseId);
+
+
 }
+
+
+
 
