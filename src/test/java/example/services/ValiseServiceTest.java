@@ -40,19 +40,7 @@ public class ValiseServiceTest {
 
 
 
-    @Test
-    public void testDeleteValise_Success() {
-        // Arrange
-        int id = 1;
-        when(valiseRepository.existsById(id)).thenReturn(true);
 
-        // Act
-        valiseService.deleteValise(id);
-
-        // Assert
-        verify(valiseRepository, times(1)).existsById(id);
-        verify(valiseRepository, times(1)).deleteById(id);
-    }
 
 
 

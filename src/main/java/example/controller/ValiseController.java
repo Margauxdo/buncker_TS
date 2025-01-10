@@ -116,18 +116,20 @@ public class ValiseController {
 
     @PostMapping("/delete/{id}")
     public String deleteValise(@PathVariable int id, Model model) {
-        log.info("Requête reçue pour supprimer la valise avec ID: {}", id);
         try {
+            System.out.println("Appel à la méthode de suppression pour la valise ID : " + id);
             valiseService.deleteValise(id);
-            log.info("Valise avec ID: {} supprimée avec succès.", id);
             return "redirect:/valise/list";
         } catch (Exception e) {
-            log.error("Erreur lors de la suppression de la valise avec ID: {}", id, e);
-            model.addAttribute("errorMessage", "Erreur lors de la suppression de la valise : " + e.getMessage());
+            System.out.println("Erreur lors de suppression de la valise : " + e.getMessage());
+            model.addAttribute("errorMessage", "Erreur lors de la valise : " + e.getMessage());
             return "valises/error";
         }
+    }
+
+
 
 }
-    }
+
 
 

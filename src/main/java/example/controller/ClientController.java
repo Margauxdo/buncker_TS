@@ -31,7 +31,7 @@ public class ClientController {
 
 
     public ClientController(ClientService clientService, ValiseService valiseService
-    , ProblemeService problemeService, RetourSecuriteService retourSecuriteService, RegleService regleService) {
+            , ProblemeService problemeService, RetourSecuriteService retourSecuriteService, RegleService regleService) {
         this.clientService = clientService;
         this.valiseService = valiseService;
         this.problemeService = problemeService;
@@ -63,9 +63,6 @@ public class ClientController {
     }
 
 
-
-
-
     /**
      * Vue Thymeleaf pour voir un client par ID.
      */
@@ -80,8 +77,6 @@ public class ClientController {
             return "clients/error";
         }
     }
-
-
 
 
     /**
@@ -131,7 +126,6 @@ public class ClientController {
     }
 
 
-
     @GetMapping("/edit/{id}")
     public String editClient(@PathVariable int id, Model model) {
         ClientDTO client = clientService.getClientById(id);
@@ -158,13 +152,6 @@ public class ClientController {
     }
 
 
-
-
-
-
-
-
-
     /**
      * Modifier un client via formulaire Thymeleaf.
      */
@@ -184,22 +171,24 @@ public class ClientController {
      */
     @PostMapping("/delete/{id}")
     public String deleteClient(@PathVariable int id, Model model) {
-        log.info("Requête reçue pour supprimer le client avec ID: {}", id);
         try {
+            log.info("Tentative de suppression du client avec ID: {}", id);
             clientService.deleteClient(id);
-            log.info("Client supprimé avec succès.");
+            log.info("Client avec ID {} supprimé avec succès.", id);
             return "redirect:/clients/list";
         } catch (Exception e) {
-            log.error("Erreur lors de la suppression du client: {}", e.getMessage());
-            model.addAttribute("errorMessage", "Erreur lors de la suppression du client: " + e.getMessage());
+            log.error("Erreur lors de la suppression du client avec ID {}: {}", id, e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
             return "clients/error";
         }
     }
 
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+

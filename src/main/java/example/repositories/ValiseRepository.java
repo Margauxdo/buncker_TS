@@ -30,5 +30,9 @@ public interface ValiseRepository extends JpaRepository<Valise, Integer> {
             "LEFT JOIN FETCH v.mouvements WHERE v.id = :id")
     Optional<Valise> findByIdWithDetails(@Param("id") Integer id);
 
+    @Query("SELECT v FROM Valise v WHERE v.client.id = :clientId")
+    List<Valise> findByClientId(@Param("clientId") Integer clientId);
+
+
 }
 

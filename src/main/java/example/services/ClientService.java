@@ -230,50 +230,21 @@ public class ClientService implements IClientService {
         return convertToDTO(updatedClient);
     }
 
+
     @Override
     @Transactional
     public void deleteClient(int id) {
-        log.info("Requête reçue pour supprimer le client avec ID: {}", id);
-
-        // Récupérer le client
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client introuvable avec l'ID : " + id));
 
-        // 1. Supprimer les valises associées
-        if (client.getValises() != null && !client.getValises().isEmpty()) {
-            log.info("Suppression des valises associées au client.");
-            valiseRepository.deleteAll(client.getValises());
-        }
 
-        // 2. Dissocier les mouvements et supprimer les retours sécurité
-        if (client.getRetourSecurites() != null && !client.getRetourSecurites().isEmpty()) {
-            log.info("Dissociation des mouvements avant suppression des retours sécurité.");
-            client.getRetourSecurites().forEach(retourSecurite -> {
-                // Dissocier les mouvements
-                List<Mouvement> mouvements = mouvementRepository.findByRetourSecurite_Id(retourSecurite.getId());
-                mouvements.forEach(mouvement -> mouvement.setRetourSecurite(null));
-                mouvementRepository.saveAll(mouvements); // Sauvegarder les modifications
-            });
-            retourSecuriteRepository.deleteAll(client.getRetourSecurites()); // Supprimer les retours sécurité
-        }
 
-        // 3. Supprimer le problème associé
-        if (client.getProbleme() != null) {
-            log.info("Suppression du problème associé au client.");
-            problemeRepository.delete(client.getProbleme());
-        }
 
-        // 4. Supprimer la règle associée
-        if (client.getRegle() != null) {
-            log.info("Suppression de la règle associée au client.");
-            regleRepository.delete(client.getRegle());
-        }
 
-        // 5. Supprimer le client
-        log.info("Suppression du client avec ID: {}", id);
+        // Supprimer le client
         clientRepository.delete(client);
-        log.info("Client avec ID: {} supprimé avec succès.", id);
     }
+
 
     @Transactional
     public ClientDTO getClientById(int id) {

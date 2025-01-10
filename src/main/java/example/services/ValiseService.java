@@ -276,27 +276,21 @@ public class ValiseService implements IValiseService {
         return mapToDTO(valise);
     }
 
-
-    @Override
     @Transactional
     public void deleteValise(int id) {
-        log.info("Tentative de suppression de la valise avec ID: {}", id);
-
         Valise valise = valiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Valise introuvable avec l'ID : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Valise not found with ID: " + id));
 
-        log.info("Vérification des relations de la valise ID: {}", id);
+        // Supprimer les mouvements associés
+        valise.getMouvements().clear();
 
-        // Vérifiez si des mouvements existent
-        if (valise.getMouvements() != null && !valise.getMouvements().isEmpty()) {
-            log.info("La valise contient {} mouvements. Ils seront supprimés automatiquement.", valise.getMouvements().size());
-        }
-
-        // Suppression de la valise
-        log.info("Suppression de la valise avec ID: {}", id);
         valiseRepository.delete(valise);
-        log.info("Valise avec ID: {} supprimée avec succès.", id);
     }
+
+
+
+
+
 
 
     // Conversion Valise vers ValiseDTO

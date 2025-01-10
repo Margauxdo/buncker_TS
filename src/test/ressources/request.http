@@ -481,7 +481,7 @@ description=test+valise+2&numeroValise=236&client.id=1
 
 
 ###Supprimer une valise
-POST http://localhost:8080/valise/delete/12
+POST http://localhost:8080/valise/delete/2
 Content-Type: application/x-www-form-urlencoded
 
 
