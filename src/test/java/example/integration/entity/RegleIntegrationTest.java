@@ -3,18 +3,15 @@ package example.integration.entity;
 import example.entity.*;
 import example.repositories.*;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,98 +23,114 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RegleIntegrationTest {
 
     @Autowired
-    private ClientRepository clientRepository;
+    private RegleRepository regleRepository;
+
+    @Autowired
+    private TypeRegleRepository typeRegleRepository;
+
+    @Autowired
+    private SortieSemaineRepository sortieSemaineRepository;
 
     @Autowired
     private ValiseRepository valiseRepository;
 
     @Autowired
-    private TypeRegleRepository typeRegleRepository;
-    ;
-    @Autowired
-    private SortieSemaineRepository sortieSemaineRepository;
-
-    @Autowired
-    private RegleRepository regleRepository;
-
-    @Autowired
-    private JourFerieRepository jourFerieRepository;
-
+    private ClientRepository clientRepository;
 
     @BeforeEach
     public void setUp() {
-
         regleRepository.deleteAll();
+        typeRegleRepository.deleteAll();
+        sortieSemaineRepository.deleteAll();
+        valiseRepository.deleteAll();
+        clientRepository.deleteAll();
     }
 
     @Test
-    public void testSaveRegleSuccess() {
+    public void testCreateRegle() {
+        // Arrange
         Regle regle = new Regle();
         regle.setCoderegle("R001");
+        regle.setReglePourSortie("Règle de test");
+        regle.setDateRegle(new Date());
         regle.setNombreJours(5);
 
+        // Act
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
+        // Assert
         assertNotNull(savedRegle.getId());
         assertEquals("R001", savedRegle.getCoderegle());
+        assertEquals("Règle de test", savedRegle.getReglePourSortie());
     }
 
     @Test
-    public void testUpdateEntitySuccess() {
+    public void testUpdateRegle() {
+        // Arrange
         Regle regle = new Regle();
-        regle.setCoderegle("R001");
+        regle.setCoderegle("R002");
+        regle.setNombreJours(7);
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
-        savedRegle.setCoderegle("R002");
+        // Act
+        savedRegle.setCoderegle("R002-Updated");
+        savedRegle.setNombreJours(10);
         Regle updatedRegle = regleRepository.saveAndFlush(savedRegle);
 
-        assertEquals("R002", updatedRegle.getCoderegle());
+        // Assert
+        assertEquals("R002-Updated", updatedRegle.getCoderegle());
+        assertEquals(10, updatedRegle.getNombreJours());
     }
 
     @Test
-    public void testDeleteEntitySuccess() {
+    public void testDeleteRegle() {
+        // Arrange
         Regle regle = new Regle();
         regle.setCoderegle("R003");
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
+        // Act
         regleRepository.deleteById(savedRegle.getId());
-        regleRepository.flush();
+        Optional<Regle> deletedRegle = regleRepository.findById(savedRegle.getId());
 
-        Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
-        assertFalse(foundRegle.isPresent());
+        // Assert
+        assertFalse(deletedRegle.isPresent());
     }
 
-
     @Test
-    public void testFindEntityByIdSuccess() {
+    public void testFindRegleById() {
+        // Arrange
         Regle regle = new Regle();
-        regle.setCoderegle("R005");
+        regle.setCoderegle("R004");
         Regle savedRegle = regleRepository.saveAndFlush(regle);
 
+        // Act
         Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
+
+        // Assert
         assertTrue(foundRegle.isPresent());
-    }
-
-    @Test
-    public void testFindEntityByIdNotFound() {
-        Optional<Regle> foundRegle = regleRepository.findById(-1);
-        assertFalse(foundRegle.isPresent());
+        assertEquals("R004", foundRegle.get().getCoderegle());
     }
 
 
     @Test
-    @Transactional
-    public void testSaveEntitySuccess() {
+    public void testRegleWithTypeRegle() {
+        // Arrange
+        TypeRegle typeRegle = new TypeRegle();
+        typeRegle.setNomTypeRegle("Type 1");
+        TypeRegle savedTypeRegle = typeRegleRepository.saveAndFlush(typeRegle);
+
         Regle regle = new Regle();
-        regle.setCoderegle("R001");
-        regle.setReglePourSortie("Règle test");
-        regle.setDateRegle(new Date());
-        regle.setNombreJours(7);
+        regle.setCoderegle("R006");
+        regle.setTypeRegle(savedTypeRegle);
+        Regle savedRegle = regleRepository.saveAndFlush(regle);
 
-        Regle savedRegle = regleRepository.save(regle);
+        // Act
+        Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
 
-        Assertions.assertNotNull(savedRegle.getId(), "L'ID de la règle doit être généré.");
-        Assertions.assertEquals("R001", savedRegle.getCoderegle(), "Le code de la règle doit correspondre.");
+        // Assert
+        assertTrue(foundRegle.isPresent());
+        assertNotNull(foundRegle.get().getTypeRegle());
+        assertEquals("Type 1", foundRegle.get().getTypeRegle().getNomTypeRegle());
     }
-
 }

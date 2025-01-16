@@ -16,8 +16,17 @@ class ClientNotFoundExceptionTest {
         ClientNotFoundException exception = new ClientNotFoundException(expectedMessage);
 
         // Assert
-        assertNotNull(exception);
-        assertEquals(expectedMessage, exception.getMessage());
+        assertNotNull(exception, "Exception should not be null");
+        assertEquals(expectedMessage, exception.getMessage(), "Exception message should match the provided message");
+    }
+
+    @Test
+    void testClientNotFoundExceptionWithoutMessage() {
+        // Act
+        ClientNotFoundException exception = new ClientNotFoundException(null);
+
+        // Assert
+        assertNotNull(exception, "Exception should not be null even without a message");
+        assertEquals(null, exception.getMessage(), "Message should be null when none is provided");
     }
 }
-

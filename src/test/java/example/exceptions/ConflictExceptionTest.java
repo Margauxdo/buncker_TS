@@ -14,7 +14,8 @@ public class ConflictExceptionTest {
         ConflictException exception = new ConflictException(expectedMessage);
 
         // Assert
-        assertEquals(expectedMessage, exception.getMessage());
+        assertNotNull(exception, "The exception instance should not be null");
+        assertEquals(expectedMessage, exception.getMessage(), "The exception message should match the expected message");
     }
 
     @Test
@@ -23,8 +24,8 @@ public class ConflictExceptionTest {
         ConflictException exception = new ConflictException("Default message");
 
         // Assert
-        assertNotNull(exception);
-        assertTrue(exception instanceof RuntimeException, "Exception should be a RuntimeException");
+        assertNotNull(exception, "The exception instance should not be null");
+        assertTrue(exception instanceof RuntimeException, "Exception should be an instance of RuntimeException");
+        assertEquals("Default message", exception.getMessage(), "The exception message should match the default message");
     }
 }
-

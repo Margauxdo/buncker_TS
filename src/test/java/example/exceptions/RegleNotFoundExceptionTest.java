@@ -14,7 +14,7 @@ public class RegleNotFoundExceptionTest {
         RegleNotFoundException exception = new RegleNotFoundException(expectedMessage);
 
         // Assert
-        assertEquals(expectedMessage, exception.getMessage());
+        assertEquals(expectedMessage, exception.getMessage(), "Exception message should match the provided message");
     }
 
     @Test
@@ -26,8 +26,21 @@ public class RegleNotFoundExceptionTest {
         RegleNotFoundException exception = new RegleNotFoundException(expectedMessage);
 
         // Assert
-        assertNotNull(exception);
-        assertInstanceOf(RuntimeException.class, exception, "Exception should be a RuntimeException");
+        assertNotNull(exception, "Exception should not be null");
+        assertInstanceOf(RuntimeException.class, exception, "Exception should be an instance of RuntimeException");
+    }
+
+    @Test
+    void testRegleNotFoundExceptionThrownAndCaught() {
+        // Arrange
+        String expectedMessage = "Test throw exception";
+
+        // Act & Assert
+        try {
+            throw new RegleNotFoundException(expectedMessage);
+        } catch (RegleNotFoundException e) {
+            assertNotNull(e, "Caught exception should not be null");
+            assertEquals(expectedMessage, e.getMessage(), "Caught exception message should match the thrown message");
+        }
     }
 }
-

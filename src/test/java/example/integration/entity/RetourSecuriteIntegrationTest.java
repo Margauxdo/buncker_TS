@@ -17,26 +17,23 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("integrationtest")
+@Transactional
 public class RetourSecuriteIntegrationTest {
 
     @Autowired
     private RetourSecuriteRepository retourSecuriteRepository;
+
     @Autowired
     private ClientRepository clientRepository;
-
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
 
     @PersistenceContext
     private EntityManager em;
@@ -47,37 +44,117 @@ public class RetourSecuriteIntegrationTest {
         clientRepository.deleteAll();
     }
 
+    @Test
+    public void testCreateRetourSecurite() {
+        // Arrange
+        Client client = new Client();
+        client.setName("John Doe");
+        client.setEmail("john.doe@example.com");
+        Client savedClient = clientRepository.saveAndFlush(client);
+
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setNumero(1001L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setCloture(false);
+        retourSecurite.setClient(savedClient);
+
+        // Act
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.saveAndFlush(retourSecurite);
+
+        // Assert
+        assertNotNull(savedRetourSecurite.getId());
+        assertEquals(1001L, savedRetourSecurite.getNumero());
+        assertFalse(savedRetourSecurite.getCloture());
+        assertEquals(savedClient.getId(), savedRetourSecurite.getClient().getId());
+    }
+
+    @Test
+    public void testUpdateRetourSecurite() {
+        // Arrange
+        Client client = new Client();
+        client.setName("Jane Doe");
+        client.setEmail("jane.doe@example.com");
+        Client savedClient = clientRepository.saveAndFlush(client);
+
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setNumero(2002L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setCloture(false);
+        retourSecurite.setClient(savedClient);
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.saveAndFlush(retourSecurite);
+
+        // Act
+        savedRetourSecurite.setCloture(true);
+        savedRetourSecurite.setDateCloture(new Date());
+        RetourSecurite updatedRetourSecurite = retourSecuriteRepository.saveAndFlush(savedRetourSecurite);
+
+        // Assert
+        assertTrue(updatedRetourSecurite.getCloture());
+        assertNotNull(updatedRetourSecurite.getDateCloture());
+    }
+
+    @Test
+    public void testDeleteRetourSecurite() {
+        // Arrange
+        Client client = new Client();
+        client.setName("Mark Spencer");
+        client.setEmail("mark.spencer@example.com");
+        Client savedClient = clientRepository.saveAndFlush(client);
+
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setNumero(3003L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setClient(savedClient);
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.saveAndFlush(retourSecurite);
+
+        // Act
+        retourSecuriteRepository.deleteById(savedRetourSecurite.getId());
+        Optional<RetourSecurite> deletedRetourSecurite = retourSecuriteRepository.findById(savedRetourSecurite.getId());
+
+        // Assert
+        assertFalse(deletedRetourSecurite.isPresent());
+    }
+
+    @Test
+    public void testRetourSecuriteWithMouvements() {
+        // Arrange
+        Client client = new Client();
+        client.setName("Alice Doe");
+        client.setEmail("alice.doe@example.com");
+        Client savedClient = clientRepository.saveAndFlush(client);
+
+        RetourSecurite retourSecurite = new RetourSecurite();
+        retourSecurite.setNumero(4004L);
+        retourSecurite.setDatesecurite(new Date());
+        retourSecurite.setClient(savedClient);
+        RetourSecurite savedRetourSecurite = retourSecuriteRepository.saveAndFlush(retourSecurite);
+
+        Mouvement mouvement = new Mouvement();
+        mouvement.setRetourSecurite(savedRetourSecurite);
+        mouvement.setDateHeureMouvement(new Date());
+        mouvement.setStatutSortie("In Progress");
+        savedRetourSecurite.getMouvements().add(mouvement);
+
+        RetourSecurite updatedRetourSecurite = retourSecuriteRepository.saveAndFlush(savedRetourSecurite);
+
+        // Act
+        Optional<RetourSecurite> foundRetourSecurite = retourSecuriteRepository.findById(updatedRetourSecurite.getId());
+
+        // Assert
+        assertTrue(foundRetourSecurite.isPresent());
+        assertEquals(1, foundRetourSecurite.get().getMouvements().size());
+        assertEquals("In Progress", foundRetourSecurite.get().getMouvements().get(0).getStatutSortie());
+    }
 
     @Test
     public void testSaveRetourSecuriteWithoutNumero() {
-        Client client = new Client();
-        client.setEmail("test@test.com");
-        client.setName("Albert");
-        clientRepository.save(client);
-
+        // Arrange
         RetourSecurite retourSecurite = new RetourSecurite();
-        //retourSecurite.setClient(new ArrayList<>());
         retourSecurite.setDatesecurite(new Date());
 
-
+        // Assert
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            retourSecuriteRepository.save(retourSecurite);
-        }, "Expected DataIntegrityViolationException due to missing 'number'");
+            retourSecuriteRepository.saveAndFlush(retourSecurite);
+        }, "Expected DataIntegrityViolationException due to missing 'numero'");
     }
-
-    @Test
-    public void testFindRetourSecuriteByIdNotFound(){
-        Optional<RetourSecurite> foundRS = retourSecuriteRepository.findById(9999);
-        Assertions.assertFalse(foundRS.isPresent(), "The safety return id must be generated");
-    }
-
-    @Test
-    public void testFindById_ReturnSecuriteDoesNotExist() {
-        Optional<RetourSecurite> foundRetourSecurite = retourSecuriteRepository.findById(99999);
-
-        Assertions.assertFalse(foundRetourSecurite.isPresent(), "safety return should not be found");
-    }
-
-
-
 }

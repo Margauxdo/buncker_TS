@@ -31,55 +31,109 @@ public class RetourSecuriteServiceTest {
     }
 
 
-
     @Test
-    public void testUpdateRetourSecurite_Success() {
+    public void testUpdateRetourSecurite_NotFound() {
+        // Arrange
         int id = 1;
         RetourSecuriteDTO retourSecuriteDTO = new RetourSecuriteDTO();
-        retourSecuriteDTO.setId(id);
 
-        RetourSecurite existingRetourSecurite = new RetourSecurite();
-        existingRetourSecurite.setId(id);
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.empty());
 
-        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(existingRetourSecurite));
-        when(retourSecuriteRepository.save(any(RetourSecurite.class))).thenReturn(existingRetourSecurite);
+        // Act & Assert
+        EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> retourSecuriteService.updateRetourSecurite(id, retourSecuriteDTO)
+        );
 
-        RetourSecuriteDTO result = retourSecuriteService.updateRetourSecurite(id, retourSecuriteDTO);
-
-        Assertions.assertNotNull(result, "RetourSecuriteDTO should not be null");
-        Assertions.assertEquals(id, result.getId(), "Wrong retour security ID");
+        Assertions.assertEquals("RetourSecurite introuvable avec l'ID : 1", exception.getMessage());
         verify(retourSecuriteRepository, times(1)).findById(id);
-        verify(retourSecuriteRepository, times(1)).save(any(RetourSecurite.class));
+    }
+
+    @Test
+    public void testGetRetourSecurite_Success() {
+        // Arrange
+        int id = 1;
+        RetourSecurite retourSecurite = RetourSecurite.builder()
+                .id(id)
+                .numero(12345L)
+                .mouvements(new ArrayList<>()) // Initialiser la liste des mouvements
+                .build();
+
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(retourSecurite));
+
+        // Act
+        RetourSecuriteDTO result = retourSecuriteService.getRetourSecurite(id);
+
+        // Assert
+        Assertions.assertNotNull(result, "RetourSecuriteDTO should not be null");
+        Assertions.assertEquals(id, result.getId(), "ID should match");
+        verify(retourSecuriteRepository, times(1)).findById(id);
     }
 
 
     @Test
-    public void testGetRetourSecurite_Success() {
+    public void testGetRetourSecurite_NotFound() {
+        // Arrange
         int id = 1;
-        RetourSecurite retourSecurite = new RetourSecurite();
-        retourSecurite.setId(id);
+        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.empty());
 
-        when(retourSecuriteRepository.findById(id)).thenReturn(Optional.of(retourSecurite));
+        // Act & Assert
+        EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> retourSecuriteService.getRetourSecurite(id)
+        );
 
-        RetourSecuriteDTO result = retourSecuriteService.getRetourSecurite(id);
-
-        Assertions.assertNotNull(result, "RetourSecuriteDTO should not be null");
-        Assertions.assertEquals(id, result.getId(), "Wrong retour security ID");
+        Assertions.assertEquals("Retour Sécurité introuvable avec l'ID : 1", exception.getMessage());
         verify(retourSecuriteRepository, times(1)).findById(id);
     }
 
     @Test
     public void testGetAllRetourSecurites_Success() {
+        // Arrange
         List<RetourSecurite> retourSecurites = new ArrayList<>();
-        retourSecurites.add(new RetourSecurite());
+        retourSecurites.add(RetourSecurite.builder().id(1).mouvements(new ArrayList<>()).build()); // Initialiser mouvements
+        retourSecurites.add(RetourSecurite.builder().id(2).mouvements(new ArrayList<>()).build()); // Initialiser mouvements
 
         when(retourSecuriteRepository.findAll()).thenReturn(retourSecurites);
 
+        // Act
         List<RetourSecuriteDTO> result = retourSecuriteService.getAllRetourSecurites();
 
-        Assertions.assertFalse(result.isEmpty(), "Security list should not be empty");
+        // Assert
+        Assertions.assertFalse(result.isEmpty(), "List should not be empty");
+        Assertions.assertEquals(2, result.size(), "List size should be 2");
         verify(retourSecuriteRepository, times(1)).findAll();
     }
 
 
+    @Test
+    public void testDeleteRetourSecurite_Success() {
+        // Arrange
+        int id = 1;
+        when(retourSecuriteRepository.existsById(id)).thenReturn(true);
+        doNothing().when(retourSecuriteRepository).deleteById(id);
+
+        // Act
+        retourSecuriteService.deleteRetourSecurite(id);
+
+        // Assert
+        verify(retourSecuriteRepository, times(1)).existsById(id);
+        verify(retourSecuriteRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    public void testDeleteRetourSecurite_NotFound() {
+        // Arrange
+        int id = 1;
+        when(retourSecuriteRepository.existsById(id)).thenReturn(false);
+
+        // Act & Assert
+        EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> retourSecuriteService.deleteRetourSecurite(id)
+        );
+
+        Assertions.assertEquals("Retour Sécurité introuvable avec l'ID : " + id, exception.getMessage());
+        verify(retourSecuriteRepository, times(1)).existsById(id);
+    }
 }

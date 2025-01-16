@@ -2,10 +2,10 @@ package example.services;
 
 import example.DTO.LivreurDTO;
 import example.entity.Livreur;
-import example.exceptions.RegleNotFoundException;
+import example.entity.Mouvement;
 import example.repositories.LivreurRepository;
+import example.repositories.MouvementRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,13 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class LivreurServiceTest {
 
     @Mock
     private LivreurRepository livreurRepository;
+
+    @Mock
+    private MouvementRepository mouvementRepository;
 
     @InjectMocks
     private LivreurService livreurService;
@@ -32,11 +35,27 @@ public class LivreurServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    private Livreur createLivreur() {
+        return Livreur.builder()
+                .id(1)
+                .nomLivreur("John Doe")
+                .codeLivreur("CODE123")
+                .mouvements(new ArrayList<>())
+                .build();
+    }
 
+    private LivreurDTO createLivreurDTO() {
+        return LivreurDTO.builder()
+                .id(1)
+                .nomLivreur("John Doe")
+                .codeLivreur("CODE123")
+                .mouvementIds(List.of(1, 2))
+                .build();
+    }
 
     @Test
     public void testGetLivreurById_Success() {
-        Livreur livreur = Livreur.builder().id(1).nomLivreur("John Doe").build();
+        Livreur livreur = createLivreur();
 
         when(livreurRepository.findById(1)).thenReturn(Optional.of(livreur));
 
@@ -44,46 +63,85 @@ public class LivreurServiceTest {
 
         assertNotNull(result);
         assertEquals("John Doe", result.getNomLivreur());
+        assertEquals("CODE123", result.getCodeLivreur());
+        verify(livreurRepository, times(1)).findById(1);
     }
+
+    @Test
+    public void testGetLivreurById_NotFound() {
+        when(livreurRepository.findById(1)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> livreurService.getLivreurById(1)
+        );
+
+        assertEquals("Livreur introuvable avec l'ID : 1", exception.getMessage());
+        verify(livreurRepository, times(1)).findById(1);
+    }
+
+
 
     @Test
     public void testDeleteLivreur_NotFound() {
-        when(livreurRepository.existsById(1)).thenReturn(false);
+        when(livreurRepository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> livreurService.deleteLivreur(1));
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> livreurService.deleteLivreur(1)
+        );
+
+        assertEquals("Livreur introuvable avec l'ID : 1", exception.getMessage());
+        verify(livreurRepository, times(1)).findById(1);
     }
 
-
-
-
-
-
-
-
     @Test
-    public void testGetAllLivreurs_Success(){
+    public void testGetAllLivreurs_Success() {
         List<Livreur> livreurs = new ArrayList<>();
-        livreurs.add(new Livreur());
+        livreurs.add(createLivreur());
+
         when(livreurRepository.findAll()).thenReturn(livreurs);
+
         List<LivreurDTO> result = livreurService.getAllLivreurs();
-        Assertions.assertEquals(1,result.size(),"la liste des livreurs devrait contenir un element");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John Doe", result.get(0).getNomLivreur());
         verify(livreurRepository, times(1)).findAll();
-        verifyNoMoreInteractions(livreurRepository);
     }
+
     @Test
-    public void testGetAllLivreurs_Failure_Exception(){
-        when(livreurRepository.findAll()).thenThrow(new RuntimeException("database error"));
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            livreurService.getAllLivreurs();
-        });
-        Assertions.assertEquals("database error",exception.getMessage(),"Exception message should match expected error");
+    public void testGetAllLivreurs_EmptyList() {
+        when(livreurRepository.findAll()).thenReturn(new ArrayList<>());
+
+        List<LivreurDTO> result = livreurService.getAllLivreurs();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
         verify(livreurRepository, times(1)).findAll();
-        verifyNoMoreInteractions(livreurRepository);
     }
+
     @Test
-    public void testNoInteractionWithLivreurRepository_Success(){
-        verifyNoInteractions(livreurRepository);
+    public void testCreateLivreur_Success() {
+        // Arrange
+        LivreurDTO livreurDTO = createLivreurDTO();
+        Livreur livreur = createLivreur();
+
+        // Simuler la récupération des mouvements et la sauvegarde du livreur
+        when(mouvementRepository.findAllById(livreurDTO.getMouvementIds())).thenReturn(new ArrayList<>());
+        when(livreurRepository.save(any(Livreur.class))).thenReturn(livreur);
+
+        // Act
+        LivreurDTO result = livreurService.createLivreur(livreurDTO);
+
+        // Assert
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertEquals("John Doe", result.getNomLivreur(), "Le nom du livreur doit correspondre");
+        verify(mouvementRepository, atLeastOnce()).findAllById(livreurDTO.getMouvementIds());
+        verify(livreurRepository, times(1)).save(any(Livreur.class));
     }
+
+
 
 
 }

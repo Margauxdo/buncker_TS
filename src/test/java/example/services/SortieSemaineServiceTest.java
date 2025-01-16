@@ -1,9 +1,10 @@
 package example.services;
 
 import example.DTO.SortieSemaineDTO;
-import example.entity.Regle;
 import example.entity.SortieSemaine;
+import example.entity.Regle;
 import example.repositories.SortieSemaineRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -28,69 +29,112 @@ class SortieSemaineServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-
-
-
+    private SortieSemaine createSortieSemaine(int id) {
+        return SortieSemaine.builder()
+                .id(id)
+                .dateSortieSemaine(new Date())
+                .regles(new ArrayList<>()) // Initialiser la liste des règles
+                .build();
+    }
 
     @Test
     public void testDeleteSortieSemaine_Success() {
+        // Arrange
         int id = 1;
-
-        // Mock existsById to return true, so deleteById can proceed
         when(sortieSemaineRepository.existsById(id)).thenReturn(true);
 
-        // Call the service method to delete
+        // Act
         sortieSemaineService.deleteSortieSemaine(id);
 
-        // Verify interactions
-        verify(sortieSemaineRepository, times(1)).deleteById(id);
+        // Assert
         verify(sortieSemaineRepository, times(1)).existsById(id);
+        verify(sortieSemaineRepository, times(1)).deleteById(id);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
-
     @Test
     public void testGetSortieSemaine_Success() {
+        // Arrange
         int id = 1;
-        SortieSemaine semaine = new SortieSemaine();
-        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.of(semaine));
+        SortieSemaine sortieSemaine = createSortieSemaine(id);
 
+        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.of(sortieSemaine));
+
+        // Act
         SortieSemaineDTO result = sortieSemaineService.getSortieSemaine(id);
 
-        assertNotNull(result, "he retrieval should return a non-null object.");
+        // Assert
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertEquals(id, result.getId(), "L'ID doit correspondre");
         verify(sortieSemaineRepository, times(1)).findById(id);
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
+    @Test
+    public void testGetSortieSemaine_NotFound() {
+        // Arrange
+        int id = 1;
+        when(sortieSemaineRepository.findById(id)).thenReturn(Optional.empty());
 
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> sortieSemaineService.getSortieSemaine(id)
+        );
+
+        assertEquals("SortieSemaine with ID " + id + " not found", exception.getMessage());
+        verify(sortieSemaineRepository, times(1)).findById(id);
+        verifyNoMoreInteractions(sortieSemaineRepository);
+    }
 
     @Test
     public void testGetAllSortieSemaine_Success() {
-        List<SortieSemaine> semaines = new ArrayList<>();
-        semaines.add(new SortieSemaine());
+        // Arrange
+        List<SortieSemaine> semaines = List.of(
+                createSortieSemaine(1),
+                createSortieSemaine(2)
+        );
         when(sortieSemaineRepository.findAll()).thenReturn(semaines);
 
+        // Act
         List<SortieSemaineDTO> result = sortieSemaineService.getAllSortieSemaine();
 
-        assertNotNull(result, "The list of weeks must not be null");
-        assertEquals(1, result.size(), "The list of weeks must not be null. The size of the list must be 1.");
+        // Assert
+        assertNotNull(result, "La liste des sorties ne doit pas être null");
+        assertEquals(2, result.size(), "La liste doit contenir 2 éléments");
         verify(sortieSemaineRepository, times(1)).findAll();
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
 
+    @Test
+    public void testGetAllSortieSemaine_EmptyList() {
+        // Arrange
+        when(sortieSemaineRepository.findAll()).thenReturn(new ArrayList<>());
 
+        // Act
+        List<SortieSemaineDTO> result = sortieSemaineService.getAllSortieSemaine();
+
+        // Assert
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertTrue(result.isEmpty(), "La liste doit être vide");
+        verify(sortieSemaineRepository, times(1)).findAll();
+        verifyNoMoreInteractions(sortieSemaineRepository);
+    }
 
     @Test
     public void testGetAllSortieSemaine_LargeDataSet() {
+        // Arrange
         List<SortieSemaine> semaines = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            semaines.add(new SortieSemaine());
+            semaines.add(createSortieSemaine(i + 1));
         }
         when(sortieSemaineRepository.findAll()).thenReturn(semaines);
 
+        // Act
         List<SortieSemaineDTO> result = sortieSemaineService.getAllSortieSemaine();
 
-        assertEquals(1000, result.size(), "The list size should be 1000.");
+        // Assert
+        assertEquals(1000, result.size(), "La taille de la liste doit être 1000");
         verify(sortieSemaineRepository, times(1)).findAll();
         verifyNoMoreInteractions(sortieSemaineRepository);
     }
@@ -99,9 +143,4 @@ class SortieSemaineServiceTest {
     public void testNoInteractionsWithSortieSemaineRepository_Success() {
         verifyNoInteractions(sortieSemaineRepository);
     }
-
-
-
-
-
 }

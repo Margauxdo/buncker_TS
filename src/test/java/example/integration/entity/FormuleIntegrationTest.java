@@ -1,10 +1,9 @@
-package example.integration.entities;
+package example.integration.entity;
 
 import example.entity.Formule;
 import example.entity.Regle;
 import example.repositories.FormuleRepository;
 import example.repositories.RegleRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,13 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -38,115 +34,113 @@ public class FormuleIntegrationTest {
             regle.setFormule(null);
             regleRepository.save(regle);
         });
-
         formuleRepository.deleteAll();
-
         regleRepository.deleteAll();
     }
 
-
-
     @Test
-    public void testUpdateFormuleSuccess() throws ParseException {
-        Regle regle = new Regle();
-        regle.setCoderegle("R125");
-        regle.setDateRegle(new Date());
-        regle = regleRepository.saveAndFlush(regle);
-
+    void testUpdateFormuleSuccess() {
+        // Arrange
         Formule formule = new Formule();
-        formule.setFormule("formule4");
         formule.setLibelle("libelle 4");
-        formule.setLibelle(String.valueOf(regle));
+        formule.setFormule("formule4");
         Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
+        // Act
         savedFormule.setLibelle("libelle 4 modifié");
         savedFormule.setFormule("formule4 modifiée");
         Formule updatedFormule = formuleRepository.saveAndFlush(savedFormule);
 
+        // Assert
         assertEquals("libelle 4 modifié", updatedFormule.getLibelle());
         assertEquals("formule4 modifiée", updatedFormule.getFormule());
     }
 
     @Test
-    public void testFindFormuleNotFound() {
+    void testFindFormuleNotFound() {
+        // Act
         Optional<Formule> formule = formuleRepository.findById(999);
 
+        // Assert
         assertTrue(formule.isEmpty());
     }
 
-
     @Test
-    public void testDeleteFormuleSuccess() {
-        Regle regle = new Regle();
-        regle.setCoderegle("R126");
-        regle.setDateRegle(new Date());
-        regle = regleRepository.saveAndFlush(regle);
-
+    void testDeleteFormuleSuccess() {
+        // Arrange
         Formule formule = new Formule();
-        formule.setFormule("formule5");
         formule.setLibelle("libelle 5");
-        formule.setLibelle(String.valueOf(regle));
+        formule.setFormule("formule5");
         Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
+        // Act
         formuleRepository.delete(savedFormule);
 
+        // Assert
         Optional<Formule> deletedFormule = formuleRepository.findById(savedFormule.getId());
         assertTrue(deletedFormule.isEmpty());
     }
+
     @Test
     void testCreateFormule() {
+        // Arrange
         Formule formule = new Formule();
         formule.setLibelle("Formule Test");
+        formule.setFormule("formule-test");
 
-        formuleRepository.save(formule);
+        // Act
+        Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
-        Optional<Formule> found = formuleRepository.findById(formule.getId());
-
+        // Assert
+        Optional<Formule> found = formuleRepository.findById(savedFormule.getId());
         assertTrue(found.isPresent());
         assertEquals("Formule Test", found.get().getLibelle());
+        assertEquals("formule-test", found.get().getFormule());
     }
-
 
     @Test
     void testFormuleRelationWithRegle() {
+        // Arrange
         Formule formule = new Formule();
         formule.setLibelle("Formule Test");
         Formule savedFormule = formuleRepository.saveAndFlush(formule);
 
         Regle regle = new Regle();
         regle.setCoderegle("CODE123");
+        regle.setDateRegle(new Date());
         regle.setFormule(savedFormule);
-        regleRepository.saveAndFlush(regle);
 
-        Optional<Regle> foundRegle = regleRepository.findById(regle.getId());
+        // Act
+        Regle savedRegle = regleRepository.saveAndFlush(regle);
+
+        // Assert
+        Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
         assertTrue(foundRegle.isPresent());
         assertEquals(savedFormule.getId(), foundRegle.get().getFormule().getId());
     }
 
-
-
     @Test
-    public void testDeleteFormuleWithRegle() {
+    void testDeleteFormuleWithRegle() {
+        // Arrange
+        Formule formule = new Formule();
+        formule.setLibelle("libelle 6");
+        formule.setFormule("formule6");
+        Formule savedFormule = formuleRepository.saveAndFlush(formule);
+
         Regle regle = new Regle();
         regle.setCoderegle("R127");
         regle.setDateRegle(new Date());
-        regle = regleRepository.saveAndFlush(regle);
-
-        Formule formule = new Formule();
-        formule.setFormule("formule6");
-        formule.setLibelle("libelle 6");
-        formule.setLibelle(String.valueOf(regle));
-        Formule savedFormule = formuleRepository.saveAndFlush(formule);
-
-        regle.setFormule(null);
+        regle.setFormule(savedFormule);
         regleRepository.saveAndFlush(regle);
 
+        regle.setFormule(null); // Detach Regle from Formule
+        regleRepository.saveAndFlush(regle);
+
+        // Act
         formuleRepository.delete(savedFormule);
 
+        // Assert
         Optional<Formule> deletedFormule = formuleRepository.findById(savedFormule.getId());
         assertTrue(deletedFormule.isEmpty());
     }
-
-
-
 }

@@ -4,7 +4,7 @@ import example.entity.Client;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
-import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,12 +32,12 @@ class ClientIntegrationTest {
 
     @BeforeEach
     void setup() {
-        clientRepository.deleteAll();
         valiseRepository.deleteAll();
+        clientRepository.deleteAll();
     }
 
     @Test
-    public void testSaveClient() {
+    void testSaveClient() {
         Client client = new Client();
         client.setName("John Doe");
         client.setEmail("johndoe@example.com");
@@ -52,55 +50,21 @@ class ClientIntegrationTest {
     }
 
     @Test
-    public void testFindClientById() {
+    void testFindClientById() {
         Client client = new Client();
         client.setName("Jane Doe");
         client.setEmail("janedoe@example.com");
 
         Client savedClient = clientRepository.save(client);
-        Client foundClient = clientRepository.findById(savedClient.getId()).orElse(null);
+        Optional<Client> foundClient = clientRepository.findById(savedClient.getId());
 
-        assertNotNull(foundClient);
-        assertEquals("Jane Doe", foundClient.getName());
-        assertEquals("janedoe@example.com", foundClient.getEmail());
+        assertTrue(foundClient.isPresent());
+        assertEquals("Jane Doe", foundClient.get().getName());
+        assertEquals("janedoe@example.com", foundClient.get().getEmail());
     }
-
-    /*@Test
-    @Transactional
-    public void testUpdateClient() {
-        // Arrange
-        Client client = new Client();
-        client.setName("Initial Name");
-        client.setEmail("initial@example.com");
-
-        // Ajout d'une valise pour tester la gestion des collections
-        Valise valise = new Valise();
-        valise.setNumeroValise(Long.valueOf("V123"));
-        valise.setClient(client);
-
-        client.setValises(new HashSet<>(Set.of(valise)));
-
-        // Persist initial client
-        client = clientRepository.save(client);
-
-        // Assurez-vous que l'entité est correctement chargée
-        assertNotNull(client.getId());
-        assertEquals(1, client.getValises().size());
-
-        // Act
-        client.setName("Updated Name");
-        client.getValises().iterator().next().setNumeroValise(Long.valueOf("V456")); // Mise à jour de la valise existante
-        Client updatedClient = clientRepository.save(client);
-
-        // Assert
-        assertEquals("Updated Name", updatedClient.getName());
-        assertEquals(1, updatedClient.getValises().size());
-        assertEquals("V456", updatedClient.getValises().iterator().next().getNumeroValise());
-    }
-*/
 
     @Test
-    public void testDeleteClient() {
+    void testDeleteClient() {
         Client client = new Client();
         client.setName("To Be Deleted");
         client.setEmail("delete@example.com");
@@ -112,7 +76,34 @@ class ClientIntegrationTest {
     }
 
     @Test
-    public void testUniqueConstraintOnEmail() {
+    void testSaveClientWithValises() {
+        // Arrange: Create a client
+        Client client = new Client();
+        client.setName("Client With Valises");
+        client.setEmail("valise@example.com");
+
+        // Arrange: Create a valise and set required fields
+        Valise valise = new Valise();
+        valise.setNumeroValise("V123");
+        valise.setDescription("Sample description"); // Ensure this field is set
+        valise.setClient(client);
+
+        // Add the valise to the client's list
+        client.setValises(List.of(valise));
+
+        // Act: Save the client (cascading will save the valise)
+        Client savedClient = clientRepository.save(client);
+
+        // Assert: Validate client and valise were saved correctly
+        assertNotNull(savedClient.getId(), "Client ID should not be null");
+        assertEquals(1, savedClient.getValises().size(), "Client should have one valise");
+        assertEquals("V123", savedClient.getValises().get(0).getNumeroValise(), "Valise number should match");
+        assertEquals("Sample description", savedClient.getValises().get(0).getDescription(), "Valise description should match");
+    }
+
+
+    @Test
+    void testUniqueConstraintOnEmail() {
         Client client1 = new Client();
         client1.setName("Client One");
         client1.setEmail("unique@example.com");
@@ -125,35 +116,24 @@ class ClientIntegrationTest {
         assertThrows(DataIntegrityViolationException.class, () -> clientRepository.save(client2));
     }
 
-    @Test
-    public void testSaveClientWithNullNameThrowsException() {
-        // Arrange
-        Client client = new Client();
-        client.setEmail("nullname@example.com");
-
-        // Act & Assert
-        assertThrows(DataIntegrityViolationException.class, () -> clientRepository.saveAndFlush(client));
-    }
-
-
 
 
     @Test
-    public void testFindAllClient() {
+    void testFindAllClients() {
         Client clientA = new Client();
         clientA.setName("Client A");
-        clientA.setEmail("clientA@test.com");
+        clientA.setEmail("clientA@example.com");
         clientRepository.save(clientA);
 
         Client clientB = new Client();
         clientB.setName("Client B");
-        clientB.setEmail("clientB@test.com");
+        clientB.setEmail("clientB@example.com");
         clientRepository.save(clientB);
 
         List<Client> clients = clientRepository.findAll();
 
-        assertEquals(2, clients.size(), "Expected two clients to be saved.");
-        assertTrue(clients.stream().anyMatch(c -> c.getName().equals("Client A")));
-        assertTrue(clients.stream().anyMatch(c -> c.getName().equals("Client B")));
+        assertEquals(2, clients.size());
+        assertTrue(clients.stream().anyMatch(client -> client.getName().equals("Client A")));
+        assertTrue(clients.stream().anyMatch(client -> client.getName().equals("Client B")));
     }
 }

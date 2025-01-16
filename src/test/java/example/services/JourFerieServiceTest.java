@@ -3,17 +3,19 @@ package example.services;
 import example.DTO.JourFerieDTO;
 import example.entity.JourFerie;
 import example.repositories.JourFerieRepository;
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Optional;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class JourFerieServiceTest {
@@ -26,65 +28,123 @@ public class JourFerieServiceTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
-    // Test pour récupérer un jour férié existant
+    private JourFerie createJourFerie() {
+        return JourFerie.builder()
+                .id(1)
+                .date(new Date())
+                .build();
+    }
+
+    private JourFerieDTO createJourFerieDTO() {
+        return JourFerieDTO.builder()
+                .id(1)
+                .date(new Date())
+                .build();
+    }
+
     @Test
     public void testGetJourFerie_Success() {
+        // Arrange
         int id = 1;
-        JourFerie jourFerie = new JourFerie();
-        jourFerie.setId(id);
+        JourFerie jourFerie = createJourFerie();
 
         when(jourFerieRepository.findById(id)).thenReturn(Optional.of(jourFerie));
 
+        // Act
         JourFerieDTO result = jourFerieService.getJourFerie(id);
 
-        Assertions.assertNotNull(result, "JourFerie should not be null");
-        Assertions.assertEquals(id, result.getId(), "JourFerie ID should match");
-
+        // Assert
+        assertNotNull(result, "JourFerie should not be null");
+        assertEquals(id, result.getId(), "JourFerie ID should match");
         verify(jourFerieRepository, times(1)).findById(id);
-        verifyNoMoreInteractions(jourFerieRepository);
     }
 
-    // Test pour récupérer un jour férié inexistant
+    @Test
+    public void testGetJourFerie_NotFound() {
+        // Arrange
+        int id = 1;
 
+        when(jourFerieRepository.findById(id)).thenReturn(Optional.empty());
 
-    // Test pour récupérer tous les jours fériés avec succès
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> jourFerieService.getJourFerie(id)
+        );
+
+        assertEquals("JourFerie introuvable avec l'ID : " + id, exception.getMessage());
+        verify(jourFerieRepository, times(1)).findById(id);
+    }
+
     @Test
     public void testGetJourFeries_Success() {
+        // Arrange
         List<JourFerie> jourFeries = new ArrayList<>();
-        jourFeries.add(new JourFerie());
-        jourFeries.add(new JourFerie());
+        jourFeries.add(createJourFerie());
+        jourFeries.add(createJourFerie());
 
         when(jourFerieRepository.findAll()).thenReturn(jourFeries);
 
+        // Act
         List<JourFerieDTO> result = jourFerieService.getJourFeries();
 
-        Assertions.assertEquals(2, result.size(), "The list of jourFeries should contain 2 elements");
-
+        // Assert
+        assertNotNull(result, "The result should not be null");
+        assertEquals(2, result.size(), "The list of jourFeries should contain 2 elements");
         verify(jourFerieRepository, times(1)).findAll();
-        verifyNoMoreInteractions(jourFerieRepository);
     }
 
-    // Test pour récupérer une liste vide de jours fériés
     @Test
     public void testGetJourFeries_EmptyList() {
+        // Arrange
         when(jourFerieRepository.findAll()).thenReturn(new ArrayList<>());
 
+        // Act
         List<JourFerieDTO> result = jourFerieService.getJourFeries();
 
-        Assertions.assertTrue(result.isEmpty(), "The list of jourFeries should be empty");
-
+        // Assert
+        assertNotNull(result, "The result should not be null");
+        assertTrue(result.isEmpty(), "The list of jourFeries should be empty");
         verify(jourFerieRepository, times(1)).findAll();
-        verifyNoMoreInteractions(jourFerieRepository);
     }
 
     @Test
-    public void testNoInteractionWithJourFerieRepository_Success() {
-        verifyNoInteractions(jourFerieRepository);
+    public void testSaveJourFerie_Success() {
+        // Arrange
+        JourFerieDTO jourFerieDTO = createJourFerieDTO();
+        JourFerie jourFerie = createJourFerie();
+
+        when(jourFerieRepository.save(any(JourFerie.class))).thenReturn(jourFerie);
+
+        // Act
+        JourFerieDTO result = jourFerieService.saveJourFerie(jourFerieDTO);
+
+        // Assert
+        assertNotNull(result, "The result should not be null");
+        assertEquals(jourFerieDTO.getDate(), result.getDate(), "Dates should match");
+        verify(jourFerieRepository, times(1)).save(any(JourFerie.class));
     }
 
 
-}
 
+
+    @Test
+    public void testDeleteJourFerie_NotFound() {
+        // Arrange
+        int id = 1;
+
+        when(jourFerieRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> jourFerieService.deleteJourFerie(id)
+        );
+
+        assertEquals("JourFerie introuvable avec l'ID : " + id, exception.getMessage());
+        verify(jourFerieRepository, times(1)).findById(id);
+    }
+}

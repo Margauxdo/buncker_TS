@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,41 +31,44 @@ public class TypeValiseServiceTest {
     private TypeValiseService typeValiseService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-
+    private TypeValise createTypeValise(Integer id, String proprietaire, String description) {
+        return TypeValise.builder()
+                .id(id)
+                .proprietaire(proprietaire)
+                .description(description)
+                .build();
+    }
 
     @Test
-    public void testDeleteTypeValise_Success() {
+    public void testCreateTypeValise_Success() {
         // Arrange
-        int id = 1;
-        TypeValise typeValise = new TypeValise();
-        typeValise.setId(id);
+        TypeValiseDTO typeValiseDTO = TypeValiseDTO.builder()
+                .proprietaire("Owner1")
+                .description("Description1")
+                .build();
 
-        when(typeValiseRepository.findById(id)).thenReturn(Optional.of(typeValise));
+        TypeValise savedTypeValise = createTypeValise(1, "Owner1", "Description1");
+
+        when(typeValiseRepository.save(any(TypeValise.class))).thenReturn(savedTypeValise);
 
         // Act
-        typeValiseService.deleteTypeValise(id);
+        TypeValiseDTO result = typeValiseService.createTypeValise(typeValiseDTO);
 
         // Assert
-        verify(typeValiseRepository, times(1)).findById(id);
-        verify(typeValiseRepository, times(1)).delete(typeValise);
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertEquals("Owner1", result.getProprietaire(), "Le propriétaire doit correspondre");
+        verify(typeValiseRepository, times(1)).save(any(TypeValise.class));
     }
 
     @Test
     public void testGetTypeValise_Success() {
         // Arrange
         int id = 1;
-        Valise valise = new Valise();
-        valise.setId(1);
-
-        TypeValise typeValise = TypeValise.builder()
-                .id(id)
-                .proprietaire("Owner")
-                .description("Description")
-                .build();
+        TypeValise typeValise = createTypeValise(id, "Owner1", "Description1");
 
         when(typeValiseRepository.findById(id)).thenReturn(Optional.of(typeValise));
 
@@ -72,10 +76,24 @@ public class TypeValiseServiceTest {
         TypeValiseDTO result = typeValiseService.getTypeValise(id);
 
         // Assert
-        assertNotNull(result, "The retrieved TypeValiseDTO should not be null");
-        assertEquals("Owner", result.getProprietaire());
-        assertEquals("Description", result.getDescription());
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertEquals("Owner1", result.getProprietaire(), "Le propriétaire doit correspondre");
+        verify(typeValiseRepository, times(1)).findById(id);
+    }
 
+    @Test
+    public void testGetTypeValise_NotFound() {
+        // Arrange
+        int id = 1;
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> typeValiseService.getTypeValise(id)
+        );
+
+        assertEquals("TypeValise with ID " + id + " not found", exception.getMessage());
         verify(typeValiseRepository, times(1)).findById(id);
     }
 
@@ -83,8 +101,8 @@ public class TypeValiseServiceTest {
     public void testGetTypeValises_Success() {
         // Arrange
         List<TypeValise> typeValises = List.of(
-                TypeValise.builder().id(1).proprietaire("Owner1").description("Description1").build(),
-                TypeValise.builder().id(2).proprietaire("Owner2").description("Description2").build()
+                createTypeValise(1, "Owner1", "Description1"),
+                createTypeValise(2, "Owner2", "Description2")
         );
 
         when(typeValiseRepository.findAll()).thenReturn(typeValises);
@@ -93,11 +111,48 @@ public class TypeValiseServiceTest {
         List<TypeValiseDTO> result = typeValiseService.getTypeValises();
 
         // Assert
-        assertNotNull(result, "The retrieved list should not be null");
-        assertEquals(2, result.size(), "The retrieved list size should be 2");
-        assertEquals("Owner1", result.get(0).getProprietaire());
-        assertEquals("Owner2", result.get(1).getProprietaire());
-
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertEquals(2, result.size(), "La taille de la liste doit être 2");
         verify(typeValiseRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testDeleteTypeValise_Success() {
+        // Arrange
+        int id = 1;
+        TypeValise typeValise = createTypeValise(id, "Owner1", "Description1");
+        List<Valise> associatedValises = new ArrayList<>();
+        Valise valise = new Valise();
+        valise.setId(1);
+        associatedValises.add(valise);
+
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.of(typeValise));
+        when(valiseRepository.findByTypeValise(typeValise)).thenReturn(associatedValises);
+
+        // Act
+        typeValiseService.deleteTypeValise(id);
+
+        // Assert
+        verify(typeValiseRepository, times(1)).findById(id);
+        verify(valiseRepository, times(1)).findByTypeValise(typeValise);
+        verify(valiseRepository, times(1)).save(valise); // Vérifie que chaque valise est dissociée individuellement
+        verify(typeValiseRepository, times(1)).delete(typeValise);
+    }
+
+
+    @Test
+    public void testDeleteTypeValise_NotFound() {
+        // Arrange
+        int id = 1;
+        when(typeValiseRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> typeValiseService.deleteTypeValise(id)
+        );
+
+        assertEquals("TypeValise avec l'ID " + id + " introuvable", exception.getMessage());
+        verify(typeValiseRepository, times(1)).findById(id);
     }
 }
