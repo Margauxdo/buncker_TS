@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BunckerTsApplication {
 
 
-	public static void main(String[]) {
+	public static void main(String[] args) {
 		SpringApplication.run(BunckerTsApplication.class, args);
 	}
 }
