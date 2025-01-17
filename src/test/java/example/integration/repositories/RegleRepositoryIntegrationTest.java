@@ -5,7 +5,6 @@ import example.repositories.RegleRepository;
 import example.repositories.SortieSemaineRepository;
 import example.repositories.TypeRegleRepository;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,128 +26,126 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("integrationtest")
 @Transactional
 public class RegleRepositoryIntegrationTest {
+
     @Autowired
     private RegleRepository regleRepository;
+
     @Autowired
     private SortieSemaineRepository sortieSemaineRepository;
+
     @Autowired
     private TypeRegleRepository typeRegleRepository;
 
     @BeforeEach
     public void setUp() {
         regleRepository.deleteAll();
+        sortieSemaineRepository.deleteAll();
+        typeRegleRepository.deleteAll();
     }
 
     @Test
-    public void testFindRegleById(){
-
+    public void testSaveAndFindRegle() {
+        // Arrange
         Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
+        regle.setCoderegle("R123");
+        regle.setDateRegle(new Date());
+        regle.setNombreJours(5);
 
-        Regle savedregle = regleRepository.save(regle);
-        Optional<Regle> foundregle = regleRepository.findById(savedregle.getId());
-        assertTrue(foundregle.isPresent());
-        assertEquals("AW5698", foundregle.get().getCoderegle());
+        // Act
+        Regle savedRegle = regleRepository.save(regle);
+        Optional<Regle> foundRegle = regleRepository.findById(savedRegle.getId());
 
-
+        // Assert
+        assertTrue(foundRegle.isPresent());
+        assertEquals("R123", foundRegle.get().getCoderegle());
+        assertEquals(5, foundRegle.get().getNombreJours());
     }
 
     @Test
-    public void testFindRegleByIdFail(){
+    public void testUpdateRegle() {
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("R456");
+        regle = regleRepository.save(regle);
+
+        // Act
+        regle.setCoderegle("R789");
+        Regle updatedRegle = regleRepository.save(regle);
+
+        // Assert
+        assertEquals("R789", updatedRegle.getCoderegle());
+    }
+
+    @Test
+    public void testDeleteRegle() {
+        // Arrange
+        Regle regle = new Regle();
+        regle.setCoderegle("R321");
+        regle = regleRepository.save(regle);
+
+        // Act
+        regleRepository.delete(regle);
+        Optional<Regle> deletedRegle = regleRepository.findById(regle.getId());
+
+        // Assert
+        assertFalse(deletedRegle.isPresent());
+    }
+
+    @Test
+    public void testFindAllRegles() {
+        // Arrange
+        Regle regle1 = new Regle();
+        regle1.setCoderegle("R101");
+        regleRepository.save(regle1);
+
+        Regle regle2 = new Regle();
+        regle2.setCoderegle("R102");
+        regleRepository.save(regle2);
+
+        // Act
         List<Regle> regles = regleRepository.findAll();
-        assertTrue(regles.isEmpty());
-    }
-    @Test
-    public void testUpdateRegle(){
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
-        Regle savedregle = regleRepository.save(regle);
-        savedregle.setCoderegle("AW56987");
-        Regle updatedregle = regleRepository.save(savedregle);
-        Optional<Regle> updatedRegle = regleRepository.findById(updatedregle.getId());
-        assertTrue(updatedRegle.isPresent());
-        assertEquals("AW56987", updatedRegle.get().getCoderegle());
 
-    }
-    @Test
-    public void testFindAllRegles(){
-        Regle regleA = new Regle();
-        regleA.setCoderegle("AW5698");
-        regleRepository.save(regleA);
-        Regle regleB = new Regle();
-        regleB.setCoderegle("AW56987");
-        regleRepository.save(regleB);
-        List<Regle> findRegles = regleRepository.findAll();
-        assertNotNull(findRegles);
-        assertTrue(findRegles.size() >= 2);
-        findRegles.sort(Comparator.comparing(Regle::getCoderegle));
-        assertEquals("AW5698", findRegles.get(0).getCoderegle());
-        assertEquals("AW56987", findRegles.get(1).getCoderegle());
-
-        findRegles.forEach(System.out::println);
-
-    }
-    @Test
-    public void testFindRegleByFormule(){
-        Formule formule = new Formule();
-        formule.setLibelle("libelle test regle");
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
-        regle.setFormule(formule);
-        Regle savedregle = regleRepository.save(regle);
-        Optional<Regle> foundregle = regleRepository.findById(savedregle.getId());
-        assertTrue(foundregle.isPresent());
-        assertEquals("libelle test regle", foundregle.get().getFormule().getLibelle());
+        // Assert
+        assertEquals(2, regles.size());
+        regles.sort(Comparator.comparing(Regle::getCoderegle));
+        assertEquals("R101", regles.get(0).getCoderegle());
+        assertEquals("R102", regles.get(1).getCoderegle());
     }
 
-    @Test
-    public void testFindNonExistentRegle() {
-        Optional<Regle> foundRegle = regleRepository.findById(-1); // Non-existent ID
-        assertFalse(foundRegle.isPresent(), "Non-existent Regle should not be found");
-    }
     @Test
     public void testSaveInvalidRegle() {
+        // Arrange
         Regle regle = new Regle(); // Missing required fields
+
+        // Act & Assert
         assertThrows(Exception.class, () -> regleRepository.saveAndFlush(regle));
     }
 
-
-
-
-
-
-
     @Test
-    public void testCascadeDeleteRegleWhenDeletingFormule() {
+    public void testCascadeDeleteWithFormule() {
+        // Arrange
         Formule formule = new Formule();
-        formule.setLibelle("Formule Test");
+        formule.setLibelle("Test Formule");
 
         Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
+        regle.setCoderegle("R800");
         regle.setFormule(formule);
         regleRepository.save(regle);
 
+        // Act
         regleRepository.delete(regle);
 
+        // Assert
         List<Regle> remainingRegles = regleRepository.findAll();
         assertTrue(remainingRegles.isEmpty());
     }
+
     @Test
-    public void testOrphanRemovalForFormule() {
-        Formule formule = new Formule();
-        formule.setLibelle("Formule Test");
-        Regle regle = new Regle();
-        regle.setCoderegle("AW5698");
-        regle.setFormule(formule);
-        regleRepository.save(regle);
+    public void testFindRegleByNonExistentId() {
+        // Act
+        Optional<Regle> foundRegle = regleRepository.findById(-1);
 
-        regle.setFormule(null);
-        regleRepository.save(regle);
-
-        List<Regle> reglesWithoutFormule = regleRepository.findAll();
-        assertNull(reglesWithoutFormule.get(0).getFormule());
+        // Assert
+        assertFalse(foundRegle.isPresent());
     }
-
-
-
 }

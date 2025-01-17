@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,13 +52,102 @@ public class ProblemeRepositoryIntegrationTest {
 
         valise = Valise.builder()
                 .description("Test Valise")
-                .numeroValise(String.valueOf(123456L))
+                .numeroValise("VAL123")
                 .client(client)
                 .build();
         valise = valiseRepository.save(valise);
     }
 
+    @Test
+    public void testSaveProbleme() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Test Description")
+                .detailsProbleme("Test Details")
+                .valise(valise)
+                .build();
+
+        Probleme savedProbleme = problemeRepository.save(probleme);
+
+        assertNotNull(savedProbleme.getId());
+        assertEquals("Test Description", savedProbleme.getDescriptionProbleme());
+        assertEquals("Test Details", savedProbleme.getDetailsProbleme());
+        assertEquals(valise.getId(), savedProbleme.getValise().getId());
+    }
+
+    @Test
+    public void testFindByValise() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Test Description")
+                .detailsProbleme("Test Details")
+                .valise(valise)
+                .build();
+
+        problemeRepository.save(probleme);
+
+        List<Probleme> problemes = problemeRepository.findByValise(valise);
+        assertFalse(problemes.isEmpty());
+        assertEquals(1, problemes.size());
+        assertEquals("Test Description", problemes.get(0).getDescriptionProbleme());
+    }
+
+    @Test
+    public void testExistsByDescriptionProblemeAndDetailsProbleme() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Unique Description")
+                .detailsProbleme("Unique Details")
+                .valise(valise)
+                .build();
+
+        problemeRepository.save(probleme);
+
+        boolean exists = problemeRepository.existsByDescriptionProblemeAndDetailsProbleme("Unique Description", "Unique Details");
+        assertTrue(exists);
+    }
+
+    @Test
+    public void testDeleteAllByValise() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Test Description")
+                .detailsProbleme("Test Details")
+                .valise(valise)
+                .build();
+
+        problemeRepository.save(probleme);
+        problemeRepository.deleteAllByValise(valise);
+
+        List<Probleme> problemes = problemeRepository.findByValise(valise);
+        assertTrue(problemes.isEmpty());
+    }
 
 
 
+    @Test
+    public void testDissociateValise() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Test Description")
+                .detailsProbleme("Test Details")
+                .valise(valise)
+                .build();
+
+        problemeRepository.save(probleme);
+        problemeRepository.dissociateValise(valise.getId());
+
+        List<Probleme> problemes = problemeRepository.findByValise(valise);
+        assertTrue(problemes.isEmpty());
+    }
+
+    @Test
+    public void testDeleteByValiseId() {
+        Probleme probleme = Probleme.builder()
+                .descriptionProbleme("Test Description")
+                .detailsProbleme("Test Details")
+                .valise(valise)
+                .build();
+
+        problemeRepository.save(probleme);
+        problemeRepository.deleteByValiseId(valise.getId());
+
+        List<Probleme> problemes = problemeRepository.findByValise(valise);
+        assertTrue(problemes.isEmpty());
+    }
 }

@@ -1,11 +1,7 @@
 package example.integration.repositories;
 
-import example.entity.Client;
 import example.entity.TypeValise;
-import example.entity.Valise;
-import example.repositories.ClientRepository;
 import example.repositories.TypeValiseRepository;
-import example.repositories.ValiseRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -30,118 +25,103 @@ public class TypeValiseRepositoryIntegrationTest {
 
     @Autowired
     private TypeValiseRepository typeValiseRepository;
-    @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
-    private ValiseRepository valiseRepository;
 
     @BeforeEach
     public void setUp() {
         typeValiseRepository.deleteAll();
     }
 
+    @Test
+    public void testSaveTypeValise() {
+        TypeValise typeValise = new TypeValise();
+        typeValise.setProprietaire("Arthur Menart");
+        typeValise.setDescription("Description de la valise");
 
+        TypeValise savedTypeValise = typeValiseRepository.save(typeValise);
+
+        assertNotNull(savedTypeValise.getId(), "L'ID ne doit pas être null après l'enregistrement.");
+        assertEquals("Arthur Menart", savedTypeValise.getProprietaire(), "Le propriétaire doit correspondre.");
+        assertEquals("Description de la valise", savedTypeValise.getDescription(), "La description doit correspondre.");
+    }
+
+    @Test
     public void testFindTypeValiseById() {
         TypeValise typeValise = new TypeValise();
         typeValise.setProprietaire("Arthur Menart");
         typeValise.setDescription("Description de la valise");
-        TypeValise savedTV = typeValiseRepository.save(typeValise);
-        Optional<TypeValise> foundTV = typeValiseRepository.findById(savedTV.getId());
-        assertTrue(foundTV.isPresent());
-        assertEquals("Arthur Menart", foundTV.get().getProprietaire());
-    }
-    @Test
-    public void testDeleteTypeValise() {
-        TypeValise typeValise = new TypeValise();
-        typeValise.setProprietaire("Arthur Menart");
-        typeValise.setDescription("Description de la valise");
-        typeValiseRepository.save(typeValise);
-        typeValiseRepository.deleteById(typeValise.getId());
-        Optional<TypeValise> foundTV = typeValiseRepository.findById(typeValise.getId());
-        assertFalse(foundTV.isPresent());
-    }
-    @Test
-    public void testFindByIdNotFound() {
 
-        Optional<TypeValise> typeValise = typeValiseRepository.findById(9999);
-        assertFalse(typeValise.isPresent(), "No Suitcase Type should be found for this non-existent ID");
+        TypeValise savedTypeValise = typeValiseRepository.save(typeValise);
+
+        Optional<TypeValise> foundTypeValise = typeValiseRepository.findById(savedTypeValise.getId());
+
+        assertTrue(foundTypeValise.isPresent(), "Le type de valise devrait être trouvé par ID.");
+        assertEquals("Arthur Menart", foundTypeValise.get().getProprietaire(), "Le propriétaire doit correspondre.");
     }
 
     @Test
     public void testUpdateTypeValise() {
         TypeValise typeValise = new TypeValise();
         typeValise.setProprietaire("Arthur Menart");
+        typeValise.setDescription("Description initiale");
+
+        TypeValise savedTypeValise = typeValiseRepository.save(typeValise);
+
+        savedTypeValise.setProprietaire("Jean Dupont");
+        savedTypeValise.setDescription("Description mise à jour");
+
+        TypeValise updatedTypeValise = typeValiseRepository.save(savedTypeValise);
+
+        assertEquals("Jean Dupont", updatedTypeValise.getProprietaire(), "Le propriétaire doit être mis à jour.");
+        assertEquals("Description mise à jour", updatedTypeValise.getDescription(), "La description doit être mise à jour.");
+    }
+
+    @Test
+    public void testDeleteTypeValise() {
+        TypeValise typeValise = new TypeValise();
+        typeValise.setProprietaire("Arthur Menart");
         typeValise.setDescription("Description de la valise");
-        TypeValise savedTV = typeValiseRepository.save(typeValise);
 
-        savedTV.setProprietaire("Jean Corotte");
-        savedTV.setDescription("Description de la valise spécifié au client");
-        TypeValise updatedTV = typeValiseRepository.save(savedTV);
+        TypeValise savedTypeValise = typeValiseRepository.save(typeValise);
 
-        Optional<TypeValise> foundTV = typeValiseRepository.findById(updatedTV.getId());
-        assertTrue(foundTV.isPresent());
-        assertEquals("Jean Corotte", foundTV.get().getProprietaire());
-        assertEquals("Description de la valise spécifié au client", foundTV.get().getDescription());
+        typeValiseRepository.delete(savedTypeValise);
+
+        Optional<TypeValise> deletedTypeValise = typeValiseRepository.findById(savedTypeValise.getId());
+        assertFalse(deletedTypeValise.isPresent(), "Le type de valise devrait être supprimé.");
     }
 
     @Test
-    public void testFindAllTypeValise() {
+    public void testFindAllTypeValises() {
         TypeValise typeValiseA = new TypeValise();
         typeValiseA.setProprietaire("Arthur Menart");
-        typeValiseA.setDescription("Description de la valise");
+        typeValiseA.setDescription("Description A");
         typeValiseRepository.save(typeValiseA);
+
         TypeValise typeValiseB = new TypeValise();
-        typeValiseB.setProprietaire("Jean Corotte");
-        typeValiseB.setDescription("Description de la valise");
+        typeValiseB.setProprietaire("Jean Dupont");
+        typeValiseB.setDescription("Description B");
         typeValiseRepository.save(typeValiseB);
+
         List<TypeValise> typeValises = typeValiseRepository.findAll();
-        assertNotNull(typeValises);
-        assertTrue(typeValises.size() >= 2);
+
+        assertEquals(2, typeValises.size(), "Le nombre de types de valises doit être 2.");
         typeValises.sort(Comparator.comparing(TypeValise::getProprietaire));
-        assertEquals("Arthur Menart", typeValises.get(0).getProprietaire());
-        assertEquals("Jean Corotte", typeValises.get(1).getProprietaire());
-        assertEquals("Description de la valise", typeValises.get(1).getDescription());
-
-
+        assertEquals("Arthur Menart", typeValises.get(0).getProprietaire(), "Le premier propriétaire doit être Arthur Menart.");
+        assertEquals("Jean Dupont", typeValises.get(1).getProprietaire(), "Le deuxième propriétaire doit être Jean Dupont.");
     }
-    @Test
-    public void testFindByProprietaire(){
-        TypeValise typeValiseA = new TypeValise();
-        typeValiseA.setProprietaire("Arthur Menart");
-        typeValiseA.setDescription("Description de la valise");
-        typeValiseRepository.save(typeValiseA);
-        TypeValise typeValiseB = new TypeValise();
-        typeValiseB.setProprietaire("Jean Corotte");
-        typeValiseB.setDescription("Description de la valise");
-        typeValiseRepository.save(typeValiseB);
-        List<TypeValise> typeValises = typeValiseRepository.findAll();
-        assertNotNull(typeValises);
-        assertEquals(2, typeValises.size());
-        assertEquals("Arthur Menart", typeValises.get(0).getProprietaire());
-        assertEquals("Jean Corotte", typeValises.get(1).getProprietaire());
-
-    }
-
 
     @Test
     public void testUniqueConstraintViolation() {
         TypeValise typeValiseA = new TypeValise();
         typeValiseA.setProprietaire("Arthur Menart");
-        typeValiseA.setDescription("Description de la valise");
+        typeValiseA.setDescription("Description unique");
         typeValiseRepository.save(typeValiseA);
 
         TypeValise typeValiseB = new TypeValise();
         typeValiseB.setProprietaire("Arthur Menart");
-        typeValiseB.setDescription("Description de la valise");
+        typeValiseB.setDescription("Description unique");
 
         assertThrows(Exception.class, () -> {
             typeValiseRepository.save(typeValiseB);
-        }, "An exception should be thrown due to the uniqueness constraint");
+        }, "Une exception devrait être levée en raison de la contrainte d'unicité.");
     }
-
-
-
-
-
-
 }

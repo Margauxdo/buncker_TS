@@ -1,9 +1,9 @@
 package example.integration.repositories;
 
-import example.entity.TypeRegle;
 import example.entity.Regle;
-import example.repositories.TypeRegleRepository;
+import example.entity.TypeRegle;
 import example.repositories.RegleRepository;
+import example.repositories.TypeRegleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,6 @@ public class TypeRegleRepositoryIntegrationTest {
 
     @Test
     public void testSaveTypeRegle() {
-        Regle regle = new Regle();
-        regle.setCoderegle("Code Regle A");
-        regleRepository.save(regle);
-
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type A")
                 .build();
@@ -49,13 +45,8 @@ public class TypeRegleRepositoryIntegrationTest {
         assertThat(savedTypeRegle.getNomTypeRegle()).isEqualTo("Type A");
     }
 
-
     @Test
     public void testFindTypeRegleById() {
-        Regle regle = new Regle();
-        regle.setCoderegle("Code Regle B");
-        regleRepository.save(regle);
-
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type B")
                 .build();
@@ -68,13 +59,8 @@ public class TypeRegleRepositoryIntegrationTest {
         assertThat(foundTypeRegle.get().getNomTypeRegle()).isEqualTo("Type B");
     }
 
-
     @Test
     public void testFindByNomTypeRegle() {
-        Regle regle = new Regle();
-        regle.setCoderegle("Code Regle C");
-        regleRepository.save(regle);
-
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type C")
                 .build();
@@ -83,32 +69,30 @@ public class TypeRegleRepositoryIntegrationTest {
 
         List<TypeRegle> foundTypeRegles = typeRegleRepository.findByNomTypeRegle("Type C");
 
-        // Vérifications
         assertThat(foundTypeRegles).hasSize(1);
         assertThat(foundTypeRegles.get(0).getNomTypeRegle()).isEqualTo("Type C");
     }
 
-
     @Test
-    public void testFindByRegleId() {
-        Regle regle = new Regle();
-        regle.setCoderegle("Regle D");
-        regleRepository.save(regle);
-
-        TypeRegle typeRegle = TypeRegle.builder()
+    public void testFindByNomTypeRegleContaining() {
+        TypeRegle typeRegle1 = TypeRegle.builder()
                 .nomTypeRegle("Type D")
                 .build();
 
-        typeRegleRepository.save(typeRegle);
+        TypeRegle typeRegle2 = TypeRegle.builder()
+                .nomTypeRegle("Type DE")
+                .build();
 
+        typeRegleRepository.save(typeRegle1);
+        typeRegleRepository.save(typeRegle2);
+
+        List<TypeRegle> foundTypeRegles = typeRegleRepository.findByNomTypeRegleContaining("Type D");
+
+        assertThat(foundTypeRegles).hasSize(2);
     }
 
     @Test
     public void testDeleteTypeRegle() {
-        Regle regle = new Regle();
-        regle.setCoderegle("Regle E");
-        regleRepository.save(regle);
-
         TypeRegle typeRegle = TypeRegle.builder()
                 .nomTypeRegle("Type E")
                 .build();

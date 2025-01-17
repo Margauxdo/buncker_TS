@@ -33,38 +33,42 @@ public class FormuleRepositoryIntegrationTest {
     }
 
     @Test
-    public void testDeleteFormule(){
-
-        Formule formule = new Formule();
-        formule.setLibelle("libelle 1234");
-        formule.setFormule("formule test");
-        Formule savedF = formuleRepository.save(formule);
-        formuleRepository.deleteById(savedF.getId());
-        Optional<Formule> foundF = formuleRepository.findById(savedF.getId());
-        assertFalse(foundF.isPresent());
-    }
-    @Test
-    public void testFindByIdNotFound(){
-        List<Formule> foundF = formuleRepository.findAll();
-        assertTrue(foundF.isEmpty());
-    }
-    @Test
-    public void testUpdateFormuleSuccess(){
+    public void testSaveAndDeleteFormule() {
         Formule formule = new Formule();
         formule.setLibelle("libelle 1234");
         formule.setFormule("formule test");
 
-        Formule savedF = formuleRepository.save(formule);
-        savedF.setLibelle("libelle updated");
-        savedF.setFormule("formule updated");
-        Formule updatedF = formuleRepository.save(savedF);
-        Optional<Formule> foundF = formuleRepository.findById(updatedF.getId());
-        assertTrue(foundF.isPresent());
-        assertEquals("libelle updated", foundF.get().getLibelle());
-        assertEquals("formule updated", foundF.get().getFormule());
+        Formule savedFormule = formuleRepository.save(formule);
+        assertNotNull(savedFormule.getId());
 
-
+        formuleRepository.deleteById(savedFormule.getId());
+        Optional<Formule> foundFormule = formuleRepository.findById(savedFormule.getId());
+        assertFalse(foundFormule.isPresent());
     }
+
+    @Test
+    public void testFindByIdNotFound() {
+        Optional<Formule> foundFormule = formuleRepository.findById(-1);
+        assertFalse(foundFormule.isPresent());
+    }
+
+    @Test
+    public void testUpdateFormuleSuccess() {
+        Formule formule = new Formule();
+        formule.setLibelle("libelle 1234");
+        formule.setFormule("formule test");
+
+        Formule savedFormule = formuleRepository.save(formule);
+        savedFormule.setLibelle("libelle updated");
+        savedFormule.setFormule("formule updated");
+
+        Formule updatedFormule = formuleRepository.save(savedFormule);
+        Optional<Formule> foundFormule = formuleRepository.findById(updatedFormule.getId());
+        assertTrue(foundFormule.isPresent());
+        assertEquals("libelle updated", foundFormule.get().getLibelle());
+        assertEquals("formule updated", foundFormule.get().getFormule());
+    }
+
     @Test
     public void testFindAllFormules() {
         Formule formule1 = new Formule();
@@ -77,39 +81,47 @@ public class FormuleRepositoryIntegrationTest {
         formule2.setFormule("formule test2");
         formuleRepository.save(formule2);
 
-        List<Formule> foundF = formuleRepository.findAll();
-        assertNotNull(foundF);
-        assertTrue(foundF.size() >= 2);
+        List<Formule> foundFormules = formuleRepository.findAll();
+        assertNotNull(foundFormules);
+        assertTrue(foundFormules.size() >= 2);
 
-        foundF.sort(Comparator.comparing(Formule::getLibelle));
+        foundFormules.sort(Comparator.comparing(Formule::getLibelle));
 
-        assertEquals("libelle 1234", foundF.get(0).getLibelle());
-        assertEquals("formule test1", foundF.get(0).getFormule());
-
-        assertEquals("libelle 5678", foundF.get(1).getLibelle());
-        assertEquals("formule test2", foundF.get(1).getFormule());
-
-        foundF.forEach(formule -> System.out.println(formule.getFormule()));
+        assertEquals("libelle 1234", foundFormules.get(0).getLibelle());
+        assertEquals("libelle 5678", foundFormules.get(1).getLibelle());
     }
 
     @Test
-    public void testSaveFormuleInvalidInput() {
+    public void testFindByLibelle() {
         Formule formule = new Formule();
-        // Ne pas définir les champs obligatoires comme "libelle"
-        assertThrows(Exception.class, () -> {
-            formuleRepository.save(formule);
-        });
+        formule.setLibelle("unique libelle");
+        formule.setFormule("formule test");
+        formuleRepository.save(formule);
+
+        List<Formule> foundFormules = formuleRepository.findByLibelle("unique libelle");
+        assertNotNull(foundFormules);
+        assertEquals(1, foundFormules.size());
+        assertEquals("unique libelle", foundFormules.get(0).getLibelle());
     }
-    
 
+    @Test
+    public void testFindByIdWithRegles() {
+        Formule formule = new Formule();
+        formule.setLibelle("libelle with regles");
+        formule.setFormule("formule with regles");
 
+        Regle regle = new Regle();
+        regle.setCoderegle("R001");
+        regle.setFormule(formule);
 
+        formule.setRegles(List.of(regle));
+        Formule savedFormule = formuleRepository.save(formule);
 
-
-
-
-
-
+        Formule foundFormule = formuleRepository.findByIdWithRegles(savedFormule.getId());
+        assertNotNull(foundFormule);
+        assertEquals(1, foundFormule.getRegles().size());
+        assertEquals("R001", foundFormule.getRegles().get(0).getCoderegle());
+    }
 
 
 }

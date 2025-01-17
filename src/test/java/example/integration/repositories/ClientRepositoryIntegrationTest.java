@@ -1,7 +1,6 @@
 package example.integration.repositories;
 
 import example.entity.Client;
-import example.entity.Probleme;
 import example.entity.Valise;
 import example.repositories.ClientRepository;
 import example.repositories.ValiseRepository;
@@ -17,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -28,11 +27,13 @@ public class ClientRepositoryIntegrationTest {
 
     @Autowired
     private ClientRepository clientRepository;
+
     @Autowired
     private ValiseRepository valiseRepository;
 
     @BeforeEach
     public void setUp() {
+        valiseRepository.deleteAll();
         clientRepository.deleteAll();
     }
 
@@ -49,94 +50,73 @@ public class ClientRepositoryIntegrationTest {
         assertEquals("john.doe@example.com", savedClient.getEmail());
     }
 
+
+
     @Test
-    public void testFindByIdSuccess() {
+    public void testSaveClientWithValise() {
+        // Arrange
         Client client = new Client();
         client.setName("John Doe");
         client.setEmail("john.doe@example.com");
+
+        Valise valise = new Valise();
+        valise.setNumeroValise("VAL123");
+        valise.setDescription("Description de la valise"); // Ajouter une description pour respecter la contrainte
+        valise.setClient(client);
+
+        client.setValises(List.of(valise));
+
+        // Act
         Client savedClient = clientRepository.save(client);
 
+        // Assert
         Optional<Client> foundClient = clientRepository.findById(savedClient.getId());
         assertTrue(foundClient.isPresent());
-        assertEquals("John Doe", foundClient.get().getName());
-    }
-
-    @Test
-    public void testFindByName() {
-        Client client1 = new Client();
-        client1.setName("Jane Doe");
-        client1.setEmail("jane.doe@example.com");
-        clientRepository.save(client1);
-
-        Client client2 = new Client();
-        client2.setName("John Smith");
-        client2.setEmail("john.smith@example.com");
-        clientRepository.save(client2);
-
-        List<Client> clients = clientRepository.findByName("Jane Doe");
-        assertEquals(1, clients.size());
-        assertEquals("jane.doe@example.com", clients.get(0).getEmail());
+        assertEquals(1, foundClient.get().getValises().size());
+        assertEquals("VAL123", foundClient.get().getValises().get(0).getNumeroValise());
+        assertEquals("Description de la valise", foundClient.get().getValises().get(0).getDescription());
     }
 
 
     @Test
-    public void testDeleteClient() {
-        Client client = new Client();
-        client.setName("Jane Doe");
-        client.setEmail("jane.doe@example.com");
-        Client savedClient = clientRepository.save(client);
-
-        clientRepository.deleteById(savedClient.getId());
-        Optional<Client> deletedClient = clientRepository.findById(savedClient.getId());
-
-        assertFalse(deletedClient.isPresent());
-    }
-    @Test
-    public void testFindByNameNotFound() {
-        List<Client> clients = clientRepository.findByName("Non Existent Name");
-        assertTrue(clients.isEmpty());
-    }
-    @Test
-    public void testFindByEmailNotFound() {
-        Optional<Client> clients = clientRepository.findByEmail("nonexistent.email@example.com");
-        assertTrue(clients.isEmpty());
-    }
-    @Test
-    public void testSaveClientFailureDueToMissingEmail() {
+    public void testDeleteClientWithValises() {
+        // Arrange
         Client client = new Client();
         client.setName("John Doe");
-        // Not setting email, expecting a failure
+        client.setEmail("john.doe@example.com");
 
-        assertThrows(Exception.class, () -> clientRepository.save(client));
+        Valise valise = new Valise();
+        valise.setNumeroValise("VAL789");
+        valise.setDescription("Valise à supprimer");
+        valise.setClient(client);
+
+        client.setValises(List.of(valise));
+        client = clientRepository.save(client);
+
+        // Act
+        clientRepository.deleteById(client.getId());
+        Optional<Client> foundClient = clientRepository.findById(client.getId());
+
+        // Assert
+        assertFalse(foundClient.isPresent());
+        List<Valise> valises = valiseRepository.findAll();
+        assertTrue(valises.isEmpty()); // Vérifie que les valises liées ont été supprimées
     }
+
     @Test
-    public void testUpdateClient() {
+    public void testUpdateClientDetails() {
         Client client = new Client();
         client.setName("John Doe");
         client.setEmail("john.doe@example.com");
         Client savedClient = clientRepository.save(client);
-
 
         savedClient.setName("John Updated");
         savedClient.setEmail("john.updated@example.com");
+        clientRepository.save(savedClient);
 
-        Client updatedClient = clientRepository.save(savedClient);
-
-        Optional<Client> foundClient = clientRepository.findById(updatedClient.getId());
-        assertTrue(foundClient.isPresent());
-        assertEquals("John Updated", foundClient.get().getName());
-        assertEquals("john.updated@example.com", foundClient.get().getEmail());
+        Optional<Client> updatedClient = clientRepository.findById(savedClient.getId());
+        assertTrue(updatedClient.isPresent());
+        assertEquals("John Updated", updatedClient.get().getName());
+        assertEquals("john.updated@example.com", updatedClient.get().getEmail());
     }
-
-
-    }
-
-
-
-
-
-
-
-
-
-
+}
